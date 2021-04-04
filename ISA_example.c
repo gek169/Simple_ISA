@@ -41,10 +41,10 @@ typedef struct{
 uint8_t main_memory[(1<<16)-1];
 
 //Basic bus functions so you can actually run the ISA definition.
-inline uint8_t read(m_regfile* reg, uint16_t addr){return reg->memory[addr];}
-inline void write(m_regfile* reg, uint8_t val, uint16_t addr){reg->memory[addr] = val;}
+static inline uint8_t read(m_regfile* reg, uint16_t addr){return reg->memory[addr];}
+static inline void write(m_regfile* reg, uint8_t val, uint16_t addr){reg->memory[addr] = val;}
 
-inline void exec(	m_regfile* reg) {
+static inline void exec(	m_regfile* reg) {
 		#define GETB() read(reg, reg->pc++)
 		#define GET2B() tmp = ((((uint16_t)read(reg, reg->pc))<<8) + read(reg, reg->pc+1)); reg->pc += 2;
 		#define DISPATCH(){\
