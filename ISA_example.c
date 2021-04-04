@@ -36,18 +36,17 @@ typedef struct{
 	uint16_t c; //jmp point
 	uint16_t pc; //program counter
 	uint8_t error; //Error flag set if division by zero occurs.
+	uint8_t *memory;//Memory addressed by system
 } m_regfile;
-uint8_t memory[(1<<16)-1];//The maximum amount addressable by 16 bits.
+uint8_t main_memory[(1<<16)-1];
 
 //Basic bus functions so you can actually run the ISA definition.
-inline uint8_t bus_read(uint16_t addr){return memory[addr];}
-inline void bus_write(uint8_t val, uint16_t addr){memory[addr] = val;}
+inline uint8_t read(m_regfile* reg, uint16_t addr){return reg->memory[addr];}
+inline void write(m_regfile* reg, uint8_t val, uint16_t addr){reg->memory[addr] = val;}
 
-inline void exec(	m_regfile* reg, 
-					uint8_t (*read)(uint16_t addr),
-					void (*write)(uint8_t val, uint16_t addr)) {
-		#define GETB() read(reg->pc++)
-		#define GET2B() tmp = ((((uint16_t)read(reg->pc))<<8) + read(reg->pc+1)); reg->pc += 2;
+inline void exec(	m_regfile* reg) {
+		#define GETB() read(reg, reg->pc++)
+		#define GET2B() tmp = ((((uint16_t)read(reg, reg->pc))<<8) + read(reg, reg->pc+1)); reg->pc += 2;
 		#define DISPATCH(){\
 			switch(GETB()&15){\
 				case 0: goto halt;\
@@ -73,13 +72,13 @@ inline void exec(	m_regfile* reg,
 		uint16_t tmp;
 		DISPATCH()
 		halt: return;
-		lda: GET2B();reg->a = read(tmp);													DISPATCH()
+		lda: GET2B();reg->a = read(reg, tmp);												DISPATCH()
 		sa: reg->a = GETB();																DISPATCH()
-		ldb: GET2B();reg->b = read(tmp);													DISPATCH()
+		ldb: GET2B();reg->b = read(reg, tmp);												DISPATCH()
 		sb: reg->b = GETB();																DISPATCH()
 		sc: GET2B();reg->c = tmp;															DISPATCH()
-		sta: GET2B();write(reg->a, tmp);													DISPATCH()
-		stb: GET2B();write(reg->b, tmp);													DISPATCH()
+		sta: GET2B();write(reg, reg->a, tmp);												DISPATCH()
+		stb: GET2B();write(reg, reg->b, tmp);												DISPATCH()
 		add: reg->a = reg->a + reg->b;														DISPATCH()
 		sub: reg->a = reg->a - reg->b;														DISPATCH()
 		mul: reg->a = reg->a * reg->b;														DISPATCH()
@@ -95,7 +94,7 @@ int main(int argc, char** argv){
 	(void)argv;
 	srand(time(NULL));
 	for(size_t i = 0; i < 65535; i++)
-		{memory[i] = 0;}
+		{main_memory[i] = 0;}
 /*Simple program which adds 1 to location 488 until it is equal to argc.*/
 	/*
 		This program does this:
@@ -104,7 +103,7 @@ int main(int argc, char** argv){
 		}while([488] < 99)
 	*/
 	size_t i = 0;
-#define INS() memory[i++]
+#define INS() main_memory[i++]
 	//Load the value at 488 into a.
 	INS() = 1;
 	INS() = 488>>8;
@@ -141,8 +140,9 @@ int main(int argc, char** argv){
 	m_regfile reggie;
 	reggie.c = 0;
 	reggie.pc = 0;
-	exec(&reggie, bus_read, bus_write);
+	reggie.memory = main_memory;
+	exec(&reggie);
 	for(size_t i = 0; i < 65535; i++)
-        if(memory[i] != 0)
-		{printf("Memory %zu is now %u\n", i, memory[i]);}
+        if(main_memory[i] != 0)
+		{printf("Memory %zu is now %u\n", i, main_memory[i]);}
 }
