@@ -36,9 +36,9 @@ typedef struct{
 	uint16_t c; //jmp point
 	uint16_t pc; //program counter
 	uint8_t error; //Error flag set if division by zero occurs.
-	uint8_t *memory;//Memory addressed by system
+	uint8_t memory[(1<<16)-1];//Memory addressed by system
 } m_regfile;
-uint8_t main_memory[(1<<16)-1];
+
 
 //Basic bus functions so you can actually run the ISA definition.
 constexpr static inline uint8_t read(m_regfile* reg, uint16_t addr){return reg->memory[addr];}
@@ -48,7 +48,7 @@ constexpr static inline void exec(	m_regfile* reg) {
 		#define GET2B() tmp = ((((uint16_t)read(reg, reg->pc))<<8) + (uint16_t)read(reg, reg->pc+1)); reg->pc += 2;
 		#define DISPATCH(){\
 			switch(GETB()&15){\
-				case 0: return;\
+				case 0: isdone = true; break;\
 				case 1: GET2B();reg->a = read(reg, tmp);break;\
 				case 2: reg->a = GETB();break;\
 				case 3: GET2B();reg->b = read(reg, tmp);break;\
@@ -67,15 +67,17 @@ constexpr static inline void exec(	m_regfile* reg) {
 			}\
 		}
 		reg->error = 0;
-		while(1){
+		bool isdone = false;
+		while(!isdone){
 			uint16_t tmp = 0;
 			DISPATCH();
 		}
 }
 
-constexpr void run_program(){
+constexpr m_regfile run_program(){
 	size_t i = 0;
-#define INS() main_memory[i++]
+	m_regfile reggie = {0,0,0,0,0,0};
+#define INS() reggie.memory[i++]
 	//Load the value at 488 into a.
 	INS() = 1;
 	INS() = 488>>8;
@@ -109,16 +111,15 @@ constexpr void run_program(){
 	INS() = 13;
 	//Jump if a is 1.
 	INS() = 14;
-	m_regfile reggie = {0,0,0,0,0,0};
-	reggie.memory = main_memory;
 	exec(&reggie);
+	return reggie;
 }
 
 
 int main(){
 	run_program();
-	
+	constexpr m_regfile result = run_program();
 	for(size_t i = 0; i < 65535; i++)
-        if(main_memory[i] != 0)
-		{printf("Memory %zu is now %u\n", i, main_memory[i]);}
+        if(result.memory[i] != 0)
+		{printf("Memory %zu is now %u\n", i, result.memory[i]);}
 }
