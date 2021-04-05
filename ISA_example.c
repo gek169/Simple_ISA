@@ -46,7 +46,9 @@ static inline void write(m_regfile* reg, uint8_t val, uint16_t addr){reg->memory
 
 static inline void exec(	m_regfile* reg) {
 		#define GETB() read(reg, reg->pc++)
-		#define GET2B() tmp = ((((uint16_t)read(reg, reg->pc))<<8) + read(reg, reg->pc+1)); reg->pc += 2;
+		#define GET2B()  (reg->pc += 2, /*The value of this expression is discarded (comma separator)*/ \
+		((((uint16_t)read(reg, reg->pc-2))<<8) + read(reg, reg->pc-1)) /*The value of this expression is returned.*/ \
+		)
 		#define DISPATCH(){\
 			switch(GETB()&15){\
 				case 0: goto halt;\
@@ -69,16 +71,15 @@ static inline void exec(	m_regfile* reg) {
 			return;/*the compiler should be able to figure out this is unreachable, but...*/\
 		}
 		reg->error = 0;
-		uint16_t tmp;
 		DISPATCH()
 		halt: return;
-		lda: GET2B();reg->a = read(reg, tmp);												DISPATCH()
+		lda: reg->a = read(reg, GET2B());												DISPATCH()
 		sa: reg->a = GETB();																DISPATCH()
-		ldb: GET2B();reg->b = read(reg, tmp);												DISPATCH()
+		ldb: ;reg->b = read(reg, GET2B());												DISPATCH()
 		sb: reg->b = GETB();																DISPATCH()
-		sc: GET2B();reg->c = tmp;															DISPATCH()
-		sta: GET2B();write(reg, reg->a, tmp);												DISPATCH()
-		stb: GET2B();write(reg, reg->b, tmp);												DISPATCH()
+		sc: reg->c = GET2B();															DISPATCH()
+		sta: write(reg, reg->a, GET2B());												DISPATCH()
+		stb: write(reg, reg->b, GET2B());												DISPATCH()
 		add: reg->a = reg->a + reg->b;														DISPATCH()
 		sub: reg->a = reg->a - reg->b;														DISPATCH()
 		mul: reg->a = reg->a * reg->b;														DISPATCH()
