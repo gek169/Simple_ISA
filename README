@@ -17,7 +17,7 @@ It it is a simple program which increments the value at memory location 488 (1e8
 
 These are the supported instructions in the C version, the C++ has slightly fewer:
 
-halt- end execution (1 byte) (0) (Causes the memory of the machine to be printed out.)
+halt- end execution (1 byte) (0)
 lda- load byte into register a (3 bytes) (1)
 sa - set register a to value (2 bytes) (2)
 ldb - load byte into register b (3 bytes) (3)
@@ -45,6 +45,9 @@ If you wanted to make this emulator ""useful"" you should add more instructions.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.
+
+The emulator will print out its memory layout at the end of execution if you pass an argument to it on the commandline.
+
 
 ~~DMHSW
 

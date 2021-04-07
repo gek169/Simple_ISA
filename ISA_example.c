@@ -23,6 +23,6 @@ oa:S.a+=S.b;D os:S.a-=S.b;D om:S.a*=S.b;D
 od:if(S.b!=0)S.a/=S.b;else{S.R=1;o h;}D
 oi:if(S.b!=0)S.a%=S.b;else{S.R=1;o h;}D
 C:if(S.a<S.b)S.a=0;else if(S.a>S.b)S.a=2;else S.a=1;D}
-int main(){u6 i=0,j;
+int main(int rc,char**rv){u6 i=0,j;
 for(;!feof(stdin);)S.M[i++]=fgetc(stdin);
-for(i=e();i<65504;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",S.M[j],((j+1)%8)?' ':'|');}
+for(i=e();i<65504&&rc>1;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",S.M[j],((j+1)%8)?' ':'|');}
