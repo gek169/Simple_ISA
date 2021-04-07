@@ -1,0 +1,50 @@
+Simple instruction set architecture for an 8-bit-micro-like computer.
+
+The C source is obfuscated but the C++ is not and runs at compiletime
+
+The included program, program.bin, is designed for the obfuscated C emulator.
+
+You can compile and run the emulator by typing...
+```
+cc ISA_example.c -o isa
+./isa < program.bin
+```
+
+The emulator is confirmed to compile with both Tiny C compiler and GCC on Linux and the included program
+works.
+
+It it is a simple program which increments the value at memory location 488 (1e8) until it is equal to 99.
+
+These are the supported instructions in the C version, the C++ has slightly fewer:
+
+halt- end execution (1 byte) (0) (Causes the memory of the machine to be printed out.)
+lda- load byte into register a (3 bytes) (1)
+sa - set register a to value (2 bytes) (2)
+ldb - load byte into register b (3 bytes) (3)
+sb - set register b to value (2 bytes) (4)
+sc- load 2 constant bytes into c (3 bytes) (5)
+sta- store a to location (3 bytes) (6)
+stb- store b to location (3 bytes) (7)
+add- a = a + b (1 byte) (8)
+sub- a = a - b (ditto) (9)
+mul- a = a * b (10)
+div- a = a / b (11)
+mod- a = a % b (12)
+cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (13)
+jmpifeq- set program counter to c if a == 1 (1 byte) (14)
+jmpifneq- set program counter to c if a is not 1 (1  byte) (15)
+getchar- read single byte from stdin into register A (16)
+putchar- read single byte from stdin into register A (17)
+and- a = a & b
+or- a = a | b
+xor- a = a ^ b
+lsh- a <<= b&7
+rsh- a >>= b&7
+
+If you wanted to make this emulator ""useful"" you should add more instructions.
+
+The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
+or for educational purposes.
+
+~~DMHSW
+

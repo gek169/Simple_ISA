@@ -3,27 +3,7 @@ an incredibly simple ISA
 
 8 bit CPU with only a few basic operations.
 Instructions are variable in size
-
-halt- end execution (1 byte) (0)
-lda- load byte into a (3 bytes) (1)
-sa - set a to value (2 bytes) (2)
-ldb - load byte into b (3 bytes) (3)
-sb - set b to value (2 bytes) (4)
-sc- load 2 constant bytes into c (3 bytes)
-sta- store a to location (3 bytes) (6)
-stb- store b to location (3 bytes) (7)
-add- a = a + b (1 byte) (8)
-sub- a = a - b (ditto) (9)
-mul- a = a * b (10)
-div- a = a / b (11)
-mod- a = a % b (12)
-cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (13)
-jmpifeq- set program counter to c if a == 1 (1 byte) (14)
-jmpifneq- set program counter to c if a is not 1 (1  byte) (15)
-Only the low 4 bits of the opcode are read.
-
-
-no signed arithmetic is provided.
+See README
 
 */
 #include <stdio.h>
