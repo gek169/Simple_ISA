@@ -7,7 +7,10 @@ The included program, program.bin, is designed for the obfuscated C emulator.
 You can compile and run the emulator by typing...
 ```
 cc ISA_example.c -o isa
-./isa < program.bin
+#run the incrementing demo
+./isa program.bin
+#run echo
+./isa echo.bin
 ```
 
 The emulator is confirmed to compile with both Tiny C compiler and GCC on Linux and the included program
@@ -27,35 +30,41 @@ sta- store a to location (3 bytes) (6)
 stb- store b to location (3 bytes) (7)
 add- a = a + b (1 byte) (8)
 sub- a = a - b (ditto) (9)
-mul- a = a * b (10)
-div- a = a / b (11)
-mod- a = a % b (12)
-cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (13)
-jmpifeq- set program counter to c if a == 1 (1 byte) (14)
-jmpifneq- set program counter to c if a is not 1 (1  byte) (15)
-getchar- read single byte from stdin into register A (16)
-putchar- Write register A to standard out. (17)
-and- a = a & b (18)
-or- a = a | b (19)
-xor- a = a ^ b (20)
-lsh- a <<= b&7 (21)
-rsh- a >>= b&7 (22)
-ilda- a = read(c), indirectly access memory through register c and load it into a (23)
-ildb- b = read(c), indirectly access memory through register c and load it into b (24)
-acb- c = a<<8 + b, make c the combination of a and b. (25)
-ab- a = b (26)
-ba- b = a (27)
-alc- a = the low half of c (28)
-ahc- a = the high half of c (29)
-
-If you feel that you need more instructions, just add more.
+mul- a = a * b (A)
+div- a = a / b (B)
+mod- a = a % b (C)
+cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (D)
+jmpifeq- set program counter to c if a == 1 (1 byte) (E)
+jmpifneq- set program counter to c if a is not 1 (1  byte) (F)
+getchar- read single byte from stdin into register A (1 byte) (10)
+putchar- Write register A to standard out. (1 byte)(11)
+and- a = a & b (1 byte)(12)
+or- a = a | b (1 byte)(13)
+xor- a = a ^ b (1 byte)(14)
+lsh- a <<= b&7 (1 byte)(15)
+rsh- a >>= b&7 (1 byte)(16)
+ilda- a = read(c), indirectly access memory through register c and load it into a (1 byte)(17)
+ildb- b = read(c), indirectly access memory through register c and load it into b (1 byte)(18)
+acb- c = a<<8 + b, make c the combination of a and b. (1 byte)(19)
+ab- a = b (1 byte)(1A)
+ba- b = a (1 byte)(1B)
+alc- a = the low half of c (1 byte)(1C)
+ahc- a = the high half of c (1 byte)(1D)
+nop- (1byte) (1E)
+halt duplicate (Free to implement)- (1byte) (1F)
+If you feel that you need more instructions, you will most likely
+have to change the mask from "&31" to "&63" which will require you to define 31 more cases
+in the switch case.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.
 
 Indirect memory addressing can be done by doing math in the A and B registers and moving the result to C.
 
-The emulator will print out its memory layout at the end of execution if you pass an argument to it on the commandline.
+The emulator will print out its memory layout at the end of execution if you pass an additional argument
+to it on the commandline.
+
+The emulator requires a filename as the first parameter.
 
 
 ~~DMHSW
