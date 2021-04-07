@@ -15,8 +15,10 @@ u6 e(){
 S.R=0;D
 Q2:S.a&=S.b;D Q3:S.a|=S.b;D Q4:S.a^=S.b;D
 Q0:S.a=getchar()D Q1:putchar(S.a)D
-Q5:S.a<<=S.b&7;D Q6:S.a>>=S.b&7;D 
-Q7:Q8:Q9:QA:QB:QC:QD:QE:QF:h:z 0;
+Q5:S.a<<=S.b&7;D Q6:S.a>>=S.b&7;D
+Q7:S.a=r(S.c)D Q8:S.b=r(S.c)D Q9:S.c=(((u6)S.a)<<8)+(u6)S.b;D
+QA:S.a=S.b;D QB:S.b=S.a;D QC:S.a=S.c;D QD:S.a=S.c>>8;D
+QE:QF:h:z 0;
 A:S.a=r(Z)D v:S.a=G;D B: S.b=r(Z)D V:S.b=G;D X: S.c=Z;D t:w(S.a,Z)D
 T:w(S.b,Z)D j:if(S.a==1) S.p=S.c;D J:if(S.a!=1) S.p=S.c;D
 oa:S.a+=S.b;D os:S.a-=S.b;D om:S.a*=S.b;D
