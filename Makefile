@@ -7,7 +7,7 @@ CPPFLAGS= -O3 -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-l
 all: main
 
 main:
-	$(CC) $(CFLAGS) ISA_example.c -o isa
+	$(CC) $(CFLAGS) isa.c -o isa
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 

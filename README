@@ -34,7 +34,7 @@ cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (13)
 jmpifeq- set program counter to c if a == 1 (1 byte) (14)
 jmpifneq- set program counter to c if a is not 1 (1  byte) (15)
 getchar- read single byte from stdin into register A (16)
-putchar- read single byte from stdin into register A (17)
+putchar- Write register A to standard out. (17)
 and- a = a & b
 or- a = a | b
 xor- a = a ^ b
