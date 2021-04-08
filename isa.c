@@ -53,7 +53,7 @@ RB:S.b=S.c;D
 RC:w(S.a,S.c)D
 RD:w(S.b,S.c)D
 RE:w2(S.a,S.c)D
-RF:w2(S.a,S.c)D
+RF:w2(S.b,S.c)D
 S0:S.p=S.c;D
 S1:w2(S.a,S.p)S.p+=2;D
 S2:w2(S.b,S.p)S.p+=2;D
