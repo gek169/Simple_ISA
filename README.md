@@ -57,6 +57,7 @@ illdaa, a = [a] indirectly load 2 bytes into A through A (1 byte)(24)
 illdbb, b = [b] indirectly load 2 bytes into B through B (1 byte)(25)
 illdab, a = [b] indirectly load 2 bytes into A through B (1 byte)(26)
 illdba, b = [a] indirectly load 2 bytes into B through A (1 byte)(27)
+~~Moving to and from register c as shorts.
 ca c=a (1 byte)(28)
 cb c=b (1 byte)(29)
 ac a=c (1 byte)(2A)
