@@ -244,6 +244,7 @@ int main(int argc, char** argv){
 	variable_names[3] = " ";
 	variable_expansions[3] = "";
 	nmacros = 4;
+	const unsigned int nbuiltin_macros = 4;
 	unsigned long long line_num = 0;
 	for(int i = 2; i < argc; i++)
 	{
@@ -311,20 +312,20 @@ int main(int argc, char** argv){
 		if(strprefix("//",line)) goto end;
 		if(strprefix("!",line)) goto end;
 		if(strlen(line) < 2) goto end; /*Contains nothing.*/
-		if(!isalpha(line[0])) {
+		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != '\t') {
 			puts("<ASM WARNING> Ignoring line beginning with illegal character...\n");
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*Not performed on MACRO Lines.*/
-		if(!strprefix("VAR#",line))
+		if(strfind(line,"VAR#")!= -1) was_macro=1;
 		{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
 					printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line_copy);
 				}
-				for(unsigned int i = 0; i<nmacros; i++){
+				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only */
 					long long linesize = strlen(line);
 					long long loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
@@ -565,6 +566,8 @@ int main(int argc, char** argv){
 			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_quit", metaproc)){
 				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
 				goto error;
+			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
+			
 			} else {
 				if(strlen(metaproc) > 0 &&
 					strfind(metaproc,";") != 0)
