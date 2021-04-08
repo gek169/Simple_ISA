@@ -9,7 +9,7 @@
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
 #define w(v,d)M[d]=v;
-#define w2(v,d)M[d]=v/255;M[d+1]=v&255;
+#define W(v,d)M[d]=v/255;M[d+1]=v&255;
 #define D ;switch(G&63){default:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6: o t;k 7: o T;\
 k 8:o oa;k 9:o os;k 10:o om;k 11:o od;k 12:o oi;k 13: o C;k 14:o j;k 15:o J;\
 k 16:o Q0;k 17:o Q1;k 18:o Q2;k 19:o Q3;k 20:o Q4;k 21:o Q5;k 22:o Q6;k 23:o Q7;\
@@ -51,12 +51,12 @@ RA:a=c;D
 RB:b=c;D
 RC:w(a,c)D
 RD:w(b,c)D
-RE:w2(a,c)D
-RF:w2(b,c)D
+RE:W(a,c)D
+RF:W(b,c)D
 S0:p=c;D
-S1:w2(a,p)p+=2;D
-S2:w2(b,p)p+=2;D
-S3:w2(c,p)p+=2;D
+S1:W(a,p)p+=2;D
+S2:W(b,p)p+=2;D
+S3:W(c,p)p+=2;D
 S4:stp+=Z;D
 S5:stp-=Z;D
 S6:stp+=a;D
