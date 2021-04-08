@@ -6,12 +6,12 @@ The included assembly programs and assembler are designed for the C code.
 
 The included makefiles and shell script show how to use the emulator and the assembler
 
-The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included program
-works.
+The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included programs
+work as intended.
 
 The emulator itself is C89 compliant, but the assembler uses C99 due to it using "unsigned long long".
 
-It could be converted to C89 as well but it would require re-writing my string library.
+It could be converted to C89 as well but it would require re-writing my string library. I decided not to bother.
 
 These are the supported instructions in the C version, the C++ has a tiny fraction and is
 mostly a proof-of-concept that you can have a compiletime machine emulator.
