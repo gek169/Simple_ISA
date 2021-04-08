@@ -7,7 +7,7 @@ CPPFLAGS= -O3 -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-l
 all: main asm_programs
 
 main:
-	$(CC) $(CFLAGS) isa.c textmode_driver.c -o isa
+	$(CC) $(CFLAGS) isa.c -o isa
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 	$(CC) $(CASMFLAGS) assembler.c -o asm
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
