@@ -4,7 +4,7 @@ The C source is obfuscated but the C++ is not and runs at compiletime
 
 The included assembly programs and assembler are designed for the C code.
 
-The included makefiles and shell script how to use the emulator and the assembler
+The included makefiles and shell script show how to use the emulator and the assembler
 
 The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included program
 works.
@@ -101,14 +101,17 @@ so you don't have to use memory if you don't want to.
 The emulator will print out its memory layout at the end of execution if you pass an additional argument
 to it on the commandline.
 
-You can make the emulator work with any device you want by implementing your own driver.
+#Device Interface
+
+You can make the emulator work with any device you want by implementing your own abstraction layer.
+Implement these functions in a driver.c file:
 
 void di() is the device initializer.
 void dcl() is the devoice closing function.
 unsigned short gch() is the "get" function which puts something into register a.
 void pch(unsigned short) is the "put" function which gets something from register a.
 
-The emulator requires a filename as the first parameter.
+The emulator requires a filename as the first parameter when running.
 
 A very basic assembler is included with the ability to define sections, 
 include arbitrary data,
