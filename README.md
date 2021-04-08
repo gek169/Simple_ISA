@@ -2,9 +2,9 @@
 
 The C source is obfuscated but the C++ is not and runs at compiletime
 
-The included program, program.bin, is designed for the obfuscated C emulator.
+The included assembly programs and assembler are designed for the C code.
 
-The included makefiles and shell script how to use the emulator and its associated tools.
+The included makefiles and shell script how to use the emulator and the assembler
 
 The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included program
 works.
