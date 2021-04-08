@@ -1,7 +1,6 @@
+/*isa.c needs stdio to load your program, must provide or replace it.*/
 #include <stdio.h>
-/*Implement your own driver here.
-use inline to get the best speed.
-*/
+/*Implement your own driver here.*/
 void di(){}
 void dcl(){}
 unsigned short gch(){return getchar();}
