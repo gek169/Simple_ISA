@@ -46,4 +46,5 @@ oi:if(S.b!=0)S.a%=S.b;else{S.R=1;o h;}D
 C:if(S.a<S.b)S.a=0;else if(S.a>S.b)S.a=2;else S.a=1;D
 }int main(int rc,char**rv){U i=0,j;if(rc<2)z 1;
 F=fopen(rv[1],"rb");for(;!feof(F);)S.M[i++]=fgetc(F);
-for(i=e();i<65504&&rc>2;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",S.M[j],((j+1)%8)?' ':'|');}
+for(i=e();i<65504&&rc>2;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",S.M[j],((j+1)%8)?' ':'|');
+if(S.R)puts("\n<Errfl>\n");}

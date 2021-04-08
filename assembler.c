@@ -88,6 +88,7 @@ uint8_t insns_numargs[32] = {
 	0,//halt
 	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
 	2, //load constant into C
+	2,2, //store A or B.
 	0,0,0,0,0, //the four elementary, + mod
 	0, //cmp
 	0,0, //jmp insns
@@ -105,8 +106,8 @@ char* insn_repl[32] = {
 	"bytes 4,",
 	"bytes 5,",
 	/*Every single other instruction has no arguments.*/
-	"bytes 6;",
-	"bytes 7;",
+	"bytes 6,",
+	"bytes 7,",
 	"bytes 8;",
 	"bytes 9;",
 	"bytes 10;",
