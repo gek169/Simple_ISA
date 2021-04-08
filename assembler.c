@@ -44,7 +44,6 @@
 
 #include "stringutil.h"
 #include <stdio.h>
-#include <stdint.h>
 char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
@@ -93,7 +92,7 @@ char* insns[64] = {
 	"illdab",
 	"illdba",
 };
-uint8_t insns_numargs[64] = {
+unsigned char insns_numargs[64] = {
 	0,//halt
 	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
 	2, //load constant into C
@@ -156,14 +155,14 @@ char* insn_repl[64] = {
 	"bytes 38;",
 	"bytes 39;",
 };
-static const uint8_t n_insns = 40;
-uint16_t outputcounter = 0;
+static const unsigned char n_insns = 40;
+unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
 
-void fputbyte(uint8_t b, FILE* f){
+void fputbyte(unsigned char b, FILE* f){
 				if(debugging)
 					printf("\nWriting individual byte %u\n", b);
 if(ftell(f) != outputcounter){
@@ -179,7 +178,7 @@ if(ftell(f) != outputcounter){
 
 fputc(b, f); outputcounter++;
 }
-void fputshort(uint16_t sh, FILE* f){
+void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
@@ -251,7 +250,7 @@ int main(int argc, char** argv){
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
-		{uint8_t have_expanded = 0; uint16_t iteration = 0;
+		{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -333,8 +332,8 @@ int main(int argc, char** argv){
 			loc_pound2++;
 			/*Search to see if we've already defined this macro*/
 			char is_overwriting = 0;
-			uint16_t index = 0;
-			for(uint16_t i = 0; i < nmacros; i++){
+			unsigned short index = 0;
+			for(unsigned short i = 0; i < nmacros; i++){
 				if(streq(macro_name, variable_names[i])){
 					printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
 					if(i < 4){
@@ -371,7 +370,7 @@ int main(int argc, char** argv){
 			the first comma beyond that before the next semicolon, is replaced with a semicolon.
 		*/
 		if(was_macro) goto end;
-			{uint8_t have_expanded = 0; uint16_t iteration = 0;
+			{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -429,7 +428,7 @@ int main(int argc, char** argv){
 			if(strprefix("bytes", metaproc)){
 				char* proc = metaproc + 5;
 				do{
-					uint8_t byteval;
+					unsigned char byteval;
 					byteval = strtoull(proc,NULL,0);
 					fputbyte(byteval, ofile);
 					/*Find the next comma.*/
@@ -444,7 +443,7 @@ int main(int argc, char** argv){
 			} else if(strprefix("shorts", metaproc)){
 				char* proc = metaproc + 6;
 				do{
-					uint16_t shortval;
+					unsigned short shortval;
 					shortval = strtoull(proc,NULL,0);
 					if(debugging)
 						printf("\nWriting short %u\n", shortval);
@@ -462,7 +461,7 @@ int main(int argc, char** argv){
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
-				uint16_t dest = strtoull(proc, NULL, 0);
+				unsigned short dest = strtoull(proc, NULL, 0);
 				if(dest == 0)
 					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s", line_copy);
 				if(debugging)
@@ -474,7 +473,7 @@ int main(int argc, char** argv){
 					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
-				uint16_t fillsize = strtoull(proc, NULL, 0);
+				unsigned short fillsize = strtoull(proc, NULL, 0);
 				if(fillsize == 0){
 					printf("<ASM WARNING> fill tag size is. Might be a bad number. Line %s", line_copy);
 				}
@@ -485,7 +484,7 @@ int main(int argc, char** argv){
 					goto error;
 				}
 				proc += next_comma + 1;
-				uint8_t fillval = strtoull(proc, NULL, 0);
+				unsigned char fillval = strtoull(proc, NULL, 0);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
 				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04x\n", line_copy, line, outputcounter);
