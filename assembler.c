@@ -100,6 +100,15 @@ char* insns[64] = {
 	"istla",
 	"istlb",
 	"jmp",
+	"stla",
+	"stlb",
+	"stc",
+	"push",
+	"pop",
+	"pusha",
+	"popa",
+	"astp",
+	"bstp",
 };
 unsigned char insns_numargs[64] = {
 	0,//halt
@@ -121,6 +130,9 @@ unsigned char insns_numargs[64] = {
 	0,0,//move from C
 	0,0,0,0,//Indirect Stores
 	0, //Direct jump.
+	2,2,2, //store shorts A,B,and C
+	2,2,0,0, //stack pointer ops
+	0,0, //retrieve the stack pointer and put it in a or b
 };
 char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
@@ -179,8 +191,20 @@ char* insn_repl[64] = {
 	"bytes 46;",
 	"bytes 47;",
 	"bytes 48;",
+	/*Store shorts to constant address*/
+	"bytes 49,",
+	"bytes 50,",
+	"bytes 51,",
+	/*Stack pointer operations.*/
+	"bytes 52,",
+	"bytes 53,",
+	"bytes 54;",
+	"bytes 55;",
+	/*stack pointer retrieval*/
+	"bytes 56;",
+	"bytes 57;",
 };
-static const unsigned char n_insns = 49;
+static const unsigned char n_insns = 58;
 unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

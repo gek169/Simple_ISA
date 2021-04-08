@@ -1,4 +1,4 @@
-Simple instruction set architecture for an 16-bit, micro-like computer.
+# Simple instruction set architecture for an 16-bit, micro-like computer.
 
 The C source is obfuscated but the C++ is not and runs at compiletime
 
@@ -33,8 +33,8 @@ mod- a = a % b (1 byte) (C)
 cmp- if(a<b) a = 0; else if(a>b)a=2; else a=1; (1 byte) (D)
 jmpifeq- set program counter to c if a == 1 (1 byte) (E)
 jmpifneq- set program counter to c if a is not 1 (1  byte) (F)
-getchar- read single byte from stdin into register A (1 byte) (10)
-putchar- Write register A to standard out. (1 byte)(11)
+getchar- read short from device. (Usually standard out) (1 byte) (10)
+putchar- write register A as short to device (Usually standard out) (1 byte)(11)
 and- a = a & b (1 byte)(12)
 or- a = a | b (1 byte)(13)
 xor- a = a ^ b (1 byte)(14)
@@ -54,24 +54,39 @@ lla, Large Load 2 constant bytes into A (3 bytes)(20)
 illda, a = [c], indirectly load 2 bytes into A through C (1 byte)(21)
 llb, Large Load 2 constant bytes into B (3 bytes)(22)
 illdb b = [c], indirectly load 2 bytes int B through C (1 byte)(23)
-illdaa indirectly load 2 bytes into A through A (1 byte)(24)
-illdbb indirectly load 2 bytes into B through B (1 byte)(25)
-illdab indirectly load 2 bytes into A through B (1 byte)(26)
-illdba indirectly load 2 bytes into B through A (1 byte)(27)
+illdaa, a = [a] indirectly load 2 bytes into A through A (1 byte)(24)
+illdbb, b = [b] indirectly load 2 bytes into B through B (1 byte)(25)
+illdab, a = [b] indirectly load 2 bytes into A through B (1 byte)(26)
+illdba, b = [a] indirectly load 2 bytes into B through A (1 byte)(27)
 ca c=a (1 byte)(28)
 cb c=b (1 byte)(29)
 ac a=c (1 byte)(2A)
 bc b=c (1 byte)(2B)
 
-ista, store a at the location pointed to by C (1 byte)(2C)
-istb, store b at the location pointed to by C (1 byte)(2D)
+ista, [c] = a, (as byte) store a at the location pointed to by C (1 byte)(2C)
+istb, [c] = b, (as byte) store b at the location pointed to by C (1 byte)(2D)
 ~~More 16 bit ops
-istla, indirectly store a at the location pointed to by C(1 byte)(2E)
-istlb, indirectly store a at the location pointed to by C(1 byte)(2F)
+istla, [c] = a, (as short) indirectly store large a at the location pointed to by C(1 byte)(2E)
+istlb, [c] = b, (as short) indirectly store large b at the location pointed to by C(1 byte)(2F)
 
-jmp, unconditionally jump (1 byte) (30)
+jmp, unconditionally jump to the location pointed to by c. (1 byte) (30)
+stla, store large A at constant address (3 bytes) (31)
+stlb, store large B at constant address (3 bytes) (32)
+stc, store C at constant address (3 bytes) (33)
+/*52 dec so far.*/
+push, stp+=val, add to the stack pointer by a number of bytes (3 bytes) (34)
+pop, stp-=val, subtract from the stack pointer by a number of bytes (3 bytes) (35)
+pusha, stp+=a, add a to the stack pointer (1 byte) (36)
+popa, stp-=a, sub a from the stack pointer (1 byte) (37)
+astp, a = stp (1 byte) (38)
+bstp, b = stp (1 byte) (39)
+/*58 decimal so far.*/
+40-0x3f, halt duplicates, free for expansion (1 byte)
 
 There are plenty of free instruction spots for you to play around with in your experimentation.
+
+You may want to add more instructions than there are currently free slots,
+just change the "&63" to "&127" and add 64 slots.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.

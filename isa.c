@@ -9,6 +9,7 @@
 #define Z3 (((((U)S.M[S.a]))<<8)+(U)S.M[S.a+1])
 #define Z4 (((((U)S.M[S.b]))<<8)+(U)S.M[S.b+1])
 #define w(v,d)S.M[d]=v;
+#define w2(v,d)S.M[d]=v/255;S.M[d+1]=v&255;
 #define D ;switch(G&63){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6: o t;k 7: o T;\
 k 8:o oa;k 9:o os;k 10:o om;k 11:o od;k 12:o oi;k 13: o C;k 14:o j;k 15:o J;\
 k 16:o Q0;k 17:o Q1;k 18:o Q2;k 19:o Q3;k 20:o Q4;k 21:o Q5;k 22:o Q6;k 23:o Q7;\
@@ -18,9 +19,9 @@ k 40:o R8;k 41:o R9;k 42:o RA;k 43:o RB;k 44:o RC;k 45:o RD;k 46:o RE;k 47:o RF;
 k 48:o S0;k 49:o S1;k 50:o S2;k 51:o S3;k 52:o S4;k 53:o S5;k 54:o S6;k 55:o S7;\
 k 56:o S8;k 57:o S9;k 58:o SA;k 59:o SB;k 60:o SC;k 61:o SD;k 62:o SE;k 63:o SF;\
 }
-typedef unsigned char u;typedef unsigned short U;struct{U a;U b;U c;U p;u R;u M[(1<<16)];}S;FILE*F;
+typedef unsigned char u;typedef unsigned short U;struct{U a;U b;U c;U p;U stp;u R;u M[(1<<16)];}S;FILE*F;
 void pch(U mq);U gch();void di();void dcl();
-U e(){S.R=0;S.p=0;S.a=0;S.b=0;di();
+U e(){S.R=0;S.p=0;S.a=0;S.b=0;S.stp=0;di();
 QE:D
 Q2:S.a&=S.b;D
 Q3:S.a|=S.b;D
@@ -51,10 +52,19 @@ RA:S.a=S.c;D
 RB:S.b=S.c;D
 RC:w(S.a,S.c)D
 RD:w(S.b,S.c)D
-RE:w(S.a/256,S.c);w(S.a&255,S.c)D
-RF:w(S.b/256,S.c);w(S.b&255,S.c)D
+RE:w2(S.a,S.c)D
+RF:w2(S.a,S.c)D
 S0:S.p=S.c;D
-S1:S2:S3:S4:S5:S6:S7:S8:S9:SA:SB:SC:SD:SE:SF:h:dcl();z 0;
+S1:w2(S.a,S.p)S.p+=2;D
+S2:w2(S.b,S.p)S.p+=2;D
+S3:w2(S.c,S.p)S.p+=2;D
+S4:S.stp+=Z;D
+S5:S.stp-=Z;D
+S6:S.stp+=S.a;D
+S7:S.stp-=S.a;D
+S8:S.a=S.stp;D
+S9:S.b=S.stp;D
+SA:SB:SC:SD:SE:SF:h:dcl();z 0;
 A:S.a=r(Z)D
 v:S.a=G;D
 B:S.b=r(Z)D
