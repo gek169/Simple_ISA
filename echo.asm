@@ -1,6 +1,6 @@
 VAR#looptop#1,0xf0
-VAR#GOTO_TOP#sc looptop;la1;jmpifeq
-VAR#jumpc#la1;jmpifeq;
+VAR#GOTO_TOP#sc looptop;jmp;
+VAR#jumpc#jmp;
 VAR#IS_A_NEWLINE#sta0,0;lb0xa0;cmp;
 VAR#GET_A_BACK#lda0,0;
 
@@ -25,11 +25,11 @@ putchar
 sta 0,0;lb 0;stb 0,5;
 
 sc $;asm_print
-lda 0,0;lb 1;add;sta 0,0;
+lda 0,0;lb 2;div;sta 0,0;
 putchar;
 lda 0,5;add;sta 0,5;
 #if A is less than this value, jump to the loop
-lb 4;
+lb 15;
 cmp;
 lb 0;
 cmp;
@@ -39,11 +39,6 @@ jmpifeq;
 
 
 #signify the end of the loop by printing some newlines.
-#la 0xA0;putchar; asm_print;
-#la 0xA0;putchar;
-#la 0xA0;putchar;
-#la 0xA0;putchar;
-#la 0xA0;putchar;
 GOTO_TOP
 #Unreachable HALT insn
 halt

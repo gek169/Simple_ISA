@@ -1,4 +1,7 @@
 #Compile this program using asm. ./asm -i program.asm -o program.bin
+section 0x100
+fill 0xF1FF,3
+
 section 0
 lda 1,0xe8
 lb 1

@@ -53,7 +53,7 @@ RC:w(S.a,S.c)D
 RD:w(S.b,S.c)D
 RE:w(S.a/256,S.c);w(S.a&255,S.c)D
 RF:w(S.b/256,S.c);w(S.b&255,S.c)D
-S0:S.c=S.p;D
+S0:S.p=S.c;D
 S1:S2:S3:S4:S5:S6:S7:S8:S9:SA:SB:SC:SD:SE:SF:h:dcl();z 0;
 A:S.a=r(Z)D
 v:S.a=G;D
