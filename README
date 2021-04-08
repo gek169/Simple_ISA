@@ -65,6 +65,12 @@ cb c=b (1 byte)(29)
 ac a=c (1 byte)(2A)
 bc b=c (1 byte)(2B)
 
+ista, store a at the location pointed to by C (1 byte)(2C)
+istb, store b at the location pointed to by C (1 byte)(2C)
+istla, indirectly store a at the location pointed to by C(1 byte)(2D)
+istlb, indirectly store a at the location pointed to by C(1 byte)(2E)
+
+
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
@@ -78,6 +84,13 @@ so you don't have to use memory if you don't want to.
 
 The emulator will print out its memory layout at the end of execution if you pass an additional argument
 to it on the commandline.
+
+You can make the emulator work with any device you want by implementing your own driver.
+
+void di() is the device initializer.
+void dcl() is the devoice closing function.
+unsigned short gch() is the "get" function which puts something into register a.
+void pch(unsigned short) is the "put" function which gets something from register a.
 
 The emulator requires a filename as the first parameter.
 

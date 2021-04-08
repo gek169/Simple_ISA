@@ -95,6 +95,10 @@ char* insns[64] = {
 	"cb",
 	"ac",
 	"bc",
+	"ista",
+	"istb",
+	"istla",
+	"istlb",
 };
 unsigned char insns_numargs[64] = {
 	0,//halt
@@ -114,6 +118,7 @@ unsigned char insns_numargs[64] = {
 	0,0,//16 bit neighbor-indirect loads
 	0,0,//move to C
 	0,0,//move from C
+	0,0,0,0,//Indirect Stores
 };
 char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
@@ -166,8 +171,13 @@ char* insn_repl[64] = {
 	/*direct move from c*/
 	"bytes 42;",
 	"bytes 43;",
+	/*indirect stores*/
+	"bytes 44;",
+	"bytes 45;",
+	"bytes 46;",
+	"bytes 47;",
 };
-static const unsigned char n_insns = 44;
+static const unsigned char n_insns = 48;
 unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
