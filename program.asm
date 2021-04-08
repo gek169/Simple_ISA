@@ -1,6 +1,6 @@
 #Compile this program using asm. ./asm -i program.asm -o program.bin
 section 0
-fill 0xFFFE,3
+fill 0xFFFF,3
 
 section 0
 lda 1,0xe8
