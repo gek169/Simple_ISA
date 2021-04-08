@@ -28,11 +28,11 @@ putchar
 sta 0,0;lb 0;stb 0,5;
 
 sc $;asm_print
-lda 0,0;lb 2;div;sta 0,0;
+lda 0,0;llb 0,2;div;sta 0,0;
 putchar;
 lda 0,5;add;sta 0,5;
 #if A is less than this value, jump to the loop
-lb 15;
+llb 0,15;
 cmp;
 lb 0;
 cmp;
