@@ -48,7 +48,7 @@ ba- b = a (1 byte)(1B)
 alc- a = low half of c (1 byte)(1C)
 ahc- a = the high half of c (1 byte)(1D)
 nop- (1byte) (1E)
-cba a = c = b<<8 + a, make c the other combination of a and b. (1 byte) (1F)
+cba c = b<<8 + a, make c the other combination of a and b. (1 byte) (1F)
 ~~~~~~~~
 Special 16 bit opcodes specifically for 16 bit mode.
 ~~~~~~~~
