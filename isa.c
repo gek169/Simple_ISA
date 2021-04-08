@@ -20,7 +20,7 @@ k 48:o S0;k 49:o S1;k 50:o S2;k 51:o S3;k 52:o S4;k 53:o S5;k 54:o S6;k 55:o S7;
 k 56:o S8;k 57:o S9;k 58:o SA;k 59:o SB;k 60:o SC;k 61:o SD;k 62:o SE;k 63:o SF;\
 }
 typedef unsigned char u;typedef unsigned short U;struct{U a;U b;U c;U p;U stp;u R;u M[(1<<16)];}S;FILE*F;
-U e(){S.R=0;S.p=0;S.a=0;S.b=0;S.stp=0;di();
+e(){S.R=0;S.p=0;S.a=0;S.b=0;S.stp=0;di();
 QE:D
 Q2:S.a&=S.b;D
 Q3:S.a|=S.b;D
@@ -80,7 +80,7 @@ om:S.a*=S.b;D
 od:if(S.b!=0)S.a/=S.b;else{S.R=1;o h;}D
 oi:if(S.b!=0)S.a%=S.b;else{S.R=1;o h;}D
 C:if(S.a<S.b)S.a=0;else if(S.a>S.b)S.a=2;else S.a=1;D
-}int main(int rc,char**rv){U i=0,j;if(rc<2)z 1;
+}main(int rc,char**rv){U i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){S.M[i++]=fgetc(F);if(i==0)break;}
 for(i=e();i<65504&&rc>2;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",S.M[j],((j+1)%8)?' ':'|');
 if(S.R)puts("\n<Errfl>\n");}

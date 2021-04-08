@@ -122,6 +122,9 @@ include arbitrary data,
 and write your own multi-statement macros.
 It also does a limited amount of error checking.
 
+## What is this ISA called?
+
+MHS-16
 
 ```
 Written by
