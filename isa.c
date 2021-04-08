@@ -5,9 +5,9 @@
 #define G S.M[S.p++]
 #define r(d) S.M[d]
 #define Z (S.p+=2,((((U)S.M[S.p-2]))<<8)+(U)S.M[S.p-1])
-#define Z2 (((((U)S.M[S.c]))<<8)+(U)S.M[S.c+1])
-#define Z3 (((((U)S.M[S.a]))<<8)+(U)S.M[S.a+1])
-#define Z4 (((((U)S.M[S.b]))<<8)+(U)S.M[S.b+1])
+#define Z2 ((((U)S.M[S.c])<<8)+(U)S.M[S.c+1])
+#define Z3 ((((U)S.M[S.a])<<8)+(U)S.M[S.a+1])
+#define Z4 ((((U)S.M[S.b])<<8)+(U)S.M[S.b+1])
 #define w(v,d)S.M[d]=v;
 #define w2(v,d)S.M[d]=v/255;S.M[d+1]=v&255;
 #define D ;switch(G&63){default:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6: o t;k 7: o T;\
