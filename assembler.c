@@ -316,7 +316,7 @@ int main(int argc, char** argv){
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
-		if(strfind(line,"VAR#") == -1)
+		if(!strprefix("VAR#",line))
 		{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
