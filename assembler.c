@@ -83,10 +83,11 @@ char* insns[64] = {
 	"nop",
 	"cba",
 	/*Special insns for 16 bit mode*/
-	"llda",
-	"illa",
-	"lldb",
-	"illb",
+	"lla",
+	"illda",
+	"llb",
+	"illdb",
+	/*Self-Indirecting access mode.*/
 	"illdaa",
 	"illdbb",
 	"illdab",

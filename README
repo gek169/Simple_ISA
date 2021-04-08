@@ -6,8 +6,10 @@ The included program, program.bin, is designed for the obfuscated C emulator.
 
 The included makefiles and shell script how to use the emulator and its associated tools.
 
-The emulator is confirmed to compile with both Tiny C compiler and GCC on Linux and the included program
+The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included program
 works.
+
+The emulator itself is C89 compliant (Although  it depends on stdint) but the assembler is C99.
 
 It it is a simple program which increments the value at memory location 488 (1e8) until it is equal to 99.
 
@@ -48,10 +50,10 @@ cba a = c = b<<8 + a, make c the other combination of a and b. (1 byte) (1F)
 ~~~~~~~~
 Special 16 bit opcodes specifically for 16 bit mode.
 ~~~~~~~~
-llda Load 2 constant bytes into A (3 bytes)(20)
-illa indirectly load 2 bytes into A through C (1 byte)(21)
-lldb Load 2 constant bytes into B (3 bytes)(22)
-illb indirectly load 2 bytes int B through C (1 byte)(23)
+lla, Large Load 2 constant bytes into A (3 bytes)(20)
+illda, a = [c], indirectly load 2 bytes into A through C (1 byte)(21)
+llb, Large Load 2 constant bytes into B (3 bytes)(22)
+illdb b = [c], indirectly load 2 bytes int B through C (1 byte)(23)
 illdaa indirectly load 2 bytes into A through A (1 byte)(24)
 illdbb indirectly load 2 bytes into B through B (1 byte)(25)
 illdab indirectly load 2 bytes into A through B (1 byte)(26)
