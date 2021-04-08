@@ -122,5 +122,9 @@ include arbitrary data,
 and write your own multi-statement macros.
 It also does a limited amount of error checking.
 
-~~DMHSW~~
 
+```
+Written by
+~~~DMHSW~~~
+for the public domain
+```
