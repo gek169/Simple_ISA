@@ -6,21 +6,23 @@
 
 #right at the beginning.
 section 0
-GOTO_TOP;#purposefully redefining here.
+GOTO_TOP;
+#purposefully redefining here.
 
 #the in-between will be filled with zeroes.
 
 
 section 0x1F0
-sc 1,0xF0
-#Read character from stdin into A and echo it back. Ignore newlines.
-getchar
+#set C to jump to the top of our big for loop
+sc 1,0xF0;
+#Read character from stdin into A and echo it backIgnore newlines.
+getchar;
 IS_A_NEWLINE;jmpifeq;GET_A_BACK;
 #putchar
 
 #Simple loop
 
-//prepare the loop by preparing our looping variable at 5,
+	//prepare the loop by preparing our looping variable at 5,
 //and the address register C to repeatedly jump to the top.
 sta 0,0;lb 0;stb 0,5;
 

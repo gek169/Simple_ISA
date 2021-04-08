@@ -311,7 +311,7 @@ int main(int argc, char** argv){
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 		if(strprefix("!",line)) goto end;
-		if(strlen(line) < 2) goto end; /*Contains nothing.*/
+		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
 		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != '\t') {
 			puts("<ASM WARNING> Ignoring line beginning with illegal character...\n");
 			goto end;
@@ -325,7 +325,7 @@ int main(int argc, char** argv){
 				if(debugging){
 					printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line_copy);
 				}
-				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only */
+				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
 					long long linesize = strlen(line);
 					long long loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
@@ -355,6 +355,10 @@ int main(int argc, char** argv){
 				}
 			}while(have_expanded && (iteration++ < 32768));
 		}
+		/*Check again to see if this is a comment line.*/
+		if(strprefix("#",line)) goto end;
+		if(strprefix("//",line)) goto end;
+		if(strprefix("!",line)) goto end;
 		/*Step 2: Check to see if this is a macro*/
 		if(debugging){
 			printf("\n~~Is this a macro?~~\n");
@@ -538,7 +542,7 @@ int main(int argc, char** argv){
 				}
 				unsigned short dest = strtoull(proc, NULL, 0);
 				if(dest == 0)
-					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s", line_copy);
+					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
 				if(debugging)
 					printf("Moving the output counter to %u\n", dest);
 				outputcounter = dest;
@@ -567,7 +571,7 @@ int main(int argc, char** argv){
 				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
 				goto error;
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
-			
+				break; /*Comment on line.*/
 			} else {
 				if(strlen(metaproc) > 0 &&
 					strfind(metaproc,";") != 0)
