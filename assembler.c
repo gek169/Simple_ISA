@@ -149,7 +149,7 @@ char* insn_repl[64] = {
 	"bytes 33;",
 	"bytes 34,",
 	"bytes 35;",
-	/*Neighbors/self indirection*/
+	/*self, neighbors indirection*/
 	"bytes 36;",
 	"bytes 37;",
 	"bytes 38;",
