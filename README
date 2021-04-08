@@ -9,7 +9,9 @@ The included makefiles and shell script how to use the emulator and its associat
 The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included program
 works.
 
-The emulator itself is C89 compliant, but the assembler uses C99.
+The emulator itself is C89 compliant, but the assembler uses C99 due to it using "unsigned long long".
+
+It could be converted to C89 as well but it would require re-writing my string library.
 
 It it is a simple program which increments the value at memory location 488 (1e8) until it is equal to 99.
 
