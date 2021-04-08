@@ -26,7 +26,7 @@ lda 1,0xe8
 putchar
 #Halt execution
 #alternatively, halt by dividing by zero
-la 1
-lb 0
-mod
+#la 1
+#lb 0
+#mod
 halt
