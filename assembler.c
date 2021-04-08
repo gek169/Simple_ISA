@@ -249,19 +249,7 @@ int main(int argc, char** argv){
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
-		if(
-			strprefix("-h",argv[i-1]) ||
-			strprefix("-v",argv[i-1]) ||
-			strprefix("--help",argv[i-1]) ||
-			strprefix("--version",argv[i-1])
-		){
-			puts("Usage: ./asm -i infile -o outfile\n");
-			puts("Optional arguments: -DBG: debug the assembler");
-			puts("Optional arguments: -E: Print macro expansion only do not write to file");
-			puts("Optional arguments: -pl: Print lines");
-			puts("\n\nAuthored by DMHSW for the Public Domain\n\n");
-			return 1;
-		}
+
 	}
 	for(int i = 1; i < argc; i++)
 	{
@@ -276,6 +264,19 @@ int main(int argc, char** argv){
 		if(strprefix("-pl",argv[i])){
 			printlines = 1;
 			puts("<ASM> Printing lines.");
+		}
+		if(
+			strprefix("-h",argv[i]) ||
+			strprefix("-v",argv[i]) ||
+			strprefix("--help",argv[i]) ||
+			strprefix("--version",argv[i])
+		){
+			puts("Usage: ./asm -i infile -o outfile\n");
+			puts("Optional arguments: -DBG: debug the assembler");
+			puts("Optional arguments: -E: Print macro expansion only do not write to file");
+			puts("Optional arguments: -pl: Print lines");
+			puts("\n\nAuthored by DMHSW for the Public Domain\n\n");
+			return 1;
 		}
 	}
 	FILE* infile;
