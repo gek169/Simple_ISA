@@ -1,4 +1,4 @@
-# Simple instruction set architecture for an 16-bit, micro-like computer.
+# Simple, Embeddable, Elegant 16 bit instruction set simulator
 
 The C source is obfuscated but the C++ is not and runs at compiletime
 
