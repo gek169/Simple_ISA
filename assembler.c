@@ -109,6 +109,7 @@ char* insns[64] = {
 	"popa",
 	"astp",
 	"bstp",
+	"compl",
 };
 unsigned char insns_numargs[64] = {
 	0,//halt
@@ -133,6 +134,7 @@ unsigned char insns_numargs[64] = {
 	2,2,2, //store shorts A,B,and C
 	2,2,0,0, //stack pointer ops
 	0,0, //retrieve the stack pointer and put it in a or b
+	0, //Compl
 };
 char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
@@ -203,8 +205,9 @@ char* insn_repl[64] = {
 	/*stack pointer retrieval*/
 	"bytes 56;",
 	"bytes 57;",
+	"bytes 58;",
 };
-static const unsigned char n_insns = 58;
+static const unsigned char n_insns = 59;
 unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

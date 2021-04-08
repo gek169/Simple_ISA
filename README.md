@@ -13,9 +13,8 @@ The emulator itself is C89 compliant, but the assembler uses C99 due to it using
 
 It could be converted to C89 as well but it would require re-writing my string library.
 
-It it is a simple program which increments the value at memory location 488 (1e8) until it is equal to 99.
-
-These are the supported instructions in the C version, the C++ has slightly fewer:
+These are the supported instructions in the C version, the C++ has a tiny fraction and is
+mostly a proof-of-concept that you can have a compiletime machine emulator.
 
 halt- end execution (1 byte) (0)
 lda- load byte into register a,zero extend (3 bytes)(1)
@@ -78,15 +77,18 @@ push, stp+=val, add to the stack pointer by a number of bytes (3 bytes) (34)
 pop, stp-=val, subtract from the stack pointer by a number of bytes (3 bytes) (35)
 pusha, stp+=a, add a to the stack pointer (1 byte) (36)
 popa, stp-=a, sub a from the stack pointer (1 byte) (37)
+
 astp, a = stp (1 byte) (38)
 bstp, b = stp (1 byte) (39)
 /*58 decimal so far.*/
-40-0x3f, halt duplicates, free for expansion (1 byte)
+compl, a = ~a (1 byte) (3A)
+
+3B-0x3f, halt duplicates, free for expansion (1 byte)
 
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
 You may want to add more instructions than there are currently free slots,
-just change the "&63" to "&127" and add 64 slots.
+just change the "&63" to "&127" and add 64 more entries into the switch case.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.

@@ -64,7 +64,8 @@ S6:S.stp+=S.a;D
 S7:S.stp-=S.a;D
 S8:S.a=S.stp;D
 S9:S.b=S.stp;D
-SA:SB:SC:SD:SE:SF:h:dcl();z 0;
+SA:S.a=~S.a;D
+SB:SC:SD:SE:SF:h:dcl();z 0;
 A:S.a=r(Z)D
 v:S.a=G;D
 B:S.b=r(Z)D
