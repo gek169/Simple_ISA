@@ -6,8 +6,17 @@ The included assembly programs and assembler are designed for the C code.
 
 The included makefiles and shell script show how to use the emulator and the assembler
 
-The emulator and assembler are confirmed to compile with Tiny C, Clang, and GCC on Linux and the included programs
-work as intended.
+The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
+
+The emulator itself has been confirmed to *compile* using compiler explorer on...
+
+* Intel Cilk Compiler
+
+* GCC arm and Clang on virtually every platform.
+
+* MSVC
+
+* a myriad of unusual and strange compilers
 
 The emulator itself is C89 compliant, but the assembler uses C99 due to it using "unsigned long long".
 
