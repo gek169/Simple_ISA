@@ -33,7 +33,7 @@ Q8:S.b=r(S.c)D
 Q9:S.c=(((U)S.a&255)<<8)+(U)(S.b&255);D
 QA:S.a=S.b;D
 QB:S.b=S.a;D
-QC:S.a=S.c;D
+QC:S.a=S.c&0xff;D
 QD:S.a=(S.c>>8)&255;D
 QF:S.c=(((U)S.b&255)<<8)+(U)(S.a&255);D
 R0:S.a=Z;D
@@ -44,7 +44,11 @@ R4:S.a=Z3;D
 R5:S.b=Z4;D
 R6:S.a=Z4;D
 R7:S.b=Z3;D
-R8:R9:RA:RB:RC:RD:RE:RF:S0:S1:S2:S3:S4:S5:S6:S7:S8:S9:SA:SB:SC:SD:SE:SF:h:z 0;
+R8:S.c=S.a;D
+R9:S.c=S.b;D
+RA:S.a=S.c;D
+RB:S.b=S.c;D
+RC:RD:RE:RF:S0:S1:S2:S3:S4:S5:S6:S7:S8:S9:SA:SB:SC:SD:SE:SF:h:z 0;
 A:S.a=r(Z)D
 v:S.a=G;D
 B:S.b=r(Z)D
