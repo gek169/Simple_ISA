@@ -1,6 +1,9 @@
 VAR#looptop#1,0xf0
 VAR#GOTO_TOP#sc looptop;jmp;
 VAR#jumpc#jmp;
+VAR#jumpc#jmp;
+VAR#jumpc#jmp;
+VAR#jumpc#jmp;
 VAR#IS_A_NEWLINE#sta0,0;lb0xa0;cmp;
 VAR#GET_A_BACK#lda0,0;
 

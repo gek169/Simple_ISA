@@ -388,7 +388,8 @@ int main(int argc, char** argv){
 			unsigned short index = 0;
 			for(unsigned short i = 0; i < nmacros; i++){
 				if(streq(macro_name, variable_names[i])){
-					printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
+					//printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
+					is_overwriting = 1;
 					if(i < 4){
 						printf("<ASM SYNTAX ERROR> redefinition of critical macro, line: %s\n", line_copy);
 						goto error;	
@@ -404,6 +405,7 @@ int main(int argc, char** argv){
 						strlen(line+loc_pound+loc_pound2)
 				);
 			} else {
+				printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);
 				variable_names[index] = macro_name;
 				variable_expansions[index] = 
 				str_null_terminated_alloc(
