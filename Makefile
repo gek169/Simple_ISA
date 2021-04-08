@@ -1,4 +1,4 @@
-CC= clang
+CC= gcc
 CCC= g++
 #CC= clang
 CFLAGS= -O3 -lm -std=c89 -pedantic
