@@ -124,7 +124,7 @@ It also does a limited amount of error checking.
 
 ## What is this ISA called?
 
-MHS-16
+"THAT isa"
 
 ```
 Written by
