@@ -1,6 +1,7 @@
 CC= gcc
-CCC= g++
+#CC= tcc
 #CC= clang
+CCC= g++
 CFLAGS= -O3 -lm -std=c89 -pedantic
 CASMFLAGS= -O3 -lm -std=c99 -pedantic
 CPPFLAGS= -O3 -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
