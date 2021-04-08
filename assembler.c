@@ -245,11 +245,23 @@ int main(int argc, char** argv){
 	variable_expansions[3] = "";
 	nmacros = 4;
 	unsigned long long line_num = 0;
-	
 	for(int i = 2; i < argc; i++)
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
+		if(
+			strprefix("-h",argv[i-1]) ||
+			strprefix("-v",argv[i-1]) ||
+			strprefix("--help",argv[i-1]) ||
+			strprefix("--version",argv[i-1])
+		){
+			puts("Usage: ./asm -i infile -o outfile\n");
+			puts("Optional arguments: -DBG: debug the assembler");
+			puts("Optional arguments: -E: Print macro expansion only do not write to file");
+			puts("Optional arguments: -pl: Print lines");
+			puts("\n\nAuthored by DMHSW for the Public Domain\n\n");
+			return 1;
+		}
 	}
 	for(int i = 1; i < argc; i++)
 	{
@@ -292,7 +304,7 @@ int main(int argc, char** argv){
 		if(debugging) printf("\nEnter a line...\n");
 		char* line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		if(!line) return 0;
-		char* line_copy = strcatalloc(line,"");
+		char* line_copy = strcatalloc(line,"");line_num++;
 		/*Step 0: Skip comment lines*/
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
@@ -343,11 +355,7 @@ int main(int argc, char** argv){
 		if(debugging){
 			printf("\n~~Is this a macro?~~\n");
 		}
-		if(quit_after_macros || debugging) {
-			printf("\n#Line post macro expansion:\n");
-			puts(line); 
-			if(quit_after_macros) goto end;
-		}
+
 		if(strprefix("VAR",line)){ /*It's show time!*/
 			if(debugging){
 				printf("\nThis is a macro!\n");
@@ -418,6 +426,11 @@ int main(int argc, char** argv){
 				printf("\nMacro Name is %s, size %u\n", variable_names[nmacros-1], (unsigned int)strlen(variable_names[nmacros-1]));
 			}
 		}
+		if(quit_after_macros || debugging) {
+			printf("\n#Line post macro expansion and evaluation:\n");
+			puts(line); 
+			if(quit_after_macros) goto end;
+		}
 		/*	most complicated step- handle insns.
 			Everything breaks down to bytes underneath, so we convert to "bytes" commands.
 			The difference between here and above is that we have to count
@@ -478,6 +491,9 @@ int main(int argc, char** argv){
 			Put out bytes.
 		*/
 		/*Inch along*/
+		if(printlines){
+			printf("%s\n",line);
+		}
 		char* metaproc = line;
 		do{
 			if(strprefix("bytes", metaproc)){

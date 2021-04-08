@@ -4,14 +4,16 @@ CC= gcc
 CCC= g++
 CFLAGS= -Ofast -lm -std=c89 -pedantic -mtune=native
 #CFLAGS= -Os -lm -std=c89 -pedantic
-CASMFLAGS= -O3 -lm -std=c99 -pedantic
-CPPFLAGS= -O3 -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
+CASMFLAGS= -Os -lm -std=c99 -pedantic
+CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 all: main asm_programs
 
 main:
 	$(CC) $(CFLAGS) isa.c -o isa
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 	$(CC) $(CASMFLAGS) assembler.c -o asm
+
+cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
 asm_programs: main
