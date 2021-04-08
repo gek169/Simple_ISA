@@ -1,33 +1,24 @@
-//Load 0 into register C
-//Jump to code location
-[0]05
-[1]01
-[2]F0
-//store 1 into A
-[11]2
-[12]1
-//jump
-[13]E
+VAR#looptop#1,0xf0
+VAR#GOTO_TOP#sc looptop;la1;jmpifeq
 
-<01F0>
-[0]05
-[1]01
-[2]F0
-//Read character from stdin into A
-[3]10
-//Echo it back
-[4]11
-//some nops for room.
-[5]1E
-[6]1E
-[7]1E
-[8]1E
-[9]1E
-[10]1E
-//store 1 into A
-[11]2
-[12]1
-//jump to 0
-[13]E
-//Unreachable halt.
-[14]0
+#right at the beginning.
+section 0
+GOTO_TOP
+
+#the in-between will be filled with zeroes.
+
+
+section 0x1F0
+sc 1,0xF0
+#Read character from stdin into A
+getchar
+#Echo it back
+putchar
+asm_print
+#some nops for room.
+nop;nop;nop;nop;nop;nop;
+GOTO_TOP
+#Unreachable HALT insn
+asm_print
+halt
+

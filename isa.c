@@ -8,11 +8,11 @@
 #define Z (S.p+=2,((((U)S.M[S.p-2]))<<8)+(U)S.M[S.p-1])
 #define w(v,d)S.M[d]=v;
 #define D ;switch(G&31){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6: o t;k 7: o T;\
-						k 8:o oa;k 9:o os;k 10:o om;k 11:o od;k 12:o oi;k 13: o C;k 14:o j;k 15:o J;\
-						k 16:o Q0;k 17:o Q1;k 18:o Q2;k 19:o Q3;k 20:o Q4;k 21:o Q5;k 22:o Q6;k 23:o Q7;\
-						k 24:o Q8;k 25:o Q9;k 26:o QA;k 27:o QB;k 28:o QC;k 29:o QD;k 30:o QE;k 31:o QF;}
+k 8:o oa;k 9:o os;k 10:o om;k 11:o od;k 12:o oi;k 13: o C;k 14:o j;k 15:o J;\
+k 16:o Q0;k 17:o Q1;k 18:o Q2;k 19:o Q3;k 20:o Q4;k 21:o Q5;k 22:o Q6;k 23:o Q7;\
+k 24:o Q8;k 25:o Q9;k 26:o QA;k 27:o QB;k 28:o QC;k 29:o QD;k 30:o QE;k 31:o QF;}
 typedef uint8_t u;typedef uint16_t U;struct{u a;u b;U c;U p;u R;u*y;u M[(1<<16)];}S={0};FILE*F;
-U e(){S.R=0;D
+U e(){QE:D
 Q2:S.a&=S.b;D
 Q3:S.a|=S.b;D
 Q4:S.a^=S.b;D
@@ -27,13 +27,13 @@ QA:S.a=S.b;D
 QB:S.b=S.a;D
 QC:S.a=S.c;D
 QD:S.a=S.c>>8;D
-QE:D
-QF:h:z 0;
+QF:S.c=(((U)S.b)<<8)+(U)S.a;D
+h:z 0;
 A:S.a=r(Z)D
 v:S.a=G;D
 B:S.b=r(Z)D
 V:S.b=G;D
-X: S.c=Z;D
+X:S.c=Z;D
 t:w(S.a,Z)D
 T:w(S.b,Z)D
 j:if(S.a==1)S.p=S.c;D
