@@ -77,13 +77,12 @@ push, stp+=val, add to the stack pointer by a number of bytes (3 bytes) (34)
 pop, stp-=val, subtract from the stack pointer by a number of bytes (3 bytes) (35)
 pusha, stp+=a, add a to the stack pointer (1 byte) (36)
 popa, stp-=a, sub a from the stack pointer (1 byte) (37)
-
 astp, a = stp (1 byte) (38)
 bstp, b = stp (1 byte) (39)
 /*58 decimal so far.*/
 compl, a = ~a (1 byte) (3A)
 
-3B-0x3f, halt duplicates, free for expansion (1 byte)
+0x3B-0x3f, halt duplicates, free for expansion (1 byte)
 
 There are plenty of free instruction spots for you to play around with in your experimentation.
 

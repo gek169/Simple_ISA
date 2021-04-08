@@ -205,6 +205,7 @@ char* insn_repl[64] = {
 	/*stack pointer retrieval*/
 	"bytes 56;",
 	"bytes 57;",
+	/*compl*/
 	"bytes 58;",
 };
 static const unsigned char n_insns = 59;
