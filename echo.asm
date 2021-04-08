@@ -4,7 +4,7 @@ VAR#jumpc#jmp;
 VAR#jumpc#jmp;
 VAR#jumpc#jmp;
 VAR#jumpc#jmp;
-VAR#IS_A_NEWLINE#sta0,0;lb0xa0;cmp;
+VAR#IS_A_NEWLINE#sta0,0;lb0xa;cmp;
 VAR#GET_A_BACK#lda0,0;
 
 #right at the beginning.
@@ -19,7 +19,7 @@ sc 1,0xF0
 #Read character from stdin into A and echo it back. Ignore newlines.
 getchar
 IS_A_NEWLINE;jmpifeq;GET_A_BACK;
-putchar
+#putchar
 
 #Simple loop
 
