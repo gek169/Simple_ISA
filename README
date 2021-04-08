@@ -1,20 +1,10 @@
-Simple instruction set architecture for an 8-bit-micro-like computer.
+Simple instruction set architecture for an 16-bit, micro-like computer.
 
 The C source is obfuscated but the C++ is not and runs at compiletime
 
 The included program, program.bin, is designed for the obfuscated C emulator.
 
-You can compile and run the emulator by typing...
-```
-cc isa.c -o isa
-cc rbytes.c -o rbytes
-#run the incrementing demo
-./isa program.bin
-#run echo
-./isa echo.bin
-#if you have compiled rbytes
-./rbytes > random_program.bin; ./isa random_program.bin
-```
+The included makefiles and shell script how to use the emulator and its associated tools.
 
 The emulator is confirmed to compile with both Tiny C compiler and GCC on Linux and the included program
 works.
@@ -24,9 +14,9 @@ It it is a simple program which increments the value at memory location 488 (1e8
 These are the supported instructions in the C version, the C++ has slightly fewer:
 
 halt- end execution (1 byte) (0)
-lda- load byte into register a (3 bytes) (1)
+lda- load byte into register a,zero extend (3 bytes)(1)
 la - set register a to value (2 bytes) (2)
-ldb - load byte into register b (3 bytes) (3)
+ldb - load byte into register b, zero extend (3 bytes)(3)
 lb - set register b to value (2 bytes) (4)
 sc- load 2 constant bytes into c (3 bytes) (5)
 sta- store a to location (3 bytes) (6)
@@ -51,13 +41,22 @@ ildb- b = read(c), indirectly access memory through register c and load it into 
 cab- c = a<<8 + b, make c the combination of a and b. (1 byte)(19)
 ab- a = b (1 byte)(1A)
 ba- b = a (1 byte)(1B)
-alc- a = the low half of c (1 byte)(1C)
+alc- a = c (1 byte)(1C)
 ahc- a = the high half of c (1 byte)(1D)
 nop- (1byte) (1E)
 cba a = c = b<<8 + a, make c the other combination of a and b. (1 byte) (1F)
-If you feel that you need more instructions, you will most likely
-have to change the mask from "&31" to "&63" which will require you to define 31 more cases
-in the switch case.
+~~~~~~~~
+Special 16 bit opcodes specifically for 16 bit mode.
+~~~~~~~~
+llda Load 2 constant bytes into A (3 bytes)(20)
+illa indirectly load 2 bytes into A through C (1 byte)(21)
+lldb Load 2 constant bytes into B (3 bytes)(22)
+illb indirectly load 2 bytes int B through C (1 byte)(23)
+illdaa indirectly load 2 bytes into A through A (1 byte)(24)
+illdbb indirectly load 2 bytes into B through B (1 byte)(25)
+illdab indirectly load 2 bytes into A through B (1 byte)(26)
+illdba indirectly load 2 bytes into B through A (1 byte)(27)
+There are plenty of free instruction spots.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.
@@ -72,6 +71,7 @@ The emulator requires a filename as the first parameter.
 A very basic assembler is included with the ability to define sections, 
 include arbitrary data,
 and write your own multi-statement macros.
+It also does a limited amount of error checking.
 
 ~~DMHSW~~
 

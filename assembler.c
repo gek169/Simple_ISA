@@ -49,7 +49,7 @@ char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
-char* insns[32] = {
+char* insns[64] = {
 	"halt",
 	"lda",
 	"la",
@@ -81,9 +81,18 @@ char* insns[32] = {
 	"alc",
 	"ahc",
 	"nop",
-	"cba"
+	"cba",
+	/*Special insns for 16 bit mode*/
+	"llda",
+	"illa",
+	"lldb",
+	"illb",
+	"illdaa",
+	"illdbb",
+	"illdab",
+	"illdba",
 };
-uint8_t insns_numargs[32] = {
+uint8_t insns_numargs[64] = {
 	0,//halt
 	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
 	2, //load constant into C
@@ -94,9 +103,13 @@ uint8_t insns_numargs[32] = {
 	0,0, //getchar,putchar,
 	0,0,0,0,0, //bitwise
 	0,0, //indirect load.
-	0,0,0,0,0,0,0 //Register to register moves and nop.
+	0,0,0,0,0,0,0, //Register to register moves and nop.
+	
+	2,0,2,0, //16 bit constant loads and loads-through-c
+	0,0,//16 bit self-indirect loads
+	0,0,//16 bit neighbor-indirect loads
 };
-char* insn_repl[32] = {
+char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
 	/*The load direct load-and-store operations have args.*/
 	"bytes 1,",
@@ -131,8 +144,18 @@ char* insn_repl[32] = {
 	"bytes 29;",
 	"bytes 30;",
 	"bytes 31;",
+	/*16 bit mode insns*/
+	"bytes 32,",
+	"bytes 33;",
+	"bytes 34,",
+	"bytes 35;",
+	/*Neighbors/self indirection*/
+	"bytes 36;",
+	"bytes 37;",
+	"bytes 38;",
+	"bytes 39;",
 };
-static const uint8_t n_insns = 32;
+static const uint8_t n_insns = 40;
 uint16_t outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
