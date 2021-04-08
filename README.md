@@ -101,6 +101,9 @@ so you don't have to use memory if you don't want to.
 
 The emulator will print out its memory layout at the end of execution if you pass an additional argument
 to it on the commandline (other than just the program name)
+```bash
+./isa program.bin literallyanything
+```
 
 #Device Interface
 
