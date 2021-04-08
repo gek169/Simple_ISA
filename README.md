@@ -108,7 +108,7 @@ to it on the commandline (other than just the program name)
 ## Device Interface
 
 You can make the emulator work with any device you want by implementing your own abstraction layer.
-Implement these functions in a driver.c file:
+Implement these functions in a driver.h file:
 
 void di() is the device initializer.
 void dcl() is the devoice closing function.
