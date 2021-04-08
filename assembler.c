@@ -21,8 +21,7 @@
 //You may have at most, 65,535 macros in your file.
 //5) Location retrieval
 //You may use the location of the current instruction you are writing as a variable.
-//It is called @
-//sc @
+//It is called @ as a short, or $ as a pair of bytes.
 //6) Arbitrary data
 //You may specify arbitrary data as either BYTES or SHORTS
 //bytes 0xFF,10,34,7
@@ -135,7 +134,7 @@ char* insn_repl[32] = {
 };
 static const uint8_t n_insns = 32;
 uint16_t outputcounter = 0;
-unsigned int nmacros = 3; /*0,1,2*/
+unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
@@ -162,11 +161,13 @@ void fputshort(uint16_t sh, FILE* f){
 }
 int main(int argc, char** argv){
 	variable_names[0] = "@";
+	variable_names[1] = "$";
 	/*Macro to remove whitespace- this assembler works without using any whitespace at all.*/
-	variable_names[1] = "\t";
-	variable_expansions[1] = "";
-	variable_names[2] = " ";
+	variable_names[2] = "\t";
 	variable_expansions[2] = "";
+	variable_names[3] = " ";
+	variable_expansions[3] = "";
+	nmacros = 4;
 	unsigned long long line_num = 0;
 	
 	for(int i = 2; i < argc; i++)
@@ -242,11 +243,16 @@ int main(int argc, char** argv){
 					have_expanded = 1;
 					long long len_to_replace = strlen(variable_names[i]);
 					char* before = str_null_terminated_alloc(line_old, loc);
-					if(i!=0)
+					if(i > 1)
 						before = strcatallocf1(before, variable_expansions[i]);
-					else{
+					else if (i == 0){
 						char expansion[1024];
-						snprintf(expansion, 1023, "%04x", outputcounter);
+						snprintf(expansion, 1023, "%u", outputcounter);
+						expansion[1023] = '\0'; /*Just in case...*/
+						before = strcatallocf1(before, expansion);
+					} else {
+						char expansion[1024];
+						snprintf(expansion, 1023, "%u,%u", (unsigned int)(outputcounter/256),(unsigned int)(outputcounter&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					}
@@ -277,7 +283,7 @@ int main(int argc, char** argv){
 			long long loc_pound = strfind(line, "#");
 			long long loc_pound2 = 0;
 			if(loc_pound == -1) {
-				printf("<SYNTAX ERROR>  missing leading # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line %s\n", line_copy); goto error;
 			}
 			/*We have a macro.*/
 			char* macro_name = line + loc_pound;
@@ -285,28 +291,50 @@ int main(int argc, char** argv){
 				printf("\nMacro Name Pre-Allocation is identified as %s\n", macro_name);
 			}
 			if(strlen(macro_name) == 1){
-				printf("\n<SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
 			}
 			macro_name += 1; loc_pound += 1; /*We use these again.*/
 			loc_pound2 = strfind(macro_name, "#");
 			if(loc_pound2 == -1) {
-				printf("\n<SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
 			}
 			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);
 			if(debugging){
 				printf("\nMacro Name is identified as %s\n", macro_name);
 			}
 			if(strlen(line + loc_pound + loc_pound2) < 2){
-				printf("<SYNTAX ERROR> macro without a definition. line %s\n", line_copy);
+				printf("<ASM SYNTAX ERROR> macro without a definition. line %s\n", line_copy);
 				goto error;
 			}
 			loc_pound2++;
-			variable_names[nmacros] = macro_name;
-			variable_expansions[nmacros++] = 
-			str_null_terminated_alloc(
-					line+loc_pound+loc_pound2,
-					strlen(line+loc_pound+loc_pound2)
-			);
+			/*Search to see if we've already defined this macro*/
+			char is_overwriting = 0;
+			uint16_t index = 0;
+			for(uint16_t i = 0; i < nmacros; i++){
+				if(streq(macro_name, variable_names[i])){
+					printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
+					if(i < 4){
+						printf("<ASM SYNTAX ERROR> redefinition of critical macro, line: %s\n", line_copy);
+						goto error;	
+					}
+					index = i;
+				}
+			}
+			if(!is_overwriting){
+				variable_names[nmacros] = macro_name;
+				variable_expansions[nmacros++] = 
+				str_null_terminated_alloc(
+						line+loc_pound+loc_pound2,
+						strlen(line+loc_pound+loc_pound2)
+				);
+			} else {
+				variable_names[index] = macro_name;
+				variable_expansions[index] = 
+				str_null_terminated_alloc(
+						line+loc_pound+loc_pound2,
+						strlen(line+loc_pound+loc_pound2)
+				);
+			}
 			if(debugging){
 				printf("\nMacro Contents are %s, size %u\n", variable_expansions[nmacros-1], (unsigned int)strlen(variable_expansions[nmacros-1]));
 				printf("\nMacro Name is %s, size %u\n", variable_names[nmacros-1], (unsigned int)strlen(variable_names[nmacros-1]));
@@ -436,7 +464,7 @@ int main(int argc, char** argv){
 				uint8_t fillval = strtoull(proc, NULL, 0);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
-				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
+				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04x\n", line_copy, line, outputcounter);
 			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_quit", metaproc)){
 				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
 				goto error;
