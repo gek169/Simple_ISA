@@ -99,6 +99,7 @@ char* insns[64] = {
 	"istb",
 	"istla",
 	"istlb",
+	"jmp",
 };
 unsigned char insns_numargs[64] = {
 	0,//halt
@@ -119,6 +120,7 @@ unsigned char insns_numargs[64] = {
 	0,0,//move to C
 	0,0,//move from C
 	0,0,0,0,//Indirect Stores
+	0, //Direct jump.
 };
 char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
@@ -176,8 +178,9 @@ char* insn_repl[64] = {
 	"bytes 45;",
 	"bytes 46;",
 	"bytes 47;",
+	"bytes 48;",
 };
-static const unsigned char n_insns = 48;
+static const unsigned char n_insns = 49;
 unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

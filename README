@@ -49,9 +49,7 @@ alc- a = low half of c (1 byte)(1C)
 ahc- a = the high half of c (1 byte)(1D)
 nop- (1byte) (1E)
 cba c = b<<8 + a, make c the other combination of a and b. (1 byte) (1F)
-~~~~~~~~
-Special 16 bit opcodes specifically for 16 bit mode.
-~~~~~~~~
+~~16 bit ops
 lla, Large Load 2 constant bytes into A (3 bytes)(20)
 illda, a = [c], indirectly load 2 bytes into A through C (1 byte)(21)
 llb, Large Load 2 constant bytes into B (3 bytes)(22)
@@ -66,10 +64,12 @@ ac a=c (1 byte)(2A)
 bc b=c (1 byte)(2B)
 
 ista, store a at the location pointed to by C (1 byte)(2C)
-istb, store b at the location pointed to by C (1 byte)(2C)
-istla, indirectly store a at the location pointed to by C(1 byte)(2D)
-istlb, indirectly store a at the location pointed to by C(1 byte)(2E)
+istb, store b at the location pointed to by C (1 byte)(2D)
+~~More 16 bit ops
+istla, indirectly store a at the location pointed to by C(1 byte)(2E)
+istlb, indirectly store a at the location pointed to by C(1 byte)(2F)
 
+jmp, unconditionally jump (1 byte) (30)
 
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
