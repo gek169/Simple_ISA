@@ -14,5 +14,5 @@ main:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
 clean:
-	rm -f *.exe *.out *.o isa isa_constexpr rbytes asm
+	rm -f *.exe *.out *.o *.bin isa isa_constexpr rbytes asm
 	clear

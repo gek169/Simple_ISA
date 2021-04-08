@@ -25,5 +25,5 @@ putchar
 #alternatively, halt by dividing by zero
 la 1
 lb 0
-div
+mod
 halt
