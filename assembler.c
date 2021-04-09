@@ -705,10 +705,10 @@ int main(int argc, char** argv){
 		continue;
 		/*Yikes!*/
 		error:
-		puts("\n<ASM> Assembler Aborted.");
+		puts("<ASM> Assembler Aborted.\n");
 		return 1;
 	}
-	puts("\n<ASM> Assembly successful.");
+	printf("<ASM> Successfully assembled %s\n", outfilename);
 	fclose(ofile);
 	fclose(infile);
 	return 0;
