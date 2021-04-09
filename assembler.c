@@ -395,14 +395,43 @@ int main(int argc, char** argv){
 					char* before = str_null_terminated_alloc(line_old, loc);
 					if(i > 2)
 						before = strcatallocf1(before, variable_expansions[i]);
-					else if (i == 0){
+					else if (i == 0){ //SYNTAX: @+7+
 						char expansion[1024];
-						snprintf(expansion, 1023, "%u", outputcounter);
+						unsigned short addval = 0;
+						/*We need to check if there is a plus sign immediately after the at sign. */
+						if(strprefix("+",line_old+loc+1)){
+							char* add_text = line_old+loc+2;
+							/*Find the next plus*/
+							long long loc_eparen = strfind(line_old+loc+2,"+");
+							if(loc_eparen == -1){
+								printf("<ASM SYNTAX ERROR> @ with no ending plus. Line:\n%s\n", line_copy);
+								goto error;
+							}
+							addval = strtoull(add_text,0,0);
+							len_to_replace += (loc_eparen-len_to_replace+3);
+						}
+						addval += outputcounter;
+						snprintf(expansion, 1023, "%u", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==1){
 						char expansion[1024];
-						snprintf(expansion, 1023, "%u,%u", (unsigned int)(outputcounter/256),(unsigned int)(outputcounter&0xff));
+						unsigned short addval = 0;
+
+						if(strprefix("+",line_old+loc+1)){
+							char* add_text = line_old+loc+2;
+							/*Find the next plus*/
+							long long loc_eparen = strfind(line_old+loc+2,"+");
+							if(loc_eparen == -1){
+								printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
+								goto error;
+							}
+							addval = strtoull(add_text,0,0);
+							len_to_replace += (loc_eparen-len_to_replace+3);
+						}
+						addval += outputcounter;
+						
+						snprintf(expansion, 1023, "%u,%u", (unsigned int)(addval/256),(unsigned int)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==2){ /*Split directive.*/

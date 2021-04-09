@@ -53,7 +53,6 @@ section 0xC000
 //defining a function out here.
 //this function prints Qs to the screen.
 section 0xA000
-asm_print;
 la 0xa
 putchar;putchar;
 lla %0xB000%;illdaa;
@@ -63,4 +62,6 @@ putchar;putchar;
 putchar;putchar;
 la 0xa
 putchar;putchar;
+
 ret
+section @+5+;asm_print;
