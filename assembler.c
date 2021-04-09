@@ -32,20 +32,22 @@
 //bytes 5; sa 7;
 //7) Arbitrary whitespace
 //The assembler does not rely on white space at all to make decisions.
+//However some operations require that there be no whitespace.
+//Character literals for instance must start at the beginning of a line with no preceding whitespace.
 //8) Skipto
 //The assembler allows you to "skip" until a desired address (which may wrap around to the beginning...)
 //by specifying it with the SECTION tag.
-//The memory in-between is *not* filled with nops.
-//SECTION 0x1000
+//If the space-in-between in the ROM does not exist it will be filled in with zeroes.
+//section 0x1000
 //9) Fill
 //The assembler allows you to write a byte value for a number of 
-//FILLBTS 0x00,0
+//fill 0xFFFF,0
 //10) Strings
 //The assembler allows you to directly write ascii characters into your output bin.
 //Lines beginning with ! are character literal lines and they will be written to the current output location.
 //11) Assembly-time directives
-//%(short)... converts number to a split short
-//They must have NO preceding whitespace.
+//%short%... converts number to a split short. It must be literal.
+//Assembly-time directives must have NO leading or trailing whitespace.
 
 
 #include "stringutil.h"
@@ -144,15 +146,16 @@ unsigned char insns_numargs[64] = {
 };
 char* insn_repl[64] = {
 	"bytes 0;", //Halt has no arguments.
-	/*The load direct load-and-store operations have args.*/
+	/*The direct load-and-store operations have args.*/
 	"bytes 1,",
 	"bytes 2,",
 	"bytes 3,",
 	"bytes 4,",
 	"bytes 5,",
-	/*Every single other instruction has no arguments.*/
+	/*stores have arguments*/
 	"bytes 6,",
 	"bytes 7,",
+	/*have no arguments.*/
 	"bytes 8;",
 	"bytes 9;",
 	"bytes 10;",
@@ -204,14 +207,16 @@ char* insn_repl[64] = {
 	"bytes 50,",
 	"bytes 51,",
 	/*Stack pointer operations.*/
+	/*Push and pop by constant amounts*/
 	"bytes 52,",
 	"bytes 53,",
+	/*using a*/
 	"bytes 54;",
 	"bytes 55;",
-	/*stack pointer retrieval*/
+	/*stack pointer retrieval into a or b*/
 	"bytes 56;",
 	"bytes 57;",
-	/*compl*/
+	/*compl of a*/
 	"bytes 58;",
 };
 static const unsigned char n_insns = 59;
@@ -472,12 +477,19 @@ int main(int argc, char** argv){
 			/*Search to see if we've already defined this macro*/
 			char is_overwriting = 0;
 			unsigned short index = 0;
+			for(unsigned short i = 0; i < n_insns; i++){
+				if( (strfind(insns[i],macro_name)>-1) ||
+				streq(macro_name, insns[i])){
+					printf("<ASM SYNTAX ERROR> This macro would override an instruction:\n%s\n", line_copy);
+					goto error;	
+				}
+			}
 			for(unsigned short i = 0; i < nmacros; i++){
 				if(streq(macro_name, variable_names[i])){
 					//printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
-						printf("<ASM SYNTAX ERROR> redefinition of critical macro, line: %s\n", line_copy);
+						printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
 						goto error;	
 					}
 					index = i;
@@ -674,6 +686,8 @@ int main(int argc, char** argv){
 				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
 				goto error;
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
+				if(debugging)
+					printf("<ASM WARNING> Inline Comment invalidates rest of line, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
 				break; /*Comment on line.*/
 			} else {
 				if(strlen(metaproc) > 0 &&

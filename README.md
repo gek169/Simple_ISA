@@ -91,6 +91,7 @@ astp, a = stp (1 byte) (38)
 bstp, b = stp (1 byte) (39)
 /*58 decimal so far.*/
 compl, a = ~a (1 byte) (3A)
+/*59 dec*/
 
 0x3B-0x3f, halt duplicates, free for expansion (1 byte)
 
