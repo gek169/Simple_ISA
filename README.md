@@ -139,7 +139,7 @@ It also does a limited amount of error checking.
 
 ## What is this ISA called?
 
-"THAT isa"
+SISA-16, Simple-ISA-16.
 
 ```
 Written by
