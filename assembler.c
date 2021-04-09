@@ -55,11 +55,12 @@
 
 #include "stringutil.h"
 #include <stdio.h>
+#include <stdint.h>
 char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
-char* insns[62] = {
+char* insns[128] = {
 	"halt",
 	"lda",
 	"la",
@@ -125,8 +126,15 @@ char* insns[62] = {
 	"cpc",
 	"call",
 	"ret",
+	/*Far Memory Access*/
+	"farillda",
+	"faristla",	
+	"farilldb",
+	"faristlb",
+	"farpagel",
+	"farpagest",
 };
-unsigned char insns_numargs[62] = {
+unsigned char insns_numargs[128] = {
 	0,//halt
 	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
 	2, //load constant into C
@@ -154,8 +162,11 @@ unsigned char insns_numargs[62] = {
 	0,//cpc
 	0,//call
 	0,//ret
+	0,0, //Far memory access- a
+	0,0, //Far memory access- b
+	0,0, //Far page load and store
 };
-char* insn_repl[62] = {
+char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
 	/*The direct load-and-store operations have args.*/
 	"bytes 1,",
@@ -233,9 +244,16 @@ char* insn_repl[62] = {
 	"bytes 59;",
 	"bytes 60;", //call
 	"bytes 61;", //ret
+	/*far memory.*/
+	"bytes 62;", //farillda
+	"bytes 63;", //faristla
+	"bytes 64;", //farilldb
+	"bytes 65;", //faristlb
+	"bytes 66;", //farpagel
+	"bytes 67;", //farpagest
 };
-static const unsigned char n_insns = 62;
-unsigned short outputcounter = 0;
+static const unsigned char n_insns = 68;
+unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
 char debugging = 0;
@@ -255,7 +273,7 @@ if(ftell(f) != outputcounter){
 		while(ftell(f)!=outputcounter)fputc(0, f);
 }
 
-fputc(b, f); outputcounter++;
+fputc(b, f); outputcounter++; outputcounter&=0xffffff;
 }
 void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
@@ -278,7 +296,6 @@ int main(int argc, char** argv){
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
-
 	}
 	for(int i = 1; i < argc; i++)
 	{
@@ -400,7 +417,7 @@ int main(int argc, char** argv){
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){ //SYNTAX: @+7+
 						char expansion[1024];
-						unsigned short addval = 0;
+						unsigned long addval = 0;
 						/*We need to check if there is a plus sign immediately after the at sign. */
 						if(strprefix("+",line_old+loc+1)){
 							char* add_text = line_old+loc+2;
@@ -414,12 +431,12 @@ int main(int argc, char** argv){
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						snprintf(expansion, 1023, "%u", addval);
+						snprintf(expansion, 1023, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==1){
 						char expansion[1024];
-						unsigned short addval = 0;
+						unsigned long addval = 0;
 
 						if(strprefix("+",line_old+loc+1)){
 							char* add_text = line_old+loc+2;
@@ -434,7 +451,7 @@ int main(int argc, char** argv){
 						}
 						addval += outputcounter;
 						
-						snprintf(expansion, 1023, "%u,%u", (unsigned int)(addval/256),(unsigned int)(addval&0xff));
+						snprintf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==2){ /*Split directive.*/
@@ -701,7 +718,7 @@ int main(int argc, char** argv){
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
-				unsigned short dest = strtoull(proc, NULL, 0);
+				unsigned long dest = strtoull(proc, NULL, 0);
 				if(dest == 0){
 				/*Explicitly check to see if they actually typed zero.*/
 					if(proc[0]!='0')
@@ -717,7 +734,7 @@ int main(int argc, char** argv){
 					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
-				unsigned short fillsize = strtoull(proc, NULL, 0);
+				unsigned long fillsize = strtoull(proc, NULL, 0);
 				if(fillsize == 0){
 					if(proc[0]!='0') /*Check if they actually typed zero.*/
 					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);

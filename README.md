@@ -24,7 +24,7 @@ It could be converted to C89 as well but it would require re-writing my string l
 
 These are the supported instructions in the C version, the C++ has a tiny fraction and is
 mostly a proof-of-concept that you can have a compiletime machine emulator.
-
+```
 halt- end execution (1 byte) (0)
 lda- load byte into register a,zero extend (3 bytes)(1)
 la - set register a to value (2 bytes) (2)
@@ -97,22 +97,22 @@ call: (1 bytes)(3C)
 write the program counter(+1) to the stack pointer. Push the stack pointer by 2. Jump to c.
 ret: (1 byte)(3D)
 subtract 2 from the stack pointer. load the program counter from the stack pointer.
-
-3E,3F, halt duplicates, free for expansion (1 byte)
-
+farillda: load short using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (3E)
+faristla: store short into far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (3F)
+farilldb: load short using far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (40)
+faristlb: store short into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (41)
+NOTE: Page size is 256 bytes.
+farpagel: copy 256 bytes from page indexed by c to local page indexed by a (1 byte) (42)
+farpagest: copy 256 bytes to page indexed by c from local page indexed by a (1 byte) (42)
+ halt duplicates, free for expansion (1 byte)
+```
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
 You may want to add more instructions than there are currently free slots,
-just change the "&63" to "&127" and add 64 more entries into the switch case.
+just change the "&127" to "&255" and add 128 more entries into the switch case.
 
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.
-
-Indirect memory addressing can be done by doing math in the A and B registers and moving the result to C,
-if you want to stick to "8 bit mode" which is what the C++ implementation has.
-
-in the C code, all the registers are 16 bit, and there are direct register-to-register moves,
-so you don't have to use memory if you don't want to.
 
 The emulator will print out its memory layout at the end of execution if you pass an additional argument
 to it on the commandline (other than just the program name)
@@ -140,6 +140,19 @@ It also does a limited amount of error checking.
 ## What is this ISA called?
 
 SISA-16, Simple-ISA-16.
+
+## Specs?
+
+The ISA is capable of indexing 64k of memory "normally" but by using "far" indexing, it can
+access 16 megabytes in total.
+
+Executable code must reside in the upper 64k. it is the "executable" segment.
+
+You can use the included assembler to define ROMs which are up to the full 16 megabytes in size,
+but the program counter cannot leave the first 64 kilobytes.
+
+It is recommended you put your procedure definitions on page boundaries so that they can be easily copied to
+executable memory and called.
 
 ```
 Written by
