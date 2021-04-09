@@ -392,7 +392,12 @@ int main(int argc, char** argv){
 		/*Check again to see if this is a comment line.*/
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-		if(strprefix("!",line)) goto end;
+		if(strprefix("!",line) || strfind(line, "!") != -1) {
+			printf("<ASM SYNTAX ERROR> Invalid character literal.");
+			printf("Character literals must be on their own line with no preceding whitespace.");
+			printf("\nLine:\n%s\n", line_copy);
+			goto error;
+		}
 		/*Step 2: Check to see if this is a macro*/
 		if(debugging){
 			printf("\n~~Is this a macro?~~\n");
@@ -440,7 +445,7 @@ int main(int argc, char** argv){
 				if(streq(macro_name, variable_names[i])){
 					//printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
 					is_overwriting = 1;
-					if(i < 4){
+					if(i < nbuiltin_macros){
 						printf("<ASM SYNTAX ERROR> redefinition of critical macro, line: %s\n", line_copy);
 						goto error;	
 					}
