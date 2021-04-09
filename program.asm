@@ -23,8 +23,8 @@ add
 #using split syntax
 sta %0x1e8%
 #grab our character from our array of characters
-
-llb %0xEFFE%
+llb %1%;sub;sub;
+llb %0xF000%
 add
 illdaa;
 llb %255%;and;
