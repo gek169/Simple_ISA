@@ -8,6 +8,7 @@
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
+#define ZR ((((U)M[P])<<8)+(U)M[P+1])
 #define w(v,d)M[d]=v;
 #define W(v,d)M[d]=v/255;M[d+1]=v&255;
 #define D ;switch(G&63){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6:o t;k 7:o T;\
@@ -63,7 +64,10 @@ S7:P-=a;D
 S8:a=P;D
 S9:b=P;D
 SA:a=~a;D
-SB:SC:SD:SE:SF:h:dcl();z 0;
+SB:c=p;D
+SC:W((p),P);P+=2;p=c;D
+SD:P-=2;p=ZR;D
+SE:SF:h:dcl();z 0;
 A:a=r(Z)D
 v:a=G;D
 B:b=r(Z)D

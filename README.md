@@ -92,8 +92,13 @@ bstp, b = stp (1 byte) (39)
 /*58 decimal so far.*/
 compl, a = ~a (1 byte) (3A)
 /*59 dec*/
+cpc, c = the program counter. (1 byte) (3B)
+call: (1 bytes)(3C)
+write the program counter(+1) to the stack pointer. Push the stack pointer by 2. Jump to c.
+ret: (1 byte)(3D)
+subtract 2 from the stack pointer. load the program counter from the stack pointer.
 
-0x3B-0x3f, halt duplicates, free for expansion (1 byte)
+3E,3F, halt duplicates, free for expansion (1 byte)
 
 There are plenty of free instruction spots for you to play around with in your experimentation.
 

@@ -56,7 +56,7 @@ char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
-char* insns[64] = {
+char* insns[62] = {
 	"halt",
 	"lda",
 	"la",
@@ -118,8 +118,12 @@ char* insns[64] = {
 	"astp",
 	"bstp",
 	"compl",
+	/*Call structure*/
+	"cpc",
+	"call",
+	"ret",
 };
-unsigned char insns_numargs[64] = {
+unsigned char insns_numargs[62] = {
 	0,//halt
 	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
 	2, //load constant into C
@@ -143,8 +147,12 @@ unsigned char insns_numargs[64] = {
 	2,2,0,0, //stack pointer ops
 	0,0, //retrieve the stack pointer and put it in a or b
 	0, //Compl
+	//call structure.
+	0,//cpc
+	0,//call
+	0,//ret
 };
-char* insn_repl[64] = {
+char* insn_repl[62] = {
 	"bytes 0;", //Halt has no arguments.
 	/*The direct load-and-store operations have args.*/
 	"bytes 1,",
@@ -218,8 +226,12 @@ char* insn_repl[64] = {
 	"bytes 57;",
 	/*compl of a*/
 	"bytes 58;",
+	/*cpc*/
+	"bytes 59;",
+	"bytes 60;", //call
+	"bytes 61;", //ret
 };
-static const unsigned char n_insns = 59;
+static const unsigned char n_insns = 62;
 unsigned short outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

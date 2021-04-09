@@ -1,6 +1,6 @@
 #Compile this program using asm. ./asm -i program.asm -o program.bin
-section 0
-fill 0xFFFF,0
+#section 0
+#fill 0xFFFF,0
 
 section 0xF000
 !hello world!!! You should see this print.
@@ -38,14 +38,30 @@ lb 0x41
 cmp;lb 0;cmp;jmpifeq
 
 
-#Load the value at 1e8 into register A
-#Using non-split syntax
-lda 1,0xe8
-#Print it
-putchar
-#Halt execution
-#alternatively, halt by dividing by zero
-#la 1
-#lb 0
-#mod
+//zero the stack pointer and then set it to a sensible value
+astp;popa;lla %0xE000%;pusha;
+lda %0x1e8%;putchar;
+sc %0xA000%;
+call;
+#we should see this when we return.
+la 0x45
+putchar;
+putchar;
+putchar;
+putchar;
+putchar;
+
 halt
+
+section 0xB000
+!QQQQQQQQQQQQQQQQQQ
+section 0xC000
+!FFFFFFFFFFFFFFFFF
+
+//defining a function out here.
+//this function prints Qs to the screen.
+section 0xA000
+asm_print;
+la 0xa
+putchar;putchar;putchar;putchar;putchar;putchar;putchar;putchar;
+ret
