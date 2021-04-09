@@ -296,7 +296,9 @@ int main(int argc, char** argv){
 	}
 	FILE* infile;
 	if(debugging) infile=stdin;
-	FILE* ofile = fopen(outfilename, "w");
+	FILE* ofile = NULL;
+	if(!quit_after_macros)
+		ofile=fopen(outfilename, "w");
 	if(!ofile){
 		printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);return 1;
 	}
