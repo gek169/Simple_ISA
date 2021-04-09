@@ -67,7 +67,6 @@ SA:a=~a;D
 SB:c=p;D
 SC:W((p),P);P+=2;p=c;D
 SD:P-=2;p=ZR;D
-SE:SF:h:dcl();z 0;
 A:a=r(Z)D
 v:a=G;D
 B:b=r(Z)D
@@ -83,7 +82,8 @@ om:a*=b;D
 od:if(b!=0)a/=b;else{R=1;o h;}D
 oi:if(b!=0)a%=b;else{R=1;o h;}D
 C:if(a<b)a=0;else if(a>b)a=2;else a=1;D
-}main(int rc,char**rv){U i=0,j;if(rc<2)z 1;
+SE:SF:h:dcl();z 0;}
+main(int rc,char**rv){U i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);if(i==0)break;}
 for(i=e();i<65504&&rc>2;i+=32)for(j=i,printf("\n%04x|",i);j<i+32;j++)printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 if(R)puts("\n<Errfl>\n");}
