@@ -19,7 +19,7 @@ k 40:o R8;k 41:o R9;k 42:o RA;k 43:o RB;k 44:o RC;k 45:o RD;k 46:o RE;k 47:o RF;
 k 48:o S0;k 49:o S1;k 50:o S2;k 51:o S3;k 52:o S4;k 53:o S5;k 54:o S6;k 55:o S7;\
 k 56:o S8;k 57:o S9;k 58:o SA;k 59:o SB;k 60:o SC;k 61:o SD;k 62:o SE;k 63:o SF;\
 }
-typedef unsigned char u;typedef unsigned short U;U a,b,c,p,P;u R,M[(1<<16)];FILE*F;
+typedef unsigned char u;typedef unsigned short U;U a,b,c,p,P;u R,M[65536];FILE*F;
 e(){R=0;p=0;a=0;b=0;P=0;di();QE:D
 Q2:a&=b;D
 Q3:a|=b;D
