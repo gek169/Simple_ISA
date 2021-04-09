@@ -42,7 +42,9 @@
 //FILLBTS 0x00,0
 //10) Strings
 //The assembler allows you to directly write ascii characters into your output bin.
-//Lines beginning with ! are character literals
+//Lines beginning with ! are character literal lines and they will be written to the current output location.
+//11) Assembly-time directives
+//%(short)... converts number to a split short
 //They must have NO preceding whitespace.
 
 
@@ -242,13 +244,15 @@ void fputshort(unsigned short sh, FILE* f){
 int main(int argc, char** argv){
 	variable_names[0] = "@";
 	variable_names[1] = "$";
+	variable_names[2] = "%";
 	/*Macro to remove whitespace- this assembler works without using any whitespace at all.*/
-	variable_names[2] = "\t";
-	variable_expansions[2] = "";
-	variable_names[3] = " ";
+	variable_names[3] = "\t";
 	variable_expansions[3] = "";
-	nmacros = 4;
-	const unsigned int nbuiltin_macros = 4;
+	variable_names[4] = " ";
+	variable_expansions[4] = "";
+	/*Assembly-time directives.*/
+	nmacros = 5;
+	const unsigned long long nbuiltin_macros = 5;
 	unsigned long long line_num = 0;
 	for(int i = 2; i < argc; i++)
 	{
@@ -369,17 +373,44 @@ int main(int argc, char** argv){
 					have_expanded = 1;
 					long long len_to_replace = strlen(variable_names[i]);
 					char* before = str_null_terminated_alloc(line_old, loc);
-					if(i > 1)
+					if(i > 2)
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){
 						char expansion[1024];
 						snprintf(expansion, 1023, "%u", outputcounter);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else {
+					} else if (i==1){
 						char expansion[1024];
 						snprintf(expansion, 1023, "%u,%u", (unsigned int)(outputcounter/256),(unsigned int)(outputcounter&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
+						before = strcatallocf1(before, expansion);
+					} else if (i==2){ /*Split directive.*/
+						/*Locate the next ending one*/
+						if(strlen(line_old+loc) == 0){
+							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
+							goto error;
+						}
+						long long loc_eparen = strfind(line_old+loc+1,"%");
+						if(loc_eparen == -1){
+							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							goto error;
+						}
+						if(loc_eparen == loc){
+							printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+						}
+						/*the character we were going to replace anyway, plus
+						the length of the stuff inbetween, plus the */
+						len_to_replace+=(loc_eparen-len_to_replace+2);
+						
+						char expansion[1024];
+						unsigned short res = strtoull(line_old+loc+1, NULL, 0);
+						if(res == 0)
+							if(line_old[loc+1] != '0')/*Test for the trivial case-did they actually *type* zero?*/
+								printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
+						if(debugging) printf("\nSplitting value %u\n", res);
+						/*Write the upper and lower halves out, separated, to expansion.*/
+						snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
 						before = strcatallocf1(before, expansion);
 					}
 					char* after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
@@ -478,13 +509,19 @@ int main(int argc, char** argv){
 			puts(line); 
 			if(quit_after_macros) goto end;
 		}
+
+		if(was_macro) goto end;
+		/* 
+			Assembly Directives
+
+		*/
+
 		/*	most complicated step- handle insns.
 			Everything breaks down to bytes underneath, so we convert to "bytes" commands.
 			The difference between here and above is that we have to count
 			how many commas we're supposed to encounter.
 			the first comma beyond that before the next semicolon, is replaced with a semicolon.
 		*/
-		if(was_macro) goto end;
 			{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;

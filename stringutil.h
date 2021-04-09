@@ -102,7 +102,6 @@ static inline long long strfind(const char* text, const char* subtext){
 			si = 0;
 			if(subtext[si] == '\0') return (ti - st);
 		}
-		
 	}
 	return -1;
 }
