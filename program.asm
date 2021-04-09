@@ -66,4 +66,4 @@ putchar;putchar;
 ret
 //Testing variable addressing.
 section @+1+;asm_print;
-sc @+1+;
+sc $+1+;
