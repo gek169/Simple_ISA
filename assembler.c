@@ -11,7 +11,7 @@
 //Names must be lower case and properly spelled.
 //Data must be separated by a comma.
 //2) Comments
-//Lines beginning with /, #, or ! will be ignored
+//Lines beginning with /, //, or # are comments.
 //3) Multiple commands per line
 //You may have multiple commands on the same line like this:
 //sa 0x53;cmp;jmpifeq;
@@ -40,6 +40,10 @@
 //9) Fill
 //The assembler allows you to write a byte value for a number of 
 //FILLBTS 0x00,0
+//10) Strings
+//The assembler allows you to directly write ascii characters into your output bin.
+//Lines beginning with ! are character literals
+//They must have NO preceding whitespace.
 
 
 #include "stringutil.h"
@@ -310,7 +314,16 @@ int main(int argc, char** argv){
 		/*Step 0: Skip comment lines*/
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-		if(strprefix("!",line)) goto end;
+		if(strprefix("!",line)) {
+			/*We are writing out individual bytes for the rest of the line.*/
+			if(debugging)
+				printf("Detected Character Literal on Line:\n%s\n", line_copy);
+			if(printlines)puts(line);
+			if(!quit_after_macros)
+				for(unsigned long long i = 1; i < strlen(line);i++)
+					fputbyte(line[i], ofile);
+			goto end;
+		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
 		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != '\t') {
 			puts("<ASM WARNING> Ignoring line beginning with illegal character...\n");
@@ -330,6 +343,26 @@ int main(int argc, char** argv){
 					long long loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
 					char* line_old = line;
+
+										/*Check to make sure that this isn't some other, longer insn.*/
+					char found_longer_match = 0;
+					if(!was_macro)
+					for(unsigned int j = 0; j<nmacros; j++){
+						if(j == i) continue;
+						if(strlen(variable_names[j]) > strlen(variable_names[i])){
+							long long checkme = strfind(line, variable_names[j]);
+							if(checkme == -1) continue;
+							/*Does this match contain us?*/
+							if(
+								checkme+strlen(variable_names[j]) >= loc + strlen(variable_names[i]) &&
+								checkme <= loc
+								){if(debugging) puts("Found longer Macro.");
+									found_longer_match = 1;
+									break;
+								}
+						}
+					}
+					if(found_longer_match) continue;
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
@@ -457,9 +490,27 @@ int main(int argc, char** argv){
 					long long loc = strfind(line, insns[i]);
 					if(loc == -1) continue;
 					char* line_old = line;
+					/*Check to make sure that this isn't some other, longer insn.*/
+					char found_longer_match = 0;
+					for(unsigned int j = 0; j<n_insns; j++){
+						if(j == i) continue;
+						if(strlen(insns[j]) > strlen(insns[i])){
+							long long checkme = strfind(line, insns[j]);
+							if(checkme == -1) continue;
+							/*Does this match contain us?*/
+							if(
+								checkme+strlen(insns[j]) >= loc + strlen(insns[i]) &&
+								checkme <= loc
+								){if(debugging) puts("Found longer insn.");
+									found_longer_match = 1;
+									break;
+								}
+						}
+					}
+					if(found_longer_match) continue;
 					/*We know the location of an insn to be expanded and it is at loc.*/
 					/*Crawl along the string. */
-					int num_commas_needed = insns_numargs[i] - 1; 
+					int num_commas_needed = insns_numargs[i] - 1;
 					//If you have three arguments, you only need two commas.
 					for(unsigned int j = loc + strlen(insns[i]); strlen(line+j)>0;j++){
 						if(line[j] == ','){
@@ -505,6 +556,7 @@ int main(int argc, char** argv){
 		char* metaproc = line;
 		do{
 			if(strprefix("bytes", metaproc)){
+				
 				char* proc = metaproc + 5;
 				do{
 					unsigned char byteval;
