@@ -286,9 +286,10 @@ int main(int argc, char** argv){
 			strprefix("--version",argv[i])
 		){
 			puts("Usage: ./asm -i infile -o outfile\n");
-			puts("Optional arguments: -DBG: debug the assembler");
-			puts("Optional arguments: -E: Print macro expansion only do not write to file");
-			puts("Optional arguments: -pl: Print lines");
+			puts("Optional argument: -DBG: debug the assembler");
+			puts("Optional argument: -E: Print macro expansion only do not write to file");
+			puts("Optional argument: -pl: Print lines");
+			puts("Optional argument: -v, -h, --help, --version: This printout.");
 			puts("\n\nAuthored by DMHSW for the Public Domain\n\n");
 			return 1;
 		}
