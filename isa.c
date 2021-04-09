@@ -20,8 +20,7 @@ k 48:o S0;k 49:o S1;k 50:o S2;k 51:o S3;k 52:o S4;k 53:o S5;k 54:o S6;k 55:o S7;
 k 56:o S8;k 57:o S9;k 58:o SA;k 59:o SB;k 60:o SC;k 61:o SD;k 62:o SE;k 63:o SF;\
 }
 typedef unsigned char u;typedef unsigned short U;U a,b,c,p,stp;u R,M[(1<<16)];FILE*F;
-e(){R=0;p=0;a=0;b=0;stp=0;di();
-QE:D
+e(){R=0;p=0;a=0;b=0;stp=0;di();QE:D
 Q2:a&=b;D
 Q3:a|=b;D
 Q4:a^=b;D

@@ -1,4 +1,4 @@
-/*isa.c needs stdio to load your program, must provide or replace it.*/
+/*stdio needed or needs to be replaced.*/
 #include <stdio.h>
 /*Implement your own driver here.*/
 void di(){}
