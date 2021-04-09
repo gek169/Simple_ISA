@@ -39,6 +39,7 @@ cmp;lb 0;cmp;jmpifeq
 
 
 #Load the value at 1e8 into register A
+#Using non-split syntax
 lda 1,0xe8
 #Print it
 putchar
