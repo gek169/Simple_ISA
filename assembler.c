@@ -325,8 +325,9 @@ int main(int argc, char** argv){
 			goto end;
 		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
+		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
 		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != '\t') {
-			puts("<ASM WARNING> Ignoring line beginning with illegal character...\n");
+			printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
@@ -593,8 +594,12 @@ int main(int argc, char** argv){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
 				unsigned short dest = strtoull(proc, NULL, 0);
-				if(dest == 0)
+				if(dest == 0){
+				/*Explicitly check to see if they actually typed zero.*/
+					if(proc[0]!='0')
 					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
+
+				}
 				if(debugging)
 					printf("Moving the output counter to %u\n", dest);
 				outputcounter = dest;
@@ -606,7 +611,8 @@ int main(int argc, char** argv){
 				}
 				unsigned short fillsize = strtoull(proc, NULL, 0);
 				if(fillsize == 0){
-					printf("<ASM WARNING> fill tag size is. Might be a bad number. Line %s", line_copy);
+					if(proc[0]!='0') /*Check if they actually typed zero.*/
+					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
 				}
 				/**/
 				long long next_comma = strfind(proc, ",");
@@ -616,6 +622,9 @@ int main(int argc, char** argv){
 				}
 				proc += next_comma + 1;
 				unsigned char fillval = strtoull(proc, NULL, 0);
+				if(fillval == 0) /*potential for a mistake*/
+					if(proc[0]!='0') /*Did they actually MEAN zero?*/
+						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
 				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04x\n", line_copy, line, outputcounter);
