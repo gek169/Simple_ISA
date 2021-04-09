@@ -64,4 +64,6 @@ la 0xa
 putchar;putchar;
 
 ret
-section @+5+;asm_print;
+//Testing variable addressing.
+section @+1+;asm_print;
+sc @+1+;

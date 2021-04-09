@@ -30,8 +30,8 @@
 //bytes myvariablename myothervariablename
 //You may use bytes and shorts in-line as if they were commands.
 //bytes 5; sa 7;
-//7) Arbitrary whitespace
-//The assembler does not rely on white space at all to make decisions.
+//7) (Mostly) Arbitrary whitespace (On a single line)
+//You can omit whitespace between keywords in most cases.
 //However some operations require that there be no whitespace.
 //Character literals for instance must start at the beginning of a line with no preceding whitespace.
 //8) Skipto
@@ -48,6 +48,9 @@
 //11) Assembly-time directives
 //%short%... converts number to a split short. It must be literal.
 //Assembly-time directives must have NO leading or trailing whitespace.
+//12) Builtin macros
+//You can retrieve the current location in the binary as a short with @, and as a byte pair with $
+//You can offset these like this: $+93+ or @+15+
 
 
 #include "stringutil.h"
