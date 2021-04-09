@@ -372,7 +372,7 @@ int main(int argc, char** argv){
 					if(loc == -1) continue;
 					char* line_old = line;
 
-										/*Check to make sure that this isn't some other, longer insn.*/
+										/*Check to make sure that this isn't some other, longer macro.*/
 					char found_longer_match = 0;
 					if(!was_macro)
 					for(unsigned int j = 0; j<nmacros; j++){
@@ -492,12 +492,12 @@ int main(int argc, char** argv){
 			}
 			was_macro = 1;
 			if(nmacros == 0xffff) {
-				printf("<ASM ERROR>  Too many macros. Cannot define another one. Line %s\n", line_copy); goto error;
+				printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
 			}
 			long long loc_pound = strfind(line, "#");
 			long long loc_pound2 = 0;
 			if(loc_pound == -1) {
-				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line:\n%s\n", line_copy); goto error;
 			}
 			/*We have a macro.*/
 			char* macro_name = line + loc_pound;
@@ -505,19 +505,19 @@ int main(int argc, char** argv){
 				printf("\nMacro Name Pre-Allocation is identified as %s\n", macro_name);
 			}
 			if(strlen(macro_name) == 1){
-				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); goto error;
 			}
 			macro_name += 1; loc_pound += 1; /*We use these again.*/
 			loc_pound2 = strfind(macro_name, "#");
 			if(loc_pound2 == -1) {
-				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line %s\n", line_copy); goto error;
+				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); goto error;
 			}
 			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);
 			if(debugging){
 				printf("\nMacro Name is identified as %s\n", macro_name);
 			}
 			if(strlen(line + loc_pound + loc_pound2) < 2){
-				printf("<ASM SYNTAX ERROR> macro without a definition. line %s\n", line_copy);
+				printf("<ASM SYNTAX ERROR> macro without a definition. Line:\n%s\n", line_copy);
 				goto error;
 			}
 			loc_pound2++;
@@ -527,11 +527,18 @@ int main(int argc, char** argv){
 			for(unsigned short i = 0; i < n_insns; i++){
 				if( (strfind(insns[i],macro_name)>-1) ||
 				streq(macro_name, insns[i])){
-					printf("<ASM SYNTAX ERROR> This macro would override an instruction:\n%s\n", line_copy);
+					printf("<ASM SYNTAX ERROR> This macro would prevent instruction %s from being used:\n%s\n", insns[i], line_copy);
 					goto error;	
 				}
 			}
 			for(unsigned short i = 0; i < nmacros; i++){
+				if(i < nbuiltin_macros)
+					if( (strfind(variable_names[i],macro_name)>-1) ||
+						streq(macro_name, variable_names[i]))
+					{
+						printf("<ASM SYNTAX ERROR> This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
+						goto error;	
+					}
 				if(streq(macro_name, variable_names[i])){
 					//printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
 					is_overwriting = 1;
