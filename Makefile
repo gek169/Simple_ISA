@@ -1,4 +1,5 @@
-CC= gcc
+CC=cc
+#CC= gcc
 #CC= tcc
 #CC= clang
 CCC= g++
