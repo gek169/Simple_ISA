@@ -38,6 +38,8 @@ The emulator itself is C89 compliant, but the assembler uses C99 due to it using
 
 It could be converted to C89 as well but it would require re-writing my string library. I decided not to bother.
 
+I plan on making the assembler self-hosting at some point.
+
 Terminology:
 ```
 Address: Location where data is stored in main memory
