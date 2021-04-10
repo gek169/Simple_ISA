@@ -136,6 +136,10 @@ char* insns[128] = {
 	"lfarpc",
 	"farcall",
 	"farret",
+	"farilda",
+	"farista",
+	"farildb",
+	"faristb",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -169,6 +173,7 @@ unsigned char insns_numargs[128] = {
 	0,0, //Far memory access- b
 	0,0, //Far page load and store
 	0,0,0, //lfarpc, farcall, farret,
+	0,0,0,0, //Far memory access- a and b, as single bytes
 };
 char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
@@ -258,8 +263,12 @@ char* insn_repl[128] = {
 	"bytes 68;", //lfarpc
 	"bytes 69;", //farcall
 	"bytes 70;", //farret
+	"bytes 71;", //farret
+	"bytes 72;", //farret
+	"bytes 73;", //farret
+	"bytes 74;", //farret
 };
-static const unsigned char n_insns = 71;
+static const unsigned char n_insns = 75;
 unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

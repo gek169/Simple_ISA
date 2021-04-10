@@ -119,7 +119,10 @@ Write the program counter offset to the stack pointer. Set the program counter o
 farret: (1 byte) (46)
 Subtract 1 from the stack pointer, assign the program counter offset from the stack pointer.
 subtract 2 from the stack pointer. load the program counter from the stack pointer. (jump)
-
+farilda: load byte using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (47)
+farista: store byte into far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (48)
+farildb: load byte using far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (49)
+faristb: store byte into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (4A)
 
 
 The rest: halt duplicates, free for expansion (1 byte)
@@ -187,7 +190,10 @@ to the actual location of instructions being executed.
 
 This can be useful- you can consider the first 64k "stack only" or "scratchpad memory"
 
-the first 64k is the fastest to access on the emulator since it is closest to the registers.
+jumps and calls that happen after a farcall or lfarpc will always jump within the
+current 64k that the program counter is inside of.
+
+the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
 
 ```
 Written by

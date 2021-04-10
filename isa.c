@@ -67,9 +67,9 @@ RD:w(b,c)D
 RE:W(a,c)D
 RF:W(b,c)D
 S0:p=c;D
-S1:W(a,p+PP)p+=2;D
-S2:W(b,p+PP)p+=2;D
-S3:W(c,p+PP)p+=2;D
+S1:W(a,(PP+p))p+=2;D
+S2:W(b,(PP+p))p+=2;D
+S3:W(c,(PP+p))p+=2;D
 S4:P+=Z;D
 S5:P-=Z;D
 S6:P+=a;D
@@ -104,7 +104,11 @@ SC:W(p,P);P+=2;p=c;D
 SD:P-=2;p=ZR;D
 T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
 T6:P-=1;pp=r(P);P-=2;p=ZR;D
-T7:T8:T9:TA:TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+T7:a=r((((UU)c)<<8)+((UU)b&255))D
+T8:w(a,((((UU)c)<<8)+((UU)b&255)))D
+T9:b=r((((UU)c)<<8)+((UU)a&255))D
+TA:w(b,((((UU)c)<<8)+((UU)a&255)))D
+TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 h:dcl();z 0;}
 main(int rc,char**rv){UU i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}

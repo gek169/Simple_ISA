@@ -62,8 +62,8 @@ putchar;putchar;
 putchar;putchar;
 
 //test far memory indexing functionality
-sc %0xffff%;asm_print;
-lla %0xea%;asm_print;
+sc %0xffff%;
+lla %0xea%;
 lb 0x59
 faristlb;
 lb 0xa
@@ -71,6 +71,20 @@ farilldb;
 ab;
 putchar;putchar;
 putchar;
+
+
+//test far memory indexing functionality for bytes
+sc %0xeeff%;
+lla %0xed%;
+lb 0x57
+faristb;
+lb 0xa
+farildb;
+ab;
+putchar;putchar;
+putchar;
+
+
 //test farpagel and farpagest
 lla%0xee%;
 sc %0xffff%
@@ -91,11 +105,6 @@ farret;#return back to the zero page.
 
 //Testing variable addressing.
 section @+1+
-
-//set up a loop
-
-
-sc $+1+;
-
+sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;
 section 0xFFFF00
 !KAKAKAIII
