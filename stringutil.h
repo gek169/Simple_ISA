@@ -90,10 +90,10 @@ static inline unsigned int streq(const char *pre, const char *str)
     return strcmp(pre, str) == 0;
 }
 //Someone once said sub-string search was an O(n^2) algorithm. What the hell?
-static inline long long strfind(const char* text, const char* subtext){
-	long long ti = 0;
-	long long si = 0;
-	long long st = strlen(subtext);
+static inline long strfind(const char* text, const char* subtext){
+	long ti = 0;
+	long si = 0;
+	long st = strlen(subtext);
 	for(;text[ti] != '\0';ti++){
 		if(text[ti] == subtext[si]) {
 			si++; 
@@ -109,8 +109,8 @@ static inline long long strfind(const char* text, const char* subtext){
 
 //Read file until terminator character is found.
 //Returns the number of characters copied.
-static inline unsigned long long read_until_terminator(FILE* f, char* buf, const unsigned long long buflen, char terminator){
-	unsigned long long i = 0;
+static inline unsigned long read_until_terminator(FILE* f, char* buf, const unsigned long buflen, char terminator){
+	unsigned long i = 0;
 	char c;
 	for(i = 0; i < (buflen-1); i++)
 	{
@@ -124,12 +124,12 @@ static inline unsigned long long read_until_terminator(FILE* f, char* buf, const
 }
 
 //Same as above but allocates memory to guarantee it can hold the entire thing. Grows naturally.
-static inline char* read_until_terminator_alloced(FILE* f, unsigned long long* lenout, char terminator, unsigned long long initsize){
+static inline char* read_until_terminator_alloced(FILE* f, unsigned long* lenout, char terminator, unsigned long initsize){
 	char c;
 	char* buf = STRUTIL_ALLOC(initsize);
 	if(!buf) return NULL;
-	unsigned long long bcap = initsize;
-	unsigned long long blen = 0;
+	unsigned long bcap = initsize;
+	unsigned long blen = 0;
 	while(1){
 		if(feof(f)){break;}
 		c = fgetc(f);
@@ -149,7 +149,7 @@ static inline char* read_until_terminator_alloced(FILE* f, unsigned long long* l
 }
 
 
-static inline void* read_file_into_alloced_buffer(FILE* f, unsigned long long* len){
+static inline void* read_file_into_alloced_buffer(FILE* f, unsigned long* len){
 	void* buf = NULL;
 	if(!f) return NULL;
 	fseek(f, 0, SEEK_END);
@@ -169,9 +169,9 @@ static inline void* read_file_into_alloced_buffer(FILE* f, unsigned long long* l
 * The token mark must be escaped with a backslash.
 * Token names which are substrings of other ones must be listed later
 */
-static inline char* strencodealloc(const char* inbuf, const char** tokens, unsigned long long ntokens, char esc, char tokmark){
-	unsigned long long lenin = strlen(inbuf);
-	char c; unsigned long long i = 0;
+static inline char* strencodealloc(const char* inbuf, const char** tokens, unsigned long ntokens, char esc, char tokmark){
+	unsigned long lenin = strlen(inbuf);
+	char c; unsigned long i = 0;
 	char c_str[512] = {0}; //We are going to be sprintf-ing to this buffer.
 	char* out = NULL;
 	c_str[0] = esc;
@@ -180,10 +180,10 @@ static inline char* strencodealloc(const char* inbuf, const char** tokens, unsig
 	c_str[0] = 0;
 	c_str[1] = 0;
 	//Write out all the token entries. format is namelength~definition
-	for(unsigned long long j = 0; j < ntokens; j++){
+	for(unsigned long j = 0; j < ntokens; j++){
 		out = strcataf1(out, tokens[2*j]);
 		//Write out the length of the token.
-		snprintf(c_str, 512, "%llu", (unsigned long long)strlen(tokens[2*j+1]));
+		snprintf(c_str, 512, "%llu", (unsigned long)strlen(tokens[2*j+1]));
 		out = strcataf1(out, c_str);
 		c_str[0] = tokmark;
 		c_str[1] = 0;
@@ -195,11 +195,11 @@ static inline char* strencodealloc(const char* inbuf, const char** tokens, unsig
 	out = strcataf1(out, c_str);
 	//We have now created the header. Now to begin encoding the text.
 	for(i=0; i<lenin; i++){
-		for(unsigned long long t = 0; t < ntokens; t++) //t- the token we are processing.
+		for(unsigned long t = 0; t < ntokens; t++) //t- the token we are processing.
 			if(strprefix(tokens[t*2+1], inbuf+i)){ //Matched at least one
-				unsigned long long howmany = 1;
-				unsigned long long curtoklen = strlen(tokens[t*2+1]); //Length of the current token we are counting
-				for(unsigned long long h=1;i+h*curtoklen < lenin;h++){
+				unsigned long howmany = 1;
+				unsigned long curtoklen = strlen(tokens[t*2+1]); //Length of the current token we are counting
+				for(unsigned long h=1;i+h*curtoklen < lenin;h++){
 					if(strprefix(tokens[t*2+1], inbuf+i+h*curtoklen))
 						{howmany++;}
 					else
@@ -211,7 +211,7 @@ static inline char* strencodealloc(const char* inbuf, const char** tokens, unsig
 				c_str[1] = 0;
 				out = strcataf1(out, c_str);
 				if(howmany > 1){
-					snprintf(c_str, 512, "%llu", (unsigned long long)howmany);
+					snprintf(c_str, 512, "%llu", (unsigned long)howmany);
 					out = strcataf1(out, c_str);
 				}
 				out = strcataf1(out, tokens[t*2]);
@@ -233,7 +233,7 @@ static inline char* strencodealloc(const char* inbuf, const char** tokens, unsig
 }
 
 static inline char* strdecodealloc(char* inbuf){
-	unsigned long long lenin = strlen(inbuf);
+	unsigned long lenin = strlen(inbuf);
 	if(lenin < 3) {
 		//puts("\nToo Short!\n");
 		return NULL;
@@ -241,21 +241,21 @@ static inline char* strdecodealloc(char* inbuf){
 	char esc = inbuf[0]; //The escape character is the first one.
 	char tokmark = inbuf[1]; //Begin token character.
 	//printf("Escape is %c, tokmark is %c\n", esc, tokmark);
-	char c; unsigned long long i = 2;
+	char c; unsigned long i = 2;
 	char c_str[2] = {0,0};
 	//Our decoded text.
 	char* out = strcatalloc("","");
 	//Tokens for replacement, even is the token,
 	//odd is its definition
 	char** tokens = NULL;
-	//unsigned long long* toklens = NULL;
-	unsigned long long ntokens = 0;
+	//unsigned long* toklens = NULL;
+	unsigned long ntokens = 0;
 //#define {if(i <= lenin) c = inbuf[i++]; else {goto end;}} {if(i <= lenin) c = inbuf[i++]; else {goto end;}}
 	//Retrieve the tokens.
 	{if(i <= lenin) c = inbuf[i++]; else {goto end;}}; //has to occur before the loop.
 	while(c != esc){	ntokens++;
 		tokens = STRUTIL_REALLOC(tokens, ntokens * 2 * sizeof(char*)); 
-		//toklens = STRUTIL_REALLOC(toklens, ntokens * sizeof(unsigned long long));
+		//toklens = STRUTIL_REALLOC(toklens, ntokens * sizeof(unsigned long));
 		//toklens[ntokens-1] = 0;
 		tokens[(ntokens-1)*2] = strcatalloc("","");
 		tokens[(ntokens-1)*2+1] = strcatalloc("","");
@@ -269,7 +269,7 @@ static inline char* strdecodealloc(char* inbuf){
 		}
 		//The last retrieve() got us the first digit of the token length.
 		//Get the length of the token
-		unsigned long long l = 0;
+		unsigned long l = 0;
 		if(!isdigit(c)) goto end;
 		while(isdigit(c) && c!=tokmark){
 			c_str[0] = c;
@@ -280,7 +280,7 @@ static inline char* strdecodealloc(char* inbuf){
 		//toklens[ntokens-1] = l;
 		//We have the name of the token and its length, the last {if(i <= lenin) c = inbuf[i++]; else {goto end;}} got us the token character (~ in my example)
 		//Now we can grab the token definition.
-		for(unsigned long long vv = 0; vv < l; vv++){
+		for(unsigned long vv = 0; vv < l; vv++){
 			{if(i <= lenin) c = inbuf[i++]; else {goto end;}};
 			c_str[0] = c;
 			tokens[(ntokens-1)*2+1] = strcatallocf1(tokens[(ntokens-1)*2+1], c_str);	
@@ -291,14 +291,14 @@ static inline char* strdecodealloc(char* inbuf){
 	//puts("\nREACHED ESCAPE CHARACTER.");
 	//Now we attempt to build our string
 	{if(i <= lenin) c = inbuf[i++]; else {goto end;}};
-	long long doescape = 0;
+	long doescape = 0;
 	while(i<=lenin){
 		if(!doescape && c==esc){
 			doescape=1;{if(i <= lenin) c = inbuf[i++]; else {goto end;}};continue;
 		}
 		if(!doescape && c==tokmark){
 			//Handle digits prefixing a token.
-			unsigned long long l = 0;
+			unsigned long l = 0;
 			{if(i <= lenin) c = inbuf[i++]; else {goto end;}};
 			if(isdigit(c))
 				while(isdigit(c)){
@@ -310,10 +310,10 @@ static inline char* strdecodealloc(char* inbuf){
 			else {l=1;}
 			i--;
 			
-			for(unsigned long long t = 0; t < ntokens; t++)
+			for(unsigned long t = 0; t < ntokens; t++)
 				if(strprefix(tokens[t*2], inbuf+i)){
 					//MATCH!
-					for(unsigned long long q = 0; q < l; q++)
+					for(unsigned long q = 0; q < l; q++)
 						out = strcatallocf1(out, tokens[t*2+1]);
 					i+=strlen(tokens[t*2]);
 					break; //break out of the for.
@@ -329,7 +329,7 @@ static inline char* strdecodealloc(char* inbuf){
 	}
 	end:
 	if(tokens){
-		for(unsigned long long j = 0; j < ntokens; j++)
+		for(unsigned long j = 0; j < ntokens; j++)
 			{STRUTIL_FREE(tokens[j*2]);STRUTIL_FREE(tokens[j*2+1]);}
 		STRUTIL_FREE(tokens);
 	}

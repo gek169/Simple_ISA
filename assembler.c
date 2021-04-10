@@ -363,8 +363,8 @@ int main(int argc, char** argv){
 	variable_expansions[4] = "";
 	/*Assembly-time directives.*/
 	nmacros = 5;
-	const unsigned long long nbuiltin_macros = 5;
-	unsigned long long line_num = 0;
+	const unsigned long nbuiltin_macros = 5;
+	unsigned long line_num = 0;
 	for(int i = 2; i < argc; i++)
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
@@ -422,7 +422,7 @@ int main(int argc, char** argv){
 		}
 	}
 	while(!feof(infile)){
-		unsigned long long linesize;
+		unsigned long linesize;
 		char was_macro = 0;
 		if(debugging) printf("\nEnter a line...\n");
 		char* line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
@@ -437,7 +437,7 @@ int main(int argc, char** argv){
 				printf("Detected Character Literal on Line:\n%s\n", line_copy);
 			if(printlines)puts(line);
 			if(!quit_after_macros)
-				for(unsigned long long i = 1; i < strlen(line);i++)
+				for(unsigned long i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
 			goto end;
 		}
@@ -460,8 +460,8 @@ int main(int argc, char** argv){
 				}
 				
 				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
-					long long linesize = strlen(line);
-					long long loc = strfind(line, variable_names[i]);
+					long linesize = strlen(line);
+					long loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
 					char* line_old = line;
 					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
@@ -471,7 +471,7 @@ int main(int argc, char** argv){
 					for(unsigned int j = 0; j<nmacros; j++){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
-							long long checkme = strfind(line, variable_names[j]);
+							long checkme = strfind(line, variable_names[j]);
 							if(checkme == -1) continue;
 							/*Does this match contain us?*/
 							if(
@@ -488,7 +488,7 @@ int main(int argc, char** argv){
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
 					
-					long long len_to_replace = strlen(variable_names[i]);
+					long len_to_replace = strlen(variable_names[i]);
 					char* before = str_null_terminated_alloc(line_old, loc);
 					if(i > 2)
 						before = strcatallocf1(before, variable_expansions[i]);
@@ -499,7 +499,7 @@ int main(int argc, char** argv){
 						if(strprefix("+",line_old+loc+1)){
 							char* add_text = line_old+loc+2;
 							/*Find the next plus*/
-							long long loc_eparen = strfind(line_old+loc+2,"+");
+							long loc_eparen = strfind(line_old+loc+2,"+");
 							if(loc_eparen == -1){
 								printf("<ASM SYNTAX ERROR> @ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
@@ -524,7 +524,7 @@ int main(int argc, char** argv){
 						if(strprefix("+",line_old+loc+1)){
 							char* add_text = line_old+loc+2;
 							/*Find the next plus*/
-							long long loc_eparen = strfind(line_old+loc+2,"+");
+							long loc_eparen = strfind(line_old+loc+2,"+");
 							if(loc_eparen == -1){
 								printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
@@ -548,7 +548,7 @@ int main(int argc, char** argv){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
-						long long loc_eparen = strfind(line_old+loc+1,"%");
+						long loc_eparen = strfind(line_old+loc+1,"%");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
@@ -598,8 +598,8 @@ int main(int argc, char** argv){
 			if(nmacros == 0xffff) {
 				printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
 			}
-			long long loc_pound = strfind(line, "#");
-			long long loc_pound2 = 0;
+			long loc_pound = strfind(line, "#");
+			long loc_pound2 = 0;
 			if(loc_pound == -1) {
 				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line:\n%s\n", line_copy); goto error;
 			}
@@ -699,8 +699,8 @@ int main(int argc, char** argv){
 					printf("\n~~Ins Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 				}
 				for(unsigned int i = 0; i<n_insns; i++){
-					long long linesize = strlen(line);
-					long long loc = strfind(line, insns[i]);
+					long linesize = strlen(line);
+					long loc = strfind(line, insns[i]);
 					if(loc == -1) continue;
 					char* line_old = line;
 					/*Check to make sure that this isn't some other, longer insn.*/
@@ -708,7 +708,7 @@ int main(int argc, char** argv){
 					for(unsigned int j = 0; j<n_insns; j++){
 						if(j == i) continue;
 						if(strlen(insns[j]) > strlen(insns[i])){
-							long long checkme = strfind(line, insns[j]);
+							long checkme = strfind(line, insns[j]);
 							if(checkme == -1) continue;
 							/*Does this match contain us?*/
 							if(
@@ -749,7 +749,7 @@ int main(int argc, char** argv){
 					}
 					/**/
 					have_expanded = 1;
-					long long len_to_replace = strlen(insns[i]);
+					long len_to_replace = strlen(insns[i]);
 					char* before = str_null_terminated_alloc(line_old, loc);
 					before = strcatallocf1(before, insn_repl[i]);
 					char* after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
@@ -776,8 +776,8 @@ int main(int argc, char** argv){
 					byteval = strtoull(proc,NULL,0);
 					fputbyte(byteval, ofile);
 					/*Find the next comma.*/
-					long long incr = strfind(proc, ",");
-					long long incrdont = strfind(proc, ";");
+					long incr = strfind(proc, ",");
+					long incrdont = strfind(proc, ";");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont)break;/**/
@@ -793,8 +793,8 @@ int main(int argc, char** argv){
 						printf("\nWriting short %u\n", shortval);
 					fputshort(shortval, ofile);
 					/*Find the next comma.*/
-					long long incr = strfind(proc, ",");
-					long long incrdont = strfind(proc, ";");
+					long incr = strfind(proc, ",");
+					long incrdont = strfind(proc, ";");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont) break; /**/
@@ -827,7 +827,7 @@ int main(int argc, char** argv){
 					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
 				}
 				/**/
-				long long next_comma = strfind(proc, ",");
+				long next_comma = strfind(proc, ",");
 				if(next_comma == -1) {
 					printf("<ASM SYNTAX ERROR> Fill tag missing value. Line %s", line_copy);
 					goto error;
@@ -852,7 +852,7 @@ int main(int argc, char** argv){
 					strfind(metaproc,";") != 0)
 					printf("<ASM WARNING> Ignoring invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
 			}
-			long long next_semicolon = strfind(metaproc, ";");
+			long next_semicolon = strfind(metaproc, ";");
 			if(next_semicolon == -1) break; /*We have handled all sublines.*/
 			metaproc += next_semicolon + 1;
 			if(strlen(metaproc) == 0) break; /*Convenient line break*/
