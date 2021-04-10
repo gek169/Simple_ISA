@@ -190,9 +190,6 @@ The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
-You may want to add more instructions than there are currently free slots,
-just change the "&127" to "&255" and add 128 more entries into the switch case.
-
 The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
 or for educational purposes.
 

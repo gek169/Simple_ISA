@@ -3,9 +3,9 @@
 #CC= tcc
 CC= clang
 CCC= g++
-CFLAGS= -Ofast -std=c89 -pedantic -mtune=native -fno-gcse --param max-goto-duplication-insns=9999
+CFLAGS= -Ofast -std=c89 -pedantic
 #CFLAGS= -Os -lm -std=c89 -pedantic
-CASMFLAGS= -Os -lm -std=c89 -pedantic -fwhole-program
+CASMFLAGS= -Os -lm -std=c89 -pedantic
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 all: main asm_programs
 
