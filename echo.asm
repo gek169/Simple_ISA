@@ -33,10 +33,7 @@ putchar;
 lda 0,5;add;sta 0,5;
 #if A is less than this value, jump to the loop
 llb 0,15;
-cmp;
-lb 0;
-cmp;
-jmpifeq;
+cmp;lb 0;cmp;jmpifeq;
 
 #jumpc
 
