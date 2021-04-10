@@ -34,9 +34,7 @@ The emulator itself has been confirmed to *compile* using compiler explorer on..
 
 * a myriad of unusual and strange compilers on dozens of architectures.
 
-The emulator itself is C89 compliant, but the assembler uses C99 due to it using "unsigned long long".
-
-It could be converted to C89 as well but it would require re-writing my string library. I decided not to bother.
+Both the emulator and the assembler are c89 compliant.
 
 I plan on making the assembler self-hosting at some point.
 
