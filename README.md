@@ -148,11 +148,16 @@ access 16 megabytes in total.
 
 Executable code must reside in the upper 64k. it is the "executable" segment.
 
-You can use the included assembler to define ROMs which are up to the full 16 megabytes in size,
-but the program counter cannot leave the first 64 kilobytes.
+You can use the included assembler to define ROMs which are up to the full 16 megabytes in size.
 
-It is recommended you put your procedure definitions on page boundaries so that they can be easily copied to
-executable memory and called.
+Note that the program counter is 16 bit (not 32) and so the program counter cannot leave
+the first 64 kilobytes of memory.
+
+It is recommended you put your procedure definitions on page boundaries so that they can be easily copied and called.
+You might want to define a standard for how the number of pages a procedure occupies is specified-
+for instance, if a procedure occupies three pages,
+you might want to store a single byte before the beginning of the procedure specifying its length as three pages.
+
 
 ```
 Written by
