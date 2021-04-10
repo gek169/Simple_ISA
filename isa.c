@@ -11,7 +11,7 @@
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
-#define ZR ((((U)M[P])<<8)+(U)M[P+1])
+#define ZR (P-=2,(((U)M[P])<<8)+(U)M[P+1])
 #define Z2F ((((U)M[(((UU)c)<<8)+((UU)b&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)b&255)+1])
 #define Z3F ((((U)M[(((UU)c)<<8)+((UU)a&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)a&255)+1])
 #define w(v,d)M[d]=v;
@@ -103,7 +103,7 @@ T4:pp=a;D
 SC:W(p,P);P+=2;p=c;D
 SD:P-=2;p=ZR;D
 T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
-T6:P-=1;pp=r(P);P-=2;p=ZR;D
+T6:P-=1;pp=r(P);p=ZR;D
 T7:a=r((((UU)c)<<8)+((UU)b&255))D
 T8:w(a,((((UU)c)<<8)+((UU)b&255)))D
 T9:b=r((((UU)c)<<8)+((UU)a&255))D
@@ -129,9 +129,9 @@ UC:W(b,P);P+=2;D
 UD:W(c,P);P+=2;D
 UE:w(a,P);P+=1;D
 UF:w(b,P);P+=1;D
-V0:P-=2;a=ZR;D
-V1:P-=2;b=ZR;D
-V2:P-=2;c=ZR;D
+V0:a=ZR;D
+V1:b=ZR;D
+V2:c=ZR;D
 V3:P-=1;a=r(P)D
 V4:P-=1;b=r(P)D
 V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
