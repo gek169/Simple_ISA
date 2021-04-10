@@ -427,7 +427,13 @@ int main(int argc, char** argv){
 								printf("<ASM SYNTAX ERROR> @ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
 							}
+							if(loc_eparen == 0){
+								printf("<ASM WARNING> @ with empty add section. Line:\n%s\n", line_copy);
+							}
 							addval = strtoull(add_text,0,0);
+							if(addval == 0)
+								printf("<ASM WARNING> @ with add evaluating to zero. Line:\n%s\n", line_copy);
+							if(addval)
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
@@ -446,7 +452,12 @@ int main(int argc, char** argv){
 								printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
 							}
+							if(loc_eparen == 0){
+								printf("<ASM WARNING> $ with empty add section. Line:\n%s\n", line_copy);
+							}
 							addval = strtoull(add_text,0,0);
+							if(addval == 0)
+								printf("<ASM WARNING> $ with add evaluating to zero. Line:\n%s\n", line_copy);
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
