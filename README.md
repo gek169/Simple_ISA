@@ -181,10 +181,10 @@ apush: push byte register a onto the stack. (1 byte) (5E)
 bpush: push byte register b onto the stack. (1 byte) (5F)
 
 alpop: pop short register a from the stack. (1 byte) (60)
-blpop: pop short register b from the stack. (1 byte) (60)
-cpop: pop short register c from the stack. (1 byte) (60)
-apop: pop byte register a from the stack. (1 byte) (60)
-bpop: pop byte register b from the stack. (1 byte) (60)
+blpop: pop short register b from the stack. (1 byte) (61)
+cpop: pop short register c from the stack. (1 byte) (62)
+apop: pop byte register a from the stack. (1 byte) (63)
+bpop: pop byte register b from the stack. (1 byte) (64)
 
 The rest: halt duplicates, free for expansion (1 byte)
 ```
