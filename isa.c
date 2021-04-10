@@ -9,11 +9,11 @@
 #define r(d)M[d]
 #define Z (p+=2,((((U)M[PP+p-2]))<<8)+(U)M[PP+p-1])
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
-#define Z2F ((((U)M[(((UU)c)<<8)+((UU)b&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)b&255)+1])
-#define Z3F ((((U)M[(((UU)c)<<8)+((UU)a&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)a&255)+1])
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
 #define ZR ((((U)M[P])<<8)+(U)M[P+1])
+#define Z2F ((((U)M[(((UU)c)<<8)+((UU)b&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)b&255)+1])
+#define Z3F ((((U)M[(((UU)c)<<8)+((UU)a&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)a&255)+1])
 #define w(v,d)M[d]=v;
 #define W(v,d)M[d]=v>>8;M[d+1]=v&255;
 #define D ;switch(G&127){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6:o t;k 7:o T;\
@@ -67,9 +67,9 @@ RD:w(b,c)D
 RE:W(a,c)D
 RF:W(b,c)D
 S0:p=c;D
-S1:W(a,(PP+p))p+=2;D
-S2:W(b,(PP+p))p+=2;D
-S3:W(c,(PP+p))p+=2;D
+S1:W(a,Z)D
+S2:W(b,Z)D
+S3:W(c,Z)D
 S4:P+=Z;D
 S5:P-=Z;D
 S6:P+=a;D
@@ -124,7 +124,15 @@ U7:a=((((UU)a)*((UU)b))>>13);D
 U8:a=((((UU)a)*((UU)b))>>14);D
 U9:a=((((UU)a)*((UU)b))>>15);D
 UA:a=((((UU)a)*((UU)b))>>16);D
-UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+UB:W(a,P);P+=2;D
+UC:W(b,P);P+=2;D
+UD:W(c,P);P+=2;D
+UE:w(a,P);P+=1;D
+UF:w(b,P);P+=1;D
+V0:P-=2;a=ZR;D
+V1:P-=2;b=ZR;D
+V2:P-=2;c=ZR;D
+V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 h:dcl();z 0;}
 main(int rc,char**rv){UU i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}

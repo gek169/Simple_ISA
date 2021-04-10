@@ -143,6 +143,11 @@ imul3.13: fixed-point multiply of a and b
 imul2.14: fixed-point multiply of a and b
 imul1.15: fixed-point multiply of a and b
 imul.16: fixed-point multiply of a and b
+alpush: push short register a onto the stack. (1 byte) (5B)
+blpush: push short register b onto the stack. (1 byte) (5C)
+cpush: push short register c onto the stack. (1 byte) (5D)
+apush: push byte register a onto the stack. (1 byte) (5E)
+bpush: push byte register b onto the stack. (1 byte) (5F)
 The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
@@ -212,6 +217,12 @@ jumps and calls that happen after a farcall or lfarpc will always jump within th
 current 64k that the program counter is inside of.
 
 the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
+
+## Programming conventions
+
+Stack:
+The stack pointer (which always resides in the first 64k) points to a *free* location on the stack.
+The stack pointer *increments* rather than decrements to increase the stack size.
 
 ```
 Written by

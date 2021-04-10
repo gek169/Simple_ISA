@@ -156,6 +156,12 @@ char* insns[128] = {
 	"imul2.14",
 	"imul1.15",
 	"imul.16",
+	/*quickly push registers onto the stack*/
+	"alpush",
+	"blpush",
+	"cpush",
+	"apush",
+	"bpush",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -195,6 +201,9 @@ unsigned char insns_numargs[128] = {
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0,
+	/*More stack ops*/
+	0,0,0,
+	0,0, //single byte pushes
 };
 char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
@@ -293,8 +302,15 @@ char* insn_repl[128] = {
 	"bytes 79;","bytes 80;","bytes 81;","bytes 82;",
 	"bytes 83;","bytes 84;","bytes 85;","bytes 86;",
 	"bytes 87;","bytes 88;","bytes 89;","bytes 90;",
+	/*Stack ops*/
+	"bytes 91;",
+	"bytes 92;",
+	"bytes 93;",
+	/*single byte stack ops*/
+	"bytes 94;",
+	"bytes 95;",
 };
-static const unsigned char n_insns = 91;
+static const unsigned char n_insns = 96;
 unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
