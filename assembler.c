@@ -332,7 +332,6 @@ unsigned int nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
-
 void fputbyte(unsigned char b, FILE* f){
 				if(debugging)
 					printf("\nWriting individual byte %u\n", b);
@@ -410,7 +409,7 @@ int main(int argc, char** argv){
 	}
 	if(infilename){
 		if(debugging) printf("\nReading from a file...\n");
-		infile = fopen(infilename, "r");
+			infile = fopen(infilename, "r");
 		if(!infile) {
 			printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);return 1;
 		}
