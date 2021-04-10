@@ -1,57 +1,57 @@
 
-
-//assembler for the ISA.
-//Supports doing any of the following:
-//1) Entering opcodes with their BYTE arguments (short args unsupported)
-//sa 0x53
-//ldb 0xFF,69
-//ldb 0xFF,0x69
-//sc 0xFF,0x39
-//nop
-//Names must be lower case and properly spelled.
-//Data must be separated by a comma.
-//2) Comments
-//Lines beginning with /, //, or # are comments.
-//3) Multiple commands per line
-//You may have multiple commands on the same line like this:
-//sa 0x53;cmp;jmpifeq;
-//4) Macros
-//You may declare a macro with VAR like this
-//VAR#my_variable_name#0x53
-//You may have at most, 65,535 macros in your file.
-//5) Location retrieval
-//You may use the location of the current instruction you are writing as a variable.
-//It is called @ as a short, or $ as a pair of bytes.
-//6) Arbitrary data
-//You may specify arbitrary data as either BYTES or SHORTS
-//bytes 0xFF,10,34,7
-//shorts 0xff10,0x3407
-//You may even use macros in the expansion
-//bytes myvariablename myothervariablename
-//You may use bytes and shorts in-line as if they were commands.
-//bytes 5; sa 7;
-//7) (Mostly) Arbitrary whitespace (On a single line)
-//You can omit whitespace between keywords in most cases.
-//However some operations require that there be no whitespace.
-//Character literals for instance must start at the beginning of a line with no preceding whitespace.
-//8) Skipto
-//The assembler allows you to "skip" until a desired address (which may wrap around to the beginning...)
-//by specifying it with the SECTION tag.
-//If the space-in-between in the ROM does not exist it will be filled in with zeroes.
-//section 0x1000
-//9) Fill
-//The assembler allows you to write a byte value for a number of 
-//fill 0xFFFF,0
-//10) Strings
-//The assembler allows you to directly write ascii characters into your output bin.
-//Lines beginning with ! are character literal lines and they will be written to the current output location.
-//11) Assembly-time directives
-//%short%... converts number to a split short. It must be literal.
-//Assembly-time directives must have NO leading or trailing whitespace.
-//12) Builtin macros
-//You can retrieve the current location in the binary as a short with @, and as a byte pair with $
-//You can offset these like this: $+93+ or @+15+
-
+/*
+assembler for the ISA.
+Supports doing any of the following:
+1) Entering opcodes with their BYTE arguments (short args unsupported)
+sa 0x53
+ldb 0xFF,69
+ldb 0xFF,0x69
+sc 0xFF,0x39
+nop
+Names must be lower case and properly spelled.
+Data must be separated by a comma.
+2) Comments
+Lines beginning with /, , or # are comments.
+3) Multiple commands per line
+You may have multiple commands on the same line like this:
+sa 0x53;cmp;jmpifeq;
+4) Macros
+You may declare a macro with VAR like this
+VAR#my_variable_name#0x53
+You may have at most, 65,535 macros in your file.
+5) Location retrieval
+You may use the location of the current instruction you are writing as a variable.
+It is called @ as a short, or $ as a pair of bytes.
+6) Arbitrary data
+You may specify arbitrary data as either BYTES or SHORTS
+bytes 0xFF,10,34,7
+shorts 0xff10,0x3407
+You may even use macros in the expansion
+bytes myvariablename myothervariablename
+You may use bytes and shorts in-line as if they were commands.
+bytes 5; sa 7;
+7) (Mostly) Arbitrary whitespace (On a single line)
+You can omit whitespace between keywords in most cases.
+However some operations require that there be no whitespace.
+Character literals for instance must start at the beginning of a line with no preceding whitespace.
+8) Skipto
+The assembler allows you to "skip" until a desired address (which may wrap around to the beginning...)
+by specifying it with the SECTION tag.
+If the space-in-between in the ROM does not exist it will be filled in with zeroes.
+section 0x1000
+9) Fill
+The assembler allows you to write a byte value for a number of 
+fill 0xFFFF,0
+10) Strings
+The assembler allows you to directly write ascii characters into your output bin.
+Lines beginning with ! are character literal lines and they will be written to the current output location.
+11) Assembly-time directives
+%short%... converts number to a split short. It must be literal.
+Assembly-time directives must have NO leading or trailing whitespace.
+12) Builtin macros
+You can retrieve the current location in the binary as a short with @, and as a byte pair with $
+You can offset these like this: $+93+ or @+15+
+*/
 
 #include "stringutil.h"
 #include <stdio.h>
@@ -170,38 +170,38 @@ char* insns[128] = {
 	"bpop",
 };
 unsigned char insns_numargs[128] = {
-	0,//halt
-	2,1,2,1, //load and load constant comboes, lda, la, ldb, lb
-	2, //load constant into C
-	2,2, //store A or B.
-	0,0,0,0,0, //the four elementary, + mod
-	0, //cmp
-	0,0, //jmp insns
-	0,0, //getchar,putchar,
-	0,0,0,0,0, //bitwise
-	0,0, //indirect load.
-	0,0,0,0,0,0,0, //Register to register moves and nop.
+	0,/*halt*/
+	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
+	2, /*load constant into C*/
+	2,2, /*store A or B.*/
+	0,0,0,0,0, /*the four elementary, + mod*/
+	0, /*cmp*/
+	0,0, /*jmp insns*/
+	0,0, /*getchar,putchar,*/
+	0,0,0,0,0, /*bitwise*/
+	0,0, /*indirect load.*/
+	0,0,0,0,0,0,0, /*Register to register moves and nop.*/
 	
-	2,0,2,0, //16 bit constant loads and loads-through-c
-	0,0,//16 bit self-indirect loads
-	0,0,//16 bit neighbor-indirect loads
-	0,0,//move to C
-	0,0,//move from C
-	0,0,0,0,//Indirect Stores
-	0, //Direct jump.
-	2,2,2, //store shorts A,B,and C
-	2,2,0,0, //stack pointer ops
-	0,0, //retrieve the stack pointer and put it in a or b
-	0, //Compl
-	//call structure.
-	0,//cpc
-	0,//call
-	0,//ret
-	0,0, //Far memory access- a
-	0,0, //Far memory access- b
-	0,0, //Far page load and store
-	0,0,0, //lfarpc, farcall, farret,
-	0,0,0,0, //Far memory access- a and b, as single bytes
+	2,0,2,0, /*16 bit constant loads and loads-through-c*/
+	0,0,/*16 bit self-indirect loads*/
+	0,0,/*16 bit neighbor-indirect loads*/
+	0,0,/*move to C*/
+	0,0,/*move from C*/
+	0,0,0,0,/*Indirect Stores*/
+	0, /*Direct jump.*/
+	2,2,2, /*store shorts A,B,and C*/
+	2,2,0,0, /*stack pointer ops*/
+	0,0, /*retrieve the stack pointer and put it in a or b*/
+	0, /*Compl*/
+	/*call structure.*/
+	0,/*cpc*/
+	0,/*call*/
+	0,/*ret*/
+	0,0, /*Far memory access- a*/
+	0,0, /*Far memory access- b*/
+	0,0, /*Far page load and store*/
+	0,0,0, /*lfarpc, farcall, farret,*/
+	0,0,0,0, /*Far memory access- a and b, as single bytes*/
 	/*Fixed point multiplies.*/
 	0,0,0,0,
 	0,0,0,0,
@@ -209,13 +209,13 @@ unsigned char insns_numargs[128] = {
 	0,0,0,0,
 	/*More stack ops*/
 	0,0,0,
-	0,0, //single byte pushes
+	0,0, 
 	/*register pops*/
 	0,0,0,
-	0,0, //single byte pops
+	0,0, 
 };
 char* insn_repl[128] = {
-	"bytes 0;", //Halt has no arguments.
+	"bytes 0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes 1,",
 	"bytes 2,",
@@ -290,22 +290,22 @@ char* insn_repl[128] = {
 	"bytes 58;",
 	/*cpc*/
 	"bytes 59;",
-	"bytes 60;", //call
-	"bytes 61;", //ret
+	"bytes 60;",  /*call*/
+	"bytes 61;",  /*ret*/
 	/*far memory.*/
-	"bytes 62;", //farillda
-	"bytes 63;", //faristla
-	"bytes 64;", //farilldb
-	"bytes 65;", //faristlb
-	"bytes 66;", //farpagel
-	"bytes 67;", //farpagest
-	"bytes 68;", //lfarpc
-	"bytes 69;", //farcall
-	"bytes 70;", //farret
-	"bytes 71;", //farret
-	"bytes 72;", //farret
-	"bytes 73;", //farret
-	"bytes 74;", //farret
+	"bytes 62;", /*farillda*/
+	"bytes 63;", /*faristla*/
+	"bytes 64;", /*farilldb*/
+	"bytes 65;", 
+	"bytes 66;", 
+	"bytes 67;", 
+	"bytes 68;", 
+	"bytes 69;", 
+	"bytes 70;", 
+	"bytes 71;", 
+	"bytes 72;", 
+	"bytes 73;", 
+	"bytes 74;", 
 	/*Fixed point ops*/
 	"bytes 75;","bytes 76;","bytes 77;","bytes 78;",
 	"bytes 79;","bytes 80;","bytes 81;","bytes 82;",
@@ -352,7 +352,9 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
-int main(int argc, char** argv){
+int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
+	const unsigned long nbuiltin_macros = 5;
+	unsigned long line_num = 0;
 	variable_names[0] = "@";
 	variable_names[1] = "$";
 	variable_names[2] = "%";
@@ -363,14 +365,13 @@ int main(int argc, char** argv){
 	variable_expansions[4] = "";
 	/*Assembly-time directives.*/
 	nmacros = 5;
-	const unsigned long nbuiltin_macros = 5;
-	unsigned long line_num = 0;
-	for(int i = 2; i < argc; i++)
+
+	{int i;for(i = 2; i < argc; i++)
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
-	}
-	for(int i = 1; i < argc; i++)
+	}}
+	{int i;for(i = 1; i < argc; i++)
 	{
 		if(strprefix("-E",argv[i])) {
 			quit_after_macros = 1;
@@ -398,10 +399,10 @@ int main(int argc, char** argv){
 			puts("\n\nAuthored by DMHSW for the Public Domain\n\n");
 			return 1;
 		}
-	}
-	FILE* infile;
+	}}
+	infile;
 	if(debugging) infile=stdin;
-	FILE* ofile = NULL;
+	ofile = NULL;
 	if(!quit_after_macros)
 		ofile=fopen(outfilename, "w");
 	if(!ofile){
@@ -422,22 +423,22 @@ int main(int argc, char** argv){
 		}
 	}
 	while(!feof(infile)){
-		unsigned long linesize;
+		unsigned long linesize;char* line, *line_copy;
 		char was_macro = 0;
 		if(debugging) printf("\nEnter a line...\n");
-		char* line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
+		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		if(!line) return 0;
-		char* line_copy = strcatalloc(line,"");line_num++;
+		line_copy = strcatalloc(line,"");line_num++;
 		/*Step 0: Skip comment lines*/
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-		if(strprefix("!",line)) {
+		if(strprefix("!",line)) {unsigned long i;
 			/*We are writing out individual bytes for the rest of the line.*/
 			if(debugging)
 				printf("Detected Character Literal on Line:\n%s\n", line_copy);
 			if(printlines)puts(line);
 			if(!quit_after_macros)
-				for(unsigned long i = 1; i < strlen(line);i++)
+				for(i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
 			goto end;
 		}
@@ -450,7 +451,7 @@ int main(int argc, char** argv){
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*Not performed on MACRO Lines.*/
 		if(strfind(line,"VAR#")!= -1) was_macro=1;
-		{unsigned char have_expanded = 0; unsigned short iteration = 0;
+		{unsigned char have_expanded = 0; unsigned short iteration = 0; unsigned long i;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -459,19 +460,23 @@ int main(int argc, char** argv){
 						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
 				
-				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
-					long linesize = strlen(line);
-					long loc = strfind(line, variable_names[i]);
+				for(i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
+					char* line_old; long loc; long linesize; char found_longer_match;
+					long len_to_replace; char* before;char* after;
+					unsigned long j;
+					linesize = strlen(line);
+					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
-					char* line_old = line;
+					line_old = line;
 					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
-					char found_longer_match = 0;
+					found_longer_match = 0;
 					if(!was_macro)
-					for(unsigned int j = 0; j<nmacros; j++){
+					for(j = 0; j<nmacros; j++){ 
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
-							long checkme = strfind(line, variable_names[j]);
+							long checkme;
+							checkme = strfind(line, variable_names[j]);
 							if(checkme == -1) continue;
 							/*Does this match contain us?*/
 							if(
@@ -488,11 +493,11 @@ int main(int argc, char** argv){
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
 					
-					long len_to_replace = strlen(variable_names[i]);
-					char* before = str_null_terminated_alloc(line_old, loc);
+					len_to_replace = strlen(variable_names[i]);
+					before = str_null_terminated_alloc(line_old, loc);
 					if(i > 2)
 						before = strcatallocf1(before, variable_expansions[i]);
-					else if (i == 0){ //SYNTAX: @+7+
+					else if (i == 0){ /*SYNTAX: @+7+*/
 						char expansion[1024];
 						unsigned long addval = 0;
 						/*We need to check if there is a plus sign immediately after the at sign. */
@@ -518,13 +523,13 @@ int main(int argc, char** argv){
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==1){
-						char expansion[1024];
-						unsigned long addval = 0;
-
-						if(strprefix("+",line_old+loc+1)){
-							char* add_text = line_old+loc+2;
+						char expansion[1024]; unsigned long addval;
+						
+						addval = 0;
+						if(strprefix("+",line_old+loc+1)){char* add_text; long loc_eparen;
+							add_text = line_old+loc+2;
 							/*Find the next plus*/
-							long loc_eparen = strfind(line_old+loc+2,"+");
+							loc_eparen = strfind(line_old+loc+2,"+");
 							if(loc_eparen == -1){
 								printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
@@ -542,26 +547,26 @@ int main(int argc, char** argv){
 						snprintf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else if (i==2){ /*Split directive.*/
+					} else if (i==2){long loc_eparen;char expansion[1024]; unsigned short res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
-						long loc_eparen = strfind(line_old+loc+1,"%");
+						loc_eparen = strfind(line_old+loc+1,"%");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
 						}
 						if(loc_eparen == 0){
-							//printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							/*printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
 						}
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						
-						char expansion[1024];
-						unsigned short res = strtoull(line_old+loc+1, NULL, 0);
+						
+						res = strtoull(line_old+loc+1, NULL, 0);
 						if(res == 0)
 							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
 						if(debugging) printf("\nSplitting value %u\n", res);
@@ -569,7 +574,7 @@ int main(int argc, char** argv){
 						snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
 						before = strcatallocf1(before, expansion);
 					}
-					char* after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
+					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
 									linesize-loc-len_to_replace);
 					line = strcatallocfb(before, after);
 					free(line_old);
@@ -590,7 +595,8 @@ int main(int argc, char** argv){
 			printf("\n~~Is this a macro?~~\n");
 		}
 
-		if(strprefix("VAR",line)){ /*It's show time!*/
+		if(strprefix("VAR",line)){ long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
+			unsigned short index;
 			if(debugging){
 				printf("\nThis is a macro!\n");
 			}
@@ -598,13 +604,13 @@ int main(int argc, char** argv){
 			if(nmacros == 0xffff) {
 				printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
 			}
-			long loc_pound = strfind(line, "#");
-			long loc_pound2 = 0;
+			loc_pound = strfind(line, "#");
+			loc_pound2 = 0;
 			if(loc_pound == -1) {
 				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line:\n%s\n", line_copy); goto error;
 			}
 			/*We have a macro.*/
-			char* macro_name = line + loc_pound;
+			macro_name = line + loc_pound;
 			if(debugging){
 				printf("\nMacro Name Pre-Allocation is identified as %s\n", macro_name);
 			}
@@ -626,16 +632,16 @@ int main(int argc, char** argv){
 			}
 			loc_pound2++;
 			/*Search to see if we've already defined this macro*/
-			char is_overwriting = 0;
-			unsigned short index = 0;
-			for(unsigned short i = 0; i < n_insns; i++){
+			is_overwriting = 0;
+			index = 0;
+			{unsigned short i;for(i = 0; i < n_insns; i++){
 				if( (strfind(insns[i],macro_name)>-1) ||
 				streq(macro_name, insns[i])){
 					printf("<ASM SYNTAX ERROR> This macro would prevent instruction %s from being used:\n%s\n", insns[i], line_copy);
 					goto error;	
 				}
-			}
-			for(unsigned short i = 0; i < nmacros; i++){
+			}}
+			{unsigned short i;for(i = 0; i < nmacros; i++){
 				if(i < nbuiltin_macros)
 					if( (strfind(variable_names[i],macro_name)>-1) ||
 						streq(macro_name, variable_names[i]))
@@ -644,7 +650,7 @@ int main(int argc, char** argv){
 						goto error;	
 					}
 				if(streq(macro_name, variable_names[i])){
-					//printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);
+					/*printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);*/
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
 						printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
@@ -652,7 +658,7 @@ int main(int argc, char** argv){
 					}
 					index = i;
 				}
-			}
+			}}
 			if(!is_overwriting){
 				variable_names[nmacros] = macro_name;
 				variable_expansions[nmacros++] = 
@@ -698,14 +704,15 @@ int main(int argc, char** argv){
 				if(debugging){
 					printf("\n~~Ins Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 				}
-				for(unsigned int i = 0; i<n_insns; i++){
-					long linesize = strlen(line);
-					long loc = strfind(line, insns[i]);
+				{unsigned long i;for(i = 0; i<n_insns; i++){char* line_old; long loc, linesize; unsigned long j;
+					char found_longer_match; int num_commas_needed;
+					linesize = strlen(line);
+					loc = strfind(line, insns[i]);					
+					line_old = line;
 					if(loc == -1) continue;
-					char* line_old = line;
 					/*Check to make sure that this isn't some other, longer insn.*/
-					char found_longer_match = 0;
-					for(unsigned int j = 0; j<n_insns; j++){
+					found_longer_match = 0;
+					for(j = 0; j<n_insns; j++){
 						if(j == i) continue;
 						if(strlen(insns[j]) > strlen(insns[i])){
 							long checkme = strfind(line, insns[j]);
@@ -723,9 +730,9 @@ int main(int argc, char** argv){
 					if(found_longer_match) continue;
 					/*We know the location of an insn to be expanded and it is at loc.*/
 					/*Crawl along the string. */
-					int num_commas_needed = insns_numargs[i] - 1;
-					//If you have three arguments, you only need two commas.
-					for(unsigned int j = loc + strlen(insns[i]); strlen(line+j)>0;j++){
+					num_commas_needed = insns_numargs[i] - 1;
+					/*If you have three arguments, you only need two commas.*/
+					for(j = loc + strlen(insns[i]); strlen(line+j)>0;j++){
 						if(line[j] == ','){
 							if(num_commas_needed > 0) num_commas_needed--;
 							else { /*Too many commas.*/
@@ -749,14 +756,16 @@ int main(int argc, char** argv){
 					}
 					/**/
 					have_expanded = 1;
-					long len_to_replace = strlen(insns[i]);
-					char* before = str_null_terminated_alloc(line_old, loc);
+					{char* before; char* after; long len_to_replace;
+					len_to_replace = strlen(insns[i]);
+					before = str_null_terminated_alloc(line_old, loc);
 					before = strcatallocf1(before, insn_repl[i]);
-					char* after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
+					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
 									linesize-loc-len_to_replace);
 					line = strcatallocfb(before, after);
 					free(line_old);
-				}
+					}
+				}}
 			}while(have_expanded && (iteration++ < 32700)); /*Probably safe right?*/
 		}
 		/*
@@ -766,18 +775,17 @@ int main(int argc, char** argv){
 		if(printlines){
 			printf("%s\n",line);
 		}
-		char* metaproc = line;
-		do{
-			if(strprefix("bytes", metaproc)){
-				
-				char* proc = metaproc + 5;
-				do{
+		metaproc = line; /*declaration at beginning of main.*/
+		do{ long incr, incrdont;
+			if(strprefix("bytes", metaproc)){ char* proc;
+				proc = metaproc + 5;
+				do{ 
 					unsigned char byteval;
 					byteval = strtoull(proc,NULL,0);
 					fputbyte(byteval, ofile);
 					/*Find the next comma.*/
-					long incr = strfind(proc, ",");
-					long incrdont = strfind(proc, ";");
+					incr = strfind(proc, ",");
+					incrdont = strfind(proc, ";");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont)break;/**/
@@ -793,19 +801,19 @@ int main(int argc, char** argv){
 						printf("\nWriting short %u\n", shortval);
 					fputshort(shortval, ofile);
 					/*Find the next comma.*/
-					long incr = strfind(proc, ",");
-					long incrdont = strfind(proc, ";");
+					incr = strfind(proc, ",");
+					incrdont = strfind(proc, ";");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont) break; /**/
 					proc += incr; proc += 1; /*Skip the comma itself.*/
 				}while(strlen(proc) > 0);
-			} else if(strprefix("section", metaproc)){
+			} else if(strprefix("section", metaproc)){ unsigned long dest;
 				char* proc = metaproc + 7;
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
-				unsigned long dest = strtoull(proc, NULL, 0);
+				dest = strtoull(proc, NULL, 0);
 				if(dest == 0){
 				/*Explicitly check to see if they actually typed zero.*/
 					if(proc[0]!='0')
@@ -813,27 +821,27 @@ int main(int argc, char** argv){
 
 				}
 				if(debugging)
-					printf("Moving the output counter to %u\n", dest);
+					printf("Moving the output counter to %lu\n", dest);
 				outputcounter = dest;
-			} else if(strprefix("fill", metaproc)){
+			} else if(strprefix("fill", metaproc)){ unsigned long fillsize; long next_comma; unsigned char fillval;
 				char* proc = metaproc + 4;
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
-				unsigned long fillsize = strtoull(proc, NULL, 0);
+				fillsize = strtoull(proc, NULL, 0);
 				if(fillsize == 0){
 					if(proc[0]!='0') /*Check if they actually typed zero.*/
 					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
 				}
 				/**/
-				long next_comma = strfind(proc, ",");
+				next_comma = strfind(proc, ",");
 				if(next_comma == -1) {
 					printf("<ASM SYNTAX ERROR> Fill tag missing value. Line %s", line_copy);
 					goto error;
 				}
 				proc += next_comma + 1;
-				unsigned char fillval = strtoull(proc, NULL, 0);
+				fillval = strtoull(proc, NULL, 0);
 				if(fillval == 0) /*potential for a mistake*/
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
 						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
@@ -852,10 +860,11 @@ int main(int argc, char** argv){
 					strfind(metaproc,";") != 0)
 					printf("<ASM WARNING> Ignoring invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
 			}
-			long next_semicolon = strfind(metaproc, ";");
+			{long next_semicolon = strfind(metaproc, ";");
 			if(next_semicolon == -1) break; /*We have handled all sublines.*/
 			metaproc += next_semicolon + 1;
 			if(strlen(metaproc) == 0) break; /*Convenient line break*/
+			}
 		} while(1);
 		end:
 		free(line);

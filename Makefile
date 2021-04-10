@@ -4,7 +4,7 @@ CC= gcc
 CCC= g++
 CFLAGS= -O3 -std=c89 -pedantic -mtune=native
 #CFLAGS= -Os -lm -std=c89 -pedantic
-CASMFLAGS= -Os -lm -std=c99 -pedantic
+CASMFLAGS= -Os -lm -std=c89 -pedantic
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 all: main asm_programs
 
