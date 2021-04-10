@@ -148,6 +148,13 @@ blpush: push short register b onto the stack. (1 byte) (5C)
 cpush: push short register c onto the stack. (1 byte) (5D)
 apush: push byte register a onto the stack. (1 byte) (5E)
 bpush: push byte register b onto the stack. (1 byte) (5F)
+
+alpop: pop short register a from the stack. (1 byte) (60)
+blpop: pop short register b from the stack. (1 byte) (60)
+cpop: pop short register c from the stack. (1 byte) (60)
+apop: pop byte register a from the stack. (1 byte) (60)
+bpop: pop byte register b from the stack. (1 byte) (60)
+
 The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
