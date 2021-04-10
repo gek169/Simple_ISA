@@ -96,7 +96,7 @@ compl, a = ~a (1 byte) (3A)
 
 cpc, c = the program counter. (1 byte) (3B)
 call: (1 bytes)(3C)
-write the program counter(+1) to the stack pointer. Push the stack pointer by 2. Jump to c.
+write the program counter to the stack pointer. Push the stack pointer by 2. Jump to c.
 ret: (1 byte)(3D)
 subtract 2 from the stack pointer. load the program counter from the stack pointer.
 farillda: load short using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (3E)
