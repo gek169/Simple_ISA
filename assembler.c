@@ -56,6 +56,7 @@ You can offset these like this: $+93+ or @+15+
 #include "stringutil.h"
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
@@ -400,7 +401,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			return 1;
 		}
 	}}
-	infile;
 	if(debugging) infile=stdin;
 	ofile = NULL;
 	if(!quit_after_macros)
@@ -512,14 +512,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							if(loc_eparen == 0){
 								printf("<ASM WARNING> @ with empty add section. Line:\n%s\n", line_copy);
 							}
-							addval = strtoull(add_text,0,0);
+							addval = strtoul(add_text,0,0);
 							if(addval == 0)
 								printf("<ASM WARNING> @ with add evaluating to zero. Line:\n%s\n", line_copy);
 							if(addval)
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						snprintf(expansion, 1023, "%lu", addval);
+						/*snprintf(expansion, 1023, "%lu", addval);*/
+						sprintf(expansion, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==1){
@@ -537,14 +538,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							if(loc_eparen == 0){
 								printf("<ASM WARNING> $ with empty add section. Line:\n%s\n", line_copy);
 							}
-							addval = strtoull(add_text,0,0);
+							addval = strtoul(add_text,0,0);
 							if(addval == 0)
 								printf("<ASM WARNING> $ with add evaluating to zero. Line:\n%s\n", line_copy);
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
 						
-						snprintf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
+						/*snprintf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));*/
+						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==2){long loc_eparen;char expansion[1024]; unsigned short res; /*Split directive.*/
@@ -566,12 +568,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						
 						
-						res = strtoull(line_old+loc+1, NULL, 0);
+						res = strtoul(line_old+loc+1, NULL, 0);
 						if(res == 0)
 							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
 						if(debugging) printf("\nSplitting value %u\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
-						snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
+						/*snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));*/
+						sprintf(expansion, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
 						before = strcatallocf1(before, expansion);
 					}
 					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
@@ -781,7 +784,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				proc = metaproc + 5;
 				do{ 
 					unsigned char byteval;
-					byteval = strtoull(proc,NULL,0);
+					byteval = strtoul(proc,NULL,0);
 					fputbyte(byteval, ofile);
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
@@ -796,7 +799,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				char* proc = metaproc + 6;
 				do{
 					unsigned short shortval;
-					shortval = strtoull(proc,NULL,0);
+					shortval = strtoul(proc,NULL,0);
 					if(debugging)
 						printf("\nWriting short %u\n", shortval);
 					fputshort(shortval, ofile);
@@ -813,7 +816,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
-				dest = strtoull(proc, NULL, 0);
+				dest = strtoul(proc, NULL, 0);
 				if(dest == 0){
 				/*Explicitly check to see if they actually typed zero.*/
 					if(proc[0]!='0')
@@ -829,7 +832,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
-				fillsize = strtoull(proc, NULL, 0);
+				fillsize = strtoul(proc, NULL, 0);
 				if(fillsize == 0){
 					if(proc[0]!='0') /*Check if they actually typed zero.*/
 					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
@@ -841,7 +844,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					goto error;
 				}
 				proc += next_comma + 1;
-				fillval = strtoull(proc, NULL, 0);
+				fillval = strtoul(proc, NULL, 0);
 				if(fillval == 0) /*potential for a mistake*/
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
 						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
