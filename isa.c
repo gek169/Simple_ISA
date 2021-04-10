@@ -132,7 +132,9 @@ UF:w(b,P);P+=1;D
 V0:P-=2;a=ZR;D
 V1:P-=2;b=ZR;D
 V2:P-=2;c=ZR;D
-V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+V3:P-=1;a=r(P)D
+V4:P-=1;b=r(P)D
+V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 h:dcl();z 0;}
 main(int rc,char**rv){UU i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}

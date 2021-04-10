@@ -39,8 +39,13 @@ cmp;lb 0;cmp;jmpifeq
 //zero the stack pointer and then set it to a sensible value
 astp;popa;lla %0xE000%;pusha;
 lda %0x1e8%;putchar;
+
 sc %0xA000%;
 lla %0x1%
+//these operations should do nothing.
+alpush;alpush;
+lla %0x0%;
+alpop;alpop;
 farcall;
 #we should see this when we return.
 la 0x45

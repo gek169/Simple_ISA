@@ -162,6 +162,12 @@ char* insns[128] = {
 	"cpush",
 	"apush",
 	"bpush",
+	/*quickly pop registers from the stack*/
+	"alpop",
+	"blpop",
+	"cpop",
+	"apop",
+	"bpop",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -204,6 +210,9 @@ unsigned char insns_numargs[128] = {
 	/*More stack ops*/
 	0,0,0,
 	0,0, //single byte pushes
+	/*register pops*/
+	0,0,0,
+	0,0, //single byte pops
 };
 char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
@@ -302,15 +311,22 @@ char* insn_repl[128] = {
 	"bytes 79;","bytes 80;","bytes 81;","bytes 82;",
 	"bytes 83;","bytes 84;","bytes 85;","bytes 86;",
 	"bytes 87;","bytes 88;","bytes 89;","bytes 90;",
-	/*Stack ops*/
+	/*Stack ops- pushes*/
 	"bytes 91;",
 	"bytes 92;",
 	"bytes 93;",
 	/*single byte stack ops*/
 	"bytes 94;",
 	"bytes 95;",
+	/*Stack ops- pops*/
+	"bytes 96;",
+	"bytes 97;",
+	"bytes 98;",
+
+	"bytes 99;",
+	"bytes 100;",
 };
-static const unsigned char n_insns = 96;
+static const unsigned char n_insns = 101;
 unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;
