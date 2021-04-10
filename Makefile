@@ -1,11 +1,11 @@
-CC=cc
+#CC=cc
 #CC= gcc
 #CC= tcc
-#CC= clang
+CC= clang
 CCC= g++
-CFLAGS= -Ofast -std=c89 -pedantic -mtune=native
+CFLAGS= -Ofast -std=c89 -pedantic -mtune=native -fno-gcse --param max-goto-duplication-insns=9999
 #CFLAGS= -Os -lm -std=c89 -pedantic
-CASMFLAGS= -Os -lm -std=c89 -pedantic
+CASMFLAGS= -Os -lm -std=c89 -pedantic -fwhole-program
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 all: main asm_programs
 
