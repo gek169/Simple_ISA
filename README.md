@@ -89,9 +89,11 @@ pusha, stp+=a, add a to the stack pointer (1 byte) (36)
 popa, stp-=a, sub a from the stack pointer (1 byte) (37)
 astp, a = stp (1 byte) (38)
 bstp, b = stp (1 byte) (39)
+
 /*58 decimal so far.*/
 compl, a = ~a (1 byte) (3A)
 /*59 dec*/
+
 cpc, c = the program counter. (1 byte) (3B)
 call: (1 bytes)(3C)
 write the program counter(+1) to the stack pointer. Push the stack pointer by 2. Jump to c.
@@ -104,7 +106,23 @@ faristlb: store short into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) 
 NOTE: Page size is 256 bytes.
 farpagel: copy 256 bytes from page indexed by c to local page indexed by a (1 byte) (42)
 farpagest: copy 256 bytes to page indexed by c from local page indexed by a (1 byte) (43)
- halt duplicates, free for expansion (1 byte)
+
+/*68 dec so far*/
+
+//Far call procedure:
+
+lfarpc: pp = a, move the program counter offset to a different 64k region of memory. (1 byte) (44)
+farcall: (1 byte) (45)
+write the program counter to the stack pointer. 
+Push the stack pointer by 2.
+Write the program counter offset to the stack pointer. Set the program counter offset to a. Jump to c.
+farret: (1 byte) (46)
+Subtract 1 from the stack pointer, assign the program counter offset from the stack pointer.
+subtract 2 from the stack pointer. load the program counter from the stack pointer. (jump)
+
+
+
+The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
@@ -146,18 +164,30 @@ SISA-16, Simple-ISA-16.
 The ISA is capable of indexing 64k of memory "normally" but by using "far" indexing, it can
 access 16 megabytes in total.
 
-Executable code must reside in the upper 64k. it is the "executable" segment.
-
 You can use the included assembler to define ROMs which are up to the full 16 megabytes in size.
 
-Note that the program counter is 16 bit (not 32) and so the program counter cannot leave
-the first 64 kilobytes of memory.
+## Far memory system.
+
+Note that the program counter is 16 bit (not 32) and so the program counter cannot normally access
+more than the first 64 kilobytes.
+
+To get around this, I have implemented an "offset" system.
+
+THere is a special register called the "program counter offset" which is set implicitly in farcall and farret,
+or set explicitly with lfarpc.
 
 It is recommended you put your procedure definitions on page boundaries so that they can be easily copied and called.
 You might want to define a standard for how the number of pages a procedure occupies is specified-
 for instance, if a procedure occupies three pages,
 you might want to store a single byte before the beginning of the procedure specifying its length as three pages.
 
+If you use the farcall/farret system, be warned: you cannot use normal loads and stores to access memory
+outside the first 64k. This means for instance that if you write self-modifying code, you will not write
+to the actual location of instructions being executed.
+
+This can be useful- you can consider the first 64k "stack only" or "scratchpad memory"
+
+the first 64k is the fastest to access on the emulator since it is closest to the registers.
 
 ```
 Written by

@@ -133,6 +133,9 @@ char* insns[128] = {
 	"faristlb",
 	"farpagel",
 	"farpagest",
+	"lfarpc",
+	"farcall",
+	"farret",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -165,6 +168,7 @@ unsigned char insns_numargs[128] = {
 	0,0, //Far memory access- a
 	0,0, //Far memory access- b
 	0,0, //Far page load and store
+	0,0,0, //lfarpc, farcall, farret,
 };
 char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
@@ -251,8 +255,11 @@ char* insn_repl[128] = {
 	"bytes 65;", //faristlb
 	"bytes 66;", //farpagel
 	"bytes 67;", //farpagest
+	"bytes 68;", //lfarpc
+	"bytes 69;", //farcall
+	"bytes 70;", //farret
 };
-static const unsigned char n_insns = 68;
+static const unsigned char n_insns = 71;
 unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

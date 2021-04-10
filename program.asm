@@ -40,7 +40,8 @@ cmp;lb 0;cmp;jmpifeq
 astp;popa;lla %0xE000%;pusha;
 lda %0x1e8%;putchar;
 sc %0xA000%;
-call;
+lla %0x1%
+farcall;
 #we should see this when we return.
 la 0x45
 putchar;putchar;putchar;
@@ -53,7 +54,7 @@ section 0xC000
 
 //defining a function out here.
 //this function prints Qs to the screen.
-section 0xA000
+section 0x1A000
 la 0xa
 putchar;putchar;
 lla %0xB000%;illdaa;
@@ -85,7 +86,9 @@ sc %0xfffb%
 farpagest;
 la 0xa
 putchar;putchar;
-ret
+farret;#return back to the zero page.
+
+
 //Testing variable addressing.
 section @+1+
 

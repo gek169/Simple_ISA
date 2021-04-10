@@ -4,9 +4,10 @@
 #define z return
 #define k case
 #define o goto
-#define G M[p++]
-#define r(d) M[d]
-#define Z (p+=2,((((U)M[p-2]))<<8)+(U)M[p-1])
+#define PP ((UU)(pp<<16))
+#define G M[PP+p++]
+#define r(d)M[d]
+#define Z (p+=2,((((U)M[PP+p-2]))<<8)+(U)M[PP+p-1])
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
 #define Z2F ((((U)M[(((UU)c)<<8)+((UU)b&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)b&255)+1])
 #define Z3F ((((U)M[(((UU)c)<<8)+((UU)a&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)a&255)+1])
@@ -32,8 +33,8 @@ k 104:o V8;k 105:o V9;k 106:o VA;k 107:o VB;k 108:o VC;k 109:o VD;k 110:o VE;k 1
 k 112:o W0;k 113:o W1;k 114:o W2;k 115:o W3;k 116:o W4;k 117:o W5;k 118:o W6;k 119:o W7;\
 k 120:o W8;k 121:o W9;k 122:o WA;k 123:o WB;k 124:o WC;k 125:o WD;k 126:o WE;k 127:o WF;\
 }
-typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;U a,b,c,p,P;u R,M[(1<<24)];FILE*F;
-e(){R=0;p=0;a=0;b=0;P=0;di();QE:D
+typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;U a,b,c,p,P;u R,pp,M[(1<<24)];FILE*F;
+e(){R=0;p=0;pp=0;a=0;b=0;P=0;di();QE:D
 Q2:a&=b;D
 Q3:a|=b;D
 Q4:a^=b;D
@@ -66,9 +67,9 @@ RD:w(b,c)D
 RE:W(a,c)D
 RF:W(b,c)D
 S0:p=c;D
-S1:W(a,p)p+=2;D
-S2:W(b,p)p+=2;D
-S3:W(c,p)p+=2;D
+S1:W(a,p+PP)p+=2;D
+S2:W(b,p+PP)p+=2;D
+S3:W(c,p+PP)p+=2;D
 S4:P+=Z;D
 S5:P-=Z;D
 S6:P+=a;D
@@ -77,8 +78,6 @@ S8:a=P;D
 S9:b=P;D
 SA:a=~a;D
 SB:c=p;D
-SC:W((p),P);P+=2;p=c;D
-SD:P-=2;p=ZR;D
 A:a=r(Z)D
 v:a=G;D
 B:b=r(Z)D
@@ -100,7 +99,12 @@ T0:b=Z3F;D
 T1:W(b,((((UU)c)<<8)+((UU)a&255)))D
 T2:memcpy(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 T3:memcpy(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
-T4:T5:T6:T7:T8:T9:TA:TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+T4:pp=a;D
+SC:W(p,P);P+=2;p=c;D
+SD:P-=2;p=ZR;D
+T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
+T6:P-=1;pp=r(P);P-=2;p=ZR;D
+T7:T8:T9:TA:TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 h:dcl();z 0;}
 main(int rc,char**rv){UU i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}
