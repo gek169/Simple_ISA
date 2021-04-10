@@ -101,7 +101,7 @@ T2:memcpy(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 T3:memcpy(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
 T4:pp=a;D
 SC:W(p,P);P+=2;p=c;D
-SD:P-=2;p=ZR;D
+SD:p=ZR;D
 T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
 T6:P-=1;pp=r(P);p=ZR;D
 T7:a=r((((UU)c)<<8)+((UU)b&255))D

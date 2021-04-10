@@ -554,7 +554,7 @@ int main(int argc, char** argv){
 							goto error;
 						}
 						if(loc_eparen == 0){
-							printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							//printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 						}
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */

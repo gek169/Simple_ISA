@@ -40,7 +40,7 @@ cmp;lb 0;cmp;jmpifeq
 astp;popa;lla %0xE000%;pusha;
 lda %0x1e8%;putchar;
 
-sc %0xA000%;
+sc %0xA0D0%;
 lla %0x1%
 //these operations should do nothing.
 alpush;alpush;
@@ -48,7 +48,7 @@ lla %0x0%;
 alpop;alpop;
 farcall;
 #we should see this when we return.
-la 0x45
+la 0x41
 putchar;putchar;putchar;
 halt
 
@@ -61,7 +61,7 @@ section 0xC000
 
 //defining a function out here.
 //this function prints Qs to the screen.
-section 0x1A000
+section 0x1A0D0
 la 0xa
 putchar;putchar;
 lla %0xB000%;illdaa;
@@ -111,13 +111,14 @@ farret;#return back to the zero page.
 
 
 //Testing variable addressing.
+//This code is never executed.
 section @+1+
 sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;
 section 0xFFFF00
 !KAKAKAIII
-imul3.13;asm_print
+imul3.13
 
 VAR#somethingg#$
-bytes somethingg;asm_print
+bytes somethingg
 sc %5%;
-bytes somethingg;asm_print
+bytes somethingg
