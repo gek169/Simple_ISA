@@ -16,7 +16,7 @@ section 0
 #loop control
 lda %0x1e8%
 lb 1
-sc %0%
+sc %%;#set to zero
 add
 #using split syntax
 sta %0x1e8%
@@ -62,7 +62,7 @@ putchar;putchar;
 
 //test far memory indexing functionality
 sc %0xffff%;asm_print;
-lla 0,0xea;asm_print;
+lla %0xea%;asm_print;
 lb 0x59
 faristlb;
 lb 0xa

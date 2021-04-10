@@ -465,7 +465,7 @@ int main(int argc, char** argv){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
 						}
-						if(loc_eparen == loc){
+						if(loc_eparen == 0){
 							printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 						}
 						/*the character we were going to replace anyway, plus
@@ -475,8 +475,7 @@ int main(int argc, char** argv){
 						char expansion[1024];
 						unsigned short res = strtoull(line_old+loc+1, NULL, 0);
 						if(res == 0)
-							if(line_old[loc+1] != '0')/*Test for the trivial case-did they actually *type* zero?*/
-								printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
+							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
 						if(debugging) printf("\nSplitting value %u\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
 						snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
