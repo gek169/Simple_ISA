@@ -1,10 +1,26 @@
 # Simple, Embeddable, Elegant 16 bit instruction set simulator
 
-The C source is obfuscated but the C++ is not and runs at compiletime
+C program to simulate the SISA-16 virtual portable computer architecture.
 
-The included assembly programs and assembler are designed for the C code.
+The included assembly programs and assembler are designed for isa.c.
 
-The included makefiles and shell script show how to use the emulator and the assembler
+(the cpp file in this repository is a proof-of-concept unmaintained alpha version of this project.)
+
+Here is how you use the emulator on a unix system:
+```bash
+#compile the emulator
+cc isa.c -o isa
+#compile the assembler
+cc assembler.c -o asm
+#assemble your program
+./asm -i program.asm -o program.bin
+#run your program
+./isa program.bin
+```
+On a windows machine, the compiled C programs would be EXEs rather than lacking an extension.
+
+DuckDuckGo is your friend if you need to learn how to compile C programs on your target platform.
+
 
 The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
 
@@ -16,14 +32,29 @@ The emulator itself has been confirmed to *compile* using compiler explorer on..
 
 * MSVC
 
-* a myriad of unusual and strange compilers
+* a myriad of unusual and strange compilers on dozens of architectures.
 
 The emulator itself is C89 compliant, but the assembler uses C99 due to it using "unsigned long long".
 
 It could be converted to C89 as well but it would require re-writing my string library. I decided not to bother.
 
-These are the supported instructions in the C version, the C++ has a tiny fraction and is
-mostly a proof-of-concept that you can have a compiletime machine emulator.
+Terminology:
+```
+Address: Location where data is stored in main memory
+
+Register: a very fast form of memory which is not part of main memory
+
+Page: 256 bytes starting at an address which, and'd with 255, is zero. there are 65536 pages in the address space.
+
+Region: 64 kilobytes starting at an address which, and'd with 65535, is zero. there are 256 of them in the address space.
+
+Zero 'Home' Region: the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
+
+Bus or Device: 
+the implementation of gch() and pch() from d.h which is used for I/O and accessible with getchar/putchar
+in the assembly language.
+```
+Supported instructions:
 ```
 halt- end execution (1 byte) (0)
 lda- load byte into register a,zero extend (3 bytes)(1)
@@ -225,11 +256,22 @@ current 64k that the program counter is inside of.
 
 the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
 
-## Programming conventions
+## Programming conventions established
 
 Stack:
+
 The stack pointer (which always resides in the first 64k) points to a *free* location on the stack.
 The stack pointer *increments* rather than decrements to increase the stack size.
+
+The stack can be, as most, 64 kilobytes.
+
+Procedure calling:
+
+Procedures freely clobber registers and do not necessarily leave a return value in the accumulator,
+it would be much more dynamic to put them on the stack.
+
+
+
 
 ```
 Written by
