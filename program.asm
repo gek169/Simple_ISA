@@ -108,3 +108,4 @@ section @+1+
 sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;
 section 0xFFFF00
 !KAKAKAIII
+imul3.13;asm_print

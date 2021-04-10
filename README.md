@@ -126,7 +126,7 @@ faristb: store byte into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (4
 /*75 dec so far.*/
 
 FIXED POINT OPERATIONS: 16 multiply instructions. add and subtract carry over.
-ranging from 4B to 5A.
+ranging from 4B to 5A. All 1 byte.
 imul15.1: fixed-point multiply of a and b, 15.1
 imul14.2: fixed-point multiply of a and b
 imul13.3: fixed-point multiply of a and b
@@ -142,7 +142,7 @@ imul4.12: fixed-point multiply of a and b
 imul3.13: fixed-point multiply of a and b
 imul2.14: fixed-point multiply of a and b
 imul1.15: fixed-point multiply of a and b
-imul0.16: fixed-point multiply of a and b
+imul.16: fixed-point multiply of a and b
 The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.

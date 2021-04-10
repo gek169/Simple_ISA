@@ -60,7 +60,7 @@ char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
-char* insns[91] = {
+char* insns[128] = {
 	"halt",
 	"lda",
 	"la",
@@ -155,7 +155,7 @@ char* insns[91] = {
 	"imul3.13",
 	"imul2.14",
 	"imul1.15",
-	"imul0.15",
+	"imul.16",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -289,25 +289,10 @@ char* insn_repl[128] = {
 	"bytes 73;", //farret
 	"bytes 74;", //farret
 	/*Fixed point ops*/
-	"bytes 75;",
-	"bytes 76;",
-	"bytes 77;",
-	"bytes 78;",
-
-	"bytes 79;",
-	"bytes 80;",
-	"bytes 81;",
-	"bytes 82;",
-
-	"bytes 83;",
-	"bytes 84;",
-	"bytes 85;",
-	"bytes 86;",
-
-	"bytes 87;",
-	"bytes 88;",
-	"bytes 89;",
-	"bytes 90;",
+	"bytes 75;","bytes 76;","bytes 77;","bytes 78;",
+	"bytes 79;","bytes 80;","bytes 81;","bytes 82;",
+	"bytes 83;","bytes 84;","bytes 85;","bytes 86;",
+	"bytes 87;","bytes 88;","bytes 89;","bytes 90;",
 };
 static const unsigned char n_insns = 91;
 unsigned int outputcounter = 0;
@@ -427,7 +412,7 @@ int main(int argc, char** argv){
 		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
-		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != '\t') {
+		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'){
 			printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
 			goto end;
 		}
