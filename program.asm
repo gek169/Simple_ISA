@@ -52,6 +52,8 @@ la 0x45
 putchar;putchar;putchar;
 halt
 
+
+
 section 0xB000
 !QQQQQQQQQQQQQQQQQQ
 section 0xC000
@@ -114,3 +116,8 @@ sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;sc $+1+;
 section 0xFFFF00
 !KAKAKAIII
 imul3.13;asm_print
+
+VAR#somethingg#$
+bytes somethingg;asm_print
+sc %5%;
+bytes somethingg;asm_print

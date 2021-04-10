@@ -328,7 +328,7 @@ char* insn_repl[128] = {
 };
 static const unsigned char n_insns = 101;
 unsigned int outputcounter = 0;
-unsigned int nmacros = 4; /*0,1,2,3*/
+unsigned int nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
@@ -455,14 +455,17 @@ int main(int argc, char** argv){
 			do{
 				have_expanded = 0;
 				if(debugging){
-					printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line_copy);
+					printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					if(was_macro)
+						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
+				
 				for(unsigned int i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
 					long long linesize = strlen(line);
 					long long loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
 					char* line_old = line;
-
+					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					char found_longer_match = 0;
 					if(!was_macro)
@@ -475,16 +478,17 @@ int main(int argc, char** argv){
 							if(
 								checkme+strlen(variable_names[j]) >= loc + strlen(variable_names[i]) &&
 								checkme <= loc
-								){if(debugging) puts("Found longer Macro.");
+								){
 									found_longer_match = 1;
 									break;
 								}
 						}
 					}
-					if(found_longer_match) continue;
+					if(found_longer_match) {puts("Found longer Macro.");continue;}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
+					
 					long long len_to_replace = strlen(variable_names[i]);
 					char* before = str_null_terminated_alloc(line_old, loc);
 					if(i > 2)

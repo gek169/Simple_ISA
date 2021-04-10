@@ -100,6 +100,7 @@ static inline long long strfind(const char* text, const char* subtext){
 			if(subtext[si] == '\0') return (ti - st)+1;
 		}else {
 			si = 0;
+			if(text[ti] == subtext[si])si++; //Minor case.
 			if(subtext[si] == '\0') return (ti - st);
 		}
 	}

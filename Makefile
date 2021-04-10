@@ -1,5 +1,5 @@
-CC= gcc
-#CC= tcc
+#CC= gcc
+CC= tcc
 #CC= clang
 CCC= g++
 CFLAGS= -Ofast -lm -std=c89 -pedantic -mtune=native
