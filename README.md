@@ -123,8 +123,26 @@ farilda: load byte using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (4
 farista: store byte into far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (48)
 farildb: load byte using far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (49)
 faristb: store byte into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (4A)
+/*75 dec so far.*/
 
-
+FIXED POINT OPERATIONS: 16 multiply instructions. add and subtract carry over.
+ranging from 4B to 5A.
+imul15.1: fixed-point multiply of a and b, 15.1
+imul14.2: fixed-point multiply of a and b
+imul13.3: fixed-point multiply of a and b
+imul12.4: fixed-point multiply of a and b
+imul11.5: fixed-point multiply of a and b
+imul10.6: fixed-point multiply of a and b
+imul9.7: fixed-point multiply of a and b
+imul8.8: fixed-point multiply of a and b
+imul7.9: fixed-point multiply of a and b
+imul6.10: fixed-point multiply of a and b
+imul5.11: fixed-point multiply of a and b
+imul4.12: fixed-point multiply of a and b
+imul3.13: fixed-point multiply of a and b
+imul2.14: fixed-point multiply of a and b
+imul1.15: fixed-point multiply of a and b
+imul0.16: fixed-point multiply of a and b
 The rest: halt duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.

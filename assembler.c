@@ -60,7 +60,7 @@ char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
-char* insns[128] = {
+char* insns[91] = {
 	"halt",
 	"lda",
 	"la",
@@ -140,6 +140,22 @@ char* insns[128] = {
 	"farista",
 	"farildb",
 	"faristb",
+	"imul15.1",
+	"imul14.2",
+	"imul13.3",
+	"imul12.4",
+	"imul11.5",
+	"imul10.6",
+	"imul9.7",
+	"imul8.8",
+	"imul7.9",
+	"imul6.10",
+	"imul5.11",
+	"imul4.12",
+	"imul3.13",
+	"imul2.14",
+	"imul1.15",
+	"imul0.15",
 };
 unsigned char insns_numargs[128] = {
 	0,//halt
@@ -174,6 +190,11 @@ unsigned char insns_numargs[128] = {
 	0,0, //Far page load and store
 	0,0,0, //lfarpc, farcall, farret,
 	0,0,0,0, //Far memory access- a and b, as single bytes
+	/*Fixed point multiplies.*/
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
+	0,0,0,0,
 };
 char* insn_repl[128] = {
 	"bytes 0;", //Halt has no arguments.
@@ -267,8 +288,28 @@ char* insn_repl[128] = {
 	"bytes 72;", //farret
 	"bytes 73;", //farret
 	"bytes 74;", //farret
+	/*Fixed point ops*/
+	"bytes 75;",
+	"bytes 76;",
+	"bytes 77;",
+	"bytes 78;",
+
+	"bytes 79;",
+	"bytes 80;",
+	"bytes 81;",
+	"bytes 82;",
+
+	"bytes 83;",
+	"bytes 84;",
+	"bytes 85;",
+	"bytes 86;",
+
+	"bytes 87;",
+	"bytes 88;",
+	"bytes 89;",
+	"bytes 90;",
 };
-static const unsigned char n_insns = 75;
+static const unsigned char n_insns = 91;
 unsigned int outputcounter = 0;
 unsigned int nmacros = 4; /*0,1,2,3*/
 char quit_after_macros = 0;

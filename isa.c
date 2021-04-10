@@ -108,7 +108,23 @@ T7:a=r((((UU)c)<<8)+((UU)b&255))D
 T8:w(a,((((UU)c)<<8)+((UU)b&255)))D
 T9:b=r((((UU)c)<<8)+((UU)a&255))D
 TA:w(b,((((UU)c)<<8)+((UU)a&255)))D
-TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+TB:a=((((UU)a)*((UU)b))>>1);D
+TC:a=((((UU)a)*((UU)b))>>2);D
+TD:a=((((UU)a)*((UU)b))>>3);D
+TE:a=((((UU)a)*((UU)b))>>4);D
+TF:a=((((UU)a)*((UU)b))>>5);D
+U0:a=((((UU)a)*((UU)b))>>6);D
+U1:a=((((UU)a)*((UU)b))>>7);D
+U2:a=((((UU)a)*((UU)b))>>8);D
+U3:a=((((UU)a)*((UU)b))>>9);D
+U4:a=((((UU)a)*((UU)b))>>10);D
+U5:a=((((UU)a)*((UU)b))>>11);D
+U6:a=((((UU)a)*((UU)b))>>12);D
+U7:a=((((UU)a)*((UU)b))>>13);D
+U8:a=((((UU)a)*((UU)b))>>14);D
+U9:a=((((UU)a)*((UU)b))>>15);D
+UA:a=((((UU)a)*((UU)b))>>16);D
+UB:UC:UD:UE:UF:V0:V1:V2:V3:V4:V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 h:dcl();z 0;}
 main(int rc,char**rv){UU i=0,j;if(rc<2)z 1;
 for(F=fopen(rv[1],"rb");!feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}
