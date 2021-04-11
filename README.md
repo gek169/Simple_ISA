@@ -24,11 +24,13 @@ DuckDuckGo is your friend if you need to learn how to compile C programs on your
 
 The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
 
+The emulator has the best performance compiled with clang at -Ofast.
+
 The emulator itself has been confirmed to *compile* using compiler explorer on...
 
 * Intel Cilk Compiler
 
-* GCC arm and Clang on virtually every platform.
+* GCC and Clang on virtually every platform.
 
 * MSVC
 
@@ -44,9 +46,9 @@ Address: Location where data is stored in main memory
 
 Register: a very fast form of memory which is not part of main memory
 
-Page: 256 bytes starting at an address which, and'd with 255, is zero. there are 65536 pages in the address space.
+Page: 256 bytes starting at an address whose low byte is zero.
 
-Region: 64 kilobytes starting at an address which, and'd with 65535, is zero. there are 256 of them in the address space.
+Region: 64 kilobytes starting at an address whose 2 low bytes is zero.
 
 Zero 'Home' Region: the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
 
