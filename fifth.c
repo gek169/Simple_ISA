@@ -184,7 +184,7 @@ typedef struct{
 	unsigned int datasize;
 } dataincl;
 
-#define NUM_RESERVED_KEYWORDS 31
+#define NUM_RESERVED_KEYWORDS 47
 const char* reserved_keywords[NUM_RESERVED_KEYWORDS] = {
 	"gotoif","goto",
 	"{","}",
@@ -203,6 +203,14 @@ const char* reserved_keywords[NUM_RESERVED_KEYWORDS] = {
 	">","==",
 	"!","||",
 	"&&","!=",
+	"*.1.15","*.2.14",
+	"*.3.13","*.4.12",
+	"*.5.11","*.6.10",
+	"*.7.9","*.8.8",
+	"*.9.7","*.10.6",
+	"*.11.5","*.12.4",
+	"*.13.3","*.14.2",
+	"*.15.1","*.16",
 };
 
 #define MAX_GLOBAL_VARS 5000
