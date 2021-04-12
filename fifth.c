@@ -24,22 +24,34 @@ Compiles into compliant loads and stores.
 2) PROCEDURE DECLARATIONS
 short|byte|short*|byte*|void proc myfunction(argument description)
 	<STATEMENT>
-3) ARGUMENT DESCRIPTION
 By example:
 short add3 (short a, byte b, short c){
 	@a @b + @c + return;
 }
 short writeshort(short* a){
-	3 @a + !* 0 return;
+#Offset store example.
+#then !_ writes the value to the pointer on the lhs.
+#!_ is a builtin operator which stores a short. the top three values on the stack must be short*, short(index), short(value)
+#its twin @_ is also allowed, which does a dereference. it needs short* on the stack and puts a single short on the stack.
+	@a 3 5 !_ 0 return;
 }
-short* offsetshort(short* a, short offset){
+short* offsetwriteshort(short* a, short offset){
 #this also demonstrates pointer arithmetic- only supported for short* or byte* with a short or byte.
-	@offset @a + return;
+#this writes 3 to a[offset]
+	@a @offset 3 !_ return;
 }
 short not(short a){
 	@a ~ return;
 }
-4) STATEMENT
+short* to_pointer(byte high, short low){
+#demonstrating the to-pointer syntax.
+	@high @low (short*) return;
+}
+short pointer_to_short(short* a){
+	@a (short) return;
+}
+
+3) STATEMENT
 	Form 1: compound statement
 	{
 		<STATEMENT>
@@ -63,7 +75,7 @@ short not(short a){
 	@myvar if
 		goto mylabel;
 	
-5) EXPRESSION
+4) EXPRESSION
 	Postfix notation is used, like a calculator.
 	Forth-like load/store semantics are used.
 	to call a function with two short arguments a and b...
@@ -73,7 +85,7 @@ short not(short a){
 
 	An array's name is considered to be a pointer to its first element- like C.
 	if you try to load or store to an index in it, that index must be a compiletime constant.
-6) EMBEDDED DATA
+5) EMBEDDED DATA
 
 You may specify a raw data file to embed into your binary
 DATA(filename)[memory location where it should be written]
@@ -93,7 +105,8 @@ typedef struct {
 					//value/variable
 	char is_stack; //does this variable exist on the stack?
 	char is_constant; //is this variable a constant?
-	char type; //0 for byte, 1 for short, 2 for short pointer, 3 for byte pointer.
+	char basic_type; //0 for byte, 1 for short.
+	unsigned int pointer_level; //
 	unsigned int value; //All variables not on the stack are "far-indexed"
 						//this includes goto labels.
 						//if this is a constant, this holds its value.
@@ -103,17 +116,17 @@ typedef struct {
 
 typedef struct stackframe{
 	unsigned int local_depth; /*Depth not including children.*/
-	variable stack_variables[500]; //you may have at most 500 variables in the stack frame.
-};
+	token stack_variables[500]; //you may have at most 500 variables in the stack frame.
+} stackframe;
 
 const char* reserved_keywords[10] = {
 	"if",
 	"goto",
 	"{",
 	"}",
-}
+};
 
-variable global_vars[10000]; /**/
+token global_vars[10000]; /**/
 unsigned int nglobals = 0;
 
 int main(int argc, char** argv){
@@ -121,5 +134,6 @@ int main(int argc, char** argv){
 	char* filetext = read_file_into_alloced_buffer(stdin, &linelen);
 	/*
 		The source code has been received.
+		Pass 1: Retrieve the list of all functions.
 	*/
 }
