@@ -1,7 +1,7 @@
 #CC=cc
 #CC= gcc
-CC= tcc
-#CC= clang
+#CC= tcc
+CC= clang
 CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
 #CFLAGS= -Os -std=c89 -pedantic
@@ -24,5 +24,5 @@ asm_programs: main
 	./asm_compile.sh
 
 clean:
-	rm -f *.exe *.out *.o *.bin isa isa_constexpr rbytes asm
+	rm -f *.exe *.out *.o *.bin isa isa_constexpr rbytes asm fifth
 	clear
