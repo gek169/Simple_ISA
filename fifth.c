@@ -32,33 +32,47 @@ short add3 (short a, byte b, short c){
 #if loads are performed on compiletime-constant indexes,
 #the compiler will optimize them out.
 #
-	a@ b@ + c@ + return;
+	@a @b + @c + return;
 }
 #Offset store example.
-#Notice how a is "at"-ed. Since a is a pointer, a's name evaluates to a pointer to a pointer.
-#it must be dereferenced to get the actual pointer.
+#writes 5 into a[3]
 short writeshort(short* a){
-	a@ 3 5 !_ 0 return;
+	5 3 @a !_ 0 return;
 }
-short* offsetwriteshort(short* a, short offset){
+void offsetwriteshort(short* a, short offset){
 #!_ requires pointer, short(index), value.
 #the typeid of value must be a.typeid.pointer_level-1
 #(the first argument is first tested to see if its pointer_level is zero)
-	a@ offset@ 3 !_ return;
+#the 
+	@a @offset 3 !_ return;
 }
 short not(short a){
-	a@ ~ return;
+	@a ~ return;
 }
 short* to_pointer(byte high, short low){
 #demonstrating the to-pointer syntax.
-#a pointer is just two shorts with the uppermost byte
-	high@ low@ join(short*) return;
+#a pointer is just two shorts with the uppermost byte being zero.
+	@high @low join(short*) return;
 }
 short pointer_to_short(short* a){
-	a@ split return;
+	@a split return;
 }
 byte pointer_high_byte_retrieval(short* a){
-	a@ split void return;
+	@a split void return;
+}
+
+void pointer_write(short* a){
+#write 3 into the location pointed to by a.
+	3 0 @a !_;
+}
+void variable_write(short a){
+	short q;
+#the topmost short on the stack is written to q,
+#which is the result of adding a and 3.
+	@a 3 + !q;
+#after every statement, any excess stack from the previous statement is removed.
+#the one short on the stack is thrown away.
+#this is a void function so return can be omitted.
 }
 
 3) STATEMENT
@@ -85,11 +99,11 @@ byte pointer_high_byte_retrieval(short* a){
 	Postfix notation is used, like a calculator.
 	Forth-like load/store semantics are used.
 	to call a function with two short arguments a and b...
-	a b myfunction;
+	@a @b myfunction;
 
 	Operators' types are compiletime-determined.
 
-	A variables name is considered to be a pointer to it in expressions, (for arrays, a pointer to the first element.)
+	Note the placement of @ and !. @ and ! must prepend a variable name.
 	
 5) EMBEDDED DATA
 
@@ -97,7 +111,9 @@ You may specify a raw data file to embed into your binary
 DATA(filename)[memory location where it should be written]
 
 You may also specify character literals like this:
-[memorylocation]"Hello world!"
+[memorylocation]!Hello world! this is a character literal.\n\\< this is a backslash on a new line.
+
+The compiler warns you if the data or character string occupies more than a single region of memory.
 
 7) TYPE CONVERSION
 	All byte types are promoted to shorts automatically.
@@ -106,8 +122,88 @@ You may also specify character literals like this:
 8) CONSTANT DECLARATION
 	you can declare a constant like this
 	const type = value
-	it effectively equates to a macro.
+	it effectively equates to a macro, and it must be an integer literal.
+9) HOW EXPRESSIONS ARE PARSED
 
+	short Operators are brain-dead simple.
+	operator+ for instance:
+	alpop;blpop;add;alpush;
+	
+	@<variablename> loads and !<variablename> stores for byte and short types are handled like this
+	~~LOADS~~
+	.a global short:
+	sc %<upper byte>%; llb %<lower short>%; farillda; alpush;
+	.a global byte:
+	sc %<upper byte>%; llb %<lower short>%; farilda; alpush;
+	.a stack short:
+	astp; llb %stack placement depth%; sub; illdaa; alpush;
+	.a stack byte:
+	astp; llb %stack placement depth%; sub; ca; ilda; alpush;
+	~
+	.a global pointer:
+	sc %<upper byte>%; llb %<lower short>%; farilda; alpush;
+	llb %<lower short+1>%; farillda; alpush;
+	.a stack pointer:
+	astp; llb %stack placement depth%; sub; ca; ilda; alpush;
+	astp; llb %stack placement depth+1%; sub; illdaa; alpush;
+	~~STORES~~
+	.a global short:
+	sc %<upper byte>%; llb %<lower short>%; alpop; faristla;
+	.a global byte:
+	sc %<upper byte>%; llb %<lower short>%; alpop; farista;
+	.a stack short:
+	astp; llb %stack placement depth%; sub; ca; alpop; istla;
+	.a stack byte:
+	astp; llb %stack placement depth%; sub; ca; alpop; ista;
+	~
+	.a global pointer:
+	sc %<upper byte>%; llb %<lower short>%; alpop; farista;
+	llb %<lower short+1>%; alpop; faristla;
+	.a stack pointer:
+	astp; llb %stack placement depth%; sub; ca; alpop; ista;
+	astp; llb %stack placement depth+1%; sub; ca; alpop; istla;
+#########################
+	The more complex @_ which takes <short index> <pointer> and !_ which takes <value> <short index> <pointer>
+	are handled like this:
+#########################
+	~~LOADS~~
+	.Pointer to global bytes:
+	alpop;	bpop;cb;blpop; add; farildb; blpush;
+
+	.Pointer to global shorts:
+	blpop;	apop;ca;alpop;
+	blpush; 
+		lb2; mul; 
+	blpop;
+	add; farilldb; blpush;
+
+	.Pointer to global pointers:
+	blpop;	apop;ca;alpop;
+		blpush; 
+			lb3; mul; 
+		blpop;
+	add; farildb; bpush;
+	lb1; add; farilldb; blpush;
+	
+	~~STORES~~
+	.Pointer to global bytes:
+	alpop;	bpop;cb; blpop; add; 			blpop;faristb;
+	.Pointer to global shorts:
+	blpop;	apop;ca; alpop;	
+		blpush;
+			lb2; mul;
+		blpop;
+	add; blpop; faristlb;
+	.Pointer to global pointers:
+	blpop;	apop;ca; alpop;	
+		blpush;
+			lb3; mul;
+		blpop;
+	add; 
+#we have now set up the pointer to where we want to write our stuff set up in c,a
+#
+	lb1;add;blpop;faristlb;
+	lb1;sub;bpop;faristb;
 */
 
 
@@ -135,7 +231,7 @@ typedef struct {
 	typeid type;
 	char is_array; /*Invalid for an expression, but valid for a global variable declaration.*/
 	char is_label; 
-	unsigned char name[TOKEN_NAME_MAX + 1];
+	char name[TOKEN_NAME_MAX + 1];
 } token;
 
 
@@ -184,7 +280,7 @@ typedef struct{
 	unsigned int datasize;
 } dataincl;
 
-#define NUM_RESERVED_KEYWORDS 47
+#define NUM_RESERVED_KEYWORDS 44
 const char* reserved_keywords[NUM_RESERVED_KEYWORDS] = {
 	"gotoif","goto",
 	"{","}",
@@ -201,8 +297,7 @@ const char* reserved_keywords[NUM_RESERVED_KEYWORDS] = {
 	"|","^",
 	"~","<",
 	">","==",
-	"!","||",
-	"&&","!=",
+		"!=",
 	"*.1.15","*.2.14",
 	"*.3.13","*.4.12",
 	"*.5.11","*.6.10",
@@ -223,13 +318,63 @@ unsigned int nglobals = 0;
 unsigned int nfunctions = 0;
 unsigned int is_debugging = 1;
 
+int check_is_reserved(char* name){
+	unsigned i;
+	for(i = 0; i < NUM_RESERVED_KEYWORDS; i++)
+		if(streq(name, reserved_keywords[i]))
+			return 1;
+	return 0;
+}
 
+int check_is_function(char* name){
+	unsigned i;
+	for(i = 0; i < nfunctions; i++)
+		if(streq(name, functions[i].name))
+			return 1;
+	return 0;
+}
+
+int check_is_global(char* name){
+	unsigned i;
+	for(i = 0; i < nglobals; i++)
+		if(streq(name, global_vars[i].name))
+			return 1;
+	return 0;
+}
 
 int main(int argc, char** argv){
-	unsigned long filelen; unsigned int i;
-	char* filetext = read_file_into_alloced_buffer(stdin, &filelen);
+	unsigned long filelen; unsigned int i; FILE* filein,* fileout; char* filetext;
+	for(i = 1; i<(unsigned)argc; i++){
+		if(streq("-i", argv[i-1])){
+			if(!filein)
+				filein = fopen(argv[i], "r");
+			else
+			{
+				puts("<FIFTH ERROR> Too many input files");
+				return 1;
+			}
+		}
+		if(streq("-o", argv[i-1])){
+			if(!fileout)
+				fileout = fopen(argv[i], "wb");
+			else
+			{
+				puts("<FIFTH ERROR> Too many output files");
+				return 1;
+			}
+		}
+	}
+	if(!filein){
+		puts("<FIFTH ERROR> No input file");
+		return 1;
+	}
+	if(!fileout){
+		puts("<FIFTH ERROR> No output file");
+		return 1;
+	}
+	filetext = read_file_into_alloced_buffer(filein, &filelen);
 	if(filelen == 1){
-		puts("<FIFTH ERROR> empty stdin input. Cannot compile.");
+		puts("<FIFTH ERROR> empty input. Cannot compile.");
 		return 1;
 	}filelen--;
 	/*
@@ -262,19 +407,27 @@ int main(int argc, char** argv){
 		/*We have now reached something which either starts with short or byte.*/
 		if(strprefix("short",filetext+i)) {current.return_type.basic_type = 1;i+=5;}
 		else if(strprefix("byte",filetext+i)) {current.return_type.basic_type = 0;i+=4;}
-		else {i++; continue;}
+		else {
+			printf("\n<FIFTH INTERNAL ERROR> Bad function recognition <1>");
+			return 1;
+		}
 		/*Count stars*/
 		current.return_type.pointer_level = 0;
 		while(strprefix("*",filetext+i)) current.return_type.pointer_level++;
-		/*Skip whitespace*/
-		while(strprefix(" ",filetext+i) || strprefix("\n",filetext+i) || strprefix("\t",filetext+i) ) i++;
-		/*The next part will be its name! but first, make sure that this thing doesn't end here.*/
-		if(i>=filelen){
+		if(i>=filelen){		
 			printf("\n<FIFTH ERROR> You began declaring something at the end of the file...\n");
 			return 1;
 		}
 		/*Check if this is a global variable declaration.*/
 		if(filetext[i] == '[')continue;
+		/*Skip whitespace*/
+		while(strprefix(" ",filetext+i) || strprefix("\n",filetext+i) || strprefix("\t",filetext+i) ) i++;
+		/*The next part will be its name! but first, make sure that this thing doesn't end here.*/
+		if(i>=filelen){
+			printf("\n<FIFTH ERROR> You began declaring a function at the end of the file...\n");
+			return 1;
+		}
+
 		/*Ensure the first character is valid.*/
 		if(!isalpha(filetext[i])){
 			printf("\n<FIFTH ERROR> You began declaring a function with a non-alpha character. Here:\n%s\n", filetext + i);
@@ -295,14 +448,21 @@ int main(int argc, char** argv){
 			printf("\n<FIFTH ERROR> You began declaring a function at the end of the file...\n");
 			return 1;
 		}
-		if(filetext[i] != ' ' && 
-			filetext[i] != '\t' &&
-			filetext[i] != '\n' &&
-			filetext[i] != '{' /*}*/
-		){continue;} /*This is most likely a variable declaration.*/
-		
+		if(
+			filetext[i] != '(' /*)*/
+		){
+			printf("\n<FIFTH ERROR> Function declaration without immediately following open parentheses. Here:\n%s\n", filetext+i);
+			return 1;
+		} /*This is most likely a variable declaration.*/
 		memcpy(current.name, filetext+i, nameend-namestart);
-		/*TODO: This is a name so we have to check and make sure the user didn't try to use a pre-existing global symbol.*/
+		/*This is a name so we have to check and make sure the user didn't try to use a pre-existing global symbol.*/
+		if(check_is_global(current.name) ||
+			check_is_function(current.name) ||
+			check_is_reserved(current.name)
+		){
+			printf("\n<FIFTH ERROR> Function declaration has name which is used. Here:\n%s\n", filetext+i);
+			return 1;
+		}
 	}
 	/*
 		TODO:
