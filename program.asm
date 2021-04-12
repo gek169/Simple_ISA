@@ -69,8 +69,8 @@ putchar;putchar;
 putchar;putchar;
 
 //test far memory indexing functionality
-sc %0xffff%;
-lla %0xea%;
+lla %0xffea%;
+sc %0xff%;
 lb 0x59
 faristlb;
 lb 0xa
@@ -81,8 +81,8 @@ putchar;
 
 
 //test far memory indexing functionality for bytes
-sc %0xeeff%;
-lla %0xed%;
+lla %0xeeff%;
+sc %0xed%;
 lb 0x57
 faristb;
 lb 0xa

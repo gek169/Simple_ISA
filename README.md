@@ -132,10 +132,10 @@ call: (1 bytes)(3C)
 write the program counter to the stack pointer. Push the stack pointer by 2. Jump to c.
 ret: (1 byte)(3D)
 subtract 2 from the stack pointer. load the program counter from the stack pointer.
-farillda: load short using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (3E)
-faristla: store short into far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (3F)
-farilldb: load short using far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (40)
-faristlb: store short into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (41)
+farillda: load short using far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) (3E)
+faristla: store short into far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) (3F)
+farilldb: load short using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (40)
+faristlb: store short into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (41)
 NOTE: Page size is 256 bytes.
 farpagel: copy 256 bytes from any page indexed by c to home region page indexed by a (1 byte) (42)
 farpagest: copy 256 bytes to any page indexed by c from home region page indexed by a (1 byte) (43)
@@ -152,10 +152,10 @@ Write the program counter offset to the stack pointer. Set the program counter o
 farret: (1 byte) (46)
 Subtract 1 from the stack pointer, assign the program counter offset from the stack pointer.
 subtract 2 from the stack pointer. load the program counter from the stack pointer. (jump)
-farilda: load byte using far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (47)
-farista: store byte into far memory indexing at [(u32)c<<8 + (u32)b] (1 byte) (48)
-farildb: load byte using far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (49)
-faristb: store byte into far memory indexing at [(u32)c<<8 + (u32)a] (1 byte) (4A)
+farilda: load byte using far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) (47)
+farista: store byte into far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) (48)
+farildb: load byte using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (49)
+faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4A)
 /*75 dec so far.*/
 
 FIXED POINT OPERATIONS: 16 multiply instructions. add and subtract carry over.

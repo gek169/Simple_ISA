@@ -1,7 +1,7 @@
 #CC=cc
 #CC= gcc
-#CC= tcc
-CC= clang
+CC= tcc
+#CC= clang
 CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
 #CFLAGS= -Os -std=c89 -pedantic
@@ -13,6 +13,9 @@ main:
 	$(CC) $(CFLAGS) isa.c -o isa
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 	$(CC) $(CASMFLAGS) assembler.c -o asm
+
+fifth:
+	$(CC) $(CFLAGS) fifth.c -o fifth
 
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr

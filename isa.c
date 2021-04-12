@@ -12,8 +12,8 @@
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
 #define ZR (P-=2,(((U)M[P])<<8)+(U)M[P+1])
-#define Z2F ((((U)M[(((UU)c)<<8)+((UU)b&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)b&255)+1])
-#define Z3F ((((U)M[(((UU)c)<<8)+((UU)a&255)])<<8)+(U)M[(((UU)c)<<8)+((UU)a&255)+1])
+#define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+((UU)b)+1])
+#define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+((UU)a)+1])
 #define w(v,d)M[d]=v;
 #define W(v,d)M[d]=v>>8;M[d+1]=v&255;
 #define D ;switch(G){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6:o t;k 7:o T;\
@@ -108,9 +108,9 @@ od:if(b!=0)a/=b;else{R=1;o h;}D
 oi:if(b!=0)a%=b;else{R=1;o h;}D
 C:if(a<b)a=0;else if(a>b)a=2;else a=1;D
 SE:a=Z2F;D
-SF:W(a,((((UU)c)<<8)+((UU)b&255)))D
+SF:W(a,((((UU)c&255)<<16)+((UU)b)))D
 T0:b=Z3F;D
-T1:W(b,((((UU)c)<<8)+((UU)a&255)))D
+T1:W(b,((((UU)c&255)<<16)+((UU)a)))D
 T2:memcpy(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 T3:memcpy(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
 T4:pp=a;D
@@ -118,10 +118,10 @@ SC:W(p,P);P+=2;p=c;D
 SD:p=ZR;D
 T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
 T6:P-=1;pp=r(P);p=ZR;D
-T7:a=r((((UU)c)<<8)+((UU)b&255))D
-T8:w(a,((((UU)c)<<8)+((UU)b&255)))D
-T9:b=r((((UU)c)<<8)+((UU)a&255))D
-TA:w(b,((((UU)c)<<8)+((UU)a&255)))D
+T7:a=r((((UU)c&255)<<16)+((UU)b))D
+T8:w(a,((((UU)c&255)<<16)+((UU)b)))D
+T9:b=r((((UU)c&255)<<16)+((UU)a))D
+TA:w(b,((((UU)c&255)<<16)+((UU)a)))D
 TB:a=(((UU)a)*((UU)b))>>1;D
 TC:a=(((UU)a)*((UU)b))>>2;D
 TD:a=(((UU)a)*((UU)b))>>3;D
