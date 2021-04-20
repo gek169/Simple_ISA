@@ -3,7 +3,6 @@
 	VAR#jumpc#jmp;
 	VAR#IS_A_NEWLINE#sta0,0;lb0xa;cmp;
 	VAR#GET_A_BACK#lda0,0;
-VAR#ldc#qqqq
 
 #right at the beginning.
 section 0
