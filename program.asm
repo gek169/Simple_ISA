@@ -1,6 +1,9 @@
 #Compile this program using asm. ./asm -i program.asm -o program.bin
-#section 0
-#fill 0xFFFF,0
+section 0
+#fills 65536 bytes with zeroes.
+asm_begin_region_restriction
+fill 65536,0
+asm_end_region_restriction
 
 section 0xF000
 !hello world!!! You should see this print.

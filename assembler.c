@@ -333,6 +333,9 @@ unsigned int nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
+unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
+unsigned long region_restriction = 0;
+char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
 				if(debugging)
 					printf("\nWriting individual byte %u\n", b);
@@ -346,7 +349,24 @@ if(ftell(f) != outputcounter){
 	else /*Fill with 0's until we reach the output counter.*/
 		while(ftell(f)!=outputcounter)fputc(0, f);
 }
-
+switch(region_restriction_mode){
+	case 0: break;
+	case 1:{
+		if (((outputcounter>>8) & 0xFFFF)  != region_restriction){
+			printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
+			exit(1);
+		}
+	}
+	break;
+	case 2:{
+		if (((outputcounter>>16) & 0xFF)  != region_restriction){
+			printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
+			exit(1);
+		}
+	}
+	break;
+	default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
+}
 fputc(b, f); outputcounter++; outputcounter&=0xffffff;
 }
 void fputshort(unsigned short sh, FILE* f){
@@ -423,7 +443,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 	}
 	while(!feof(infile)){
-		unsigned long linesize;char* line, *line_copy;
+		
 		char was_macro = 0;
 		if(debugging) printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
@@ -851,7 +871,19 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
 				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04x\n", line_copy, line, outputcounter);
-			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_quit", metaproc)){
+			} else if(strprefix("asm_begin_region_restriction", metaproc)){
+				/*The assembler will warn you if the region changes during the creation of the function.*/
+				region_restriction = (outputcounter>>16) & 0xFF;
+				region_restriction_mode = 2; /*region*/
+			} else if(strprefix("asm_end_region_restriction", metaproc)){
+				region_restriction_mode = 0; /*end region*/
+			} else if(strprefix("asm_begin_block_restriction", metaproc)){
+				/*The assembler will warn you if the block changes during the creation of the function.*/
+				region_restriction = (outputcounter>>8) & 0xFFFF;
+				region_restriction_mode = 1; /*block*/
+			} else if(strprefix("asm_end_block_restriction", metaproc)){
+				region_restriction_mode = 0; /*end block*/
+			} else if(strprefix("asm_quit", metaproc)){
 				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
 				goto error;
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
