@@ -328,7 +328,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 
 ### list of SISA-16 assembler reserved words
 ```
-	<all the instruction names are reserved>
+	<all the instruction names are reserved. See above.>
 	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
 	asm_halt- if on the second pass, halt assembly.
 	ASM_*- reserved namespace
@@ -336,7 +336,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macros are not expanded.
-	ASM_data_include- include a file. Macros are not expanded.
+	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
 	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers.
 	" "- space macro, used to remove whitespace.
