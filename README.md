@@ -383,10 +383,12 @@ Through intelligent use of the assembler to compile libraries before programs th
 static linking by using `ASM_data_include` and then creating macros to call functions defined in the file included,
 or macros to refer to variables which are instantiated and used inside the library.
 
-```
-#you have some library written as myLibrary.asm
+```c
+#you have some library written as myLibrary.asm, which is used by myProgram.asm.
 ./asm -i myLibrary.asm -o myLibrary.bin
-#in your program's asm file...
+./asm -i myProgram.asm -o myProgram.bin
+
+#in myProgram.asm...
 section 0xee0000
 asm_begin_region_restriction;
 ASM_data_include myLibrary.bin
