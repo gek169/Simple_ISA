@@ -336,6 +336,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macros are not expanded.
+	$- expands to the current position of the line counter as an unsigned short, but split into two bytes.
+		if the line counter is at 0xe9f2 then $ will evaluate to '233,242'
 	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
 	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers.
