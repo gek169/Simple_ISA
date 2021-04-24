@@ -4,8 +4,8 @@
 
 /*Linux only code to achieve unbuffered stdin*/
 #include <ncurses.h>
-void di(){initscr();}
-void dcl(){endwin();}
+#define di(){initscr();}
+#define dcl(){endwin();}
 
-unsigned short gch(){return getchar();}
-void pch(unsigned short a){putchar(a);}
+#define gch() getchar()
+#define pch(a){putchar(a);}
