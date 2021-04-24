@@ -229,6 +229,13 @@ access 16 megabytes in total.
 
 You can use the included assembler to define ROMs which are up to the full 16 megabytes in size.
 
+CPU speed:
+The machine isn't real but it executes as fast as possible on the host machine.
+
+Memory speed:
+Again, not really simulated. The architecture is designed with cache-efficiency in-mind, though- hence
+the existence of the home region and its special properties.
+
 ## Far memory system.
 
 Note that the program counter is 16 bit (not 32) and so the program counter cannot normally access
@@ -335,9 +342,15 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_*- reserved namespace
 	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
-		Macros are not expanded.
-	$- expands to the current position of the line counter as an unsigned short, but split into two bytes.
-		if the line counter is at 0xe9f2 then $ will evaluate to '233,242'
+		Macro names in a string literal are not expanded.
+	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
+		if the output counter is at 0xe9f2 then $ will evaluate to '233,242'. Note that the output counter
+		position is determined at the beginning of the current line. Also note that if the output counter
+		is greater than 64k, the upper byte will be ignored- effectively trapping $ to the home region.
+		you can also specify an amount to be added to the $ value with $+value+, where value is an integer literal (Not a macro)
+	@- expands to the current position of the output counter as a 24 bit unsigned integer. 
+		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@% to avoid using $.
+	%- two of these defines a split directive. %0xff0A% will be split into 255,10.
 	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
 	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers.
@@ -388,9 +401,10 @@ asm_end_region_restriction;
 
 #You have a subroutine called "print" defined in your library which is at 0xff90 in the library.
 VAR#callPrint#la0xee;sc%0xff90%;farcall;
-#Your library defines a short variable "LibVar" at 0xb102a4 which it uses for something
-VAR#getshrtLibVar#sc %0xb1%;llb 0x02a4;farillda;alpush;
-VAR#putshrtLibVar#sc %0xb1%;llb 0x02a4;alpop;faristla;
+#Your library defines a short variable "LibVar" at 0xb102a4 which you need to interact with.
+VAR#accessLibVar#sc %0xb1%;llb 0x02a4
+VAR#getshrtLibVar#accessLibVar;farillda;alpush;
+VAR#putshrtLibVar#accessLibVar;alpop;faristla;
 ```
 
 ### Integer literals
