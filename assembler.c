@@ -374,6 +374,7 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
+	unsigned long npasses = 0;
 	const unsigned long nbuiltin_macros = 5;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
@@ -442,8 +443,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			return 1;
 		}
 	}
+	/*Second pass to allow forward declarations.*/
+	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(!feof(infile)){
-		
 		char was_macro = 0;
 		if(debugging) printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
@@ -481,8 +483,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				goto error;
 			}
 			fseek(tmp, 0, SEEK_SET);
-			for(;len>0;len--)
-				fputbyte(fgetc(tmp), ofile);
+			for(;len>0;len--)fputbyte(fgetc(tmp), ofile);
+			fclose(tmp);
 			goto end;
 		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
@@ -556,7 +558,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 								printf("<ASM WARNING> @ with empty add section. Line:\n%s\n", line_copy);
 							}
 							addval = strtoul(add_text,0,0);
-							if(addval == 0)
+							if(addval == 0 && npasses == 1)
 								printf("<ASM WARNING> @ with add evaluating to zero. Line:\n%s\n", line_copy);
 							if(addval)
 							len_to_replace += (loc_eparen-len_to_replace+3);
@@ -582,7 +584,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 								printf("<ASM WARNING> $ with empty add section. Line:\n%s\n", line_copy);
 							}
 							addval = strtoul(add_text,0,0);
-							if(addval == 0)
+							if(addval == 0 && npasses == 1)
 								printf("<ASM WARNING> $ with add evaluating to zero. Line:\n%s\n", line_copy);
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
@@ -612,7 +614,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						
 						
 						res = strtoul(line_old+loc+1, NULL, 0);
-						if(res == 0)
+						if(res == 0  && npasses == 1)
 							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
 						if(debugging) printf("\nSplitting value %u\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
@@ -721,7 +723,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						strlen(line+loc_pound+loc_pound2)
 				);
 			} else {
-				printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);
+				/*printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);*/
 				variable_names[index] = macro_name;
 				variable_expansions[index] = 
 				str_null_terminated_alloc(
@@ -870,7 +872,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				dest = strtoul(proc, NULL, 0);
 				if(dest == 0){
 				/*Explicitly check to see if they actually typed zero.*/
-					if(proc[0]!='0')
+					if(proc[0]!='0'  && npasses == 1)
 					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
 
 				}

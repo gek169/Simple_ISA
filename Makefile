@@ -25,7 +25,7 @@ fifth:
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
-asm_programs: main
+asm_programs: assembler
 	./asm_compile.sh
 
 clean:
