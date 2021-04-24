@@ -426,11 +426,7 @@ I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's s
 you will very easily find ways to break it.
 8) Know the limitations of the implementation. The evaluation order of macros, for instance, is the same as the
 order they were defined in. Built-in macros are evaluated before all other macros, including % and $, so if you 
-do something like this:
-
-```c
-	%myVariable%
-```
+do `%myVariable%`
 you will find the assembler gives you a warning that this evaluates to zero, because the built-in macro % is evaluated before myVariable.
 9) If you have a library which must be placed at a particular location in the binary, you should specify that in the name!
 	I would recommend region-aligning all libraries, unless they are extremely small.
