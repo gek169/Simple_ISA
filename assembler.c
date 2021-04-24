@@ -687,6 +687,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					goto error;	
 				}
 			}}
+			/*
+				Check and make sure this is not a reserved name
+			*/
+			if(strprefix("ASM_", macro_name) || strprefix("asm_", macro_name))
+			{
+				printf("<ASM SYNTAX ERROR> This macro attempts to define a reserved name. You may not use this name:\n%s\n", line_copy);
+				goto error;	
+			}
 			{unsigned short i;for(i = 0; i < nmacros; i++){
 				if(i < nbuiltin_macros)
 					if( (strfind(variable_names[i],macro_name)>-1) ||

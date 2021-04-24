@@ -7,12 +7,17 @@ CFLAGS= -Ofast -std=c89 -pedantic
 #CFLAGS= -Os -std=c89 -pedantic
 CASMFLAGS= -Os -lm -std=c89 -pedantic
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
+
 all: main asm_programs
 
-main:
+isa:
 	$(CC) $(CFLAGS) isa.c -o isa
+rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
+assembler:
 	$(CC) $(CASMFLAGS) assembler.c -o asm
+
+main: isa rbytes assembler
 
 fifth:
 	$(CC) $(CFLAGS) fifth.c -o fifth
