@@ -34,8 +34,6 @@ lda 0,5;add;sta 0,5;
 llb 0,15;
 cmp;lb 0;cmp;jmpifeq;
 
-#jumpc
-
 
 #signify the end of the loop by printing some newlines.
 GOTO_TOP
