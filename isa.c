@@ -111,8 +111,8 @@ SE:a=Z2F;D
 SF:W(a,((((UU)c&255)<<16)+((UU)b)))D
 T0:b=Z3F;D
 T1:W(b,((((UU)c&255)<<16)+((UU)a)))D
-T2:memcpy(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
-T3:memcpy(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
+T2:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
+T3:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
 T4:pp=a;D
 SC:W(p,P);P+=2;p=c;D
 SD:p=ZR;D

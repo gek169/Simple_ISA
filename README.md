@@ -409,7 +409,7 @@ VAR#putshrtLibVar#accessLibVar;alpop;faristla;
 Integer literals are default evaluated as decimal, like any other programming language,
 but by prefixing them with `0` (zero) you can make them be interpreted as octal, or `0x` (zero, lowercase x) to be interpreted as hexadecimal.
 
-### Doing stuff
+### Tips for doing stuff
 If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
 
 You may also find it particularly annoying that complete pointer arithmetic is impossible.
@@ -420,9 +420,55 @@ I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's s
 2) Write macros for your variables and functions.
 3) Write macros which use other macros. Macros inside of a macro are not expanded until they are used (With the exception of built-ins like $ and %)
 4) create inline subroutines using macros so you don't have to dedicate brainpower to indexing into an array.
-5) 
+5) Align all arrays to page or region boundaries- you can use `section` to move the output counter to a designated location.
+6) use asm_begin_region_restriction and asm_end_region_restriction or page equivalents for arrays.
+7) Do not try to be too clever with extremely recursive macros and the two passes- this is a very simple assembler and
+you will very easily find ways to break it.
+8) Know the limitations of the implementation. The evaluation order of macros, for instance, is the same as the
+order they were defined in. Built-in macros are evaluated before all other macros, including % and $, so if you 
+do something like this:
 
+```c
+	%myVariable%
+```
+you will find the assembler gives you a warning that this evaluates to zero, because the built-in macro % is evaluated before myVariable.
+9) If you have a library which must be placed at a particular location in the binary, you should specify that in the name!
+	I would recommend region-aligning all libraries, unless they are extremely small.
+10) There is a known bug/feature of SISA's program loader- if the file is smaller than 16 megabytes, isa.c will load
+a single "255" byte at the very end. This may be an issue if you were relying on it being a zero, like the rest of memory.
+11) If you are concerned about the size of your binary (You probably shouldn't be) then use farpagel and farpagest to write
+your own "bootloader" of sorts- construct the memory layout before beginning main program execution.
 
+### Project ideas
+
+This repository is written primarily as an educational or recreational asset- I know it serves little practical purpose.
+
+Here are some project ideas:
+
+~~Easy~~
+* Write a program which reads in a string from standard input, terminated with a newline, and then spits it back out.
+* Write a program which creates interesting patterns on standard out using ascii characters, like https://youtu.be/0yKwJJw6Abs
+* Determine the length of a string taken from standard in
+* Write a program which parses a base-10 integer entered on standard in and prints its value in hexadecimal or binary.
+* Take in two numbers on standard in, and do math on them, like adding them together.
+* Parse negative numbers as two's complement, do math on them, and print the result.
+~~Medium~~
+* Parse simple postfix notation expressions using the stack (`5 3 + 4 *` being equivalent to (5+3)*4 )
+* Parse a number with a decimal portion and interpret it as a fixed point, then do some fixed point math.
+* Write a program which takes a number on standard in and tells you if it's prime.
+* Write a prime number sieve which prints all prime numbers less than 65,535.
+* Write a statically linked library in SISA-16 with some subroutines and some variables.
+* implement memcpy in SISA-16
+~~Hard~~
+* Try to write a bootloader to replace isa.c's program loader- your program should receive slightly less than 16 megabytes from standard in and write them to memory, then begin execution.
+* Add new instructions to the architecture for a new kind of math (32 bit arithmetic, for example) and implement them into the assembler.
+* Implement your own device in d.h to interface with SDL, the file system, or anything else and write a SISA-16 program to use it.
+~~Very Hard~~
+* Write a simple interpreter or compiler for a language like BASIC or Forth.
+* make SISA-16 a self-hosting assembly language- port assembler.c to SISA-16.
+~~Extreme~~
+* write a C compiler and libC for the ISA. Need not be self-hosting.
+* write a microkernel, or failing that, an exokernel.
 ```
 Written by
 ~~~DMHSW~~~
