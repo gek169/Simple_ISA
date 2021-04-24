@@ -444,28 +444,29 @@ This repository is written primarily as an educational or recreational asset- I 
 
 Here are some project ideas:
 
-~~Easy~~
+## Easy
 * Write a program which reads in a string from standard input, terminated with a newline, and then spits it back out.
 * Write a program which creates interesting patterns on standard out using ascii characters, like https://youtu.be/0yKwJJw6Abs
 * Determine the length of a string taken from standard in
 * Write a program which parses a base-10 integer entered on standard in and prints its value in hexadecimal or binary.
 * Take in two numbers on standard in, and do math on them, like adding them together.
 * Parse negative numbers as two's complement, do math on them, and print the result.
-~~Medium~~
+## Medium
 * Parse simple postfix notation expressions using the stack (`5 3 + 4 *` being equivalent to (5+3)*4 )
 * Parse a number with a decimal portion and interpret it as a fixed point, then do some fixed point math.
 * Write a program which takes a number on standard in and tells you if it's prime.
 * Write a prime number sieve which prints all prime numbers less than 65,535.
 * Write a statically linked library in SISA-16 with some subroutines and some variables.
 * implement memcpy in SISA-16
-~~Hard~~
+## Hard
 * Try to write a bootloader to replace isa.c's program loader- your program should receive slightly less than 16 megabytes from standard in and write them to memory, then begin execution.
 * Add new instructions to the architecture for a new kind of math (32 bit arithmetic, for example) and implement them into the assembler.
 * Implement your own device in d.h to interface with SDL, the file system, or anything else and write a SISA-16 program to use it.
-~~Very Hard~~
+## Very Hard
 * Write a simple interpreter or compiler for a language like BASIC or Forth.
 * make SISA-16 a self-hosting assembly language- port assembler.c to SISA-16.
-~~Extreme~~
+
+## Extreme
 * write a C compiler and libC for the ISA. Need not be self-hosting.
 * write a microkernel, or failing that, an exokernel.
 ```
