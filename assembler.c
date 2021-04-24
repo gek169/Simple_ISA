@@ -915,11 +915,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				region_restriction_mode = 2; /*region*/
 			} else if(strprefix("asm_end_region_restriction", metaproc)){
 				region_restriction_mode = 0; /*end region*/
-			} else if(strprefix("asm_begin_block_restriction", metaproc)){
+			} else if(strprefix("asm_begin_block_restriction", metaproc) || strprefix("asm_begin_page_restriction", metaproc)){
 				/*The assembler will warn you if the block changes during the creation of the function.*/
 				region_restriction = (outputcounter>>8) & 0xFFFF;
 				region_restriction_mode = 1; /*block*/
-			} else if(strprefix("asm_end_block_restriction", metaproc)){
+			} else if(strprefix("asm_end_block_restriction", metaproc) || strprefix("asm_end_page_restriction", metaproc)){
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)

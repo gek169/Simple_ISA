@@ -269,6 +269,62 @@ Procedure calling:
 Procedures freely clobber registers and do not necessarily leave a return value in the accumulator,
 it would be much more dynamic to put them on the stack.
 
+## SISA-16 Assembler
+
+the SISA-16 assembler is very basic but very powerful. you can define variables, include arbitrary data in multiple ways,
+and of course, invoke every single one of SISA-16's many instructions.
+
+The assembler is a two-pass compiler. The first pass behaves like the second pass but doesn't actually write
+to the output file. On the second pass, the assembler writes to the output file.
+
+This is done so that macros for goto labels can be generated on the first pass and used on the second-
+if you have something like this:
+```
+sc %myLabel%;jmp;
+#later...
+
+VAR#myLabel#$
+```
+then on the first pass, the split `%myLabel%` will be evaluated as zero on the first pass, but on the second pass,
+the value will be used.
+
+The assembler allows you to define macros like this
+```
+VAR#myVariableName# my variable definition
+```
+If the variable definition contains a builtin macro or assembly directive such as `$`, `@`, or `%%`, then 
+they will be expanded before macro definition. This allows you to define goto labels, for instance.
+
+Anywhere where "myVariableName" is encountered from then-on in the source code (including in the second pass) will be
+expanded.
+
+Note that you can create recursive or infinitely recursive macros, and the latter will undoubtedly segfault the program.
+Is that a bug, or a feature?
+my answer is YES to both, and i'm sure clever programmers will come up with ways to abuse macro recursion
+
+I'm also extremely confident that you could somehow cause the second pass to be out-of-sync with the first pass
+by abusing macro recursion. If you find such a bug, file an issue, I'll try to fix it.
+
+The assembler will generate warnings for most situations that would warrant it:
+* a split directive evaluates to zero (You could have just written "0,0" , it is most likely a misspelled variable)
+* an inline comment invalidates the rest of a line (Just a warning)
+* fill tag is set to zero when not explicitly declared as zero (the statement will do nothing)
+* section tag is set to zero when not explicitly declared as zero (the statement moves the outputcounter to the beginning of the output file)
+
+The assembler will generate unrecoverable errors for most situations that would warrant it:
+* An unknown name is parsed as a command (Usually meaning you misspelled a macro name...)
+* An invalid number of arguments is provided for an instruction or directive
+* The bounds check for a region restriction or page/block restriction fails. This is useful when you want to
+make sure that a subroutine fits inside of a memory region or page (64k or 256 bytes, aligned, respectively) or that
+a piece of data which will be accessed as an array can be indexed "normally" using 16 bit math.
+* a macro definition uses a reserved name, like an instruction name or anything beginning with ASM_ or asm_
+* a macro definition would trample a built-in macro or reserved name. You cannot define "ll" for instance,
+	because it would make "llb" and "lla" and "illdaa" unusable.
+* a file is included that is larger than the entire SISA-16 address space.
+* a file is included that is empty
+* you attempt to define a string literal anywhere other than the start of a line.
+* asm_halt was invoked on the second pass.
+* an unreachable or unopenable file is included with ASM_data_include
 
 
 
