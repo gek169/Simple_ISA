@@ -412,13 +412,12 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	
 	const unsigned long nbuiltin_macros = 5;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
 	variable_names[1] = "$";
 	variable_names[2] = "%";
-	/*Macro to remove whitespace- this assembler works without using any whitespace at all.*/
+	/*Macros to remove whitespace- this assembler works without using any whitespace at all.*/
 	variable_names[3] = "\t";
 	variable_expansions[3] = "";
 	variable_names[4] = " ";
@@ -529,8 +528,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 		if(strprefix("ASM_COMPILE", line)){
 		}
-		if(strprefix("asm_macro_call#", line)){char* f = line; long next_pound = -1;char* result = NULL;
-			unsigned long nargs = 0;unsigned long i = 0;char* macro_name=0;
+		if(strprefix("asm_macro_call#", line)){char* f = line; long next_pound = -1;
+			unsigned long i = 0;char* macro_name=0;
 			/*The string immediately after the first # is the macro to call.
 			the arguments thereafter are arg1, arg2, arg3... */
 			f+=strlen("asm_macro_call#");
@@ -563,9 +562,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(streq(varname, variable_names[macro_i]))
 						overwriting = macro_i; /*It does!*/
 				if(overwriting == -1) {
-					overwriting = nmacros; nmacros++;
-					variable_names[overwriting] = NULL;
-					variable_expansions[overwriting] = NULL;
+					overwriting = nmacros++;
+					/*variable_names[overwriting] = NULL;*/
+					/*variable_expansions[overwriting] = NULL;*/
 				}
 
 				/*get the definition*/
@@ -615,12 +614,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					linesize = strlen(line);
 					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
+					if(was_macro && i==2){
+						/*printf("\nThis line is a macro:\n%s\n", line_copy);*/
+						continue; /*Do not parse the split directive inside of a macro.*/
+					}
+					if(was_macro && (i==3 || i==4)){
+						/*printf("\nThis line is a macro:\n%s\n", line_copy);*/
+						continue; /*Do not parse the space or tab */
+					}
 					line_old = line;
 					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
 					if(!was_macro)
-					for(j = 0; j<(long)nmacros; j++){ 
+					for(j = 0; j<(long)nmacros; j++){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
 							long checkme;
@@ -717,8 +724,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						
 						
 						res = strtoul(line_old+loc+1, NULL, 0);
-						if(res == 0  && npasses == 1)
-							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\n", line_copy);
+						if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
+							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
 						if(debugging) printf("\nSplitting value %u\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
 						/*snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));*/
@@ -729,6 +736,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 									linesize-loc-len_to_replace);
 					line = strcatallocfb(before, after);
 					free(line_old);
+					break; /*we have expanded something.*/
+					local_end:; /*We have*/
 				}
 			}while(have_expanded && (iteration++ < 32768));
 		}
