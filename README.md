@@ -355,9 +355,12 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 
 The assembler is compiled as `asm` by default on a *nix machine.
 you can invoke the assembler on a source file `source.asm` and create `source.bin` like this:
+
 `./asm -i source.asm -o source.bin`
+
 if you are editting or debugging the assembler itself, you may find it useful to
 view extended debug output, or use stdin as the input file. you can use -DBG as an argument to the assembler for this.
+
 
 Note that the two passes *won't work* in stdin mode.
 
