@@ -391,6 +391,11 @@ VAR#getshrtLibVar#sc %0xb1%;llb 0x02a4;farillda;alpush;
 VAR#putshrtLibVar#sc %0xb1%;llb 0x02a4;alpop;faristla;
 ```
 
+### Integer literals
+Integer literals are default evaluated as decimal, like any other programming language,
+but by prefixing them with `0` (zero) you can make them be interpreted as octal, or `0x` (zero, lowercase x) to be interpreted as hexadecimal.
+
+
 ```
 Written by
 ~~~DMHSW~~~
