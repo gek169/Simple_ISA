@@ -702,6 +702,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				printf("<ASM SYNTAX ERROR> This macro attempts to define a reserved name. You may not use this name:\n%s\n", line_copy);
 				goto error;	
 			}
+			if(
+				strfind(macro_name, "!") != -1 ||
+				strfind(macro_name, "$") != -1 ||
+				strfind(macro_name, "@") != -1 ||
+				strfind(macro_name, "%") != -1
+			)
+			{
+				printf("<ASM SYNTAX ERROR> This macro attempts to define or trample a reserved name. You may not use this name:\n%s\n", line_copy);
+				goto error;	
+			}
 			{unsigned short i;for(i = 0; i < nmacros; i++){
 				if(i < nbuiltin_macros)
 					if( (strfind(variable_names[i],macro_name)>-1) ||

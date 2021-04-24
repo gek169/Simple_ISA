@@ -262,19 +262,14 @@ current 64k that the program counter is inside of.
 
 the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
 
-## Programming conventions established
+## Programming conventions established by hardware
 
 Stack:
 
 The stack pointer (which always resides in the first 64k) points to a *free* location on the stack.
 The stack pointer *increments* rather than decrements to increase the stack size.
 
-The stack can be, as most, 64 kilobytes.
-
-Procedure calling:
-
-Procedures freely clobber registers and do not necessarily leave a return value in the accumulator,
-it would be much more dynamic to put them on the stack.
+The stack can be, at most, 64 kilobytes. Don't let it get there.
 
 ## SISA-16 Assembler
 
@@ -325,8 +320,8 @@ The assembler will generate unrecoverable errors for most situations that would 
 make sure that a subroutine fits inside of a memory region or page (64k or 256 bytes, aligned, respectively) or that
 a piece of data which will be accessed as an array can be indexed "normally" using 16 bit math.
 * a macro definition uses a reserved name, like an instruction name or anything beginning with ASM_ or asm_
-* a macro definition would trample a built-in macro or reserved name. You cannot define "ll" for instance,
-	because it would make "llb" and "lla" and "illdaa" unusable.
+* a macro definition would trample or redefine a built-in macro or reserved name. You cannot define "ll" for instance,
+	because it would make "llb" and "lla" and "illdaa" unusable, but you can define "myll" because it would not trample any of those.
 * a file is included that is larger than the entire SISA-16 address space.
 * a file is included that is empty
 * you attempt to define a string literal anywhere other than the start of a line.
@@ -340,7 +335,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_halt- if on the second pass, halt assembly.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace
-	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line.
+	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line, but it
+		may have preceding whitespace.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macro names in a string literal are not expanded.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
@@ -349,11 +345,11 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 		is greater than 64k, the upper byte will be ignored- effectively trapping $ to the home region.
 		you can also specify an amount to be added to the $ value with $+value+, where value is an integer literal (Not a macro)
 	@- expands to the current position of the output counter as a 24 bit unsigned integer. 
-		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@% to avoid using $.
+		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@%.
 	%- two of these defines a split directive. %0xff0A% will be split into 255,10.
-	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded.
+	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded on the line.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
-	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers.
+	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers. Do not split the integers.
 	" "- space macro, used to remove whitespace.
 	"\t"- tab macro, used to remove tabs.
 	asm_begin_region_restriction- record the current region of the output counter and emit an assemblytime error
@@ -410,6 +406,19 @@ VAR#putshrtLibVar#accessLibVar;alpop;faristla;
 ### Integer literals
 Integer literals are default evaluated as decimal, like any other programming language,
 but by prefixing them with `0` (zero) you can make them be interpreted as octal, or `0x` (zero, lowercase x) to be interpreted as hexadecimal.
+
+### Doing stuff
+If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
+
+You may also find it particularly annoying that complete pointer arithmetic is impossible.
+
+I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's some tips:
+
+1) Establish an ABI convention. is the b register preserved through a function call, for instance? How are function arguments and return values passed?
+2) Write macros for your variables and functions.
+3) Write macros which use other macros. Macros inside of a macro are not expanded until they are used (With the exception of built-ins like $ and %)
+4) create inline subroutines using macros so you don't have to dedicate brainpower to indexing into an array.
+5) 
 
 
 ```
