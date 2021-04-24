@@ -1,4 +1,4 @@
-/*Implement your own driver here.*/
+/*Implement your own driver here. You can access memory with M[index]*/
 void di(){}
 void dcl(){}
 unsigned short gch(){return getchar();}
