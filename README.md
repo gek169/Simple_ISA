@@ -372,7 +372,7 @@ you can invoke the assembler on a source file `source.asm` and create `source.bi
 if you are editting or debugging the assembler itself, you may find it useful to
 view extended debug output, or use stdin as the input file. you can use -DBG as an argument to the assembler for this.
 
-Note that the two passes *won't work* in stdin mode.
+Note that the two passes *won't work* in stdin mode. stdin mode is used if an input file is not specified.
 
 if you have bash on your system, or another compatible shell with typical core utils, then note that
 any and all `.asm` files will be compiled and output to `.bin` files of the same name if they are placed

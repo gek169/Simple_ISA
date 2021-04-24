@@ -1,13 +1,18 @@
 #Compile this program using asm. ./asm -i program.asm -o program.bin
 section 0
 #fills 65536 bytes with zeroes.
+#notice the region restriction....
 asm_begin_region_restriction
 fill 65536,0
 asm_end_region_restriction
 
-section 0xA000
+section 0x3000
 #demonstrating a data include.
+asm_begin_region_restriction
+
 ASM_data_include README.md
+
+asm_end_region_restriction
 
 section 0xF000
 !hello world!!! You should see this print.
