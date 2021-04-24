@@ -326,7 +326,31 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 * asm_halt was invoked on the second pass.
 * an unreachable or unopenable file is included with ASM_data_include
 
-
+### list of SISA-16 assembler reserved words
+```
+	<all the instruction names are reserved>
+	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
+	asm_halt- if on the second pass, halt assembly.
+	ASM_*- reserved namespace
+	asm_*- reserved namespace
+	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line.
+	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
+		Macros are not expanded.
+	ASM_data_include- include a file. Macros are not expanded.
+	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
+	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers.
+	" "- space macro, used to remove whitespace.
+	"\t"- tab macro, used to remove tabs.
+	asm_begin_region_restriction- record the current region of the output counter and emit an assemblytime error
+		if an attempt to write bytes outside that region is made before an end tag.
+	asm_begin_block_restriction- same as asm_begin_page_restriction
+	asm_begin_page_restriction- record the current page of the output counter and emit an assemblytime error
+		if an attempt to write bytes outside that page is made before an end tag.
+		Note that setting a page restriction causes the current region restriction to be forgotten.
+	asm_end_region_restriction- same as asm_end_page_restriction.
+	asm_end_block_restriction- same as asm_end_page_restriction.
+	asm_end_page_restriction- End the current restriction, do not emit errors.
+```
 
 ```
 Written by
