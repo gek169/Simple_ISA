@@ -339,15 +339,15 @@ char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
 				if(debugging)
 					printf("\nWriting individual byte %u\n", b);
-if(ftell(f) != outputcounter){
+if((unsigned long)ftell(f) != outputcounter){
 	/*seek to the end*/
 	if(debugging)
 		puts("Having to move the file counter.\n");
 	fseek(f,0,SEEK_END);
-	if(ftell(f) > outputcounter) /*The file is already larger than needed.*/
+	if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
 		fseek(f,outputcounter,SEEK_SET); 
 	else /*Fill with 0's until we reach the output counter.*/
-		while(ftell(f)!=outputcounter)fputc(0, f);
+		while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
 }
 switch(region_restriction_mode){
 	case 0: break;
@@ -893,7 +893,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
-				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04x\n", line_copy, line, outputcounter);
+				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
 			} else if(strprefix("asm_begin_region_restriction", metaproc)){
 				/*The assembler will warn you if the region changes during the creation of the function.*/
 				region_restriction = (outputcounter>>16) & 0xFF;
@@ -907,7 +907,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else if(strprefix("asm_end_block_restriction", metaproc)){
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_quit", metaproc)){
-				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04x\n", line_copy, outputcounter);
+				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
 				if(debugging)
