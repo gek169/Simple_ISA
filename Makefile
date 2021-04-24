@@ -11,7 +11,7 @@ CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-l
 all: main asm_programs
 
 isa:
-	$(CC) $(CFLAGS) isa.c -o isa
+	$(CC) $(CFLAGS) isa.c -o isa -lncurses
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 assembler:
