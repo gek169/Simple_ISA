@@ -34,12 +34,18 @@ illdaa;
 llb %255%;and;
 putchar
 
+sc %myLabel%;
+jmp;
+VAR#myLabel#@
+sc 0,0
 
-
+asm_print
 #perform the loop check
 lda 1,0xe8
 lb 0x41
 cmp;lb 0;cmp;jmpifeq
+
+
 
 
 //zero the stack pointer and then set it to a sensible value

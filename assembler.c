@@ -501,7 +501,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*Not performed on MACRO Lines.*/
 		if(strfind(line,"VAR#")!= -1) was_macro=1;
-		{unsigned char have_expanded = 0; unsigned short iteration = 0; unsigned long i;
+		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -510,10 +510,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
 				
-				for(i = 0; i<(was_macro?nbuiltin_macros:nmacros); i++){ /*Only check builtin macros when writing a macro.*/
+				for(i = (was_macro?nbuiltin_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
 					char* line_old; long loc; long linesize; char found_longer_match;
 					long len_to_replace; char* before;char* after;
-					unsigned long j;
+					long j;
 					linesize = strlen(line);
 					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
@@ -522,7 +522,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
 					if(!was_macro)
-					for(j = 0; j<nmacros; j++){ 
+					for(j = 0; j<(long)nmacros; j++){ 
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
 							long checkme;

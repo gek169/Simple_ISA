@@ -424,10 +424,7 @@ I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's s
 6) use asm_begin_region_restriction and asm_end_region_restriction or page equivalents for arrays.
 7) Do not try to be too clever with extremely recursive macros and the two passes- this is a very simple assembler and
 you will very easily find ways to break it.
-8) Know the limitations of the implementation. The evaluation order of macros, for instance, is the same as the
-order they were defined in. Built-in macros are evaluated before all other macros, including % and $, so if you 
-do `%myVariable%`
-you will find the assembler gives you a warning that this evaluates to zero, because the built-in macro % is evaluated before myVariable.
+8) Know the limitations of the implementation. The evaluation order of macros, for instance, is in reverse- the most recently defined macros are recognized first.
 9) If you have a library which must be placed at a particular location in the binary, you should specify that in the name!
 	I would recommend region-aligning all libraries, unless they are extremely small.
 10) There is a known bug/feature of SISA's program loader- if the file is smaller than 16 megabytes, isa.c will load
