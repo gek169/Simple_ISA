@@ -5,6 +5,10 @@ asm_begin_region_restriction
 fill 65536,0
 asm_end_region_restriction
 
+section 0xA000
+#demonstrating a data include.
+ASM_data_include README.md
+
 section 0xF000
 !hello world!!! You should see this print.
 bytes 0xA, 0xA;

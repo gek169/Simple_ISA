@@ -328,8 +328,8 @@ char* insn_repl[128] = {
 	"bytes 100;",
 };
 static const unsigned char n_insns = 101;
-unsigned int outputcounter = 0;
-unsigned int nmacros = 5; /*0,1,2,3,4*/
+unsigned long outputcounter = 0;
+unsigned long nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;
 char debugging = 0;
 char printlines = 0;
@@ -460,6 +460,29 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			if(!quit_after_macros)
 				for(i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
+			goto end;
+		}
+		if(strprefix("ASM_data_include ", line)){
+			/*data include! format is
+			[newline]asm_data_include filename
+			*/
+			FILE* tmp; char* metaproc; unsigned long len;
+			metaproc = line + strlen("ASM_data_include ");
+			tmp = fopen(metaproc, "rb");
+			if(!tmp) {printf("<ASM COMPILATION ERROR> Unknown/unreachable data file %s\n", metaproc); goto error;}
+			fseek(tmp, 0, SEEK_END);
+			len = ftell(tmp);
+			if(len > 0x1000000) {
+				printf("<ASM COMPILATION ERROR> data file %s larger than entire address space.\n", metaproc); 
+				goto error;
+			}
+			if(len == 0){
+				printf("<ASM COMPILATION ERROR> data file %s is empty.\n", metaproc); 
+				goto error;
+			}
+			fseek(tmp, 0, SEEK_SET);
+			for(;len>0;len--)
+				fputbyte(fgetc(tmp), ofile);
 			goto end;
 		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
