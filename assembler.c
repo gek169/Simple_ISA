@@ -332,6 +332,7 @@ unsigned long outputcounter = 0;
 unsigned long nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;
 char debugging = 0;
+unsigned long npasses = 0;
 char printlines = 0;
 unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
@@ -339,42 +340,44 @@ char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
 				if(debugging)
 					printf("\nWriting individual byte %u\n", b);
-if((unsigned long)ftell(f) != outputcounter){
-	/*seek to the end*/
-	if(debugging)
-		puts("Having to move the file counter.\n");
-	fseek(f,0,SEEK_END);
-	if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
-		fseek(f,outputcounter,SEEK_SET); 
-	else /*Fill with 0's until we reach the output counter.*/
-		while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
-}
-switch(region_restriction_mode){
-	case 0: break;
-	case 1:{
-		if (((outputcounter>>8) & 0xFFFF)  != region_restriction){
-			printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
-			exit(1);
-		}
+	if((unsigned long)ftell(f) != outputcounter){
+		/*seek to the end*/
+		if(debugging)
+			puts("Having to move the file counter.\n");
+		fseek(f,0,SEEK_END);
+		if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
+			fseek(f,outputcounter,SEEK_SET); 
+		else /*Fill with 0's until we reach the output counter.*/
+			while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
 	}
-	break;
-	case 2:{
-		if (((outputcounter>>16) & 0xFF)  != region_restriction){
-			printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
-			exit(1);
+	switch(region_restriction_mode){
+		case 0: break;
+		case 1:{
+			if (((outputcounter>>8) & 0xFFFF)  != region_restriction){
+				printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
+				exit(1);
+			}
 		}
+		break;
+		case 2:{
+			if (((outputcounter>>16) & 0xFF)  != region_restriction){
+				printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
+				exit(1);
+			}
+		}
+		break;
+		default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
 	}
-	break;
-	default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
-}
-fputc(b, f); outputcounter++; outputcounter&=0xffffff;
+	if(npasses == 1)
+		fputc(b, f);
+	outputcounter++; outputcounter&=0xffffff;
 }
 void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	unsigned long npasses = 0;
+	
 	const unsigned long nbuiltin_macros = 5;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
@@ -904,7 +907,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_print", metaproc)){
-				printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
+				if(npasses == 1)
+					printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
 			} else if(strprefix("asm_begin_region_restriction", metaproc)){
 				/*The assembler will warn you if the region changes during the creation of the function.*/
 				region_restriction = (outputcounter>>16) & 0xFF;
@@ -918,7 +922,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else if(strprefix("asm_end_block_restriction", metaproc)){
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_quit", metaproc)){
-				printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
+				if(npasses == 1)
+					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
 				if(debugging)
@@ -926,8 +931,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				break; /*Comment on line.*/
 			} else {
 				if(strlen(metaproc) > 0 &&
-					strfind(metaproc,";") != 0)
-					printf("<ASM WARNING> Ignoring invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
+					strfind(metaproc,";") != 0){
+					printf("<ASM SYNTAX ERROR> invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
+					goto error;
+				}
 			}
 			{long next_semicolon = strfind(metaproc, ";");
 			if(next_semicolon == -1) break; /*We have handled all sublines.*/
