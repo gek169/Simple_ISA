@@ -367,7 +367,29 @@ if you have bash on your system, or another compatible shell with typical core u
 any and all `.asm` files will be compiled and output to `.bin` files of the same name if they are placed
 in the top level directory of this project when you invoke `make`, thanks to `asm_compile.sh`
 
+### Static Linking
+Through intelligent use of the assembler to compile libraries before programs that use them, one can achieve
+static linking by using `ASM_data_include` and then creating macros to call functions defined in the file included,
+or macros to refer to variables which are instantiated and used inside the library.
 
+```
+#you have some library written as myLibrary.asm
+./asm -i myLibrary.asm -o myLibrary.bin
+#in your program's asm file...
+section 0xee0000
+asm_begin_region_restriction;
+ASM_data_include myLibrary.bin
+asm_end_region_restriction;
+
+#Note that ASM_data_include does not change where the code you are including
+#decides to put its variables or subroutines- the assembler just sees bytes- you must be careful about that.
+
+#You have a subroutine called "print" defined in your library which is at 0xff90 in the library.
+VAR#callPrint#la0xee;sc%0xff90%;farcall;
+#Your library defines a short variable "LibVar" at 0xb102a4 which it uses for something
+VAR#getshrtLibVar#sc %0xb1%;llb 0x02a4;farillda;alpush;
+VAR#putshrtLibVar#sc %0xb1%;llb 0x02a4;alpop;faristla;
+```
 
 ```
 Written by
