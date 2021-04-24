@@ -620,7 +620,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					}
 					if(was_macro && (i==3 || i==4)){
 						/*printf("\nThis line is a macro:\n%s\n", line_copy);*/
-						continue; /*Do not parse the space or tab */
+						continue; /*Do not parse the space or tab inside of a macro.*/
 					}
 					line_old = line;
 					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
@@ -960,8 +960,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			if(strprefix("bytes", metaproc)){ char* proc;
 				proc = metaproc + 5;
 				do{ 
-					unsigned char byteval;
-					byteval = strtoul(proc,NULL,0);
+					unsigned char byteval; unsigned long preval;
+					preval = strtoul(proc,NULL,0);byteval = preval & 255;
 					fputbyte(byteval, ofile);
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");

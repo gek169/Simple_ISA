@@ -92,9 +92,9 @@ lla %0xB000%;illdaa;
 putchar;putchar;
 putchar;putchar;
 
-sc %myLabel2%;
+sc %myLabel2%;asm_print;
 jmp;
-VAR#myLabel2#@
+VAR#myLabel2#   @    
 
 //test far memory indexing functionality
 lla %0xffea%;
@@ -146,7 +146,9 @@ section 0xFFFF00
 !KAKAKAIII
 imul3.13
 
-VAR#somethingg#$
+VAR#somethingg#$;asm_print;
+
+
 bytes somethingg
 sc %5%;
 bytes somethingg

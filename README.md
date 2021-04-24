@@ -335,8 +335,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_halt- if on the second pass, halt assembly.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace
-	VAR#- define a macro with syntax VAR#name#definition. The macro must be the only thing on the line, but it
-		may have preceding whitespace.
+	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
+	asm_macro_cal#- call a macro function with arguments. must be at the beginning of a line.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macro names in a string literal are not expanded.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
@@ -409,6 +409,12 @@ VAR#putshrtLibVar#accessLibVar;alpop;faristla;
 Integer literals are default evaluated as decimal, like any other programming language,
 but by prefixing them with `0` (zero) you can make them be interpreted as octal, or `0x` (zero, lowercase x) to be interpreted as hexadecimal.
 
+### Macro evaluation order and macro evaluation bugs
+Macros are evaluated in the order of most recently defined to first defined.
+
+First defined macros include the builtin macros such as $, @, the space, and the percent directive.
+
+Builtin macros *except for %, space, and tab* are parsed on macro lines.
 ### Tips for doing stuff
 If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
 
@@ -424,7 +430,7 @@ I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's s
 6) use asm_begin_region_restriction and asm_end_region_restriction or page equivalents for arrays.
 7) Do not try to be too clever with extremely recursive macros and the two passes- this is a very simple assembler and
 you will very easily find ways to break it.
-8) Know the limitations of the implementation. The evaluation order of macros, for instance, is in reverse- the most recently defined macros are recognized first.
+8) Know the limitations of the implementation. 
 9) If you have a library which must be placed at a particular location in the binary, you should specify that in the name!
 	I would recommend region-aligning all libraries, unless they are extremely small.
 10) There is a known bug/feature of SISA's program loader- if the file is smaller than 16 megabytes, isa.c will load
