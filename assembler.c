@@ -723,7 +723,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						strlen(line+loc_pound+loc_pound2)
 				);
 			} else {
-				/*printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);*/
+				if(npasses == 0)
+					printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);
 				variable_names[index] = macro_name;
 				variable_expansions[index] = 
 				str_null_terminated_alloc(
