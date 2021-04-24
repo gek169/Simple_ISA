@@ -400,7 +400,7 @@ asm_end_region_restriction;
 #You have a subroutine called "print" defined in your library which is at 0xff90 in the library.
 VAR#callPrint#la0xee;sc%0xff90%;farcall;
 #Your library defines a short variable "LibVar" at 0xb102a4 which you need to interact with.
-VAR#accessLibVar#sc %0xb1%;llb 0x02a4
+VAR#accessLibVar#sc %0xb1%;llb %0x02a4%
 VAR#getshrtLibVar#accessLibVar;farillda;alpush;
 VAR#putshrtLibVar#accessLibVar;alpop;faristla;
 ```

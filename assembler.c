@@ -51,7 +51,40 @@ Assembly-time directives must have NO leading or trailing whitespace.
 12) Builtin macros
 You can retrieve the current location in the binary as a short with @, and as a byte pair with $
 You can offset these like this: $+93+ or @+15+
-13) 
+13) asm_macro_call#macroname#arg1#arg2#
+you can call a macro of name macroname with arg1, arg2, arg3... being automatically defined for you
+by 
+
+14) ASM_COMPILE
+	A miniature programming language!
+	by specifying the macros get<myvariable> and put<myvariable> which will get and put them onto the stack,
+	you can automatically build common expressions.
+
+if you have these macros defined:
+VAR#getshrtLibVar#sc %0xb1%;llb %0x02a4%;farillda;alpush;
+VAR#putshrtLibVar#sc %0xb1%;llb %0x02a4%;alpop;faristla;
+then you can write
+
+ASM_COMPILE shrtLibVar= shrtLibVar ASM_CONSTEXPR(3) +
+this compiles into...
+getshrtLibVar; llb %3%; alpop; add;  alpush;    putshrtLibVar;
+
+which is then macro expanded.
+Note that macros inside of an ASM_COMPILE line are *not* expanded.
+
+Also note that the constant expression is not put onto the stack, because it is the second argument immediately
+before an operator. if it was the first, it would be pushed onto the stack.
+
+Valid ASM_COMPILE lines:
+ASM_COMPILE <variablename>=<postfix notation expression>
+
+variablename must have get and put functions defined for loading to and from the stack.
+All other referenced variables must have get defined.
+
+ASM_COMPILE <variablename>()
+variablename must have "callvariablename" defined.
+
+ASM_COMPILE macro_call(macroname) #definition of arg1#definition of arg2#definition of arg3
 
 */
 
@@ -340,8 +373,8 @@ unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
 char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
-				if(debugging)
-					printf("\nWriting individual byte %u\n", b);
+				/*if(debugging)
+					printf("\nWriting individual byte %u\n", b);*/
 	if((unsigned long)ftell(f) != outputcounter){
 		/*seek to the end*/
 		if(debugging)
@@ -493,6 +526,69 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			for(;len>0;len--)fputbyte(fgetc(tmp), ofile);
 			fclose(tmp);
 			goto end;
+		}
+		if(strprefix("ASM_COMPILE", line)){
+		}
+		if(strprefix("asm_macro_call#", line)){char* f = line; long next_pound = -1;char* result = NULL;
+			unsigned long nargs = 0;unsigned long i = 0;char* macro_name=0;
+			/*The string immediately after the first # is the macro to call.
+			the arguments thereafter are arg1, arg2, arg3... */
+			f+=strlen("asm_macro_call#");
+			next_pound = strfind(f, "#");
+			if(next_pound == -1) {
+				printf("<ASM SYNTAX ERROR> macro call lacking end pound.Line:\n%s\n", line_copy);
+				goto error;
+			}
+			macro_name = str_null_terminated_alloc(f, next_pound);
+			if(debugging)
+				printf("\nMacro call attempt on macro \'%s\'", macro_name);
+			f+=next_pound+1;
+			for(i=1;*f!='\0' && !strprefix("//", f);i++){unsigned long macro_i;
+				char namebuf[128]; /*Holds name of argXXX*/
+				/*Used for defining the macro.*/
+				char* varname = NULL;
+				char* vardef = NULL;
+				long overwriting = -1;/*if not negative, this means it's replacing something.*/
+				/*Check to see if we even can define a macro.*/
+				if(nmacros == 0xffff) {
+					printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
+				}
+				/*There is enough room for a macro.*/
+				sprintf(namebuf, "_arg%lu", i);
+				varname = strcatalloc(namebuf, "");
+				if(debugging)
+					printf("\nReplacing %s...", varname);
+				/*We need to see if this macro already exists.*/
+				for(macro_i = 0; macro_i < nmacros; macro_i++)
+					if(streq(varname, variable_names[macro_i]))
+						overwriting = macro_i; /*It does!*/
+				if(overwriting == -1) {
+					overwriting = nmacros; nmacros++;
+					variable_names[overwriting] = NULL;
+					variable_expansions[overwriting] = NULL;
+				}
+
+				/*get the definition*/
+				next_pound = strfind(f, "#");
+				if(next_pound == -1) {
+					printf("<ASM SYNTAX ERROR> macro call lacking end pound.Line:\n%s\n", line_copy);
+					goto error;
+				}
+				vardef = str_null_terminated_alloc(f, next_pound);
+				f+=next_pound+1;
+				if(variable_names[overwriting]){free(variable_names[overwriting]);variable_names[overwriting] = NULL;}
+				if(variable_expansions[overwriting]){free(variable_expansions[overwriting]);variable_expansions[overwriting] = NULL;}
+				variable_names[overwriting] = varname;
+				variable_expansions[overwriting] = vardef;
+				/*DO NOT FREE VARNAME AND VARDEF!!! they are owned by the table.*/
+				if(debugging)
+					printf("\nReplacing %s with %s", varname, vardef);
+			}
+			/*We now have the line.*/
+			free(line);
+			line = strcatallocf2("  ",macro_name);
+			if(debugging)
+				printf("\nThe line is now %s\n", line);
 		}
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
@@ -699,9 +795,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			/*
 				Check and make sure this is not a reserved name
 			*/
-			if(strprefix("ASM_", macro_name) || strprefix("asm_", macro_name))
+			if(strprefix("ASM_", macro_name) || strprefix("asm_", macro_name) || strprefix("_arg", macro_name))
 			{
 				printf("<ASM SYNTAX ERROR> This macro attempts to define a reserved name. You may not use this name:\n%s\n", line_copy);
+				puts("Note that all names beginning with asm_, ASM_, and \'_arg\' are reserved.");
 				goto error;	
 			}
 			if(
