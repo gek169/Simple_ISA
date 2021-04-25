@@ -55,9 +55,6 @@ You can offset these like this: $+93+ or @+15+
 you can call a macro of name macroname with arg1, arg2, arg3... being automatically defined for you
 by 
 
-14) ASM_EVAL##
-
-
 */
 
 #include "stringutil.h"
@@ -1048,11 +1045,21 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_vars", metaproc)){
 				unsigned long i;
+				printf("\nSTATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
 				printf("<DUMPING SYMBOL TABLE ON PASS %ld>\n", npasses+1);
 				for(i=0;i<nmacros;i++){
 					if(i==nmacros) puts("Showing User Macros");
 					if(strprefix("_arg", variable_names[i])) printf("\n<auto>:");
-					printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
+					if(i==0){char expansion[1024];
+						sprintf(expansion, "%lu", outputcounter);
+						expansion[1023] = '\0'; /*Just in case...*/
+						printf("VAR#%s#%s\n",variable_names[i],expansion);
+					} else if(i==1){char expansion[1024];
+						sprintf(expansion, "%lu,%lu", (unsigned long)(outputcounter/256),(unsigned long)(outputcounter&0xff));
+						expansion[1023] = '\0'; /*Just in case...*/
+						printf("VAR#%s#%s\n",variable_names[i],expansion);	
+					}else
+						printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
 			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_halt", metaproc)){
 				if(npasses == 1)
