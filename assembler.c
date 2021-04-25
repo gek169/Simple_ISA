@@ -385,18 +385,18 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	const unsigned long nbuiltin_macros = 6;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
-	variable_expansions[0] = "<defun defun 3>";
+	variable_expansions[0] = "";
 	variable_names[1] = "$";
 	variable_expansions[1] = variable_expansions[0];
 	variable_names[2] = "%";
 	variable_expansions[2] = variable_expansions[0];
 	/*Macros to remove whitespace- this assembler works without using any whitespace at all.*/
 	variable_names[3] = "\t";
-	variable_expansions[3] = "";
+	variable_expansions[3] = variable_expansions[0];
 	variable_names[4] = " ";
-	variable_expansions[4] = "";
+	variable_expansions[4] = variable_expansions[0];
 	variable_names[5] = "  ";
-	variable_expansions[5] = "";
+	variable_expansions[5] = variable_expansions[0];
 	/*Assembly-time directives.*/
 	nmacros = 6;
 
