@@ -388,8 +388,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	const unsigned long nbuiltin_macros = 6;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
+	variable_expansions[0] = "<defun defun 3>";
 	variable_names[1] = "$";
+	variable_expansions[1] = variable_expansions[0];
 	variable_names[2] = "%";
+	variable_expansions[2] = variable_expansions[0];
 	/*Macros to remove whitespace- this assembler works without using any whitespace at all.*/
 	variable_names[3] = "\t";
 	variable_expansions[3] = "";
@@ -1046,11 +1049,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(strprefix("_arg", variable_names[i])) printf("\n<auto>:");
 					printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
-			} else if(strprefix("asm_quit", metaproc)){
+			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_halt", metaproc)){
 				if(npasses == 1)
 					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
-			}else if (strprefix("#", metaproc) || strprefix("//", metaproc) || strprefix("!", metaproc)){
+			}else if(strprefix("!", metaproc)){
+				printf("<ASM SYNTAX ERROR> Cannot put string literal here, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
+			}else if (strprefix("#", metaproc) || strprefix("//", metaproc)){
 				if(debugging)
 					printf("<ASM WARNING> Inline Comment invalidates rest of line, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
 				break; /*Comment on line.*/
