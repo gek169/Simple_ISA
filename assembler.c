@@ -55,36 +55,8 @@ You can offset these like this: $+93+ or @+15+
 you can call a macro of name macroname with arg1, arg2, arg3... being automatically defined for you
 by 
 
-14) ASM_COMPILE
-	A miniature programming language!
-	by specifying the macros get<myvariable> and put<myvariable> which will get and put them onto the stack,
-	you can automatically build common expressions.
+14) ASM_EVAL##
 
-if you have these macros defined:
-VAR#getshrtLibVar#sc %0xb1%;llb %0x02a4%;farillda;alpush;
-VAR#putshrtLibVar#sc %0xb1%;llb %0x02a4%;alpop;faristla;
-then you can write
-
-ASM_COMPILE shrtLibVar= shrtLibVar ASM_CONSTEXPR(3) +
-this compiles into...
-getshrtLibVar; llb %3%; alpop; add;  alpush;    putshrtLibVar;
-
-which is then macro expanded.
-Note that macros inside of an ASM_COMPILE line are *not* expanded.
-
-Also note that the constant expression is not put onto the stack, because it is the second argument immediately
-before an operator. if it was the first, it would be pushed onto the stack.
-
-Valid ASM_COMPILE lines:
-ASM_COMPILE <variablename>=<postfix notation expression>
-
-variablename must have get and put functions defined for loading to and from the stack.
-All other referenced variables must have get defined.
-
-ASM_COMPILE <variablename>()
-variablename must have "callvariablename" defined.
-
-ASM_COMPILE macro_call(macroname) #definition of arg1#definition of arg2#definition of arg3
 
 */
 
@@ -528,7 +500,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 		if(strprefix("ASM_COMPILE", line)){
 		}
-		if(strprefix("asm_macro_call#", line)){char* f = line; long next_pound = -1;
+		if(strprefix("asm_macro_call#", line)){
+			char* f = line; long next_pound = -1;
 			unsigned long i = 0;char* macro_name=0;
 			/*The string immediately after the first # is the macro to call.
 			the arguments thereafter are arg1, arg2, arg3... */
@@ -539,10 +512,18 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(f, next_pound);
+			{unsigned long macro_i;unsigned char found=0;
+				for(macro_i = 0; macro_i < nmacros; macro_i++)
+					if(streq(macro_name, variable_names[macro_i])) found=1;
+				if(!found){
+					printf("<ASM SYNTAX ERROR> macro call on non-existent macro.Line:\n%s\n", line_copy);
+					goto error;
+				}
+			}
 			if(debugging)
 				printf("\nMacro call attempt on macro \'%s\'", macro_name);
 			f+=next_pound+1;
-			for(i=1;*f!='\0' && !strprefix("//", f);i++){unsigned long macro_i;
+			for(i=1;*f!=';' && *f!='\0' && !strprefix("//", f);i++){unsigned long macro_i;
 				char namebuf[128]; /*Holds name of argXXX*/
 				/*Used for defining the macro.*/
 				char* varname = NULL;
@@ -615,11 +596,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
 					if(was_macro && i==2){
-						/*printf("\nThis line is a macro:\n%s\n", line_copy);*/
 						continue; /*Do not parse the split directive inside of a macro.*/
 					}
 					if(was_macro && (i==3 || i==4)){
-						/*printf("\nThis line is a macro:\n%s\n", line_copy);*/
 						continue; /*Do not parse the space or tab inside of a macro.*/
 					}
 					line_old = line;
@@ -643,14 +622,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 								}
 						}
 					}
-					if(found_longer_match) {puts("Found longer Macro.");continue;}
+					if(debugging)
+						if(found_longer_match) 
+							{puts("Found longer Macro.");continue;}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
 					
 					len_to_replace = strlen(variable_names[i]);
 					before = str_null_terminated_alloc(line_old, loc);
-					if(i > 2)
+					if(i > 2) /*0,1,2 are special cases. 3,4,X are not.*/
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){ /*SYNTAX: @+7+*/
 						char expansion[1024];
@@ -737,7 +718,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					line = strcatallocfb(before, after);
 					free(line_old);
 					break; /*we have expanded something.*/
-					local_end:; /*We have*/
 				}
 			}while(have_expanded && (iteration++ < 32768));
 		}
