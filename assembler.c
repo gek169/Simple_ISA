@@ -68,6 +68,7 @@ char* outfilename = "out.bin";
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
+char variable_is_redefining_flag[65535] = {0};
 char* insns[128] = {
 	"halt",
 	"lda",
@@ -384,7 +385,7 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	const unsigned long nbuiltin_macros = 5;
+	const unsigned long nbuiltin_macros = 6;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
 	variable_names[1] = "$";
@@ -394,8 +395,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	variable_expansions[3] = "";
 	variable_names[4] = " ";
 	variable_expansions[4] = "";
+	variable_names[5] = "  ";
+	variable_expansions[5] = "";
 	/*Assembly-time directives.*/
-	nmacros = 5;
+	nmacros = 6;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
@@ -809,13 +812,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						goto error;	
 					}
 				if(streq(macro_name, variable_names[i])){
-					/*printf("<ASM WARNING> redefinition of macro, line: %s\n", line_copy);*/
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
 						printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
 						goto error;	
 					}
 					index = i;
+					
 				}
 			}}
 			if(!is_overwriting){
@@ -825,15 +828,29 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
-			} else {
+			} else {char* temp;
 				if(npasses == 0)
-					printf("<ASM WARNING> redefining macro, line: %s\n", line_copy);
+					{
+						printf("<ASM WARNING> redefining macro, potentially desyncing compilation. line: %s\n", line_copy);
+						variable_is_redefining_flag[index] = 1;
+					}
+				
 				variable_names[index] = macro_name;
-				variable_expansions[index] = 
+				temp = 
 				str_null_terminated_alloc(
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
+				if(npasses == 2 && !variable_is_redefining_flag[index])
+				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
+					if(!streq(temp, variable_expansions[index])){
+						printf("<ASM WARNING> Confirmed Macro Desync between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
+					}
+					free(temp);
+				} else {
+					free(variable_expansions[index]);
+					variable_expansions[index] = temp;
+				}
 			}
 			if(debugging){
 				printf("\nMacro Contents are %s, size %u\n", variable_expansions[nmacros-1], (unsigned int)strlen(variable_expansions[nmacros-1]));
@@ -1021,6 +1038,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				region_restriction_mode = 1; /*block*/
 			} else if(strprefix("asm_end_block_restriction", metaproc) || strprefix("asm_end_page_restriction", metaproc)){
 				region_restriction_mode = 0; /*end block*/
+			} else if(strprefix("asm_vars", metaproc)){
+				unsigned long i;
+				printf("<DUMPING SYMBOL TABLE ON PASS %ld>\n", npasses+1);
+				for(i=0;i<nmacros;i++){
+					if(i==nmacros) puts("Showing User Macros");
+					if(strprefix("_arg", variable_names[i])) printf("\n<auto>:");
+					printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
+				}
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)
 					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
