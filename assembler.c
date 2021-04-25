@@ -736,6 +736,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			printf("\nLine:\n%s\n", line_copy);
 			goto error;
 		}
+		
 		/*Step 2: Check to see if this is a macro*/
 		if(debugging){
 			printf("\n~~Is this a macro?~~\n");
@@ -846,10 +847,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				);
 				if(npasses == 2 && !variable_is_redefining_flag[index])
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
+
 					if(!streq(temp, variable_expansions[index])){
 						printf("<ASM WARNING> Confirmed Macro Desync between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
-					}
-					free(temp);
+						free(variable_expansions[index]);
+						variable_expansions[index] = temp;
+					} else free(temp);
+					free(variable_expansions[index]);
+					variable_expansions[index] = temp;
 				} else {
 					free(variable_expansions[index]);
 					variable_expansions[index] = temp;
