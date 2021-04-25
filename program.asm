@@ -49,10 +49,10 @@ illdaa;
 llb %255%;and;
 putchar
 
-sc %myLabel%;
+sc %~myLabel~%;
 					asm_vars
 jmp;
-VAR#myLabel#@
+VAR#~myLabel~#@
 sc 0,0
 
 #perform the loop check
@@ -97,9 +97,9 @@ lla %0xB000%;illdaa;
 putchar;putchar;
 putchar;putchar;
 
-sc %myLabel2%;asm_print;
-jmp;
-VAR#myLabel2#   @    
+VAR#goto_myLabel2#sc %~myLabel2~%;jmp;
+goto_myLabel2
+VAR#~myLabel2~#   @    
 
 //test far memory indexing functionality
 lla %0xffea%;

@@ -780,25 +780,28 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			index = 0;
 			{unsigned short i;for(i = 0; i < n_insns; i++){
 				if( (strfind(insns[i],macro_name)>-1) ||
-				streq(macro_name, insns[i])){
+					(strfind(macro_name, insns[i])==0) 
+				){
 					printf("<ASM SYNTAX ERROR> This macro would prevent instruction %s from being used:\n%s\n", insns[i], line_copy);
 					goto error;	
 				}
 			}}
 			/*
+				Prevent macros from being defined which contain other 
+			*/
+			/*
 				Check and make sure this is not a reserved name
 			*/
-			if(strprefix("ASM_", macro_name) || strprefix("asm_", macro_name) || strprefix("_arg", macro_name))
-			{
-				printf("<ASM SYNTAX ERROR> This macro attempts to define a reserved name. You may not use this name:\n%s\n", line_copy);
-				puts("Note that all names beginning with asm_, ASM_, and \'_arg\' are reserved.");
-				goto error;	
-			}
 			if(
 				strfind(macro_name, "!") != -1 ||
 				strfind(macro_name, "$") != -1 ||
 				strfind(macro_name, "@") != -1 ||
-				strfind(macro_name, "%") != -1
+				strfind(macro_name, "%") != -1 ||
+				strfind(macro_name, "bytes") != -1 ||
+				strfind(macro_name, "shorts") != -1 ||
+				strfind(macro_name, "asm_") != -1 ||
+				strfind(macro_name, "ASM_") != -1 ||
+				strfind(macro_name, "_arg") != -1
 			)
 			{
 				printf("<ASM SYNTAX ERROR> This macro attempts to define or trample a reserved name. You may not use this name:\n%s\n", line_copy);
@@ -812,6 +815,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						printf("<ASM SYNTAX ERROR> This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
 						goto error;	
 					}
+				if( (
+					(strfind(variable_names[i],macro_name)>-1) ||
+					(strfind(macro_name, variable_names[i])>-1)
+					)
+					&& !streq(macro_name, variable_names[i]))
+				{
+					printf("<ASM WARNING> This macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
+				}
+				
 				if(streq(macro_name, variable_names[i])){
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
@@ -819,7 +831,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						goto error;	
 					}
 					index = i;
-					
 				}
 			}}
 			if(!is_overwriting){
