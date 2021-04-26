@@ -861,6 +861,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			*/
 			if(
 				strfind(macro_name, "!") != -1 ||
+				strfind(macro_name, "//") != -1 ||
 				strfind(macro_name, " ") != -1 ||
 				strfind(macro_name, "\t") != -1 ||
 				strfind(macro_name, ";") != -1 ||
@@ -881,6 +882,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 
 			if(
 				strfind("!", macro_name) != -1 ||
+				strfind("//", macro_name) != -1 ||
 				strfind(" ", macro_name) != -1 ||
 				strfind("\t", macro_name) != -1 ||
 				strfind(";", macro_name) != -1 ||
@@ -989,17 +991,27 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 
 		if(was_macro) goto end;
+		/*We must first determine if this line contains a line comment. Don't search past the line comment for insns.*/
+		if(strfind(line, "#") != -1){
+			long loc_line_comment = strfind(line, "#");
+			line[loc_line_comment] = '\0';
+		} else if(strfind(line, "//") != -1){
+			long loc_line_comment = strfind(line, "//");
+			line[loc_line_comment] = '\0';
+		} 
+		
 		/* 
 			Assembly Directives
 
 		*/
-
+		
 		/*	most complicated step- handle insns.
 			Everything breaks down to bytes underneath, so we convert to "bytes" commands.
 			The difference between here and above is that we have to count
 			how many commas we're supposed to encounter.
 			the first comma beyond that before the next semicolon, is replaced with a semicolon.
 		*/
+		
 			{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
@@ -1012,6 +1024,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					loc = strfind(line, insns[i]);					
 					line_old = line;
 					if(loc == -1) continue;
+
 					/*Check to make sure that this isn't some other, longer insn.*/
 					found_longer_match = 0;
 					for(j = 0; j<n_insns; j++){
@@ -1030,6 +1043,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						}
 					}
 					if(found_longer_match) continue;
+					if(loc>0){
+						/*Check to make sure this isn't prefixed by something which is obviously erroneous.*/
+						if(*(line+loc-1) != ';')
+							printf("<ASM WARNING> Instruction parsing reached with "
+									"unusual prefixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\n",*(line+loc-1),insns[i],line_copy);
+					}
 					/*We know the location of an insn to be expanded and it is at loc.*/
 					/*Crawl along the string. */
 					num_commas_needed = insns_numargs[i] - 1;
