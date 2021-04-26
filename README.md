@@ -285,7 +285,7 @@ if you have something like this:
 sc %myLabel%;jmp;
 #later...
 
-VAR#myLabel#$
+VAR#myLabel#@
 ```
 then on the first pass, the split `%myLabel%` will be evaluated as zero on the first pass, but on the second pass,
 the value will be used.
