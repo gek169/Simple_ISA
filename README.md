@@ -346,7 +346,19 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
 	asm_call- call a macro with arguments. asm_call#mymacro#firstarg#secondarg##;
 		may be inline, you can invoke asm_call multiple times.
-		If during macro expansion on a non-macro line, an asm_call appears which did not exist before, then the it is processed.
+		If during macro expansion on a non-macro line, an asm_call appears which did not exist before, then it is processed.
+	asm_pleq- perform addition on macros. 
+		Syntax;
+		asm_pleq#\macroname1#\macroname2#; OR asm_pleq#\macroname1#integerliteral#;
+		if macroname1 is a string containing an integer literal, it will be replaced with the string
+		resulting from the parsing of the integer literal of strtol(macroname1) + strtol(macroname2)
+		or, for the integer literal caase,
+		strtol(macroname1) + strtol("integerliteral").
+
+		if you perform a pleq then all statements after it (even on the same line) will see the macro as being that value.
+	asm_muleq- identical to asm_pleq but for multiplication.
+	\- Escape character. Prevent macro expansion for following macro. Needed to pass macro names to asm_pleq and asm_muleq,
+		otherwise they would be expanded.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macro names in a string literal are not expanded.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
