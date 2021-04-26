@@ -1,12 +1,16 @@
 //Macros!
 
 VAR#myFunction#sc %_arg1%; lla _arg2; farilldb;
+VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg1#_arg2##;
 
 
 
 #note how this line ends in two pound symbols- this is very important.
 #an asm_call can happen anywhere on the line, but it must end in two consecutive pound symbols.
 asm_call#myFunction#3#%7%##;asm_call#myFunction#9#%12%##;asm_print;
+
+
+asm_call#nestedFunction#9#%12%##;nop;nop;
 
 
 #Compile this program using asm. ./asm -i program.asm -o program.bin
