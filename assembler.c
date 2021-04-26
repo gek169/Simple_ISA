@@ -861,6 +861,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			*/
 			if(
 				strfind(macro_name, "!") != -1 ||
+				strfind(macro_name, " ") != -1 ||
+				strfind(macro_name, "\t") != -1 ||
+				strfind(macro_name, ";") != -1 ||
+				strfind(macro_name, "#") != -1 ||
 				strfind(macro_name, "$") != -1 ||
 				strfind(macro_name, "@") != -1 ||
 				strfind(macro_name, "%") != -1 ||
@@ -871,7 +875,42 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(macro_name, "_arg") != -1
 			)
 			{
-				printf("<ASM SYNTAX ERROR> This macro attempts to define or trample a reserved name. You may not use this name:\n%s\n", line_copy);
+				printf("<ASM SYNTAX ERROR> This macro deliberately attempts to define or trample a reserved name or character. You may not use this name:\n%s\n", macro_name);
+				goto error;	
+			}
+
+			if(
+				strfind("!", macro_name) != -1 ||
+				strfind(" ", macro_name) != -1 ||
+				strfind("\t", macro_name) != -1 ||
+				strfind(";", macro_name) != -1 ||
+				strfind("#", macro_name) != -1 ||
+				strfind("$", macro_name) != -1 ||
+				strfind("@", macro_name) != -1 ||
+				strfind("%",macro_name) != -1 ||
+				strfind("bytes",macro_name) != -1 ||
+				strfind("shorts",macro_name) != -1 ||
+				strfind("asm_",macro_name) != -1 ||
+				strfind("ASM_", macro_name) != -1 ||
+				strfind("_arg", macro_name) != -1 ||
+				strfind("section", macro_name) != -1 ||
+				strfind("fill", macro_name) != -1 ||
+				strfind("asm_help", macro_name) != -1 ||
+				strfind("asm_call", macro_name) != -1 ||
+				strfind("asm_fix_outputcounter", macro_name) != -1 ||
+				strfind("asm_print", macro_name) != -1 ||
+				strfind("asm_vars", macro_name) != -1 ||
+				strfind("asm_begin_region_restriction", macro_name) != -1 ||
+				strfind("asm_begin_page_restriction", macro_name) != -1 ||
+				strfind("asm_begin_block_restriction", macro_name) != -1 ||
+				strfind("asm_end_region_restriction", macro_name) != -1 ||
+				strfind("asm_end_page_restriction", macro_name) != -1 ||
+				strfind("asm_end_block_restriction", macro_name) != -1 ||
+				strfind("asm_end_restriction", macro_name) != -1 ||
+				strfind("asm_quit", macro_name) != -1
+			)
+			{
+				printf("<ASM SYNTAX ERROR> This macro would prevent language features from being used. You may not use this name:\n%s\n", macro_name);
 				goto error;	
 			}
 			{unsigned short i;for(i = 0; i < nmacros; i++){
@@ -1141,10 +1180,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				region_restriction = (outputcounter>>8) & 0xFFFF;
 				region_restriction_mode = 1; /*block*/
 			} else if(strprefix("asm_end_block_restriction", metaproc)|| 
-				strprefix("asm_end_page_restriction", metaproc)||
-				strprefix("asm_end_restriction", metaproc)
+					strprefix("asm_end_page_restriction", metaproc)||
+					strprefix("asm_end_restriction", metaproc)
 				)
-				{
+			{
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_vars", metaproc)){
 				unsigned long i;
@@ -1164,7 +1203,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					}else
 						printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
-			} else if(strprefix("asm_quit", metaproc) || strprefix("asm_halt", metaproc)){
+			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)
 					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
