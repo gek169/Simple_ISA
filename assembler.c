@@ -464,7 +464,17 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		char was_macro = 0;
 		if(debugging) printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
-		if(!line) return 0;
+		/*if this line ends in a backslash...*/
+		
+		if(!line) {
+			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
+		}
+		while(strlen(line) > 0 && line[strlen(line)-1] == '\\'){char* line_temp;
+			line[strlen(line)-1] = '\0';
+			line_temp = read_until_terminator_alloced(infile, &linesize, '\n', 1);
+			line = strcatallocfb(line,line_temp);
+			linesize = strlen(line);
+		}
 		line_copy = strcatalloc(line,"");line_num++;
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/

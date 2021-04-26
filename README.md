@@ -370,6 +370,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_muleq- identical to asm_pleq but for multiplication.
 	\- Escape character. Prevent macro expansion for following macro. Needed to pass macro names to asm_pleq and asm_muleq,
 		otherwise they would be expanded.
+	|- Macro evaluation sequence point operator. the line will be fully macro-expanded before this point, including
+		all pre-processing.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macro names in a string literal are not expanded.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
