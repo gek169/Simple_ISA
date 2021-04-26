@@ -1,17 +1,17 @@
 //Macros!
 
 VAR#myFunction#sc %_arg1%; lla _arg2; farilldb;
-VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg1#_arg2##;
+VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg2#_arg1##;
 
 
 
 #note how this line ends in two pound symbols- this is very important.
 #an asm_call can happen anywhere on the line, but it must end in two consecutive pound symbols.
 asm_call#myFunction#3#%7%##;asm_call#myFunction#9#%12%##;asm_print;
+asm_call#nestedFunction#%9%#12##;nop;nop;
 
 
-asm_call#nestedFunction#9#%12%##;nop;nop;
-
+//All the code before here was entirely meaningless. Ignore it.
 
 #Compile this program using asm. ./asm -i program.asm -o program.bin
 section 0
@@ -55,7 +55,7 @@ llb %255%;and;
 putchar
 
 sc %~myLabel~%;
-					asm_vars
+#					asm_vars
 jmp;
 VAR#~myLabel~#@
 sc 0,0

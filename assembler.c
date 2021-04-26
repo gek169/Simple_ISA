@@ -382,7 +382,7 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	const unsigned long nbuiltin_macros = 6;
+	const unsigned long nbuiltin_macros = 6; unsigned long nmacrocalls = 0; const unsigned long maxmacrocalls = 0x10000;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
@@ -483,12 +483,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					fputbyte(line[i], ofile);
 			goto end;
 		}
-		pre_pre_processing:
-		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace.*/
-			char* line_old = line;
-			line = strcatalloc(line+1,"");
-			free(line_old);
-		}
 		if(strprefix("ASM_data_include ", line)){
 			/*data include! format is
 			[newline]asm_data_include filename
@@ -512,12 +506,37 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			fclose(tmp);
 			goto end;
 		}
+		pre_pre_processing:
+		if(nmacrocalls > maxmacrocalls){
+			printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
+			goto error;
+		}
+		nmacrocalls++;
+		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace.*/
+			char* line_old = line;
+			line = strcatalloc(line+1,"");
+			free(line_old);
+		}
+
 		if(strprefix("ASM_COMPILE", line)){
 			puts("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
 			goto error;
 		}
-
-
+		if(strprefix("ASM_COPYRIGHT", line)){
+			puts("SISA-16 Assembler,(C)David M.H.S. Webster 2021\navailable to you under the Creative Commons Zero license.");
+			goto end;
+		}
+		if(strprefix("asm_help", line)){
+			puts("This assembler should have come with a README.MD and an emulator \"isa.c\". If it did not, you got scammed! ");
+			puts("There are 100 instructions in the original version of the emulator which you can invoke by name.");
+			puts("This is no ordinary assembler, it has a very complicated macro syntax, arbitrary data includes, and string literals.");
+			puts("There are, however, no structured programming control flow statements. you've only got the jmp, jmpifeq, jmpifneq, call, farcall, ret, and farret insns.");
+			puts("The assembler is a two-pass compiler. Both passes work roughly the same. The first pass won't actually write the file, though.");
+			puts("However, on the second pass, you can use variable defined from the first pass.");
+			puts("This allows you to do things like define goto labels. On the first pass, the jump target will evaluate as zero, but on the second it will be defined.");
+			puts("Note that it is possible to (purposefully or by mistake...) deysynchronize the two passes. That is, cause the number of bytes written to the output file to be different on different passes.");
+			puts("");
+		}
 
 		
 		if(
@@ -536,7 +555,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(f, next_pound);
-			printf("\nMacro call attempt detected on macro \'%s\'", macro_name);
+			/*printf("\nMacro call attempt detected on macro \'%s\'", macro_name);*/
 			{
 				unsigned long macro_i;
 				for(macro_i = 0; macro_i < nmacros; macro_i++)
@@ -555,7 +574,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				/*Used for defining the macro.*/
 				char* varname = NULL;
 				unsigned long replacements = 0;
-				const unsigned long max_repl = 65535;
+				const unsigned long max_repl = 0x10000;
 				char* vardef = NULL;
 				long overwriting = -1;/*if not negative, this means it's replacing something.*/
 				/*Check to see if we even can define a macro.*/
@@ -1084,8 +1103,26 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				fillval = strtoul(proc, NULL, 0);
 				if(fillval == 0) /*potential for a mistake*/
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
-						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line %s", line_copy);
+						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line:\n%s\n", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
+			} else if(strprefix("asm_correct_outp", metaproc)){ /*Perform a second-pass correction of the output counter.*/
+				char* proc; char mode; unsigned long outputcounterold;
+				if(npasses == 1){
+					proc = metaproc + strlen("asm_correct_outp");
+					if(proc[0] == '+') mode=0; else
+					if(proc[0] == '-') mode=1; else
+					{
+						printf("\n<ASM SYNTAX ERROR> asm_correct_outp lacks a + or -.Line:\n%s\n", line_copy);
+						goto error;
+					}proc++;
+					if(!mode)
+						outputcounter += strtoul(proc, NULL, 0);
+					else
+						outputcounter -= strtoul(proc, NULL, 0);
+					outputcounterold = outputcounter;
+					outputcounter &= 0xffFFff;
+					printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s", outputcounterold, outputcounter, line_copy);
+				}
 			} else if(strprefix("asm_print", metaproc)){
 				if(npasses == 1)
 					printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
