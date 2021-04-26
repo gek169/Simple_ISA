@@ -2,7 +2,8 @@
 
 VAR#myFunction#sc %_arg1%; lla _arg2; farilldb;
 VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg2#_arg1##;
-
+//this wont compile
+#VAR#0myFunction#nop;
 
 
 #note how this line ends in two pound symbols- this is very important.

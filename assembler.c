@@ -52,8 +52,8 @@ Assembly-time directives must have NO leading or trailing whitespace.
 You can retrieve the current location in the binary as a short with @, and as a byte pair with $
 You can offset these like this: $+93+ or @+15+
 13) asm_macro_call#macroname#arg1#arg2#
-you can call a macro of name macroname with arg1, arg2, arg3... being automatically defined for you
-by 
+you can call a macro of name macroname with _arg1, _arg2, _arg3... being automatically defined for you.
+14) 
 
 */
 
@@ -875,10 +875,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(macro_name, "shorts") != -1 ||
 				strfind(macro_name, "asm_") != -1 ||
 				strfind(macro_name, "ASM_") != -1 ||
-				strfind(macro_name, "_arg") != -1
+				strfind(macro_name, "_arg") != -1 ||
+				/*begins with a number*/
+				(macro_name[0] <= '9' && macro_name[0] >= '0')
+				
 			)
 			{
 				printf("<ASM SYNTAX ERROR> This macro deliberately attempts to define or trample a reserved name or character. You may not use this name:\n%s\n", macro_name);
+				puts("NOTE: You cannot use names beginning with numbers, either.");
 				goto error;	
 			}
 
@@ -1049,8 +1053,19 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						/*Check to make sure this isn't prefixed by something which is obviously erroneous.*/
 						if(*(line+loc-1) != ';')
 							printf("<ASM WARNING> Instruction parsing reached with "
-									"unusual prefixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\n",*(line+loc-1),insns[i],line_copy);
+									"unusual prefixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\nInternally:\n%s\n",*(line+loc-1),insns[i],line_copy, line);
 					}
+					if(
+						*(line+loc+strlen(insns[i])) != ';' && 
+						*(line+loc+strlen(insns[i])) != '\0' && 
+						!(
+							*(line+loc+strlen(insns[i])) >= '0' &&
+							*(line+loc+strlen(insns[i])) <= '9'
+						) &&
+						*(line+loc+strlen(insns[i])) != ' '
+					)
+						printf("<ASM WARNING> Instruction parsing reached with "
+								"unusual postfixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\nInternally:\n%s\n",*(line+loc+strlen(insns[i])),insns[i],line_copy,line);
 					/*We know the location of an insn to be expanded and it is at loc.*/
 					/*Crawl along the string. */
 					num_commas_needed = insns_numargs[i] - 1;
