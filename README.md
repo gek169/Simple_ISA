@@ -334,7 +334,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
 	asm_halt- if on the second pass, halt assembly.
 	asm_vars- print all variables on both passes.
-	asm_call- call a macro with arguments.
+	asm_call- call a macro with arguments. asm_call#mymacro#firstarg#secondarg##;
+	
 	asm_fix_outputcounter- if you have a desync issue between the two passes of the assembler and 
 		you don't know how to fix it, you can correct it with this. Moves the output counter on the second pass only.
 	section- move the output counter to a location.
@@ -402,8 +403,8 @@ asm_end_region_restriction;
 #Note that ASM_data_include does not change where the code you are including
 #decides to put its variables or subroutines- the assembler just sees bytes- you must be careful about that.
 
-#You have a subroutine called "print" defined in your library which is at 0xff90 in the library.
-VAR#callPrint#la0xee;sc%0xff90%;farcall;
+#You have a subroutine called "LibPrint" defined in your library which is at 0xff90 in the library.
+VAR#procLibPrint#la0xee;sc%0xff90%;farcall;
 #Your library defines a short variable "LibVar" at 0xb102a4 which you need to interact with.
 VAR#accessLibVar#sc %0xb1%;llb %0x02a4%
 VAR#getshrtLibVar#accessLibVar;farillda;alpush;
@@ -428,7 +429,7 @@ You may also find it particularly annoying that complete pointer arithmetic is i
 I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's some tips:
 
 1) Establish an ABI convention. is the b register preserved through a function call, for instance? How are function arguments and return values passed?
-2) Write macros for your variables and functions.
+2) Write macros for your variables and functions. you can use asm_call to do very fancy tricks!
 3) Write macros which use other macros. Macros inside of a macro are not expanded until they are used (With the exception of built-ins like $ and %)
 4) create inline subroutines using macros so you don't have to dedicate brainpower to indexing into an array.
 5) Align all arrays to page or region boundaries- you can use `section` to move the output counter to a designated location.
@@ -440,9 +441,7 @@ you will very easily find ways to break it.
 	I would recommend region-aligning all libraries, unless they are extremely small.
 10) There is a known bug/feature of SISA's program loader- if the file is smaller than 16 megabytes, isa.c will load
 a single "255" byte at the very end. This may be an issue if you were relying on it being a zero, like the rest of memory.
-11) If you are concerned about the size of your binary (You probably shouldn't be) then use farpagel and farpagest to write
-your own "bootloader" of sorts- construct the memory layout before beginning main program execution.
-
+11) If you want to reduce your binary size, try using $+value+, @+value+, section, farpagest, and farpagel. You can unpack your binary at boot time.
 ### Project ideas
 
 This repository is written primarily as an educational or recreational asset- I know it serves little practical purpose.
