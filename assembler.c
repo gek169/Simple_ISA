@@ -465,7 +465,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(debugging) printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		/*if this line ends in a backslash...*/
-		
 		if(!line) {
 			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
 		}
