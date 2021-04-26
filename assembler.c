@@ -581,9 +581,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			if(loc_call != -1 && 
 				loc_call < loc) 
 			{
-				printf("\nDeferring to a call statement before us. Line internally:\n%s\nUs:\n%s\nCall:\n%s\n", line, line + loc, line + loc_call);
+				/*printf("\nDeferring to a call statement before us. Line internally:\n%s\nUs:\n%s\nCall:\n%s\n", line, line + loc, line + loc_call);*/
 				goto process_asm_call;
 			} /*We have to evaluate it first.*/
+			/*Sequence break before this point- do not allow to continue.*/
+			if(strfind(line, "|") != -1 &&
+				strfind(line, "|") < loc)
+				goto process_asm_call;
 			proc = line_old + loc + strlen(command_name);
 			before = str_null_terminated_alloc(line_old, loc);
 			if(proc[0] != '\\'){
@@ -678,6 +682,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(
 			(!strprefix("VAR#", line)) /*Do not parse asm_call's inside of a VAR# line.*/
 			&& (strfind(line, "asm_call#") != -1) /*We have found one!*/
+			&& !((strfind(line, "|") != -1) && strfind(line, "|") < strfind(line, "asm_call#")  ) /*No sequence point operator.*/
 			){
 			char* f, *before, *after, *content; long next_pound = -1; long found_macro_id=-1;
 			unsigned long i = 0;char* macro_name=0;
@@ -771,14 +776,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			goto pre_pre_processing; /*Allow recursive calling.*/
 		}
 
-		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
+		if(strlen(line) < 1) goto end; /*the line is empty*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
-		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'){
+		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'
+			&& line[0] != '\\' && line[0] != '|'){
 			printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*Not performed on MACRO Lines.*/
+		
 		if(strfind(line,"VAR#")!= -1) was_macro=1;
 		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
 			do{
@@ -788,19 +795,28 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(was_macro)
 						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
-				if(!was_macro) 
-					if(strfind(line, "asm_call") != -1 ||
-						strfind(line, "asm_pleq") != -1 ||
-						strfind(line, "asm_muleq") != -1
-						)
+				{
+				long loc_vbar = strfind(line, "|");
+				if(loc_vbar == -1) loc_vbar = strlen(line);
+				if(!was_macro)
+					if( (strfind(line, "asm_call") != -1   && strfind(line, "asm_call") <loc_vbar) ||
+						(strfind(line, "asm_pleq") != -1   && strfind(line, "asm_pleq") <loc_vbar) ||
+						(strfind(line, "asm_muleq") != -1  && strfind(line, "asm_muleq")<loc_vbar)
+						){
 						goto pre_pre_processing; /*A macro has been expanded, resulting in an asm_call or math forming.*/
+					}
+				}
 				for(i = (was_macro?nbuiltin_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
 					char* line_old; long loc; long linesize; char found_longer_match;
 					long len_to_replace; char* before;char* after;
-					long j;
+					long j, loc_vbar = 0;;
+
+					loc_vbar = strfind(line, "|");
 					linesize = strlen(line);
+					if((loc_vbar == -1) || was_macro) loc_vbar = linesize;
 					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
+					if(loc >= loc_vbar) continue; /*Respect the sequence operator.*/
 					if(loc > 0 && *(line+loc-1) == '\\') continue;
 					if(was_macro && i==2){
 						continue; /*Do not parse the split directive inside of a macro.*/
@@ -1004,6 +1020,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(macro_name, " ") != -1 ||
 				strfind(macro_name, "\t") != -1 ||
 				strfind(macro_name, ";") != -1 ||
+				strfind(macro_name, "|") != -1 ||
 				strfind(macro_name, "#") != -1 ||
 				strfind(macro_name, "$") != -1 ||
 				strfind(macro_name, "@") != -1 ||
@@ -1029,6 +1046,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(" ", macro_name) != -1 ||
 				strfind("\t", macro_name) != -1 ||
 				strfind(";", macro_name) != -1 ||
+				strfind("|", macro_name) != -1 ||
 				strfind("#", macro_name) != -1 ||
 				strfind("$", macro_name) != -1 ||
 				strfind("@", macro_name) != -1 ||
@@ -1134,6 +1152,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 
 		if(was_macro) goto end;
+		if(strfind(line, "|")!=-1){ /*Sequence point on non-macro line. go up!*/
+			line[strfind(line, "|")] = ';';
+			goto pre_pre_processing;
+		}
 		/*We must first determine if this line contains a line comment. Don't search past the line comment for insns.*/
 		if(strfind(line, "#") != -1){
 			long loc_line_comment = strfind(line, "#");

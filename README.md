@@ -356,6 +356,17 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 		strtol(macroname1) + strtol("integerliteral").
 
 		if you perform a pleq then all statements after it (even on the same line) will see the macro as being that value.
+
+		Note that because pleq is a *pre-pre processor instruction* all macro evaluations of a the variable on the line
+		will be the last value calculated. if you do
+		sc %myvar%; asm_pleq#myvar#3#;
+		where myvar is zero on the line before it is added to, 
+		then you will not get the expected result,
+		sc %0%; myvar+=3;
+		you will instead get...
+		myvar += 3; sc %3%;
+
+		You should be careful how you allow macro evaluations to occur.
 	asm_muleq- identical to asm_pleq but for multiplication.
 	\- Escape character. Prevent macro expansion for following macro. Needed to pass macro names to asm_pleq and asm_muleq,
 		otherwise they would be expanded.
