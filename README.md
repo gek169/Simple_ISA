@@ -335,7 +335,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_halt- if on the second pass, halt assembly.
 	asm_vars- print all variables on both passes.
 	asm_call- call a macro with arguments.
-	asm_correct_outp- if you have a desync issue between the two passes of the assembler and you don't know how to fix it, you can correct it with this.
+	asm_fix_outputcounter- if you have a desync issue between the two passes of the assembler and 
+		you don't know how to fix it, you can correct it with this. Moves the output counter on the second pass only.
 	section- move the output counter to a location.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace

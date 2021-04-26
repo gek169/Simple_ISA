@@ -54,8 +54,14 @@ illdaa;
 llb %255%;and;
 putchar
 
+
+#asm_fix_outputcounter+2;
 sc %~myLabel~%;
+
+
 #					asm_vars
+
+
 jmp;
 VAR#~myLabel~#@
 sc 0,0

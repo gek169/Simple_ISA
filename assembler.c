@@ -535,7 +535,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			puts("However, on the second pass, you can use variable defined from the first pass.");
 			puts("This allows you to do things like define goto labels. On the first pass, the jump target will evaluate as zero, but on the second it will be defined.");
 			puts("Note that it is possible to (purposefully or by mistake...) deysynchronize the two passes. That is, cause the number of bytes written to the output file to be different on different passes.");
-			puts("");
+			puts("(You can fix this on the second pass with asm_correct_outp+amount; or asm_correct_outp-amount;)");
+			puts("You can try to figure out how it works from source but you really need the readme.");
 		}
 
 		
@@ -909,7 +910,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else {char* temp;
 				if(npasses == 0)
 					{
-						printf("<ASM WARNING> redefining macro, potentially desyncing compilation. line: %s\n", line_copy);
+						printf("<ASM WARNING> redefining macro, potentially desyncing compilation. Check that. line: %s\n", line_copy);
 						variable_is_redefining_flag[index] = 1;
 					}
 				
@@ -919,14 +920,17 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
-				if(npasses == 2 && !variable_is_redefining_flag[index])
+				if(npasses == 1 && 
+					!variable_is_redefining_flag[index] && 
+					!strprefix("_arg", variable_names[index])
+					)
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
 
 					if(!streq(temp, variable_expansions[index])){
-						printf("<ASM WARNING> Confirmed Macro Desync between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
+						printf("<ASM HUGE WARNING>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
 						free(variable_expansions[index]);
 						variable_expansions[index] = temp;
-					} else free(temp);
+					}
 					free(variable_expansions[index]);
 					variable_expansions[index] = temp;
 				} else {
@@ -1105,23 +1109,23 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
 						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line:\n%s\n", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
-			} else if(strprefix("asm_correct_outp", metaproc)){ /*Perform a second-pass correction of the output counter.*/
+			} else if(strprefix("asm_fix_outputcounter", metaproc)){ /*Perform a second-pass correction of the output counter.*/
 				char* proc; char mode; unsigned long outputcounterold;
 				if(npasses == 1){
-					proc = metaproc + strlen("asm_correct_outp");
+					proc = metaproc + strlen("asm_fix_outputcounter");
 					if(proc[0] == '+') mode=0; else
 					if(proc[0] == '-') mode=1; else
 					{
 						printf("\n<ASM SYNTAX ERROR> asm_correct_outp lacks a + or -.Line:\n%s\n", line_copy);
 						goto error;
 					}proc++;
+					outputcounterold = outputcounter;
 					if(!mode)
 						outputcounter += strtoul(proc, NULL, 0);
 					else
 						outputcounter -= strtoul(proc, NULL, 0);
-					outputcounterold = outputcounter;
 					outputcounter &= 0xffFFff;
-					printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s", outputcounterold, outputcounter, line_copy);
+					printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s\n", outputcounterold, outputcounter, line_copy);
 				}
 			} else if(strprefix("asm_print", metaproc)){
 				if(npasses == 1)
@@ -1136,7 +1140,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				/*The assembler will warn you if the block changes during the creation of the function.*/
 				region_restriction = (outputcounter>>8) & 0xFFFF;
 				region_restriction_mode = 1; /*block*/
-			} else if(strprefix("asm_end_block_restriction", metaproc) || strprefix("asm_end_page_restriction", metaproc)){
+			} else if(strprefix("asm_end_block_restriction", metaproc)|| 
+				strprefix("asm_end_page_restriction", metaproc)||
+				strprefix("asm_end_restriction", metaproc)
+				)
+				{
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_vars", metaproc)){
 				unsigned long i;
