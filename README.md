@@ -333,6 +333,10 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	<all the instruction names are reserved. See above.>
 	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
 	asm_halt- if on the second pass, halt assembly.
+	asm_vars- print all variables on both passes.
+	asm_call- call a macro with arguments.
+	asm_correct_outp- if you have a desync issue between the two passes of the assembler and you don't know how to fix it, you can correct it with this.
+	section- move the output counter to a location.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace
 	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
