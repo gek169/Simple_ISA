@@ -465,7 +465,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		if(!line) return 0;
 		line_copy = strcatalloc(line,"");line_num++;
-		/*Step 0: Skip comment lines*/
+		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
+		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
+			char* line_old = line;
+			line = strcatalloc(line+1,"");
+			free(line_old);
+		}
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 		if(strprefix("!",line)) {unsigned long i;
@@ -477,6 +482,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				for(i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
 			goto end;
+		}
+		pre_pre_processing:
+		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace.*/
+			char* line_old = line;
+			line = strcatalloc(line+1,"");
+			free(line_old);
 		}
 		if(strprefix("ASM_data_include ", line)){
 			/*data include! format is
@@ -502,34 +513,49 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			goto end;
 		}
 		if(strprefix("ASM_COMPILE", line)){
+			puts("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
+			goto error;
 		}
-		if(strprefix("asm_macro_call#", line)){
-			char* f = line; long next_pound = -1;
+
+
+
+		
+		if(
+			(!strprefix("VAR#", line)) /*Do not parse asm_call's inside of a VAR# line.*/
+			&& (strfind(line, "asm_call#") != -1) /*We have found one!*/
+			){
+			char* f, *before, *after, *content; long next_pound = -1; long found_macro_id=-1;
 			unsigned long i = 0;char* macro_name=0;
+			f = line + strfind(line, "asm_call#") + strlen("asm_call#");
+			before = str_null_terminated_alloc(line, strfind(line, "asm_call#"));
 			/*The string immediately after the first # is the macro to call.
 			the arguments thereafter are arg1, arg2, arg3... */
-			f+=strlen("asm_macro_call#");
 			next_pound = strfind(f, "#");
 			if(next_pound == -1) {
 				printf("<ASM SYNTAX ERROR> macro call lacking end pound.Line:\n%s\n", line_copy);
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(f, next_pound);
-			{unsigned long macro_i;unsigned char found=0;
+			printf("\nMacro call attempt detected on macro \'%s\'", macro_name);
+			{
+				unsigned long macro_i;
 				for(macro_i = 0; macro_i < nmacros; macro_i++)
-					if(streq(macro_name, variable_names[macro_i])) found=1;
-				if(!found){
+					if(streq(macro_name, variable_names[macro_i])){found_macro_id=macro_i;break;}
+				if(found_macro_id == -1){
 					printf("<ASM SYNTAX ERROR> macro call on non-existent macro.Line:\n%s\n", line_copy);
 					goto error;
 				}
 			}
-			if(debugging)
-				printf("\nMacro call attempt on macro \'%s\'", macro_name);
+			content = strcatalloc(variable_expansions[found_macro_id],"");
+			if(debugging) printf("\nMacro call attempt on macro \'%s\'", macro_name);
 			f+=next_pound+1;
-			for(i=1;*f!=';' && *f!='\0' && !strprefix("//", f);i++){unsigned long macro_i;
-				char namebuf[128]; /*Holds name of argXXX*/
+			for(i=1;*f!='\0' && *f!='#';i++){
+				unsigned long macro_i;
+				char namebuf[64]; /*Holds name of argXXX*/
 				/*Used for defining the macro.*/
 				char* varname = NULL;
+				unsigned long replacements = 0;
+				const unsigned long max_repl = 65535;
 				char* vardef = NULL;
 				long overwriting = -1;/*if not negative, this means it's replacing something.*/
 				/*Check to see if we even can define a macro.*/
@@ -547,8 +573,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						overwriting = macro_i; /*It does!*/
 				if(overwriting == -1) {
 					overwriting = nmacros++;
-					/*variable_names[overwriting] = NULL;*/
-					/*variable_expansions[overwriting] = NULL;*/
 				}
 
 				/*get the definition*/
@@ -563,16 +587,39 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				if(variable_expansions[overwriting]){free(variable_expansions[overwriting]);variable_expansions[overwriting] = NULL;}
 				variable_names[overwriting] = varname;
 				variable_expansions[overwriting] = vardef;
-				/*DO NOT FREE VARNAME AND VARDEF!!! they are owned by the table.*/
 				if(debugging)
 					printf("\nReplacing %s with %s", varname, vardef);
+				/*replace _argXXX in content.*/
+				while(strfind(content, varname)!= -1 && replacements < max_repl){
+					char* content_before, *content_after;replacements++;
+					if(debugging) puts("Found an instance of a required replacement!");
+					content_before = str_null_terminated_alloc(content,strfind(content, varname));
+					content_after = strcatalloc(content+strfind(content, varname)+strlen(varname),"");
+					free(content); /**/
+					content = strcatallocfb(
+						content_before,
+						strcatallocf2(vardef, content_after)
+					);
+				}
 			}
-			/*We now have the line.*/
+			if(*f != '#'){
+				printf("<ASM SYNTAX ERROR> macro call lacking end second pound.Line:\n%s\n", line_copy);
+				goto error;
+			}f++;
+			/*Old code:
 			free(line);
-			line = strcatallocf2("  ",macro_name);
-			if(debugging)
-				printf("\nThe line is now %s\n", line);
+			line = strcatallocf2("",macro_name);
+			*/
+			/*Get the after.*/
+			after = strcatalloc(f,"");
+			line = strcatallocf1(
+				before,
+				strcatallocfb(content, after)
+			);
+			if(debugging) printf("\nThe line is now \n%s\nas a result of a macro call!\n", line);
+			goto pre_pre_processing; /*Allow recursive calling.*/
 		}
+
 		if(strlen(line) < 1) goto end; /*Allow single character macros.*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
 		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'){

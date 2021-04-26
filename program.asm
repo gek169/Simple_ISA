@@ -4,8 +4,9 @@ VAR#myFunction#sc %_arg1%; lla _arg2; farilldb;
 
 
 
-#note how this line ends in a pound symbol- this is very important.
-asm_macro_call#myFunction#3#%7%#//You are allowed to follow this with an immediate comment, no whitespace.
+#note how this line ends in two pound symbols- this is very important.
+#an asm_call can happen anywhere on the line, but it must end in two consecutive pound symbols.
+asm_call#myFunction#3#%7%##;asm_call#myFunction#9#%12%##;asm_print;
 
 
 #Compile this program using asm. ./asm -i program.asm -o program.bin
