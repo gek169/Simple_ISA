@@ -657,7 +657,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(was_macro)
 						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
-				
+				if(!was_macro) 
+					if(strfind(line, "asm_call") != -1) 
+						goto pre_pre_processing; /*A macro has been expanded, resulting in an asm_call forming.*/
 				for(i = (was_macro?nbuiltin_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
 					char* line_old; long loc; long linesize; char found_longer_match;
 					long len_to_replace; char* before;char* after;

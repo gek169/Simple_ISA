@@ -294,27 +294,31 @@ The assembler allows you to define macros like this
 ```
 VAR#myVariableName# my variable definition
 ```
-If the variable definition contains a builtin macro or assembly directive such as `$`, `@`, or `%%`, then 
+If the variable definition contains `$` or `@` then 
 they will be expanded before macro definition. This allows you to define goto labels, for instance.
 
 Anywhere where "myVariableName" is encountered from then-on in the source code (including in the second pass) will be
 expanded.
 
-Note that you can create recursive or infinitely recursive macros, and the latter will undoubtedly segfault the program.
-Is that a bug, or a feature?
+Note that you can create infinitely recursive macros.
+Is that a bug or a feature?
 my answer is YES to both, and i'm sure clever programmers will come up with ways to abuse macro recursion
 
 I'm also extremely confident that you could somehow cause the second pass to be out-of-sync with the first pass
-by abusing macro recursion. If you find such a bug, file an issue, I'll try to fix it.
+by abusing macro recursion. You can fix such bugs yourself by using asm_fix_outputcounter in a pinch.
+
+Really, you should figure out why it's happening.
 
 The assembler will generate warnings for most situations that would warrant it:
-* a split directive evaluates to zero (You could have just written "0,0" , it is most likely a misspelled variable)
+* a split directive evaluates to zero on the second pass. (You could have just written "0,0" , it is most likely a misspelled variable)
 * an inline comment invalidates the rest of a line (Just a warning)
 * fill tag is set to zero when not explicitly declared as zero (the statement will do nothing)
 * section tag is set to zero when not explicitly declared as zero (the statement moves the outputcounter to the beginning of the output file)
+* Confirmed macro desync between passes
+* Unusual characters before an instruction's name (Usually leads to an unrecoverable error.)
 
 The assembler will generate unrecoverable errors for most situations that would warrant it:
-* An unknown name is parsed as a command (Usually meaning you misspelled a macro name...)
+* An unknown name is parsed as a statement (Usually meaning you misspelled a macro name...)
 * An invalid number of arguments is provided for an instruction or directive
 * The bounds check for a region restriction or page/block restriction fails. This is useful when you want to
 make sure that a subroutine fits inside of a memory region or page (64k or 256 bytes, aligned, respectively) or that
@@ -325,24 +329,24 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 * a file is included that is larger than the entire SISA-16 address space.
 * a file is included that is empty
 * you attempt to define a string literal anywhere other than the start of a line.
-* asm_halt was invoked on the second pass.
+* asm_quit was invoked on the second pass.
 * an unreachable or unopenable file is included with ASM_data_include
 
 ### list of SISA-16 assembler reserved words
 ```
 	<all the instruction names are reserved. See above.>
 	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
-	asm_halt- if on the second pass, halt assembly.
+	asm_quit- if on the second pass, stop assembly.
 	asm_vars- print all variables on both passes.
-	asm_call- call a macro with arguments. asm_call#mymacro#firstarg#secondarg##;
-	
 	asm_fix_outputcounter- if you have a desync issue between the two passes of the assembler and 
 		you don't know how to fix it, you can correct it with this. Moves the output counter on the second pass only.
 	section- move the output counter to a location.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace
 	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
-	asm_macro_cal#- call a macro function with arguments. must be at the beginning of a line.
+	asm_call- call a macro with arguments. asm_call#mymacro#firstarg#secondarg##;
+		may be inline, you can invoke asm_call multiple times.
+		If during macro expansion on a non-macro line, an asm_call appears which did not exist before, then the it is processed.
 	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
 		Macro names in a string literal are not expanded.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
