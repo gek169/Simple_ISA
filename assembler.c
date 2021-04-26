@@ -998,7 +998,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		} else if(strfind(line, "//") != -1){
 			long loc_line_comment = strfind(line, "//");
 			line[loc_line_comment] = '\0';
-		} 
+		}
 		
 		/* 
 			Assembly Directives
@@ -1016,7 +1016,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			do{
 				have_expanded = 0;
 				if(debugging){
-					printf("\n~~Ins Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					printf("\n~~Insn Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 				}
 				{unsigned long i;for(i = 0; i<n_insns; i++){char* line_old; long loc, linesize; unsigned long j;
 					char found_longer_match; int num_commas_needed;
