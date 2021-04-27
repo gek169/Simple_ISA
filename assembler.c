@@ -221,117 +221,147 @@ unsigned char insns_numargs[128] = {
 	0,0, 
 };
 char* insn_repl[128] = {
-	"bytes 0;", 
+	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
-	"bytes 1,",
-	"bytes 2,",
-	"bytes 3,",
-	"bytes 4,",
-	"bytes 5,",
+	"bytes1,",
+	"bytes2,",
+	"bytes3,",
+	"bytes4,",
+	"bytes5,",
 	/*stores have arguments*/
-	"bytes 6,",
-	"bytes 7,",
+	"bytes6,",
+	"bytes7,",
 	/*have no arguments.*/
-	"bytes 8;",
-	"bytes 9;",
-	"bytes 10;",
-	"bytes 11;",
-	"bytes 12;",
-	"bytes 13;",
-	"bytes 14;",
-	"bytes 15;",
-	"bytes 16;",
-	"bytes 17;",
-	"bytes 18;",
-	"bytes 19;",
-	"bytes 20;",
-	"bytes 21;",
-	"bytes 22;",
-	"bytes 23;",
-	"bytes 24;",
-	"bytes 25;",
-	"bytes 26;",
-	"bytes 27;",
-	"bytes 28;",
-	"bytes 29;",
-	"bytes 30;",
-	"bytes 31;",
+	"bytes8;",
+	"bytes9;",
+	"bytes10;",
+	"bytes11;",
+	"bytes12;",
+	"bytes13;",
+	"bytes14;",
+	"bytes15;",
+	"bytes16;",
+	"bytes17;",
+	"bytes18;",
+	"bytes19;",
+	"bytes20;",
+	"bytes21;",
+	"bytes22;",
+	"bytes23;",
+	"bytes24;",
+	"bytes25;",
+	"bytes26;",
+	"bytes27;",
+	"bytes28;",
+	"bytes29;",
+	"bytes30;",
+	"bytes31;",
 	/*16 bit mode insns*/
-	"bytes 32,",
-	"bytes 33;",
-	"bytes 34,",
-	"bytes 35;",
+	"bytes32,",
+	"bytes33;",
+	"bytes34,",
+	"bytes35;",
 	/*self, neighbors indirection*/
-	"bytes 36;",
-	"bytes 37;",
-	"bytes 38;",
-	"bytes 39;",
+	"bytes36;",
+	"bytes37;",
+	"bytes38;",
+	"bytes39;",
 	/*direct move to c*/
-	"bytes 40;",
-	"bytes 41;",
+	"bytes40;",
+	"bytes41;",
 	/*direct move from c*/
-	"bytes 42;",
-	"bytes 43;",
+	"bytes42;",
+	"bytes43;",
 	/*indirect stores*/
-	"bytes 44;",
-	"bytes 45;",
-	"bytes 46;",
-	"bytes 47;",
-	"bytes 48;",
+	"bytes44;",
+	"bytes45;",
+	"bytes46;",
+	"bytes47;",
+	"bytes48;",
 	/*Store shorts to constant address*/
-	"bytes 49,",
-	"bytes 50,",
-	"bytes 51,",
+	"bytes49,",
+	"bytes50,",
+	"bytes51,",
 	/*Stack pointer operations.*/
 	/*Push and pop by constant amounts*/
-	"bytes 52,",
-	"bytes 53,",
+	"bytes52,",
+	"bytes53,",
 	/*using a*/
-	"bytes 54;",
-	"bytes 55;",
+	"bytes54;",
+	"bytes55;",
 	/*stack pointer retrieval into a or b*/
-	"bytes 56;",
-	"bytes 57;",
+	"bytes56;",
+	"bytes57;",
 	/*compl of a*/
-	"bytes 58;",
+	"bytes58;",
 	/*cpc*/
-	"bytes 59;",
-	"bytes 60;",  /*call*/
-	"bytes 61;",  /*ret*/
+	"bytes59;",
+	"bytes60;",  /*call*/
+	"bytes61;",  /*ret*/
 	/*far memory.*/
-	"bytes 62;", /*farillda*/
-	"bytes 63;", /*faristla*/
-	"bytes 64;", /*farilldb*/
-	"bytes 65;", 
-	"bytes 66;", 
-	"bytes 67;", 
-	"bytes 68;", 
-	"bytes 69;", 
-	"bytes 70;", 
-	"bytes 71;", 
-	"bytes 72;", 
-	"bytes 73;", 
-	"bytes 74;", 
+	"bytes62;", /*farillda*/
+	"bytes63;", /*faristla*/
+	"bytes64;", /*farilldb*/
+	"bytes65;", 
+	"bytes66;", 
+	"bytes67;", 
+	"bytes68;", 
+	"bytes69;", 
+	"bytes70;", 
+	"bytes71;", 
+	"bytes72;", 
+	"bytes73;", 
+	"bytes74;", 
 	/*Fixed point ops*/
-	"bytes 75;","bytes 76;","bytes 77;","bytes 78;",
-	"bytes 79;","bytes 80;","bytes 81;","bytes 82;",
-	"bytes 83;","bytes 84;","bytes 85;","bytes 86;",
-	"bytes 87;","bytes 88;","bytes 89;","bytes 90;",
+	"bytes75;","bytes76;","bytes77;","bytes78;",
+	"bytes79;","bytes80;","bytes81;","bytes82;",
+	"bytes83;","bytes84;","bytes85;","bytes86;",
+	"bytes87;","bytes88;","bytes89;","bytes90;",
 	/*Stack ops- pushes*/
-	"bytes 91;",
-	"bytes 92;",
-	"bytes 93;",
+	"bytes91;",
+	"bytes92;",
+	"bytes93;",
 	/*single byte stack ops*/
-	"bytes 94;",
-	"bytes 95;",
+	"bytes94;",
+	"bytes95;",
 	/*Stack ops- pops*/
-	"bytes 96;",
-	"bytes 97;",
-	"bytes 98;",
+	"bytes96;",
+	"bytes97;",
+	"bytes98;",
 
-	"bytes 99;",
-	"bytes 100;",
+	"bytes99;",
+	"bytes100;",
 };
+
+char int_checker(char* proc){
+	char int_mode = 0; /*starting with 0x means */
+	char first_character = 1;
+	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
+	if(proc[0] == '0') {int_mode = 1;proc++;} /*octal*/
+	if(*proc) {if(proc[0] == 'x') {int_mode = 2;proc++;} else return 0;} /*hex*/
+	if(int_mode == 1 && (proc[0] == ',' || proc[0] == ';' || proc[0] == '\0')) return 0; /*zero.*/
+	for(;!(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0');proc++){
+		/*Check hex*/
+		if(int_mode==2 && 
+		!( (*proc <= '9' && *proc >= '0') || (*proc <= 'F' && *proc >= 'A') || (*proc <= 'f' && *proc >= 'a'))
+		){
+			return 1; /*they have 0x, but no numbers!*/
+		}
+		if(int_mode==0 && 
+		!(*proc <= '9' && *proc >= '0')){
+			return 1;
+		}
+		if(int_mode==1 && 
+		!( (*proc <= '8' && *proc >= '0') )){
+			return 1;
+		}
+		first_character = 0;
+	}
+	if(first_character && int_mode != 1) return 1; /*There were no characters in the number.*/
+	if(proc)
+	return 0;
+}
+
 static const unsigned char n_insns = 101;
 unsigned long outputcounter = 0;
 unsigned long nmacros = 5; /*0,1,2,3,4*/
@@ -382,7 +412,7 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	const unsigned long nbuiltin_macros = 6; unsigned long nmacrocalls = 0; const unsigned long maxmacrocalls = 0x10000;
+	const unsigned long nbuiltin_macros = 7; unsigned long nmacrocalls = 0; const unsigned long maxmacrocalls = 0x10000;
 	unsigned long line_num = 0;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
@@ -397,9 +427,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	variable_expansions[4] = variable_expansions[0];
 	variable_names[5] = "  ";
 	variable_expansions[5] = variable_expansions[0];
+	variable_names[6] = ";;";
+	variable_expansions[6] = ";";
 	/*Do math.*/
 	/*Assembly-time directives.*/
-	nmacros = 6;
+	nmacros = 7;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
@@ -777,10 +809,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			}f++;
 			/*Get the after.*/
 			after = strcatalloc(f,"");
-			line = strcatallocf1(
+			if(line) free(line);
+			line = strcatallocfb(
 				before,
 				strcatallocfb(content, after)
 			);
+			free(macro_name);
 			if(debugging) printf("\nThe line is now \n%s\nas a result of a macro call!\n", line);
 			goto pre_pre_processing; /*Allow recursive calling.*/
 		}
@@ -856,7 +890,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						}
 					}
 					if(debugging)
-						if(found_longer_match) 
+						if(found_longer_match)
 							{puts("Found longer Macro.");continue;}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
@@ -888,7 +922,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						/*snprintf(expansion, 1023, "%lu", addval);*/
 						sprintf(expansion, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
@@ -1121,10 +1154,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else {char* temp;
 				if(npasses == 0)
 					{
-						printf("<ASM WARNING> redefining macro, potentially desyncing compilation. Check that. line: %s\n", line_copy);
+						/*printf("<ASM WARNING> redefining macro, potentially desyncing compilation. Check that. line: %s\n", line_copy);*/
 						variable_is_redefining_flag[index] = 1;
 					}
-				
+				if(variable_names[index]) free(variable_names[index]);
 				variable_names[index] = macro_name;
 				temp = 
 				str_null_terminated_alloc(
@@ -1136,7 +1169,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					!strprefix("_arg", variable_names[index])
 					)
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
-
 					if(!streq(temp, variable_expansions[index])){
 						printf("<ASM HUGE WARNING>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
 						free(variable_expansions[index]);
@@ -1279,15 +1311,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			Put out bytes.
 		*/
 		/*Inch along*/
-		if(printlines){
+		if(printlines && npasses==1){
 			printf("%s\n",line);
 		}
 		metaproc = line; /*declaration at beginning of main.*/
 		do{ long incr, incrdont;
 			if(strprefix("bytes", metaproc)){ char* proc;
 				proc = metaproc + 5;
-				do{ 
-					unsigned char byteval; unsigned long preval;
+				do{
+					unsigned char byteval; unsigned long preval; 
+					if(int_checker(proc)){
+						printf("<ASM SYNTAX ERROR> invalid integer literal for bytes command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						goto error;
+					}
+					
 					preval = strtoul(proc,NULL,0);
 					byteval = preval & 255;
 					fputbyte(byteval, ofile);
@@ -1304,6 +1341,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				char* proc = metaproc + 6;
 				do{
 					unsigned short shortval;
+					if(int_checker(proc)){
+						printf("<ASM SYNTAX ERROR> invalid integer literal for shorts command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						goto error;
+					}
 					shortval = strtoul(proc,NULL,0);
 					fputshort(shortval, ofile);
 					/*Find the next comma.*/
@@ -1318,6 +1359,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				char* proc = metaproc + 7;
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
+				}
+				if(int_checker(proc)){
+					printf("<ASM SYNTAX ERROR> invalid integer literal for section command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					goto error;
 				}
 				dest = strtoul(proc, NULL, 0);
 				if(dest == 0){
@@ -1335,6 +1380,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
+				if(int_checker(proc)){
+					printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					goto error;
+				}
 				fillsize = strtoul(proc, NULL, 0);
 				if(fillsize == 0){
 					if(proc[0]!='0') /*Check if they actually typed zero.*/
@@ -1347,6 +1396,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					goto error;
 				}
 				proc += next_comma + 1;
+				if(int_checker(proc)){
+					printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					goto error;
+				}
 				fillval = strtoul(proc, NULL, 0);
 				if(fillval == 0) /*potential for a mistake*/
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
@@ -1363,6 +1416,10 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						goto error;
 					}proc++;
 					outputcounterold = outputcounter;
+					if(int_checker(proc)){
+						printf("<ASM SYNTAX ERROR> invalid integer literal for asm_fix_outputcounter command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						goto error;
+					}
 					if(!mode)
 						outputcounter += strtoul(proc, NULL, 0);
 					else
@@ -1371,7 +1428,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s\n", outputcounterold, outputcounter, line_copy);
 				}
 			} else if(strprefix("asm_print", metaproc)){
-				if(npasses == 1)
+				if(npasses == 1 && !printlines)
 					printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
 			} else if(strprefix("asm_begin_region_restriction", metaproc)){
 				/*The assembler will warn you if the region changes during the creation of the function.*/
