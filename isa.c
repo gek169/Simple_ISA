@@ -13,8 +13,8 @@ typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
 #define ZR (P-=2,(((U)M[P])<<8)+(U)M[P+1])
-#define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+((UU)b)+1])
-#define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+((UU)a)+1])
+#define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
+#define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
 #define w(v,d)M[d]=v;
 #define W(v,d)M[d]=v>>8;M[d+1]=v&255;
 #define D ;switch(G){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6:o t;k 7:o T;\
