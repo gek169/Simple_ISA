@@ -733,7 +733,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			the arguments thereafter are arg1, arg2, arg3... */
 			next_pound = strfind(f, "#");
 			if(next_pound == -1) {
-				printf("<ASM SYNTAX ERROR> macro call lacking end pound.Line:\n%s\n", line_copy);
+				printf("<ASM SYNTAX ERROR> macro call lacking any succeeding pounds.Line:\n%s\n", line_copy);
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(f, next_pound);
@@ -779,7 +779,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				/*get the definition*/
 				next_pound = strfind(f, "#");
 				if(next_pound == -1) {
-					printf("<ASM SYNTAX ERROR> macro call lacking end pound.Line:\n%s\n", line_copy);
+					printf("<ASM SYNTAX ERROR> macro call lacking end first pound.Line:\n%s\n", line_copy);
 					goto error;
 				}
 				vardef = str_null_terminated_alloc(f, next_pound);
@@ -1126,16 +1126,22 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						printf("<ASM SYNTAX ERROR> This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
 						goto error;	
 					}
-				if( (
-					(strfind(variable_names[i],macro_name)>-1) ||
-					(strfind(macro_name, variable_names[i])>-1)
+				if(
+					(!streq(macro_name, variable_names[i]))
+					&& (npasses==1) && 
+					(
+						(strfind(variable_names[i],macro_name)>-1) ||
+						(strfind(macro_name, variable_names[i])>-1)
 					)
-					&& !streq(macro_name, variable_names[i]))
-				{
-					printf("<ASM WARNING> This macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
+				){
+					printf("<ASM WARNING> This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
 				}
 				
 				if(streq(macro_name, variable_names[i])){
+					if(is_overwriting){
+						printf("<ASM INTERNAL ERROR> Multiple macros exist with the same name. Line:\n%s\n", line_copy);
+						goto error;
+					}
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
 						printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
