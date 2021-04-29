@@ -338,7 +338,7 @@ char int_checker(char* proc){
 	char first_character = 1;
 	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
 	if(proc[0] == '0') {int_mode = 1;proc++;} /*octal*/
-	if(*proc) {if(proc[0] == 'x') {int_mode = 2;proc++;} else return 0;} /*hex*/
+	if(*proc && int_mode == 1) {if(proc[0] == 'x') {int_mode = 2;proc++;} else return 0;} /*hex*/
 	if(int_mode == 1 && (proc[0] == ',' || proc[0] == ';' || proc[0] == '\0')) return 0; /*zero.*/
 	for(;!(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0');proc++){
 		/*Check hex*/
@@ -358,7 +358,6 @@ char int_checker(char* proc){
 		first_character = 0;
 	}
 	if(first_character && int_mode != 1) return 1; /*There were no characters in the number.*/
-	if(proc)
 	return 0;
 }
 
@@ -500,7 +499,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(!line) {
 			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
 		}
-		while(strlen(line) > 0 && line[strlen(line)-1] == '\\'){char* line_temp;
+		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
+			char* line_old = line;
+			line = strcatalloc(line+1,"");
+			free(line_old);
+		}
+		while(!feof(infile) && strlen(line) > 0 && !strprefix("!",line) && !strprefix("//",line) && !strprefix("#",line) && line[strlen(line)-1] == '\\'){char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 			line = strcatallocfb(line,line_temp);
@@ -508,11 +512,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 		line_copy = strcatalloc(line,"");line_num++;
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
-		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
-			char* line_old = line;
-			line = strcatalloc(line+1,"");
-			free(line_old);
-		}
+		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 		if(strprefix("!",line)) {unsigned long i;
