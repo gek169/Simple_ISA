@@ -47,7 +47,7 @@ section 0
 #loop control
 lda %0x1e8%
 lb 1
-sc %%;#set to zero
+sc %%;
 add
 #using split syntax
 sta %0x1e8%

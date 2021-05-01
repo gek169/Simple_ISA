@@ -414,7 +414,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	const unsigned long nbuiltin_macros = 7; 
 	const unsigned long maxmacrocalls = 0x10000;
 	unsigned long line_num = 0; 
-	char* grabby = "";
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
@@ -549,6 +548,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			fseek(tmp, 0, SEEK_SET);
 			for(;len>0;len--)fputbyte(fgetc(tmp), ofile);
 			fclose(tmp);
+			if(printlines)puts(line);
 			goto end;
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
@@ -564,7 +564,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			line = strcatalloc(line+1,"");
 			free(line_old);
 		}
-
 		if(strprefix("ASM_COMPILE", line)){
 			puts("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
 			goto error;
@@ -861,7 +860,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 
 					loc_vbar = strfind(line, "|");
 					linesize = strlen(line);
-					if((loc_vbar == -1) || was_macro) loc_vbar = linesize;
+					if((loc_vbar == -1)) loc_vbar = linesize;
 					loc = strfind(line, variable_names[i]);
 					if(loc == -1) continue;
 					if(loc >= loc_vbar) continue; /*Respect the sequence operator.*/
@@ -1274,7 +1273,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 									"unusual prefixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\nInternally:\n%s\n",*(line+loc-1),insns[i],line_copy, line);
 					}
 					if(
-						*(line+loc+strlen(insns[i])) != ';' && 
+						*(line+loc+strlen(insns[i])) != ';' &&  
 						*(line+loc+strlen(insns[i])) != '\0' && 
 						!(
 							*(line+loc+strlen(insns[i])) >= '0' &&
@@ -1348,8 +1347,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");
-					if(strfind(proc, "|")>-1 && 
-						strfind(proc, "|") < incrdont) incrdont = strfind(proc, "|");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont)break;/**/
@@ -1369,8 +1366,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");
-					if(strfind(proc, "|")>-1 && 
-						strfind(proc, "|") < incrdont) incrdont = strfind(proc, "|");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont) break; /**/
@@ -1504,9 +1499,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				}
 			}
 			{long next_semicolon = strfind(metaproc, ";");
-				long next_vbar = strfind(metaproc, "|");
+			long next_vbar = strfind(metaproc, "|");
 			if(next_semicolon == -1) break; /*We have handled all sublines.*/
-			if(next_vbar < next_semicolon) break; /**/
+			if(next_vbar!=-1 && next_vbar < next_semicolon) break; /**/
 			metaproc += next_semicolon + 1;
 			if(strlen(metaproc) == 0) break; /*Convenient line break*/
 			}
