@@ -16,7 +16,6 @@ asm_call#myFunction#3#%7%##;asm_print;
 asm_call#myFunction#9#%12%##;
 asm_call#nestedFunction#%9%#12##;nop;nop;
 
-
 //All the code before here was entirely meaningless. Ignore it.
 
 #Compile this program using asm. ./asm -i program.asm -o program.bin
@@ -158,7 +157,7 @@ sc %0xfffb%
 farpagest;
 la 0xa
 putchar;putchar;
-farret;#return back to the zero page.
+farret;//return back to the zero page.
 
 
 //Testing variable addressing.

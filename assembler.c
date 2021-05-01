@@ -411,8 +411,10 @@ void fputshort(unsigned short sh, FILE* f){
 	fputbyte(sh, f);
 }
 int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
-	const unsigned long nbuiltin_macros = 7; unsigned long nmacrocalls = 0; const unsigned long maxmacrocalls = 0x10000;
-	unsigned long line_num = 0;
+	const unsigned long nbuiltin_macros = 7; 
+	const unsigned long maxmacrocalls = 0x10000;
+	unsigned long line_num = 0; 
+	char* grabby = "";
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
@@ -489,15 +491,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			return 1;
 		}
 	}
-	/*Second pass to allow forward declarations.*/
+	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(!feof(infile)){
-		char was_macro = 0;
+		char was_macro = 0;	unsigned long nmacrocalls = 0;
 		if(debugging) printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		/*if this line ends in a backslash...*/
 		if(!line) {
 			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
+			goto error;
 		}
 		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
@@ -511,7 +514,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			linesize = strlen(line);
 		}
 		line_copy = strcatalloc(line,"");line_num++;
-		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
+
 		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
@@ -548,7 +551,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			fclose(tmp);
 			goto end;
 		}
+		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		pre_pre_processing:
+
 		if(nmacrocalls > maxmacrocalls){
 			printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
 			goto error;
@@ -1065,6 +1070,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(macro_name, "|") != -1 ||
 				strfind(macro_name, "#") != -1 ||
 				strfind(macro_name, "$") != -1 ||
+				strfind(macro_name, "&") != -1 ||
 				strfind(macro_name, "@") != -1 ||
 				strfind(macro_name, "%") != -1 ||
 				strfind(macro_name, "bytes") != -1 ||
@@ -1091,6 +1097,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind("|", macro_name) != -1 ||
 				strfind("#", macro_name) != -1 ||
 				strfind("$", macro_name) != -1 ||
+				strfind("&", macro_name) != -1 ||
 				strfind("@", macro_name) != -1 ||
 				strfind("%",macro_name) != -1 ||
 				strfind("bytes",macro_name) != -1 ||
@@ -1199,15 +1206,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 
 		if(was_macro) goto end;
-		if(strfind(line, "|")!=-1){ /*Sequence point on non-macro line. go up!*/
-			line[strfind(line, "|")] = ';';
-			goto pre_pre_processing;
-		}
+		/*
+			if(strfind(line, "|")!=-1){
+				line[strfind(line, "|")] = ';';
+				goto pre_pre_processing;
+			}
+		*/
 		/*We must first determine if this line contains a line comment. Don't search past the line comment for insns.*/
-		if(strfind(line, "#") != -1){
-			long loc_line_comment = strfind(line, "#");
-			line[loc_line_comment] = '\0';
-		} else if(strfind(line, "//") != -1){
+		if(strfind(line, "//") != -1){
 			long loc_line_comment = strfind(line, "//");
 			line[loc_line_comment] = '\0';
 		}
@@ -1236,6 +1242,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					loc = strfind(line, insns[i]);					
 					line_old = line;
 					if(loc == -1) continue;
+					if(strfind(line, "|")!= -1 &&
+						strfind(line, "|") < loc) continue;
 
 					/*Check to make sure that this isn't some other, longer insn.*/
 					found_longer_match = 0;
@@ -1264,7 +1272,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(
 						*(line+loc+strlen(insns[i])) != ';' && 
 						*(line+loc+strlen(insns[i])) != '\0' && 
-						*(line+loc+strlen(insns[i])) != '\\' && 
 						!(
 							*(line+loc+strlen(insns[i])) >= '0' &&
 							*(line+loc+strlen(insns[i])) <= '9'
@@ -1337,6 +1344,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");
+					if(strfind(proc, "|")>-1 && 
+						strfind(proc, "|") < incrdont) incrdont = strfind(proc, "|");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont)break;/**/
@@ -1356,6 +1365,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");
+					if(strfind(proc, "|")>-1 && 
+						strfind(proc, "|") < incrdont) incrdont = strfind(proc, "|");
 					if(incr == -1) break;
 					if(incrdont != -1 &&
 						incr > incrdont) break; /**/
@@ -1481,18 +1492,27 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					printf("<ASM WARNING> Inline Comment invalidates rest of line, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
 				break; /*Comment on line.*/
 			} else {
-				if(strlen(metaproc) > 0 &&
-					strfind(metaproc,";") != 0){
+				if(strlen(metaproc) > 0 && !
+					(strfind(metaproc,";") == 0 ||
+					strfind(metaproc,"|") == 0)){
 					printf("<ASM SYNTAX ERROR> invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
 					goto error;
 				}
 			}
 			{long next_semicolon = strfind(metaproc, ";");
+				long next_vbar = strfind(metaproc, "|");
 			if(next_semicolon == -1) break; /*We have handled all sublines.*/
+			if(next_vbar < next_semicolon) break; /**/
 			metaproc += next_semicolon + 1;
 			if(strlen(metaproc) == 0) break; /*Convenient line break*/
 			}
 		} while(1);
+		/*if this is a line with vertical bars, start processing the stuff after the next vertical bar. */
+		if(strfind(line, "|")!=-1){
+			char* line_temp = strcatalloc(line+strfind(line, "|")+1, "");
+			free(line); line = line_temp;
+			goto pre_pre_processing;
+		}
 		end:
 		free(line);
 		free(line_copy);
