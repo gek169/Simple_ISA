@@ -8,7 +8,7 @@ typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[
 #define PP ((UU)(pp<<16))
 #define G M[PP+p++]
 #define r(d)M[d]
-#define Z (p+=2,((((U)M[PP+p-2]))<<8)+(U)M[PP+p-1])
+#define Z (p+=2,((((U)M[PP+(p-2)]))<<8)+(U)M[PP+(p-1)])
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
