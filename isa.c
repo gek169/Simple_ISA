@@ -16,7 +16,7 @@ typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[
 #define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
 #define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
 #define w(v,d)M[d]=v;
-#define W(v,d)M[d]=v>>8;M[d+1]=v&255;
+#define W(v,d)M[d]=v>>8;M[(d+1)&0xFFffFF]=v&255;
 #define D ;switch(G){k 0:o h;k 1:o A;k 2:o v;k 3:o B;k 4:o V;k 5:o X;k 6:o t;k 7:o T;\
 k 8:o oa;k 9:o os;k 10:o om;k 11:o od;k 12:o oi;k 13: o C;k 14:o j;k 15:o J;\
 k 16:o Q0;k 17:o Q1;k 18:o Q2;k 19:o Q3;k 20:o Q4;k 21:o Q5;k 22:o Q6;k 23:o Q7;\
