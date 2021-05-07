@@ -1,7 +1,7 @@
 #CC=cc
 #CC= gcc
-CC= tcc
-#CC= clang
+#CC= tcc
+CC= clang
 CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
 CASMFLAGS= -Os -lm -std=c89 -pedantic -g
