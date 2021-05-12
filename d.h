@@ -3,9 +3,14 @@
 #include <stdlib.h>
 
 /*Linux only code to achieve unbuffered stdin*/
+#if defined(__unix__) || defined(linux)
 #include <ncurses.h>
 #define di(){initscr();}
 #define dcl(){endwin();}
+#else
+#define di(){;}
+#define dcl(){;}
+#endif
 
 #define gch() getchar()
 #define pch(a){putchar(a);}
