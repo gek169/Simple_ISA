@@ -1,8 +1,8 @@
 //Macros!
 
-VAR#myFunction#sc %_arg1%; lla _arg2; farilldb; ab;  llb %myComptimeVar%; add;\
+VAR#myFunction#sc %_arg1_%; lla _arg2_; farilldb; ab;  llb %myComptimeVar%; add;\
 	|asm_pleq#\myComptimeVar#100#;asm_print myComptimeVar;|
-VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg2#_arg1##;
+VAR#nestedFunction#nop; asm_print;asm_call#myFunction#_arg2_#_arg1_##;
 //this wont compile. invalid name.
 #VAR#0myFunction#nop;
 

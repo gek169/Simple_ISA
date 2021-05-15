@@ -8,7 +8,7 @@ VAR#LIBC_START#0x12
 VAR#LIBC_START_ADDR#0
 
 
-VAR#CALCULATE_REGION_LOCATION#asm_muleq#\_arg1_ADDR#0#;|asm_pleq#\_arg1_ADDR#0x10000#;|asm_muleq#\_arg1_ADDR#\_arg1#;
+VAR#CALCULATE_REGION_LOCATION#asm_muleq#\_arg1__ADDR#0#;|asm_pleq#\_arg1__ADDR#0x10000#;|asm_muleq#\_arg1__ADDR#\_arg1_#;
 
 asm_call#CALCULATE_REGION_LOCATION#DATA_REGION_1##;
 asm_call#CALCULATE_REGION_LOCATION#__START__##;
@@ -20,27 +20,27 @@ VAR#ZERO_STACK_POINTER#astp;popa;
 VAR#POP_FARPTR_VARIABLE#	blpop;apop;ca;
 VAR#PUSH_FARPTR_VARIABLE#	ac;apush;blpush;
 //generic loads and stores for far variables at constant addresses.
-VAR#fetch_far_short#sc _arg1;llb _arg2; farillda;
-VAR#fetch_far_byte#sc _arg1;llb _arg2; farilda;
-VAR#put_far_short#sc _arg1;llb _arg2; faristla;
-VAR#put_far_byte#sc _arg1;llb _arg2; farista;
+VAR#fetch_far_short#sc _arg1_;llb _arg2_; farillda;
+VAR#fetch_far_byte#sc _arg1_;llb _arg2_; farilda;
+VAR#put_far_short#sc _arg1_;llb _arg2_; faristla;
+VAR#put_far_byte#sc _arg1_;llb _arg2_; farista;
 //Index into an array whose pointer you know. Argument 3 is the macro to load the indexing variable.
-VAR#fetch_far_short_array#load__arg3;lb2;mul;sc_arg1;llb_arg2;add;farilldb;ab;
-VAR#fetch_far_byte_array#load__arg3;sc_arg1;llb_arg2;add;ba;farilda;
+VAR#fetch_far_short_array#load__arg3_;lb2;mul;sc_arg1;llb_arg2_;add;farilldb;ab;
+VAR#fetch_far_byte_array#load__arg3_;sc_arg1_;llb_arg2_;add;ba;farilda;
 //There are now two arguments.
 //Argument 3 is the index, argument 4 is the variable name to store.
-VAR#put_far_short_array#	load__arg4;alpush;\
-							load__arg3;lb2;mul;sc_arg1;llb_arg2;add;ba;alpop;faristla;
-VAR#put_far_byte_array#	load__arg4;apush;\
-						load__arg3;sc_arg1;llb_arg2;add;ba;apop;farista;
+VAR#put_far_short_array#	load__arg4_;alpush;\
+							load__arg3_;lb2;mul;sc_arg1_;llb_arg2_;add;ba;alpop;faristla;
+VAR#put_far_byte_array#	load__arg4_;apush;\
+						load__arg3_;sc_arg1_;llb_arg2_;add;ba;apop;farista;
 
-VAR#ISEQ_CONST#	load__arg1;llb _arg2;cmp;
-VAR#goto_ifeq_const#		sc _arg2;load__arg1;llb%_arg3%;cmp;jmpifeq;
-VAR#goto_ifneq_const#		sc _arg2;load__arg1;llb%_arg3%;cmp;jmpifneq;
-VAR#goto_ifgreater_const#	sc _arg2;load__arg1;llb%_arg3%;cmp;llb%2%;cmp;jmpifeq;
-VAR#goto_iflesser_const#	sc _arg2;load__arg1;llb%_arg3%;cmp;llb%0%;cmp;jmpifeq;
-VAR#goto_ifgreatereq_const#	sc _arg2;load__arg1;llb%_arg3%;cmp;llb%0%;cmp;jmpifneq;
-VAR#goto_iflesser_const#	sc _arg2;load__arg1;llb%_arg3%;cmp;llb%2%;cmp;jmpifneq;
+VAR#ISEQ_CONST#	load__arg1_;llb _arg2_;cmp;
+VAR#goto_ifeq_const#		sc _arg2_;load__arg1_;llb%_arg3_%;cmp;jmpifeq;
+VAR#goto_ifneq_const#		sc _arg2_;load__arg1_;llb%_arg3_%;cmp;jmpifneq;
+VAR#goto_ifgreater_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifeq;
+VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%0%;cmp;jmpifeq;
+VAR#goto_ifgreatereq_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%0%;cmp;jmpifneq;
+VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifneq;
 
 
 section LIBC_START_ADDR; asm_begin_region_restriction;

@@ -768,7 +768,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
 				}
 				/*There is enough room for a macro.*/
-				sprintf(namebuf, "_arg%lu", i);
+				sprintf(namebuf, "_arg%lu_", i);
 				varname = strcatalloc(namebuf, "");
 				if(debugging)
 					printf("\nReplacing %s...", varname);
