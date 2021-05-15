@@ -77,8 +77,10 @@ asm_end_region_restriction;
 //DATA SECTION~~~~~~~~~~~~~~~~~~~~~~~~~~~
 section DATA_REGION_1_ADDR;
 VAR#msg_req_string#@
-!Enter a string, you dork!:
-bytes 0xd,0xa,0;
+!Hello World!
+bytes 0xd,0xa;
+!Another line.
+bytes 0;
 
 
 

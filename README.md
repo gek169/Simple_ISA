@@ -366,7 +366,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 		you will instead get...
 		myvar += 3; sc %3%;
 
-		You should be careful how you allow macro evaluations to occur.
+		You can use | to get the expected macro evaluation order.
 	asm_muleq- identical to asm_pleq but for multiplication.
 	\- Escape character. Prevent macro expansion for following macro. Needed to pass macro names to asm_pleq and asm_muleq,
 		otherwise they would be expanded.
