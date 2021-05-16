@@ -45,9 +45,11 @@ VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifn
 
 section LIBC_START_ADDR; asm_begin_region_restriction;
 VAR#proc_puts#sc%@%;lla%LIBC_START%;farcall;
-astp;lb6;sub;//move the stack pointer back.
-illdaa;lb8;rsh;lb255;and;ca;//load the thing that's there. But we also loaded the high byte of the
-							//next short, so we need to get rid of that. Goes in C.
+//move the stack pointer back.
+astp;lb6;sub;
+illdaa;lb8;rsh;lb255;and;ca;
+//load the thing thats there. But we also loaded the high byte of the
+//next short, so we need to get rid of that. Goes in C
 astp;lb5;sub;illdaa;//we need to grab that short.
 
 //we now have our far pointer! put it on the top of the stack for easy access.
