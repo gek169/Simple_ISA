@@ -2,6 +2,7 @@
 #CC=cc
 #CC= gcc
 #CC= tcc
+INSTALL_DIR= ~/bin
 CC= clang
 CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
@@ -10,14 +11,14 @@ CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-l
 
 all: main asm_programs
 
-isa:
-	$(CC) $(CFLAGS) isa.c -o isa -lncurses -DUSE_NCURSES || $(CC) $(CFLAGS) isa.c -o isa
+sisa16:
+	$(CC) $(CFLAGS) isa.c -o sisa16 -lncurses -DUSE_NCURSES || $(CC) $(CFLAGS) isa.c -o sisa16
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
-assembler:
-	$(CC) $(CASMFLAGS) assembler.c -o asm
+sisa16_asm:
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
 
-main: isa rbytes assembler
+main: sisa16 rbytes sisa16_asm
 
 fifth:
 	$(CC) $(CFLAGS) fifth.c -o fifth
@@ -25,9 +26,18 @@ fifth:
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
-asm_programs: assembler
+asm_programs: sisa16_asm
 	./asm_compile.sh
 
+install: main
+	cp ./sisa16* $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16 tools."
+	@echo "Installed into home bin directory."
+
+uninstall:
+	rm -f $(INSTALL_DIR)/sisa16
+	rm -f ~/bin/sisa16_asm
+	@echo "Uninstalled from INSTALL_DIR."
+
 clean:
-	rm -f *.exe *.out *.o *.bin isa isa_constexpr rbytes asm fifth
+	rm -f *.exe *.out *.o *.bin sisa16 isa_constexpr rbytes sisa16_asm fifth
 	clear

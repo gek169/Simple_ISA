@@ -4,6 +4,6 @@ for filename in $ASMFILE
 do
  echo "<SHELL> Assembling $filename"
  name=$(echo "$filename" | cut -f 1 -d '.')
- ./asm -i $filename -o $name.bin
+ ./sisa16_asm -i $filename -o $name.bin
  #./asm -i $filename -o $name.bin -DBG
 done
