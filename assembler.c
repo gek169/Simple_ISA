@@ -174,6 +174,7 @@ char* insns[128] = {
 	"cpop",
 	"apop",
 	"bpop",
+	"interrupt",
 };
 unsigned char insns_numargs[128] = {
 	0,/*halt*/
@@ -219,6 +220,8 @@ unsigned char insns_numargs[128] = {
 	/*register pops*/
 	0,0,0,
 	0,0, 
+	/*extended interrupt/device interaction*/
+	0,
 };
 char* insn_repl[128] = {
 	"bytes0;", 
@@ -331,6 +334,7 @@ char* insn_repl[128] = {
 
 	"bytes99;",
 	"bytes100;",
+	"bytes101;",
 };
 
 char int_checker(char* proc){
@@ -361,7 +365,7 @@ char int_checker(char* proc){
 	return 0;
 }
 
-static const unsigned char n_insns = 101;
+static const unsigned char n_insns = 102;
 unsigned long outputcounter = 0;
 unsigned long nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;

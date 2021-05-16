@@ -15,3 +15,6 @@
 
 #define gch() getchar()
 #define pch(a){putchar(a);}
+static unsigned short interrupt(unsigned short a, unsigned short b, unsigned short c){
+	return a;
+}

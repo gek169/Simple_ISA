@@ -187,6 +187,8 @@ blpop: pop short register b from the stack. (1 byte) (61)
 cpop: pop short register c from the stack. (1 byte) (62)
 apop: pop byte register a from the stack. (1 byte) (63)
 bpop: pop byte register b from the stack. (1 byte) (64)
+interrupt: pass the registers a,b, and c to the user defined "interrupt" function (1 byte) (65)
+
 
 The rest: nop duplicates, free for expansion (1 byte)
 ```
