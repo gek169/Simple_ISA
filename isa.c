@@ -1,20 +1,24 @@
 #include <string.h>
 #include <stdio.h>
-typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[(1<<24)];FILE*F;
+typedef unsigned long UU;
+typedef unsigned char u;
+typedef unsigned short U;u R,M[(1<<24)];FILE*F;
 #include "d.h"
 #define k case
 #define PP ((UU)(program_counter_region<<16))
-#define CONSUME_BYTE M[PP+program_counter++]
+#define CONSUME_BYTE M[PP+((U)(program_counter++))]
 #define r(d)M[d]
-#define CONSUME_TWO_BYTES (program_counter+=2,((((U)M[PP+(program_counter-2)]))<<8)+(U)M[PP+(program_counter-1)])
+#define CONSUME_TWO_BYTES (program_counter+=2,\
+						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
+						(U)M[PP+((U)(program_counter-1))])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
 #define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
-#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)((U)(b+1))])
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)((U)(a+1))])
 #define write_byte(v,d)M[d]=v;
-#define write_2bytes(v,d)M[d]=v>>8;M[(d+1)&0xFFffFF]=v&255;
+#define write_2bytes(v,d)M[d]=v>>8;M[((d)+1)&0xFFffFF]=v&255;
 #define D ;switch(CONSUME_BYTE){k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
