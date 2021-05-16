@@ -3,7 +3,8 @@
 #include <stdlib.h>
 
 /*Linux only code to achieve unbuffered stdin*/
-#if defined(__unix__) || defined(linux)
+/*#if defined(__unix__) || defined(linux)*/
+#if defined(USE_NCURSES)
 #include <ncurses.h>
 #define di(){initscr();}
 #define dcl(){endwin();}

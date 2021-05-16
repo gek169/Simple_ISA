@@ -1,3 +1,4 @@
+#USE-NCURSES
 #CC=cc
 #CC= gcc
 CC= tcc
@@ -10,7 +11,7 @@ CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-l
 all: main asm_programs
 
 isa:
-	$(CC) $(CFLAGS) isa.c -o isa -lncurses
+	$(CC) $(CFLAGS) isa.c -o isa -lncurses -DUSE_NCURSES || $(CC) $(CFLAGS) isa.c -o isa
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 assembler:
