@@ -1,11 +1,11 @@
 #USE-NCURSES
 #CC=cc
-#CC= gcc
+CC= gcc
 #CC= tcc
-INSTALL_DIR= /usr/bin
-CC= clang
+INSTALL_DIR=/usr/bin
+#CC= clang
 CCC= g++
-CFLAGS= -Ofast -std=c89 -pedantic
+CFLAGS= -O3 -std=c89 -pedantic
 CASMFLAGS= -Os -lm -std=c89 -pedantic -g
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
