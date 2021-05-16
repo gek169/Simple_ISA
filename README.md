@@ -9,13 +9,13 @@ The included assembly programs and assembler are designed for isa.c.
 Here is how you use the emulator on a unix system:
 ```bash
 #compile the emulator
-cc isa.c -o isa
+cc isa.c -o sisa16
 #compile the assembler
-cc assembler.c -o asm
+cc assembler.c -o sisa16_asm
 #assemble your program
-./asm -i program.asm -o program.bin
+./sisa16_asm -i program.asm -o program.bin
 #run your program
-./isa program.bin
+./sisa16 program.bin
 ```
 On a windows machine, the compiled C programs would be EXEs rather than lacking an extension.
 
@@ -32,9 +32,13 @@ sudo make install
 sudo make uninstall
 ```
 
-you `sudo make install` and `sudo make uninstall` sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
+you `sudo make install` and `sudo make uninstall` to install sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
 
-you can set the INSTALL_DIR by using `make INSTALL_DIR=/my/directory`
+you can set the INSTALL_DIR by using `make install INSTALL_DIR=/my/directory`
+
+but make sure that while uninstalling you pass INSTALL_DIR again.
+
+Alternatively, you can set INSTALL_DIR in the makefile yourself.
 
 once you've installed the emulator and the assembler, you can quickly run assembly programs like this:
 
@@ -74,7 +78,7 @@ Page: 256 bytes starting at an address whose low byte is zero.
 
 Region: 64 kilobytes starting at an address whose 2 low bytes is zero.
 
-Zero 'Home' Region: the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
+Zero 'Home' or 'Stack' Region: the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
 
 Bus or Device: 
 the implementation of gch() and pch() from d.h which is used for I/O and accessible with getchar/putchar
@@ -224,9 +228,8 @@ or for educational purposes.
 The emulator will print out its memory layout at the end of execution if you pass an additional argument
 to it on the commandline (other than just the program name)
 ```bash
-./isa program.bin literallyanything
+sisa16 program.bin literallyanything
 ```
-
 ## Device Interface
 
 You can make the emulator work with any device you want by implementing your own abstraction layer.
@@ -246,7 +249,7 @@ It also does a limited amount of error checking.
 
 ## What is this ISA called?
 
-SISA-16, Simple-ISA-16.
+SISA16, Simple Instruction Set Architecture 16-bit.
 
 ## Specs?
 
@@ -261,6 +264,8 @@ The machine isn't real but it executes as fast as possible on the host machine.
 Memory speed:
 Again, not really simulated. The architecture is designed with cache-efficiency in-mind, though- hence
 the existence of the home region and its special properties.
+
+It is a TODO to provide clock interrupts from the host or add timer insns.
 
 ## Far memory system.
 
@@ -367,6 +372,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	asm_fix_outputcounter- if you have a desync issue between the two passes of the assembler and 
 		you don't know how to fix it, you can correct it with this. Moves the output counter on the second pass only.
 	section- move the output counter to a location.
+	fill- fill an area of memory with a constant byte value.
 	ASM_*- reserved namespace
 	asm_*- reserved namespace
 	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
@@ -402,8 +408,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 		the backslash at the end of the line will be eliminated.
 	|- Macro evaluation sequence point operator. the line will be fully macro-expanded before this point, including
 		all pre-processing. The vertical bar will then be replaced with a semicolon.
-	!- string literal line. Must start at the beginning of a line with no preceding whitespace. 
-		Macro names in a string literal are not expanded.
+	!- string literal line. Must start at the beginning of a line.
 	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
 		if the output counter is at 0xe9f2 then $ will evaluate to '233,242'. Note that the output counter
 		position is determined at the beginning of the current line. Also note that if the output counter
@@ -432,12 +437,14 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 The assembler is compiled as `asm` by default on a *nix machine.
 you can invoke the assembler on a source file `source.asm` and create `source.bin` like this:
 
-`./asm -i source.asm -o source.bin`
+`sisa16_asm -i source.asm -o source.bin`
 
 if you are editting or debugging the assembler itself, you may find it useful to
 view extended debug output, or use stdin as the input file. you can use -DBG as an argument to the assembler for this.
 
-Note that the two passes *won't work* in stdin mode. stdin mode is used if an input file is not specified.
+Note that the two passes *won't work* in stdin mode. 
+
+stdin mode is used if an input file is not specified and is solely for quickly debugging the assembler itself.
 
 if you have bash on your system, or another compatible shell with typical core utils, then note that
 any and all `.asm` files will be compiled and output to `.bin` files of the same name if they are placed
@@ -450,8 +457,8 @@ or macros to refer to variables which are instantiated and used inside the libra
 
 ```c
 #you have some library written as myLibrary.asm, which is used by myProgram.asm.
-./asm -i myLibrary.asm -o myLibrary.bin
-./asm -i myProgram.asm -o myProgram.bin
+sisa16_asm -i myLibrary.asm -o myLibrary.bin
+sisa16_asm -i myProgram.asm -o myProgram.bin
 
 #in myProgram.asm...
 section 0xee0000
@@ -531,7 +538,7 @@ Here are some project ideas:
 
 ## Extreme
 * write a C compiler and libC for the ISA. Need not be self-hosting.
-* write a microkernel, or failing that, an exokernel.
+* write a microkernel, or failing that, an exokernel. (May be impossible?)
 ```
 Written by
 ~~~DMHSW~~~
