@@ -94,6 +94,7 @@ farcall;
 #we should see this when we return.
 la 0x41
 putchar;putchar;putchar;
+lla %0xFFff%;interrupt;
 halt
 
 

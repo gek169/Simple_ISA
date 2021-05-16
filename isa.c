@@ -2,7 +2,8 @@
 #include <stdio.h>
 typedef unsigned long UU;
 typedef unsigned char u;
-typedef unsigned short U;u R,M[(1<<24)];FILE*F;
+typedef unsigned short U;u R=0,M[(1<<24)];FILE*F;
+
 #include "d.h"
 #define k case
 #define PP ((UU)(program_counter_region<<16))
@@ -52,7 +53,8 @@ k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}
 int e(){
-	register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;R=0;
+register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
+R=0;
 	di();
 V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
 G_NOP:D
@@ -164,7 +166,7 @@ G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
 G_APOP:stack_pointer-=1;a=r(stack_pointer)D
 G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
-G_INTERRUPT:a=interrupt(a,b,c)D
+G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region)D
 }
 int main(int rc,char**rv){
 	UU i=0,j;
