@@ -64,6 +64,7 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 char* outfilename = "outsisa16.bin";
 char* execute_sisa16 = "sisa16";
 char run_sisa16 = 0;
+char clear_output = 0;
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
@@ -461,7 +462,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 		if(streq("-run", argv[i])){
 			run_sisa16 = 1;
-			puts("<ASM> Executing resulting binary after building.");
+			puts("<ASM> Executing resulting binary after building. (only for not debugging and not -E)");
+		}
+		if(streq("-clear", argv[i])){
+			clear_output = 1;
+			puts("<ASM> Clearing output after assembly (only for -run)");
 		}
 		if(
 			strprefix("-h",argv[i]) ||
@@ -1535,8 +1540,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	printf("<ASM> Successfully assembled %s\n", outfilename);
 	fclose(ofile);
 	fclose(infile);
-	if(run_sisa16 && !quit_after_macros){
+	if(run_sisa16 && !quit_after_macros && !debugging){
 		puts("<ASM> Executing binary.");
+		if(clear_output){
+#if defined(__unix__) || defined(linux)
+			system("clear");
+#else
+/*Probably windows.*/
+			system("cls");
+#endif
+		}
 		system(strcatallocf1(strcatalloc(execute_sisa16, " "),outfilename));
 	}
 	return 0;

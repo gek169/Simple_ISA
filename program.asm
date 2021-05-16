@@ -94,7 +94,9 @@ farcall;
 #we should see this when we return.
 la 0x41
 putchar;putchar;putchar;
-lla %0xFFff%;interrupt;
+//enable these two lines to dump the memory of the emulator after execution.
+//lla %0xFFff%;
+//interrupt;
 halt
 
 

@@ -21,6 +21,22 @@ On a windows machine, the compiled C programs would be EXEs rather than lacking 
 
 DuckDuckGo is your friend if you need to learn how to compile C programs on your target platform.
 
+# How to install SISA16 on your machine.
+
+you `make install` and `make uninstall` sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
+
+you can set the INSTALL_DIR by using `make INSTALL_DIR=/my/directory`
+
+once you've installed the emulator and the assembler, you can quickly run assembly programs like this:
+
+`sisa16_asm -run -i my_asm_file.asm`
+
+this will create the normal assembler output, but will also run the program.
+
+if you want to clear the terminal after the assembler is run...
+
+`sisa16_asm -run -clear -i my_asm_file.asm`
+
 
 The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
 
