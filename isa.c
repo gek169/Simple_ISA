@@ -4,18 +4,18 @@ typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[
 #include "d.h"
 #define k case
 #define PP ((UU)(program_counter_region<<16))
-#define G M[PP+program_counter++]
+#define CONSUME_BYTE M[PP+program_counter++]
 #define r(d)M[d]
-#define Z (program_counter+=2,((((U)M[PP+(program_counter-2)]))<<8)+(U)M[PP+(program_counter-1)])
-#define Z2 ((((U)M[c])<<8)+(U)M[c+1])
-#define Z3 ((((U)M[a])<<8)+(U)M[a+1])
-#define Z4 ((((U)M[b])<<8)+(U)M[b+1])
-#define ZR (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
-#define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
-#define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
-#define w(v,d)M[d]=v;
-#define W(v,d)M[d]=v>>8;M[(d+1)&0xFFffFF]=v&255;
-#define D ;switch(G){k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
+#define CONSUME_TWO_BYTES (program_counter+=2,((((U)M[PP+(program_counter-2)]))<<8)+(U)M[PP+(program_counter-1)])
+#define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
+#define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
+#define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
+#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
+#define write_byte(v,d)M[d]=v;
+#define write_2bytes(v,d)M[d]=v>>8;M[(d+1)&0xFFffFF]=v&255;
+#define D ;switch(CONSUME_BYTE){k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
 k 24:goto G_ILDB;k 25:goto G_CAB;k 26:goto G_AB;k 27:goto G_BA;k 28:goto G_ALC;k 29:goto G_AHC;k 30:goto G_NOP;k 31:goto G_CBA;\
@@ -67,41 +67,41 @@ G_BA:b=a;D
 G_ALC:a=c&0xff;D
 G_AHC:a=(c>>8)&255;D
 G_CBA:c=((b&255)<<8)+(a&255)D
-G_LLA:a=Z;D
-G_ILLDA:a=Z2;D
-G_LLB:b=Z;D
-G_ILLDB:b=Z2;D
-G_ILLDAA:a=Z3;D
-G_ILLDBB:b=Z4;D
-G_ILLDAB:a=Z4;D
-G_ILLDBA:b=Z3;D
+G_LLA:a=CONSUME_TWO_BYTES;D
+G_ILLDA:a=Z_READ_TWO_BYTES_THROUGH_C;D
+G_LLB:b=CONSUME_TWO_BYTES;D
+G_ILLDB:b=Z_READ_TWO_BYTES_THROUGH_C;D
+G_ILLDAA:a=Z_READ_TWO_BYTES_THROUGH_A;D
+G_ILLDBB:b=Z_READ_TWO_BYTES_THROUGH_B;D
+G_ILLDAB:a=Z_READ_TWO_BYTES_THROUGH_B;D
+G_ILLDBA:b=Z_READ_TWO_BYTES_THROUGH_A;D
 G_CA:c=a;D
 G_CB:c=b;D
 G_AC:a=c;D
 G_BC:b=c;D
-G_ISTA:w(a,c)D
-G_ISTB:w(b,c)D
-G_ISTLA:W(a,c)D
-G_ISTLB:W(b,c)D
+G_ISTA:write_byte(a,c)D
+G_ISTB:write_byte(b,c)D
+G_ISTLA:write_2bytes(a,c)D
+G_ISTLB:write_2bytes(b,c)D
 G_JMP:program_counter=c;D
-G_STLA:W(a,Z)D
-G_STLB:W(b,Z)D
-G_STC:W(c,Z)D
-G_PUSH:stack_pointer+=Z;D
-G_POP:stack_pointer-=Z;D
+G_STLA:write_2bytes(a,CONSUME_TWO_BYTES)D
+G_STLB:write_2bytes(b,CONSUME_TWO_BYTES)D
+G_STC:write_2bytes(c,CONSUME_TWO_BYTES)D
+G_PUSH:stack_pointer+=CONSUME_TWO_BYTES;D
+G_POP:stack_pointer-=CONSUME_TWO_BYTES;D
 G_PUSHA:stack_pointer+=a;D
 G_POPA:stack_pointer-=a;D
 G_ASTP:a=stack_pointer;D
 G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
 G_CPC:c=program_counter;D
-G_LDA:a=r(Z)D
-G_LA:a=G;D
-G_LDB:b=r(Z)D
-G_LB:b=G;D
-G_SC:c=Z;D
-G_STA:w(a,Z)D
-G_STB:w(b,Z)D
+G_LDA:a=r(CONSUME_TWO_BYTES)D
+G_LA:a=CONSUME_BYTE;D
+G_LDB:b=r(CONSUME_TWO_BYTES)D
+G_LB:b=CONSUME_BYTE;D
+G_SC:c=CONSUME_TWO_BYTES;D
+G_STA:write_byte(a,CONSUME_TWO_BYTES)D
+G_STB:write_byte(b,CONSUME_TWO_BYTES)D
 G_JMPIFEQ:if(a==1)program_counter=c;D
 G_JMPIFNEQ:if(a!=1)program_counter=c;D
 G_ADD:a+=b;D
@@ -110,21 +110,27 @@ G_MUL:a*=b;D
 G_DIV:if(b!=0)a/=b;else{R=1;goto G_HALT;}D
 G_MOD:if(b!=0)a%=b;else{R=1;goto G_HALT;}D
 G_CMP:if(a<b)a=0;else if(a>b)a=2;else a=1;D
-G_FARILLDA:a=Z2F;D
-G_FARISTLA:W(a,((((UU)c&255)<<16)+((UU)b)))D
-G_FARILLDB:b=Z3F;D
-G_FARISTLB:W(b,((((UU)c&255)<<16)+((UU)a)))D
+G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
+G_FARISTLA:write_2bytes(a,((((UU)c&255)<<16)+((UU)b)))D
+G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
+G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)+((UU)a)))D
 G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
 G_LFARPC:program_counter_region=a;D
-G_CALL:W(program_counter,stack_pointer);stack_pointer+=2;program_counter=c;D
-G_RET:program_counter=ZR;D
-G_FARCALL:W(program_counter,stack_pointer);stack_pointer+=2;w(program_counter_region,stack_pointer);stack_pointer+=1;program_counter_region=a;program_counter=c;D
-G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=ZR;D
+G_CALL:
+write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
+program_counter=c;D
+G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
+G_FARCALL:
+write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
+write_byte(program_counter_region,stack_pointer);stack_pointer+=1;
+program_counter_region=a;
+program_counter=c;D
+G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
 G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
-G_FARISTA:w(a,((((UU)c&255)<<16)+((UU)b)))D
+G_FARISTA:write_byte(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILDB:b=r((((UU)c&255)<<16)+((UU)a))D
-G_FARISTB:w(b,((((UU)c&255)<<16)+((UU)a)))D
+G_FARISTB:write_byte(b,((((UU)c&255)<<16)+((UU)a)))D
 /*fixed point mults*/
 TB:a=(((UU)a)*((UU)b))>>1;D
 TC:a=(((UU)a)*((UU)b))>>2;D
@@ -143,14 +149,14 @@ U8:a=(((UU)a)*((UU)b))>>14;D
 U9:a=(((UU)a)*((UU)b))>>15;D
 UA:a=(((UU)a)*((UU)b))>>16;D
 
-G_ALPUSH:W(a,stack_pointer);stack_pointer+=2;D
-G_BLPUSH:W(b,stack_pointer);stack_pointer+=2;D
-G_CPUSH:W(c,stack_pointer);stack_pointer+=2;D
-G_APUSH:w(a,stack_pointer);stack_pointer+=1;D
-G_BPUSH:w(b,stack_pointer);stack_pointer+=1;D
-G_ALPOP:a=ZR;D
-G_BLPOP:b=ZR;D
-G_CPOP:c=ZR;D
+G_ALPUSH:write_2bytes(a,stack_pointer);stack_pointer+=2;D
+G_BLPUSH:write_2bytes(b,stack_pointer);stack_pointer+=2;D
+G_CPUSH:write_2bytes(c,stack_pointer);stack_pointer+=2;D
+G_APUSH:write_byte(a,stack_pointer);stack_pointer+=1;D
+G_BPUSH:write_byte(b,stack_pointer);stack_pointer+=1;D
+G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
+G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
+G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
 G_APOP:stack_pointer-=1;a=r(stack_pointer)D
 G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 }
