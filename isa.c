@@ -24,9 +24,11 @@ k 40:goto G_CA;k 41:goto G_CB;k 42:goto G_AC;k 43:goto G_BC;k 44:goto G_ISTA;k 4
 k 48:goto G_JMP;k 49:goto G_STLA;k 50:goto G_STLB;k 51:goto G_STC;k 52:goto G_PUSH;k 53:goto G_POP;k 54:goto G_PUSHA;k 55:goto G_POPA;\
 k 56:goto G_ASTP;k 57:goto G_BSTP;k 58:goto G_COMPL;k 59:goto G_CPC;k 60:goto G_CALL;k 61:goto G_RET;k 62:goto G_FARILLDA;k 63:goto G_FARISTLA;\
 k 64:goto G_FARILLDB;k 65:goto G_FARISTLB;k 66:goto G_FARPAGEL;k 67:goto G_FARPAGEST;k 68:goto G_LFARPC;k 69:goto G_FARCALL;k 70:goto G_FARRET;k 71:goto G_FARILDA;\
-k 72:goto G_FARISTA;k 73:goto G_FARILDB;k 74:goto G_FARISTB;k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
+k 72:goto G_FARISTA;k 73:goto G_FARILDB;k 74:goto G_FARISTB;\
+k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
 k 80:goto U0;k 81:goto U1;k 82:goto U2;k 83:goto U3;k 84:goto U4;k 85:goto U5;k 86:goto U6;k 87:goto U7;\
-k 88:goto U8;k 89:goto U9;k 90:goto UA;k 91:goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
+k 88:goto U8;k 89:goto U9;k 90:goto UA;k 91:\
+goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
 k 96:goto G_ALPOP;k 97:goto G_BLPOP;k 98:goto G_CPOP;k 99:goto G_APOP;k 100:goto G_BPOP;k 101:goto V5;k 102:goto V6;k 103:goto V7;\
 k 104:goto V8;k 105:goto V9;k 106:goto VA;k 107:goto VB;k 108:goto VC;k 109:goto VD;k 110:goto VE;k 111:goto VF;\
 k 112:goto W0;k 113:goto W1;k 114:goto W2;k 115:goto W3;k 116:goto W4;k 117:goto W5;k 118:goto W6;k 119:goto W7;\
@@ -43,13 +45,12 @@ k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
-k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_HALT;}
+k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}
 int e(){
 	register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;R=0;
 	di();
-
-	G_NOP:D
 V5:V6:V7:V8:V9:VA:VB:VC:VD:VE:VF:W0:W1:W2:W3:W4:W5:W6:W7:W8:W9:WA:WB:WC:WD:WE:WF:
+G_NOP:D
 G_HALT:dcl();return 0;
 G_AND:a&=b;D
 G_OR:a|=b;D

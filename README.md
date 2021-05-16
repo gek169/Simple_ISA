@@ -188,7 +188,7 @@ cpop: pop short register c from the stack. (1 byte) (62)
 apop: pop byte register a from the stack. (1 byte) (63)
 bpop: pop byte register b from the stack. (1 byte) (64)
 
-The rest: halt duplicates, free for expansion (1 byte)
+The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
 
