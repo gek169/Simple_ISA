@@ -472,14 +472,16 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			strprefix("--help",argv[i]) ||
 			strprefix("--version",argv[i])
 		){
-			puts("Usage: ./asm -i infile -o outfile\n");
+			printf("Usage: %s [ARGS...]\n", argv[0]);
+			puts("Optional argument: -i: specify input file.");
+			puts("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
 			puts("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
 			puts("Optional argument: -E: Print macro expansion only do not write to file");
 			puts("Optional argument: -pl: Print lines");
+			puts("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
 			puts("Optional argument: -v, -h, --help, --version: This printout.");
-			puts("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.0, ");
-			puts("Authored by DMHSW for the Public Domain\n\n");
-			
+			puts("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.1");
+			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			return 1;
 		}
 	}}
