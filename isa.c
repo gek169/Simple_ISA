@@ -16,18 +16,18 @@ typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[
 #define w(v,d)M[d]=v;
 #define W(v,d)M[d]=v>>8;M[(d+1)&0xFFffFF]=v&255;
 #define D ;switch(G){k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
-k 8:goto oa;k 9:goto os;k 10:goto om;k 11:goto od;k 12:goto oi;k 13: goto C;k 14:goto j;k 15:goto J;\
+k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
 k 24:goto G_ILDB;k 25:goto G_CAB;k 26:goto G_AB;k 27:goto G_BA;k 28:goto G_ALC;k 29:goto G_AHC;k 30:goto G_NOP;k 31:goto G_CBA;\
 k 32:goto G_LLA;k 33:goto G_ILLDA;k 34:goto G_LLB;k 35:goto G_ILLDB;k 36:goto G_ILLDAA;k 37:goto G_ILLDBB;k 38:goto G_ILLDAB;k 39:goto G_ILLDBA;\
 k 40:goto G_CA;k 41:goto G_CB;k 42:goto G_AC;k 43:goto G_BC;k 44:goto G_ISTA;k 45:goto G_ISTB;k 46:goto G_ISTLA;k 47:goto G_ISTLB;\
 k 48:goto G_JMP;k 49:goto G_STLA;k 50:goto G_STLB;k 51:goto G_STC;k 52:goto G_PUSH;k 53:goto G_POP;k 54:goto G_PUSHA;k 55:goto G_POPA;\
-k 56:goto G_ASTP;k 57:goto G_BSTP;k 58:goto G_COMPL;k 59:goto G_CPC;k 60:goto SC;k 61:goto SD;k 62:goto SE;k 63:goto SF;\
-k 64:goto T0;k 65:goto T1;k 66:goto T2;k 67:goto T3;k 68:goto T4;k 69:goto T5;k 70:goto T6;k 71:goto T7;\
-k 72:goto T8;k 73:goto T9;k 74:goto TA;k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
+k 56:goto G_ASTP;k 57:goto G_BSTP;k 58:goto G_COMPL;k 59:goto G_CPC;k 60:goto G_CALL;k 61:goto G_RET;k 62:goto G_FARILLDA;k 63:goto G_FARISTLA;\
+k 64:goto G_FARILLDB;k 65:goto G_FARISTLB;k 66:goto G_FARPAGEL;k 67:goto G_FARPAGEST;k 68:goto G_LFARPC;k 69:goto G_FARCALL;k 70:goto G_FARRET;k 71:goto G_FARILDA;\
+k 72:goto G_FARISTA;k 73:goto G_FARILDB;k 74:goto G_FARISTB;k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
 k 80:goto U0;k 81:goto U1;k 82:goto U2;k 83:goto U3;k 84:goto U4;k 85:goto U5;k 86:goto U6;k 87:goto U7;\
-k 88:goto U8;k 89:goto U9;k 90:goto UA;k 91:goto UB;k 92:goto UC;k 93:goto UD;k 94:goto UE;k 95:goto UF;\
-k 96:goto V0;k 97:goto V1;k 98:goto V2;k 99:goto V3;k 100:goto V4;k 101:goto V5;k 102:goto V6;k 103:goto V7;\
+k 88:goto U8;k 89:goto U9;k 90:goto UA;k 91:goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
+k 96:goto G_ALPOP;k 97:goto G_BLPOP;k 98:goto G_CPOP;k 99:goto G_APOP;k 100:goto G_BPOP;k 101:goto V5;k 102:goto V6;k 103:goto V7;\
 k 104:goto V8;k 105:goto V9;k 106:goto VA;k 107:goto VB;k 108:goto VC;k 109:goto VD;k 110:goto VE;k 111:goto VF;\
 k 112:goto W0;k 113:goto W1;k 114:goto W2;k 115:goto W3;k 116:goto W4;k 117:goto W5;k 118:goto W6;k 119:goto W7;\
 k 120:goto W8;k 121:goto W9;k 122:goto WA;k 123:goto WB;k 124:goto WC;k 125:goto WD;k 126:goto WE;k 127:goto WF;\
@@ -101,29 +101,30 @@ G_LB:b=G;D
 G_SC:c=Z;D
 G_STA:w(a,Z)D
 G_STB:w(b,Z)D
-j:if(a==1)p=c;D
-J:if(a!=1)p=c;D
-oa:a+=b;D
-os:a-=b;D
-om:a*=b;D
-od:if(b!=0)a/=b;else{R=1;goto G_HALT;}D
-oi:if(b!=0)a%=b;else{R=1;goto G_HALT;}D
-C:if(a<b)a=0;else if(a>b)a=2;else a=1;D
-SE:a=Z2F;D
-SF:W(a,((((UU)c&255)<<16)+((UU)b)))D
-T0:b=Z3F;D
-T1:W(b,((((UU)c&255)<<16)+((UU)a)))D
-T2:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
-T3:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
-T4:pp=a;D
-SC:W(p,P);P+=2;p=c;D
-SD:p=ZR;D
-T5:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
-T6:P-=1;pp=r(P);p=ZR;D
-T7:a=r((((UU)c&255)<<16)+((UU)b))D
-T8:w(a,((((UU)c&255)<<16)+((UU)b)))D
-T9:b=r((((UU)c&255)<<16)+((UU)a))D
-TA:w(b,((((UU)c&255)<<16)+((UU)a)))D
+G_JMPIFEQ:if(a==1)p=c;D
+G_JMPIFNEQ:if(a!=1)p=c;D
+G_ADD:a+=b;D
+G_SUB:a-=b;D
+G_MUL:a*=b;D
+G_DIV:if(b!=0)a/=b;else{R=1;goto G_HALT;}D
+G_MOD:if(b!=0)a%=b;else{R=1;goto G_HALT;}D
+G_CMP:if(a<b)a=0;else if(a>b)a=2;else a=1;D
+G_FARILLDA:a=Z2F;D
+G_FARISTLA:W(a,((((UU)c&255)<<16)+((UU)b)))D
+G_FARILLDB:b=Z3F;D
+G_FARISTLB:W(b,((((UU)c&255)<<16)+((UU)a)))D
+G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
+G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
+G_LFARPC:pp=a;D
+G_CALL:W(p,P);P+=2;p=c;D
+G_RET:p=ZR;D
+G_FARCALL:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
+G_FARRET:P-=1;pp=r(P);p=ZR;D
+G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
+G_FARISTA:w(a,((((UU)c&255)<<16)+((UU)b)))D
+G_FARILDB:b=r((((UU)c&255)<<16)+((UU)a))D
+G_FARISTB:w(b,((((UU)c&255)<<16)+((UU)a)))D
+/*fixed point mults*/
 TB:a=(((UU)a)*((UU)b))>>1;D
 TC:a=(((UU)a)*((UU)b))>>2;D
 TD:a=(((UU)a)*((UU)b))>>3;D
@@ -140,16 +141,17 @@ U7:a=(((UU)a)*((UU)b))>>13;D
 U8:a=(((UU)a)*((UU)b))>>14;D
 U9:a=(((UU)a)*((UU)b))>>15;D
 UA:a=(((UU)a)*((UU)b))>>16;D
-UB:W(a,P);P+=2;D
-UC:W(b,P);P+=2;D
-UD:W(c,P);P+=2;D
-UE:w(a,P);P+=1;D
-UF:w(b,P);P+=1;D
-V0:a=ZR;D
-V1:b=ZR;D
-V2:c=ZR;D
-V3:P-=1;a=r(P)D
-V4:P-=1;b=r(P)D
+
+G_ALPUSH:W(a,P);P+=2;D
+G_BLPUSH:W(b,P);P+=2;D
+G_CPUSH:W(c,P);P+=2;D
+G_APUSH:w(a,P);P+=1;D
+G_BPUSH:w(b,P);P+=1;D
+G_ALPOP:a=ZR;D
+G_BLPOP:b=ZR;D
+G_CPOP:c=ZR;D
+G_APOP:P-=1;a=r(P)D
+G_BPOP:P-=1;b=r(P)D
 }
 int main(int rc,char**rv){
 	UU i=0,j;
