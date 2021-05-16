@@ -2,7 +2,7 @@
 #CC= gcc
 #CC= tcc
 CC= clang
-zCCC= g++
+CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
 CASMFLAGS= -Os -lm -std=c89 -pedantic -g
 CPPFLAGS= -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
