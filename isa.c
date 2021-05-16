@@ -3,14 +3,14 @@
 typedef unsigned long UU;typedef unsigned char u;typedef unsigned short U;u R,M[(1<<24)];FILE*F;
 #include "d.h"
 #define k case
-#define PP ((UU)(pp<<16))
-#define G M[PP+p++]
+#define PP ((UU)(program_counter_region<<16))
+#define G M[PP+program_counter++]
 #define r(d)M[d]
-#define Z (p+=2,((((U)M[PP+(p-2)]))<<8)+(U)M[PP+(p-1)])
+#define Z (program_counter+=2,((((U)M[PP+(program_counter-2)]))<<8)+(U)M[PP+(program_counter-1)])
 #define Z2 ((((U)M[c])<<8)+(U)M[c+1])
 #define Z3 ((((U)M[a])<<8)+(U)M[a+1])
 #define Z4 ((((U)M[b])<<8)+(U)M[b+1])
-#define ZR (P-=2,(((U)M[P])<<8)+(U)M[P+1])
+#define ZR (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
 #define Z2F ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(b+1)])
 #define Z3F ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)(a+1)])
 #define w(v,d)M[d]=v;
@@ -45,7 +45,7 @@ k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_HALT;}
 int e(){
-	register u pp=0;register U a=0,b=0,c=0,p=0,P=0;R=0;
+	register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;R=0;
 	di();
 
 	G_NOP:D
@@ -82,18 +82,18 @@ G_ISTA:w(a,c)D
 G_ISTB:w(b,c)D
 G_ISTLA:W(a,c)D
 G_ISTLB:W(b,c)D
-G_JMP:p=c;D
+G_JMP:program_counter=c;D
 G_STLA:W(a,Z)D
 G_STLB:W(b,Z)D
 G_STC:W(c,Z)D
-G_PUSH:P+=Z;D
-G_POP:P-=Z;D
-G_PUSHA:P+=a;D
-G_POPA:P-=a;D
-G_ASTP:a=P;D
-G_BSTP:b=P;D
+G_PUSH:stack_pointer+=Z;D
+G_POP:stack_pointer-=Z;D
+G_PUSHA:stack_pointer+=a;D
+G_POPA:stack_pointer-=a;D
+G_ASTP:a=stack_pointer;D
+G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
-G_CPC:c=p;D
+G_CPC:c=program_counter;D
 G_LDA:a=r(Z)D
 G_LA:a=G;D
 G_LDB:b=r(Z)D
@@ -101,8 +101,8 @@ G_LB:b=G;D
 G_SC:c=Z;D
 G_STA:w(a,Z)D
 G_STB:w(b,Z)D
-G_JMPIFEQ:if(a==1)p=c;D
-G_JMPIFNEQ:if(a!=1)p=c;D
+G_JMPIFEQ:if(a==1)program_counter=c;D
+G_JMPIFNEQ:if(a!=1)program_counter=c;D
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
@@ -115,11 +115,11 @@ G_FARILLDB:b=Z3F;D
 G_FARISTLB:W(b,((((UU)c&255)<<16)+((UU)a)))D
 G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
-G_LFARPC:pp=a;D
-G_CALL:W(p,P);P+=2;p=c;D
-G_RET:p=ZR;D
-G_FARCALL:W(p,P);P+=2;w(pp,P);P+=1;pp=a;p=c;D
-G_FARRET:P-=1;pp=r(P);p=ZR;D
+G_LFARPC:program_counter_region=a;D
+G_CALL:W(program_counter,stack_pointer);stack_pointer+=2;program_counter=c;D
+G_RET:program_counter=ZR;D
+G_FARCALL:W(program_counter,stack_pointer);stack_pointer+=2;w(program_counter_region,stack_pointer);stack_pointer+=1;program_counter_region=a;program_counter=c;D
+G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=ZR;D
 G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
 G_FARISTA:w(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILDB:b=r((((UU)c&255)<<16)+((UU)a))D
@@ -142,16 +142,16 @@ U8:a=(((UU)a)*((UU)b))>>14;D
 U9:a=(((UU)a)*((UU)b))>>15;D
 UA:a=(((UU)a)*((UU)b))>>16;D
 
-G_ALPUSH:W(a,P);P+=2;D
-G_BLPUSH:W(b,P);P+=2;D
-G_CPUSH:W(c,P);P+=2;D
-G_APUSH:w(a,P);P+=1;D
-G_BPUSH:w(b,P);P+=1;D
+G_ALPUSH:W(a,stack_pointer);stack_pointer+=2;D
+G_BLPUSH:W(b,stack_pointer);stack_pointer+=2;D
+G_CPUSH:W(c,stack_pointer);stack_pointer+=2;D
+G_APUSH:w(a,stack_pointer);stack_pointer+=1;D
+G_BPUSH:w(b,stack_pointer);stack_pointer+=1;D
 G_ALPOP:a=ZR;D
 G_BLPOP:b=ZR;D
 G_CPOP:c=ZR;D
-G_APOP:P-=1;a=r(P)D
-G_BPOP:P-=1;b=r(P)D
+G_APOP:stack_pointer-=1;a=r(stack_pointer)D
+G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 }
 int main(int rc,char**rv){
 	UU i=0,j;
