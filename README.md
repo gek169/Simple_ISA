@@ -42,7 +42,7 @@ once you've installed the emulator and the assembler, you can quickly run assemb
 
 if you want to use sisa16 assembler as a scripting language, you can add a shebang to your files:
 
-for the default INSTALL_DIR which is your user directory:
+for the default INSTALL_DIR which is `/usr/bin`:
 
 `#!/usr/bin/sisa16_asm -run`
 
