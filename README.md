@@ -23,20 +23,28 @@ DuckDuckGo is your friend if you need to learn how to compile C programs on your
 
 # How to install SISA16 on your machine.
 
-you `make install` and `make uninstall` sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
+On most unix-based machines:
+```sh
+make
+#or su - and login, no sudo...
+sudo make install
+#to uninstall
+sudo make uninstall
+```
+
+you `sudo make install` and `sudo make uninstall` sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
 
 you can set the INSTALL_DIR by using `make INSTALL_DIR=/my/directory`
 
 once you've installed the emulator and the assembler, you can quickly run assembly programs like this:
 
-`sisa16_asm -run -i my_asm_file.asm`
+`sisa16_asm -run my_asm_file.asm`
 
-this will create the normal assembler output, but will also run the program.
+if you want to use sisa16 assembler as a scripting language, you can add a shebang to your files:
 
-if you want to clear the terminal after the assembler is run...
+for the default INSTALL_DIR which is your user directory:
 
-`sisa16_asm -run -clear -i my_asm_file.asm`
-
+`#!/usr/bin/sisa16_asm -run`
 
 The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
 

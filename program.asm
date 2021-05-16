@@ -1,3 +1,4 @@
+#!/usr/bin/sisa16_asm -run
 //Macros!
 
 VAR#myFunction#sc %_arg1_%; lla _arg2_; farilldb; ab;  llb %myComptimeVar%; add;\

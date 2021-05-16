@@ -2,7 +2,7 @@
 #CC=cc
 #CC= gcc
 #CC= tcc
-INSTALL_DIR= ~/bin
+INSTALL_DIR= /usr/bin
 CC= clang
 CCC= g++
 CFLAGS= -Ofast -std=c89 -pedantic
@@ -30,8 +30,8 @@ asm_programs: sisa16_asm
 	./asm_compile.sh
 
 install: main
-	cp ./sisa16* $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16 tools."
-	@echo "Installed into home bin directory."
+	@cp ./sisa16* $(INSTALL_DIR)/;echo "Installed into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16 tools."
+	
 
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16

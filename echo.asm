@@ -1,3 +1,4 @@
+#!/usr/bin/sisa16_asm -run
 VAR#looptop#1,0xf0
 VAR#GOTO_TOP#sc looptop;jmp;
 VAR#jumpc#jmp;

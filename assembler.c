@@ -444,6 +444,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
+		if(strprefix("-run",argv[i-1])){
+			infilename = argv[i];
+			run_sisa16 = 1;
+			clear_output = 1;
+			puts("<ASM> Executing after building...");
+		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
 	{int i;for(i = 1; i < argc; i++)
@@ -459,14 +465,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(strprefix("-pl",argv[i])){
 			printlines = 1;
 			puts("<ASM> Printing lines.");
-		}
-		if(streq("-run", argv[i])){
-			run_sisa16 = 1;
-			puts("<ASM> Executing resulting binary after building. (only for not debugging and not -E)");
-		}
-		if(streq("-clear", argv[i])){
-			clear_output = 1;
-			puts("<ASM> Clearing output after assembly (only for -run)");
 		}
 		if(
 			strprefix("-h",argv[i]) ||

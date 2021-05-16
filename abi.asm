@@ -1,3 +1,4 @@
+#!/usr/bin/sisa16_asm -run
 //define the regions to use.
 //we also need to define these ADDR variables, just set them to zero.
 VAR#DATA_REGION_1#0x2A
