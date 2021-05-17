@@ -156,11 +156,11 @@ U8:a=(((UU)a)*((UU)b))>>14;D
 U9:a=(((UU)a)*((UU)b))>>15;D
 UA:a=(((UU)a)*((UU)b))>>16;D
 
-G_ALPUSH:write_2bytes(a,stack_pointer);stack_pointer+=2;D
-G_BLPUSH:write_2bytes(b,stack_pointer);stack_pointer+=2;D
-G_CPUSH:write_2bytes(c,stack_pointer);stack_pointer+=2;D
-G_APUSH:write_byte(a,stack_pointer);stack_pointer+=1;D
-G_BPUSH:write_byte(b,stack_pointer);stack_pointer+=1;D
+G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
+G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
+G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
+G_APUSH:	write_byte(a,stack_pointer);	stack_pointer+=1;D
+G_BPUSH:	write_byte(b,stack_pointer);	stack_pointer+=1;D
 G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
 G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D

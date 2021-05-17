@@ -5,8 +5,8 @@ VAR#POP_FARPTR_VARIABLE#	blpop;apop;ca;
 VAR#PUSH_FARPTR_VARIABLE#	ac;apush;blpush;
 
 //global variables.
-VAR#ld_iteration_count#	sc %0x4%;lb 0;farillda;
-VAR#st_iteration_count#	sc %0x4%;lb 0;faristla;
+VAR#ld_iteration_count#	sc%0x44%;lb 0;farillda;
+VAR#st_iteration_count#	sc%0x44%;lb 0;faristla;
 
 section 0xAF0000;
 !Did you enjoy that print?
@@ -93,26 +93,25 @@ asm_end_region_restriction;
 
 
 section 0x10000;
+VAR#proc_asciifun#sc 0,0;la 1;farcall;
 la 0;alpush;
-ld_iteration_count;lb1;add;
-st_iteration_count;
-//looptop
-VAR#looptop#@
+VAR#asciifun_looptop#@
 	proc_printbytehex;
 //print spaces.
 	la 0x20;putchar;
 //print new lines occasionally.
 	alpop;alpush;
-	lb 0x0F;and;
-	//lb 0xf;
-	cmp;sc%skipnewline%;jmpifneq;
+	lb 0xf;and;
+	cmp;sc%asciifun_skipnewline%;jmpifneq;
 		la 0xA;putchar;la 0xD;putchar;
-	VAR#skipnewline#@
+		//astp;alpush;proc_printbytehex;la0x20;putchar;apop;proc_printbytehex;apop;
+		//la 0xA;putchar;la 0xD;putchar;
+	VAR#asciifun_skipnewline#@
 	//i++
 	alpop;lb1;add;alpush;
 	//check to see if we have reached or surpassed the ending point.
-	llb %0xEFFF%;cmp;lb2;cmp;sc%looptop%;jmpifneq;
-VAR#loopout#@
+	llb %0xEFFF%;cmp;lb2;cmp;sc%asciifun_looptop%;jmpifneq;
+VAR#asciifun_loopout#@
 alpop;
 farret;
 
@@ -121,10 +120,16 @@ farret;
 //MAIN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 section 0;
-astp;popa;
+ZERO_STACK_POINTER;
+la0;st_iteration_count;
+astp;alpush;proc_printbytehex;la0x20;putchar;apop;proc_printbytehex;apop;
+VAR#main_looptop#@
+proc_asciifun;
+proc_asciifun;
+ld_iteration_count;lb1;add;st_iteration_count;
+ld_iteration_count;
+lb 0xFF;cmp;lb 0x2;cmp;sc %main_looptop%;jmpifneq;
 
-
-sc 0,0;la 1;farcall;
 la 0xA;putchar;la 0xD;putchar;
 la 0xA;putchar;la 0xD;putchar;
 la 0xA;putchar;la 0xD;putchar;
@@ -134,4 +139,7 @@ la 0xA;putchar;la 0xD;putchar;
 la 0xaf;	lb0;
 apush;		blpush;
 proc_puts;
+la 0xA;putchar;la 0xD;putchar;
+//ld_iteration_count;apush;proc_printbytehex;
+
 halt;
