@@ -3,7 +3,7 @@
 #include <time.h>
 typedef unsigned long UU;
 typedef unsigned char u;
-typedef unsigned short U;u R=0,M[(1<<24)];FILE*F;
+typedef unsigned short U;u R=0,M[(((UU)1)<<24)];FILE*F;
 
 #include "d.h"
 #define k case
@@ -173,7 +173,7 @@ G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
 G_APOP:stack_pointer-=1;a=r(stack_pointer)D
 G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
-G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region)D
+G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3)D
 G_CLOCK:{register clock_t q=clock();a=((1000*q)/CLOCKS_PER_SEC); b=q/CLOCKS_PER_SEC;c=q;}D
 /*load from RX0*/
 G_ARX0:a=RX0;D

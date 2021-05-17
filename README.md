@@ -276,15 +276,21 @@ void dcl() is the devoice closing function.
 unsigned short gch() is the "get" function which puts something into register a.
 void pch(unsigned short) is the "put" function which gets something from register a.
 
+the memory (`unsigned char M[(1<<24)];`) is accessible from these functions.
+
 for more advanced usage which requires access to the registers...
 ```c
 static unsigned short interrupt(unsigned short a,
-	unsigned short b,
-	unsigned short c,
-	unsigned short stack_pointer,
-	unsigned short program_counter,
-	unsigned char program_counter_region
-);
+									unsigned short b,
+									unsigned short c,
+									unsigned short stack_pointer,
+									unsigned short program_counter,
+									unsigned char program_counter_region,
+									unsigned short RX0,
+									unsigned short RX1,
+									unsigned short RX2,
+									unsigned short RX3
+								);
 ```
 
 The emulator requires a filename as the first parameter when running.

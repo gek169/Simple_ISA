@@ -21,7 +21,11 @@ static unsigned short interrupt(unsigned short a,
 									unsigned short c,
 									unsigned short stack_pointer,
 									unsigned short program_counter,
-									unsigned char program_counter_region
+									unsigned char program_counter_region,
+									unsigned short RX0,
+									unsigned short RX1,
+									unsigned short RX2,
+									unsigned short RX3
 								)
 {
 	if(a == 0xffFF){ /*Perform a memory dump.*/
