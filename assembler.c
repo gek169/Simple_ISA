@@ -1635,17 +1635,19 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	printf("<ASM> Successfully assembled %s\n", outfilename);
 	fclose(ofile);
 	fclose(infile);
-	if(run_sisa16 && !quit_after_macros && !debugging){
-		puts("<ASM> Executing binary.");
-		if(clear_output){
+	if(clear_output){
 #if defined(__unix__) || defined(linux)
-			system("clear");
+		system("clear");
 #else
 /*Probably windows.*/
-			system("cls");
+		system("cls");
 #endif
-		}
-		system(strcatallocf1(strcatalloc(execute_sisa16, " "),outfilename));
+	}
+	if(run_sisa16 && !quit_after_macros && !debugging){
+		char* tmp;
+		tmp = strcatallocf1(strcatalloc(execute_sisa16, " "),outfilename);
+		system(tmp);
+		free(tmp); tmp = NULL;
 	}
 	return 0;
 }
