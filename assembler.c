@@ -899,19 +899,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							long checkme;
 							checkme = strfind(line, variable_names[j]);
 							if(checkme == -1) continue;
-							/*Does this match contain us?*/
+							/*Does this match intersect?*/
 							if(
-								checkme+strlen(variable_names[j]) >= loc + strlen(variable_names[i]) &&
-								checkme <= loc
-								){
-									found_longer_match = 1;
-									break;
-								}
+								(
+									checkme+strlen(variable_names[j]) >= loc + strlen(variable_names[i]) &&
+																	checkme <= loc
+								)
+							){
+								found_longer_match = 1;
+								break;
+							}
 						}
 					}
-					if(debugging)
-						if(found_longer_match)
-							{puts("Found longer Macro.");continue;}
+					if(found_longer_match)
+					{if(debugging)puts("Found longer Macro.");continue;}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
@@ -1273,12 +1274,24 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							if(checkme == -1) continue;
 							/*Does this match contain us?*/
 							if(
+								/*
 								checkme+strlen(insns[j]) >= loc + strlen(insns[i]) &&
-								checkme <= loc
-								){if(debugging) puts("Found longer insn.");
+								checkme <= loc*/
+
+								(
+									checkme+strlen(insns[j]) >= loc + strlen(insns[i]) &&
+									checkme <= loc
+								) ||
+								(
+									((checkme+(long)strlen(insns[j])) < loc + (long)strlen(insns[i])) &&
+									((checkme+(long)strlen(insns[j])) >= loc)
+								)
+							)
+							{
+								if(debugging) puts("Found longer insn.");
 									found_longer_match = 1;
 									break;
-								}
+							}
 						}
 					}
 					if(found_longer_match) continue;
@@ -1307,7 +1320,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						if(line[j] == ','){
 							if(num_commas_needed > 0) num_commas_needed--;
 							else { /*Too many commas.*/
-								printf("\n<ASM SYNTAX ERROR> too many arguments to insn, line %s", line_copy);
+								printf("\n<ASM SYNTAX ERROR> too many arguments to insn %s, line %s", insns[i], line_copy);
 								goto error;
 							}
 						}
