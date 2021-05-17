@@ -334,9 +334,9 @@ char* insn_repl[128] = {
 	"bytes96;",
 	"bytes97;",
 	"bytes98;",
-
 	"bytes99;",
 	"bytes100;",
+	/*interrupt*/
 	"bytes101;",
 };
 
