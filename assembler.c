@@ -69,7 +69,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[128] = {
+char* insns[256] = {
 	"halt",
 	"lda",
 	"la",
@@ -179,8 +179,37 @@ char* insns[128] = {
 	"bpop",
 	"interrupt",
 	"clock",
+	/*Extra register loads and stores.*/
+	/*rx0*/
+	"arx0",
+	"brx0",
+	"crx0",
+	"rx0a",
+	"rx0b",
+	"rx0c",
+	/*rx1*/
+	"arx1",
+	"brx1",
+	"crx1",
+	"rx1a",
+	"rx1b",
+	"rx1c",
+	/*rx2*/
+	"arx2",
+	"brx2",
+	"crx2",
+	"rx2a",
+	"rx2b",
+	"rx2c",
+	/*rx3*/
+	"arx3",
+	"brx3",
+	"crx3",
+	"rx3a",
+	"rx3b",
+	"rx3c",
 };
-unsigned char insns_numargs[128] = {
+unsigned char insns_numargs[256] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -225,9 +254,24 @@ unsigned char insns_numargs[128] = {
 	0,0,0,
 	0,0, 
 	/*extended interrupt/device interaction*/
-	0,0,
+	0,
+	/*Clock.*/
+	0,
+	/*extended registers.*/
+	/*RX0*/
+		0,0,0,
+		0,0,0,
+	/*RX1*/
+		0,0,0,
+		0,0,0,
+	/*RX2*/
+		0,0,0,
+		0,0,0,
+	/*RX3*/
+		0,0,0,
+		0,0,0
 };
-char* insn_repl[128] = {
+char* insn_repl[256] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -341,6 +385,39 @@ char* insn_repl[128] = {
 	"bytes101;",
 	/*clock*/
 	"bytes102;",
+	/*extended register interactions.*/
+	/*RX0*/
+		"bytes103;",
+		"bytes104;",
+		"bytes105;",
+
+		"bytes106;",
+		"bytes107;",
+		"bytes108;",
+	/*RX1*/
+		"bytes109;",
+		"bytes110;",
+		"bytes111;",
+
+		"bytes112;",
+		"bytes113;",
+		"bytes114;",
+	/*RX2*/
+		"bytes115;",
+		"bytes116;",
+		"bytes117;",
+
+		"bytes118;",
+		"bytes119;",
+		"bytes120;",
+	/*RX3*/
+		"bytes121;",
+		"bytes122;",
+		"bytes123;",
+
+		"bytes124;",
+		"bytes125;",
+		"bytes126;"
 };
 
 char int_checker(char* proc){
@@ -371,7 +448,7 @@ char int_checker(char* proc){
 	return 0;
 }
 
-static const unsigned char n_insns = 103;
+static const unsigned char n_insns = 127;
 unsigned long outputcounter = 0;
 unsigned long nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;

@@ -218,6 +218,33 @@ bpop: pop byte register b from the stack. (1 byte) (64)
 interrupt: pass the registers to the user defined "interrupt" function (1 byte) (65)
 clock: set register a to the execution time in thousandths of a second. Register B will be the time in seconds.
 C will be the raw number of clock cycles.
+arx0: load RX0 into A. (1 byte) (66)
+brx0: load RX0 into B. (1 byte) (67)
+crx0: load RX0 into C. (1 byte) (68)
+rx0a: load A into RX0. (1 byte) (69)
+rx0b: load B into RX0. (1 byte) (6A)
+rx0c: load C into RX0. (1 byte) (6B)
+
+arx1: load RX1 into A. (1 byte) (66)
+brx1: load RX1 into B. (1 byte) (67)
+crx1: load RX1 into C. (1 byte) (68)
+rx1a: load A into RX1. (1 byte) (69)
+rx1b: load B into RX1. (1 byte) (6A)
+rx1c: load C into RX1. (1 byte) (6B)
+
+arx2: load RX2 into A. (1 byte) (6C)
+brx2: load RX2 into B. (1 byte) (6D)
+crx2: load RX2 into C. (1 byte) (6E)
+rx2a: load A into RX2. (1 byte) (6F)
+rx2b: load B into RX2. (1 byte) (70)
+rx2c: load C into RX2. (1 byte) (71)
+
+arx3: load RX3 into A. (1 byte) (72)
+brx3: load RX3 into B. (1 byte) (73)
+crx3: load RX3 into C. (1 byte) (74)
+rx3a: load A into RX3. (1 byte) (75)
+rx3b: load B into RX3. (1 byte) (76)
+rx3c: load C into RX3. (1 byte) (77)
 
 The rest: nop duplicates, free for expansion (1 byte)
 ```
