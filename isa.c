@@ -177,9 +177,15 @@ int main(int rc,char**rv){
 		printf("\nUsage: %s myprogram.bin", rv[0]);
 		return 1;
 	}
-	for(F=fopen(rv[1],"rb");!feof(F);){
+	F=fopen(rv[1],"rb");
+	if(!F){
+		puts("SISA16 emulator cannot open this file.");
+		exit(1);
+	}
+	for(;F && !feof(F);){
 		M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;
 	}
+	
 	fclose(F);
 	for(i=e();i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",i);j<i+32;j++)

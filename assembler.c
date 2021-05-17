@@ -489,17 +489,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 	}}
 	if(debugging) infile=stdin;
-	ofile = NULL;
-	if(!quit_after_macros)
-		ofile=fopen(outfilename, "w");
-	if(!ofile){
-		printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);return 1;
-	}
+
 	if(infilename){
 		if(debugging) printf("\nReading from a file...\n");
 			infile = fopen(infilename, "r");
 		if(!infile) {
-			printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);return 1;
+			printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);
+			return 1;
 		}
 	} else {
 		if(debugging) printf("\nReading from stdin...");
@@ -508,6 +504,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			puts("\n<ASM> Assembler Aborted.");
 			return 1;
 		}
+	}
+	ofile = NULL;
+	if(!quit_after_macros)
+		ofile=fopen(outfilename, "wb");
+	if(!ofile){
+		printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);return 1;
 	}
 	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
