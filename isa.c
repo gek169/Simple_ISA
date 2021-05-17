@@ -172,6 +172,14 @@ G_CLOCK:{register clock_t q=clock();a=((1000*q)/CLOCKS_PER_SEC); b=q/CLOCKS_PER_
 }
 int main(int rc,char**rv){
 	UU i=0,j;
+	if(
+		(sizeof(U) != 2) ||
+		(sizeof(u) != 1) ||
+		(sizeof(UU) < 4)
+		){
+		puts("SISA16 ERROR!!! Compilation Environment conditions unmet.");
+		return 1;
+	}
 	if(rc<2){
 		puts("SISA-16 Emulator written by DMHSW for the Public Domain");
 		printf("\nUsage: %s myprogram.bin", rv[0]);
