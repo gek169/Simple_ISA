@@ -216,7 +216,8 @@ cpop: pop short register c from the stack. (1 byte) (62)
 apop: pop byte register a from the stack. (1 byte) (63)
 bpop: pop byte register b from the stack. (1 byte) (64)
 interrupt: pass the registers to the user defined "interrupt" function (1 byte) (65)
-
+clock: set register a to the execution time in thousandths of a second. Register B will be the time in seconds.
+C will be the raw number of clock cycles.
 
 The rest: nop duplicates, free for expansion (1 byte)
 ```

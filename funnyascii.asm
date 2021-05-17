@@ -104,6 +104,10 @@ VAR#asciifun_looptop#@
 	lb 0xf;and;
 	cmp;sc%asciifun_skipnewline%;jmpifneq;
 		la 0xA;putchar;la 0xD;putchar;
+		clock;alpush;proc_printbytehex;alpop;
+		la 0xA;putchar;la 0xD;putchar;
+		clock;blpush;proc_printbytehex;blpop;
+		la 0xA;putchar;la 0xD;putchar;
 		//astp;alpush;proc_printbytehex;la0x20;putchar;apop;proc_printbytehex;apop;
 		//la 0xA;putchar;la 0xD;putchar;
 	VAR#asciifun_skipnewline#@
@@ -123,6 +127,7 @@ section 0;
 ZERO_STACK_POINTER;
 la0;st_iteration_count;
 astp;alpush;proc_printbytehex;la0x20;putchar;apop;proc_printbytehex;apop;
+
 VAR#main_looptop#@
 proc_asciifun;
 proc_asciifun;
