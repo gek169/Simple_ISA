@@ -170,7 +170,11 @@ G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_regi
 }
 int main(int rc,char**rv){
 	UU i=0,j;
-	if(rc<2)return 1;
+	if(rc<2){
+		puts("SISA-16 Emulator written by DMHSW for the Public Domain");
+		printf("\nUsage: %s myprogram.bin", rv[0]);
+		return 1;
+	}
 	for(F=fopen(rv[1],"rb");!feof(F);){
 		M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;
 	}
