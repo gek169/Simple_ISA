@@ -17,7 +17,7 @@ section 0x20000;asm_begin_region_restriction;
 VAR#proc_printbytehex#sc 0,0;la 2;farcall; 
 //retrieve our argument.
 astp;lb4;sub;ca;ilda;
-alpush;
+apush;
 lb 4;rsh;
 lb0xf;and;
 lb 7;mul;
@@ -40,7 +40,7 @@ la0x44;putchar;sc%proc_printbytehex_jmptable_1_end%;jmp
 la0x45;putchar;sc%proc_printbytehex_jmptable_1_end%;jmp
 la0x46;putchar;sc%proc_printbytehex_jmptable_1_end%;jmp
 VAR#proc_printbytehex_jmptable_1_end#@
-alpop;lb 15;and;lb7;mul;
+apop;lb 15;and;lb7;mul;
 llb%proc_printbytehex_jmptable_2%;add;ca;jmp;
 VAR#proc_printbytehex_jmptable_2#@
 la0x30;putchar;sc%proc_printbytehex_jmptable_2_end%;jmp
@@ -108,12 +108,12 @@ VAR#looptop#@
 	cmp;sc%skipnewline%;jmpifneq;
 		la 0xA;putchar;la 0xD;putchar;
 	VAR#skipnewline#@
+	//i++
+	alpop;lb1;add;alpush;
 	//check to see if we have reached or surpassed the ending point.
-	//we want to go to the top.
-	alpop;lb 1;add;alpush;
 	llb %0xEFFF%;cmp;lb2;cmp;sc%looptop%;jmpifneq;
 VAR#loopout#@
-//alpop;
+alpop;
 farret;
 
 
