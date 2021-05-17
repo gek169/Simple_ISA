@@ -3,8 +3,9 @@
 #include <time.h>
 typedef unsigned long UU;
 typedef unsigned char u;
-typedef unsigned short U;u R=0,M[(((UU)1)<<24)];FILE*F;
-
+typedef unsigned short U;
+static u R=0,M[(((UU)1)<<24)];
+static FILE* F;
 #include "d.h"
 #define k case
 #define PP ((UU)(program_counter_region<<16))
