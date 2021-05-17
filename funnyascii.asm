@@ -100,7 +100,9 @@ VAR#asciifun_looptop#@
 //print spaces.
 	la 0x20;putchar;
 //print new lines occasionally.
-	alpop;alpush;rx0a;arx0;
+	alpop;alpush;
+//test the new RX register functionality.
+	rx0a;arx0;
 	lb 0xf;and;
 	cmp;sc%asciifun_skipnewline%;jmpifneq;
 		la 0xA;putchar;la 0xD;putchar;
