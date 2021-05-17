@@ -2,6 +2,13 @@
 
 C program to simulate the SISA-16 virtual portable computer architecture.
 
+Confirmed to work on the following architectures and platforms:
+```c
+	IA32 (Debian linux, native)
+	x86_64 (Debian linux, native)
+	riscv64 (Buildroot linux, jslinux)
+```
+
 The included assembly programs and assembler are designed for isa.c.
 
 (the cpp file in this repository is a proof-of-concept unmaintained alpha version of this project.)
