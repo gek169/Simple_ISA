@@ -9,6 +9,8 @@ VAR#GET_A_BACK#				lda0,0;
 
 
 
+asm_print %/32%;
+
 #right at the beginning.
 section 0
 GOTO_TOP;

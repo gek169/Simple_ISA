@@ -470,6 +470,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 	@- expands to the current position of the output counter as a 24 bit unsigned integer. 
 		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@%.
 	%- two of these defines a split directive. %0xff0A% will be split into 255,10.
+		Additionally, if you have a 32 bit value you wish to be split into four bytes (highest, high, low, lowest)
+		then you can do %/myvalue% (with a forward slash) to 
 	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded on the line.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
 	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers. Do not split the integers.

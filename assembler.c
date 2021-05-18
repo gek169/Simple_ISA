@@ -1053,13 +1053,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else if (i==2){long loc_eparen;char expansion[1024]; unsigned short res; /*Split directive.*/
+					} else if (i==2){long loc_slash;char do_32bit=0;long loc_eparen;char expansion[1024]; 
+					unsigned long res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
 						loc_eparen = strfind(line_old+loc+1,"%");
+						loc_slash = strfind(line_old+loc+1,"/");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
@@ -1067,18 +1069,32 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						if(loc_eparen == 0){
 							/*printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
 						}
+						if(loc_slash==0) do_32bit = 1;
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						
-						
-						res = strtoul(line_old+loc+1, NULL, 0);
-						if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
-							printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
-						if(debugging) printf("\nSplitting value %u\n", res);
+						if(do_32bit == 0)
+							res = strtoul(line_old+loc+1, NULL, 0);
+						else /*Skip the forward slash.*/
+							res = strtoul(line_old+loc+2, NULL, 0);
+						if(!do_32bit){
+							if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
+								printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
+						} else {
+							if(res == 0  && npasses == 1 && line_old[loc+2] != '%' && line_old[loc+2] != '0')
+								printf("<ASM WARNING> Unusual 32-bit SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
+						}
+						if(debugging) printf("\nSplitting value %lu\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
-						/*snprintf(expansion, 1023, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));*/
-						sprintf(expansion, "%u,%u", (unsigned int)(res/256),(unsigned int)(res&0xff));
+						if(do_32bit == 0)
+							sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
+						else
+							sprintf(expansion, "%u,%u,%u,%u", (unsigned int)((res/(256*256*256))&0xff),
+																(unsigned int)((res/(256*256))&0xff),
+																(unsigned int)((res/(256))&0xff),
+																(unsigned int)((res)&0xff)
+																);
 						before = strcatallocf1(before, expansion);
 					} 
 					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
@@ -1163,6 +1179,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind(macro_name, "]") != -1 ||
 				strfind(macro_name, "\\") != -1 ||
 				strfind(macro_name, "//") != -1 ||
+				strfind(macro_name, "/") != -1 ||
 				strfind(macro_name, " ") != -1 ||
 				strfind(macro_name, "\t") != -1 ||
 				strfind(macro_name, ";") != -1 ||
@@ -1192,6 +1209,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind("]", macro_name) != -1 ||
 				strfind("\\", macro_name) != -1 ||
 				strfind("//", macro_name) != -1 ||
+				strfind("/", macro_name) != -1 ||
 				strfind(" ", macro_name) != -1 ||
 				strfind("\t", macro_name) != -1 ||
 				strfind(";", macro_name) != -1 ||
