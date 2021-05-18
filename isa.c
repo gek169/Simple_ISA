@@ -304,7 +304,7 @@ int main(int rc,char**rv){
 	}
 	if(rc<2){
 		puts("SISA-16 Emulator written by DMHSW for the Public Domain");
-		printf("\nUsage: %s myprogram.bin", rv[0]);
+		printf("\nUsage: %s myprogram.bin\n", rv[0]);
 		return 1;
 	}
 	F=fopen(rv[1],"rb");

@@ -687,7 +687,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			puts("Optional argument: -pl: Print lines");
 			puts("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
 			puts("Optional argument: -v, -h, --help, --version: This printout.");
-			puts("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.1");
+			puts("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.2");
 			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			return 1;
 		}
