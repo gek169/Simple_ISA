@@ -5,7 +5,7 @@ CC= gcc
 INSTALL_DIR=/usr/bin
 #CC= clang
 CCC= g++
-CFLAGS_SMALL= -Os -s -Wl,--gc-sections
+CFLAGS_SMALL= -Os -s
 MORECFLAGS=
 CFLAGS= $(MORECFLAGS) -O3 -std=c89 -pedantic
 CASMFLAGS=  $(MORECFLAGS) $(CFLAGS_SMALL) -lm -std=c89 -pedantic
