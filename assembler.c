@@ -672,7 +672,6 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		}
 		if(strprefix("asm_help", line)){
 			puts("This assembler should have come with a README.MD and an emulator \"isa.c\". If it did not, you got scammed! ");
-			puts("There are 100 instructions in the original version of the emulator which you can invoke by name.");
 			puts("This is no ordinary assembler, it has a very complicated macro syntax, arbitrary data includes, and string literals.");
 			puts("There are, however, no structured programming control flow statements. you've only got the jmp, jmpifeq, jmpifneq, call, farcall, ret, and farret insns.");
 			puts("The assembler is a two-pass compiler. Both passes work roughly the same. The first pass won't actually write the file, though.");
