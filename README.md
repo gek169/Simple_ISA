@@ -579,7 +579,8 @@ the end of the line is at the newline character, and all spaces and characters a
 part of the filename.
 
 If a relative path is used for the filename it will be searched for in the following locations, in order:
-* current working directory
+* current working directory.
+* getenv("SISA16BIN")/
 * /usr/include/
 * ~/sisa16/
 * C:\SISA16\
@@ -623,6 +624,21 @@ Macros are evaluated in the order of most recently defined to first defined.
 First defined macros include the builtin macros such as $, @, the space, and the percent directive.
 
 Builtin macros *except for %, space, and tab* are parsed on macro lines.
+### Use as a scripting language
+SISA16 is an interpreted 32/16/8-bit bytecode virtual machine that compiles from .asm sources.
+
+the primary advantage of SISA16 over other scripting languages is its portability and speed-
+it is an interpreted bytecode compiled from textual source with minimal dependencies, requiring
+a minimal libc to interface with the command prompt and load files from disk.
+
+You can use SISA16 on *nix-likes by added shebangs to the beginnings of your files and putting sisa16 in your path.
+
+SISA16's default driver interfaces directly with the command prompt, but can be made to interface with anything.
+
+### Use as an embedded language for program extension
+You can embed SISA16 by implementing a host program that operates through the device driver. 
+di, dcl, interrupt, gch and pch.
+
 ### Tips for doing stuff
 If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
 
@@ -639,42 +655,8 @@ I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's s
 7) Do not try to be too clever with extremely recursive macros and the two passes- this is a very simple assembler and
 you will very easily find ways to break it.
 8) Know the limitations of the implementation. 
-9) If you have a library which must be placed at a particular location in the binary, you should specify that in the name!
+9) If you have a prebuilt library which must be placed at a particular location in the binary, you should specify that in the name!
 	I would recommend region-aligning all libraries, unless they are extremely small.
-10) There is a known bug/feature of SISA's program loader- if the file is smaller than 16 megabytes, isa.c will load
-a single "255" byte at the very end. This may be an issue if you were relying on it being a zero, like the rest of memory.
-11) If you want to reduce your binary size, try using $+value+, @+value+, section, farpagest, and farpagel. You can unpack your binary at boot time.
-### Project ideas
-
-This repository is written primarily as an educational or recreational asset- I know it serves little practical purpose.
-
-Here are some project ideas:
-
-## Easy
-* Write a program which reads in a string from standard input, terminated with a newline, and then spits it back out.
-* Write a program which creates interesting patterns on standard out using ascii characters, like https://youtu.be/0yKwJJw6Abs
-* Determine the length of a string taken from standard in
-* Write a program which parses a base-10 integer entered on standard in and prints its value in hexadecimal or binary.
-* Take in two numbers on standard in, and do math on them, like adding them together.
-* Parse negative numbers as two's complement, do math on them, and print the result.
-## Medium
-* Parse simple postfix notation expressions using the stack (`5 3 + 4 *` being equivalent to (5+3)*4 )
-* Parse a number with a decimal portion and interpret it as a fixed point, then do some fixed point math.
-* Write a program which takes a number on standard in and tells you if it's prime.
-* Write a prime number sieve which prints all prime numbers less than 65,535.
-* Write a statically linked library in SISA-16 with some subroutines and some variables.
-* implement memcpy in SISA-16
-## Hard
-* Try to write a bootloader to replace isa.c's program loader- your program should receive slightly less than 16 megabytes from standard in and write them to memory, then begin execution.
-* Add new instructions to the architecture for a new kind of math (32 bit arithmetic, for example) and implement them into the assembler.
-* Implement your own device in d.h to interface with SDL, the file system, or anything else and write a SISA-16 program to use it.
-## Very Hard
-* Write a simple interpreter or compiler for a language like BASIC or Forth.
-* make SISA-16 a self-hosting assembly language- port assembler.c to SISA-16.
-
-## Extreme
-* write a C compiler and libC for the ISA. Need not be self-hosting.
-* write a microkernel, or failing that, an exokernel. (May be impossible?)
 ```
 Written by
 ~~~DMHSW~~~

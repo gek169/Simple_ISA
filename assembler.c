@@ -779,6 +779,28 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			tmp = fopen(metaproc, "r");
+			if(!tmp && getenv("SISA16BIN") &&
+				(
+					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/' ||
+					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\'
+				)
+			) 
+			{
+				char* bruh = strcatalloc(getenv("SISA16BIN"), metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
+			if(!tmp && getenv("SISA16BIN") &&
+				(
+					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/' ||
+					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\'
+				)
+			) 
+			{
+				char* bruh = strcatallocf1(strcatalloc(getenv("SISA16BIN"),"/"), metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
 			if(!tmp) {
 				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);
 				tmp = fopen(bruh, "r");
@@ -1867,10 +1889,20 @@ int main(int argc, char** argv){
 */
 	}
 	if(run_sisa16 && !quit_after_macros && !debugging){
-		char* tmp;
-		tmp = strcatallocf1(strcatalloc(execute_sisa16, " "),outfilename);
+		char* tmp; char* l_execute_sisa16 = execute_sisa16;
+		if(getenv("SISA16BIN") && (
+				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/')|| 
+				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\')
+			)
+		){
+			l_execute_sisa16 = strcatalloc(getenv("SISA16BIN"),execute_sisa16);
+		} else if(getenv("SISA16BIN")){
+			l_execute_sisa16 = strcatallocf1(strcatalloc(getenv("SISA16BIN"),"/"),execute_sisa16);
+		}
+		tmp = strcatallocf1(strcatalloc(l_execute_sisa16, " "),outfilename);
 		system(tmp);
 		free(tmp); tmp = NULL;
+		if(l_execute_sisa16 != execute_sisa16) free(l_execute_sisa16);
 	}
 	return 0;
 }
