@@ -14,14 +14,36 @@ static FILE* F;
 #define CONSUME_TWO_BYTES (program_counter+=2,\
 						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
 						(U)M[PP+((U)(program_counter-1))])
+#define CONSUME_FOUR_BYTES (program_counter+=4,\
+						((((UU)M[PP+((U)(program_counter-1))]))<<24)+\
+						((((UU)M[PP+((U)(program_counter-2))]))<<16)+\
+						((((UU)M[PP+((U)(program_counter-3))]))<<8)+\
+						(UU)M[PP+((U)(program_counter-4))])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
 #define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
+#define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
+										(((UU)M[stack_pointer])<<24)+\
+										(((UU)M[stack_pointer+1])<<16)+\
+										(((UU)M[stack_pointer+2])<<8)+\
+										(UU)M[stack_pointer+3]\
+									)
 #define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)b)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)((U)(b+1))])
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16)+((UU)a)])<<8)+(U)M[(((UU)c&255)<<16)+(UU)((U)(a+1))])
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 (\
+											(((UU)M[(((UU)c&255)<<16)+((UU)a)])<<24)+\
+											(((UU)M[(((UU)c&255)<<16)+(UU)((U)(a+1))])<<16)+\
+											(((UU)M[(((UU)c&255)<<16)+(UU)((U)(a+2))])<<8)+\
+											((UU)M[(((UU)c&255)<<16)+(UU)((U)(a+3))])\
+											)
 #define write_byte(v,d)M[d]=v;
-#define write_2bytes(v,d)M[d]=v>>8;M[((d)+1)&0xFFffFF]=v&255;
+#define write_2bytes(v,d)	M[d]=					(v)>>8;\
+							M[((d)+1)&0xFFffFF]=	(v)&255;
+#define write_4bytes(v,d)	M[((d))&0xFFffFF]=		(v)>>24;\
+							M[((d)+1)&0xFFffFF]=	(v)>>16;\
+							M[((d)+2)&0xFFffFF]=	(v)>>8;\
+							M[((d)+3)&0xFFffFF]=	(v)&255;
 #define D ;switch(CONSUME_BYTE){k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
@@ -43,11 +65,17 @@ k 104:goto G_BRX0;k 105:goto V9;k 106:goto VA;k 107:goto VB;k 108:goto VC;k 109:
 k 112:goto W0;k 113:goto W1;k 114:goto W2;k 115:goto W3;k 116:goto W4;k 117:goto W5;k 118:goto W6;k 119:goto W7;\
 k 120:goto W8;k 121:goto W9;k 122:goto WA;k 123:goto WB;k 124:goto WC;k 125:goto WD;k 126:goto WE;\
 k 127:goto WF;\
-k 128:goto X0;k 129:goto X1;k 130:k 131:k 132:k 133:k 134:k 135:k 136:k 137:\
-k 138:k 139:k 140:k 141:k 142:k 143:k 144:k 145:k 146:k 147:\
-k 148:k 149:k 150:k 151:k 152:k 153:k 154:k 155:k 156:k 157:\
-k 158:k 159:k 160:k 161:k 162:k 163:k 164:k 165:k 166:k 167:\
-k 168:k 169:k 170:k 171:k 172:k 173:k 174:k 175:k 176:k 177:\
+k 128:goto X0;k 129:goto X1;k 130:goto X2;k 131:goto X3;k 132:goto X4;\
+k 133:goto X5;k 134:goto X6;k 135:goto X7;k 136:goto X8;k 137:goto X9;\
+k 138:goto XA;k 139:goto XB;k 140:goto XC;k 141:goto XD;k 142:goto XE;k 143:goto XF;\
+k 144:goto Y0;k 145:goto Y1;k 146:goto Y2;k 147:goto Y3;\
+k 148:goto Y4;k 149:goto Y5;k 150:goto Y6;k 151:goto Y7;k 152:goto Y8;k 153:goto Y9;\
+k 154:goto YA;k 155:goto YB;k 156:goto YC;k 157:goto YD;\
+k 158:goto YE;k 159:goto YF;\
+k 160:goto Z0;k 161:goto Z1;k 162:goto Z2;k 163:goto Z3;\
+k 164:goto Z4;k 165:goto Z5;k 166:goto Z6;k 167:goto Z7;\
+k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
+k 171:k 172:k 173:k 174:k 175:k 176:k 177:\
 k 178:k 179:k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
 k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
 k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
@@ -62,7 +90,7 @@ register UU
 RX0=0,RX1=0,RX2=0,RX3=0;
 R=0;
 	di();
-WF:X0:X1:
+
 G_NOP:D
 G_HALT:dcl();return 0;
 G_AND:a&=b;D
@@ -121,7 +149,7 @@ G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
 G_DIV:if(b!=0)a/=b;else{R=1;goto G_HALT;}D
-G_MOD:if(b!=0)a%=b;else{R=1;goto G_HALT;}D
+G_MOD:if(b!=0)a%=b;else{R=2;goto G_HALT;}D
 G_CMP:if(a<b)a=0;else if(a>b)a=2;else a=1;D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
 G_FARISTLA:write_2bytes(a,((((UU)c&255)<<16)+((UU)b)))D
@@ -206,6 +234,63 @@ WB:c=RX3;D
 WC:RX3=a;D
 WD:RX3=b;D
 WE:RX3=c;D
+/*Register-to-register moves for RX registers.*/
+WF:RX0=RX1;D
+X0:RX0=RX2;D
+X1:RX0=RX3;D
+
+X2:RX1=RX0;D
+X3:RX1=RX2;D
+X4:RX1=RX3;D
+
+X5:RX2=RX0;D
+X6:RX2=RX1;D
+X7:RX2=RX3;D
+
+X8:RX3=RX0;D
+X9:RX3=RX1;D
+XA:RX3=RX2;D
+
+/*loads*/
+XB:RX0=CONSUME_FOUR_BYTES;D
+XC:RX1=CONSUME_FOUR_BYTES;D
+XD:RX2=CONSUME_FOUR_BYTES;D
+XE:RX3=CONSUME_FOUR_BYTES;D
+/*far indirect loads, through C and A.*/
+XF:RX0=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
+Y0:RX1=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
+Y1:RX2=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
+Y2:RX3=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
+/*far indirect stores, through C and A*/
+Y3:write_4bytes(RX0,((((UU)c&255)<<16)+((UU)a)))D
+Y4:write_4bytes(RX1,((((UU)c&255)<<16)+((UU)a)))D
+Y5:write_4bytes(RX2,((((UU)c&255)<<16)+((UU)a)))D
+Y6:write_4bytes(RX3,((((UU)c&255)<<16)+((UU)a)))D
+/*math*/
+Y7:RX0=(RX0+RX1)&0xffFFffFF;D
+Y8:RX0=(RX0-RX1)&0xffFFffFF;D
+Y9:RX0=(RX0*RX1)&0xffFFffFF;D
+YA:if(RX1!=0)RX0=(RX0/RX1)&0xffFFffFF;else{R=3;goto G_HALT;}D
+YB:if(RX1!=0)RX0=(RX0%RX1)&0xffFFffFF;else{R=4;goto G_HALT;}D
+YC:RX0=(RX0>>(RX1&31))&0xffFFffFF;D
+YD:RX0=(RX0<<(RX1&31))&0xffFFffFF;D
+
+/*pushes*/
+YE:write_4bytes(RX0, stack_pointer);stack_pointer+=4;D
+YF:write_4bytes(RX1, stack_pointer);stack_pointer+=4;D
+Z0:write_4bytes(RX2, stack_pointer);stack_pointer+=4;D
+Z1:write_4bytes(RX3, stack_pointer);stack_pointer+=4;D
+/*pops*/
+Z2:RX0=Z_POP_FOUR_BYTES_FROM_STACK;D
+Z3:RX1=Z_POP_FOUR_BYTES_FROM_STACK;D
+Z4:RX2=Z_POP_FOUR_BYTES_FROM_STACK;D
+Z5:RX3=Z_POP_FOUR_BYTES_FROM_STACK;D
+/*bitwise*/
+Z6:RX0=RX0&RX1;D
+Z7:RX0=RX0|RX1;D
+Z8:RX0=RX0^RX1;D
+Z9:RX0=~RX0;D
+ZA:if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;D
 }
 int main(int rc,char**rv){
 	UU i=0,j;
@@ -235,5 +320,8 @@ int main(int rc,char**rv){
 	for(i=e();i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",i);j<i+32;j++)
 			printf("%02x%c",M[j],((j+1)%8)?' ':'|');
-	if(R)puts("\n<Errfl>\n");
+	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
+	if(R==2)puts("\n<Errfl, 16 bit mod  by 0>\n");
+	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
+	if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
 }

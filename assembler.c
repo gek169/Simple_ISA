@@ -208,6 +208,58 @@ char* insns[256] = {
 	"rx3a",
 	"rx3b",
 	"rx3c",
+	/*Register-to-register moves for RX registers.*/
+	"rx0_1",
+	"rx0_2",
+	"rx0_3",
+
+	"rx1_0",
+	"rx1_2",
+	"rx1_3",
+
+	"rx2_0",
+	"rx2_1",
+	"rx2_3",
+
+	"rx3_0",
+	"rx3_1",
+	"rx3_2",
+	/*lRXX*/
+	"lrx0",
+	"lrx1",
+	"lrx2",
+	"lrx3",
+	/*farildRXX*/
+	"farildrx0",
+	"farildrx1",
+	"farildrx2",
+	"farildrx3",
+	/*faristRXX*/
+	"faristrx0",
+	"faristrx1",
+	"faristrx2",
+	"faristrx3",
+	/*RXmath*/
+	"rxadd",
+	"rxsub",
+	"rxmul",
+	"rxdiv",
+	"rxmod",
+	"rxrsh",
+	"rxlsh",
+	"rx0push",
+	"rx1push",
+	"rx2push",
+	"rx3push",
+	"rx0pop",
+	"rx1pop",
+	"rx2pop",
+	"rx3pop",
+	"rxand",
+	"rxor",
+	"rxxor",
+	"rxcompl",
+	"rxcmp"
 };
 unsigned char insns_numargs[256] = {
 	0,/*halt*/
@@ -269,7 +321,29 @@ unsigned char insns_numargs[256] = {
 		0,0,0,
 	/*RX3*/
 		0,0,0,
-		0,0,0
+		0,0,0,
+	/*Register-to-register moves for RX registers.*/
+		0,0,0,
+		0,0,0,
+		0,0,0,
+		0,0,0,
+	/*lRXX*/
+		4,4,4,4,
+	/*farildRXX and st*/
+		0,0,0,0,
+		0,0,0,0,
+	/*RXmath and CMP*/
+		0,0,0,0,
+		0,/*mod*/
+		0,0,/*shifts*/
+		/*push/pop*/
+		0,0,0,0,
+		0,0,0,0,
+		/*bitwise and compl*/
+		0,0,0, /*rxand,rxor,rxxor*/
+		0,
+		/*rxcmp*/
+		0
 };
 char* insn_repl[256] = {
 	"bytes0;", 
@@ -417,9 +491,62 @@ char* insn_repl[256] = {
 
 		"bytes124;",
 		"bytes125;",
-		"bytes126;"
-};
+		"bytes126;",
+	/*Register-to-register moves for RX registers.*/
+		"bytes127;",
+		"bytes128;",
+		"bytes129;",
 
+		"bytes130;",
+		"bytes131;",
+		"bytes132;",
+
+		"bytes133;",
+		"bytes134;",
+		"bytes135;",
+
+		"bytes136;",
+		"bytes137;",
+		"bytes138;",
+	/*lRXX*/
+		"bytes139,",
+		"bytes140,",
+		"bytes141,",
+		"bytes142,",
+	/*farildRXX*/
+		"bytes143,",
+		"bytes144,",
+		"bytes145,",
+		"bytes146,",
+	/*faristRXX*/
+		"bytes147,",
+		"bytes148,",
+		"bytes149,",
+		"bytes150,",
+	/*More RX stuff.*/
+		"bytes151,",
+		"bytes152,",
+		"bytes153,",
+		"bytes154,",
+		"bytes155,",
+		"bytes156,",
+		"bytes157,",
+		"bytes158,",
+		"bytes159,",
+		"bytes160,",
+		"bytes161,",
+		"bytes162,",
+		"bytes163,",
+		"bytes164,",
+		"bytes165,",
+		"bytes166,",
+		"bytes167,",
+		"bytes168,",
+		"bytes169,",
+	/*rxcmp*/
+		"bytes170,",
+};
+static const unsigned int n_insns = 171;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
@@ -448,7 +575,7 @@ char int_checker(char* proc){
 	return 0;
 }
 
-static const unsigned char n_insns = 127;
+
 unsigned long outputcounter = 0;
 unsigned long nmacros = 5; /*0,1,2,3,4*/
 char quit_after_macros = 0;

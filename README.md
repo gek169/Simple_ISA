@@ -254,6 +254,61 @@ rx3a: load A into RX3. (1 byte) (7C)
 rx3b: load B into RX3. (1 byte) (7D)
 rx3c: load C into RX3. (1 byte) (7E)
 
+rx0_1: RX0 = RX1; (1 byte) (7F)
+rx0_2: RX0 = RX2; (1 byte) (80)
+rx0_3: RX0 = RX3; (1 byte) (81)
+
+rx1_0: RX1 = RX0; (1 byte) (82)
+rx1_2: RX1 = RX2; (1 byte) (83)
+rx1_3: RX1 = RX3; (1 byte) (84)
+
+rx2_0: RX2 = RX0; (1 byte) (85)
+rx2_1: RX2 = RX1; (1 byte) (86)
+rx2_3: RX2 = RX3; (1 byte) (87)
+
+rx3_0: RX3 = RX0; (1 byte) (88)
+rx3_1: RX3 = RX1; (1 byte) (89)
+rx3_2: RX3 = RX2; (1 byte) (8A)
+
+lrx0: load 4 constant bytes (highest, high, low, lowest) into RX0. (5 bytes) (8B)
+lrx1: load 4 constant bytes (highest, high, low, lowest) into RX1. (5 bytes) (8C)
+lrx2: load 4 constant bytes (highest, high, low, lowest) into RX2. (5 bytes) (8D)
+lrx3: load 4 constant bytes (highest, high, low, lowest) into RX3. (5 bytes) (8E)
+
+farildrx0: load RX0 from memory location M[(c&255)<<16 + a] (1 byte) (8F)
+farildrx1: load RX1 from memory location M[(c&255)<<16 + a] (1 byte) (90)
+farildrx2: load RX2 from memory location M[(c&255)<<16 + a] (1 byte) (91)
+farildrx3: load RX3 from memory location M[(c&255)<<16 + a] (1 byte) (92)
+
+faristrx0: store RX0 at memory location M[(c&255)<<16 + a] (1 byte) (93)
+faristrx1: store RX1 at memory location M[(c&255)<<16 + a] (1 byte) (94)
+faristrx2: store RX2 at memory location M[(c&255)<<16 + a] (1 byte) (95)
+faristrx3: store RX3 at memory location M[(c&255)<<16 + a] (1 byte) (96)
+
+rxadd: RX0 += RX1;(1 byte) (97)
+rxsub: RX0 -= RX1;(1 byte) (98)
+rxmul: RX0 *= RX1;(1 byte) (99)
+rxdiv: RX0 /= RX1;(1 byte) (9A)
+rxmod: RX0 %= RX1;(1 byte) (9B)
+rxrsh: RX0 >>= RX1;(1 byte) (9C)
+rxlsh: RX0 <<= RX1;(1 byte) (9D)
+
+rx0push: push 32 bit RX0 register onto the stack. (1 byte) (9E)
+rx1push: push 32 bit RX1 register onto the stack. (1 byte) (9F)
+rx2push: push 32 bit RX2 register onto the stack. (1 byte) (A0)
+rx3push: push 32 bit RX3 register onto the stack. (1 byte) (A1)
+
+rx0pop: pop 32 bit RX0 register from the stack. (1 byte) (A2)
+rx1pop: pop 32 bit RX1 register from the stack. (1 byte) (A3)
+rx2pop: pop 32 bit RX2 register from the stack. (1 byte) (A4)
+rx3pop: pop 32 bit RX3 register from the stack. (1 byte) (A5)
+
+rxand: RX0 &= RX1(1 byte) (A6)
+rxor: RX0 |= RX1(1 byte) (A7)
+rxxor: RX0 ^= RX1(1 byte) (bitwise XOR) (A8)
+rxcompl: RX0 = ~RX0; bitwise inversion, 1's complement.(1 byte) (A9)
+rxcmp:	if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;  (1 byte) (AA)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
