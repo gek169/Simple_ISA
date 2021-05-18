@@ -14,7 +14,7 @@ CPPFLAGS= $(MORECFLAGS) -Os -lm -Wno-unused-function -Wno-absolute-value -std=c+
 all: main asm_programs
 
 sisa16:
-	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses -ltinfo || $(CC) $(CFLAGS) isa.c -o sisa16
+	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses || $(CC) $(CFLAGS) isa.c -o sisa16
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 sisa16_asm:
