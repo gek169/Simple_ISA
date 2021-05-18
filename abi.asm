@@ -46,29 +46,29 @@ VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifn
 
 section LIBC_START_ADDR; asm_begin_region_restriction;
 VAR#proc_puts#sc%@%;lla%LIBC_START%;farcall;
-//move the stack pointer back.
-astp;lb6;sub;
-illdaa;lb8;rsh;lb255;and;ca;
-//load the thing thats there. But we also loaded the high byte of the
-//next short, so we need to get rid of that. Goes in C
-astp;lb5;sub;illdaa;//we need to grab that short.
+	//move the stack pointer back.
+	astp;lb6;sub;
+	illdaa;lb8;rsh;lb255;and;ca;
+	//load the thing thats there. But we also loaded the high byte of the
+	//next short, so we need to get rid of that. Goes in C
+	astp;lb5;sub;illdaa;//we need to grab that short.
 
-//we now have our far pointer! put it on the top of the stack for easy access.
-bc;bpush;alpush;
-//FARPTR1|FARPTR2|FARPTRPROC
-//				  (upper)[lower]
-VAR#puts_looptop#@
-POP_FARPTR_VARIABLE;
-PUSH_FARPTR_VARIABLE;
-farilda;
-putchar;
-lb0;cmp;sc%puts_loopend%;jmpifeq;
-POP_FARPTR_VARIABLE;
-ab;lb1;add;ba;
-PUSH_FARPTR_VARIABLE;
-sc %puts_looptop%;jmp;
-VAR#puts_loopend#@
-POP_FARPTR_VARIABLE;
+	//we now have our far pointer! put it on the top of the stack for easy access.
+	bc;bpush;alpush;
+	//FARPTR1|FARPTR2|FARPTRPROC
+	//				  (upper)[lower]
+	VAR#puts_looptop#@
+	POP_FARPTR_VARIABLE;
+	PUSH_FARPTR_VARIABLE;
+	farilda;
+	putchar;
+	lb0;cmp;sc%puts_loopend%;jmpifeq;
+	POP_FARPTR_VARIABLE;
+	ab;lb1;add;ba;
+	PUSH_FARPTR_VARIABLE;
+	sc %puts_looptop%;jmp;
+	VAR#puts_loopend#@
+	POP_FARPTR_VARIABLE;
 farret;
 asm_end_region_restriction;
 
@@ -96,11 +96,18 @@ ZERO_STACK_POINTER;
 
 VAR#load_main_i#sc%0x2%;llb%0x0000%;farillda;
 VAR#store_main_i#sc%0x2%;llb%0x0000%;faristla;
-
+	la 10;putchar;
+	la 13;putchar;	
 lla %0%;store_main_i;
 laDATA_REGION_1;apush;lla%msg_req_string%;alpush;
 proc_puts;
-
+	la 10;putchar;
+	la 13;putchar;	
+	lrx0 %/0x30%;asm_print;
+	lrx1 %/7%;asm_print;rxadd;
+	arx0;putchar;
+	la 10;putchar;
+	la 13;putchar;	
 halt;
 asm_end_region_restriction;
 

@@ -15,10 +15,10 @@ static FILE* F;
 						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
 						(U)M[PP+((U)(program_counter-1))])
 #define CONSUME_FOUR_BYTES (program_counter+=4,\
-						((((UU)M[PP+((U)(program_counter-1))]))<<24)+\
-						((((UU)M[PP+((U)(program_counter-2))]))<<16)+\
-						((((UU)M[PP+((U)(program_counter-3))]))<<8)+\
-						(UU)M[PP+((U)(program_counter-4))])
+						((((UU)M[PP+((U)(program_counter-4))]))<<24)+\
+						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
+						((((UU)M[PP+((U)(program_counter-2))]))<<8)+\
+						(UU)M[PP+((U)(program_counter-1))])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
