@@ -7,18 +7,18 @@ INSTALL_DIR=/usr/bin
 CCC= g++
 CFLAGS_SMALL= -Os -s
 MORECFLAGS=
-CFLAGS= $(MORECFLAGS) -O3 -std=c89 -pedantic
-CASMFLAGS=  $(MORECFLAGS) $(CFLAGS_SMALL) -lm -std=c89 -pedantic
+CFLAGS= $(MORECFLAGS) -O3 -s -std=c89 -pedantic
+CASMFLAGS=  $(MORECFLAGS) -O3 -s -lm -std=c89 -pedantic
 CPPFLAGS= $(MORECFLAGS) -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
 
 sisa16:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses || $(CC) $(CFLAGS) isa.c -o sisa16
-rbytes:
-	$(CC) $(CFLAGS) rbytes.c -o rbytes
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
+rbytes:
+	$(CC) $(CFLAGS) rbytes.c -o rbytes
 
 main: sisa16 sisa16_asm
 
