@@ -182,7 +182,7 @@ farpagest: copy 256 bytes to any page indexed by c from home region page indexed
 
 //Far call procedure:
 
-lfarpc: pp = a, move the program counter offset to a different 64k region of memory. (1 byte) (44)
+lfarpc: pp = a; pc=0; move the program counter offset to a different 64k region of memory. Set PC to 0. (1 byte) (44)
 farcall: (1 byte) (45)
 write the program counter to the stack pointer. 
 Push the stack pointer by 2.
