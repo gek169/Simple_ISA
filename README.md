@@ -2,9 +2,12 @@
 
 C program to simulate the SISA-16 virtual portable computer architecture.
 
-Confirmed to work on the following architectures and platforms:
+
+The emulator and assembler are CONFIRMED to work on the following architectures and platforms:
+
 ```c
 	IA32 (Debian linux, native)
+	i536 (Alpine linux, jslinux)
 	x86_64 (Debian linux, native)
 	riscv64 (Buildroot linux, jslinux)
 ```
