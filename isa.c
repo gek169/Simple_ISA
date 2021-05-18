@@ -157,7 +157,7 @@ G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
 G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)+((UU)a)))D
 G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
-G_LFARPC:program_counter_region=a;D
+G_LFARPC:program_counter_region=a;program_counter=0;D
 G_CALL:
 write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
 program_counter=c;D
