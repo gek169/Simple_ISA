@@ -113,12 +113,8 @@ asm_end_region_restriction;
 
 
 
-
-
-
-
-
-
+VAR#BOOT_REGION#__START__
+ASM_header bootdol.hasm
 
 //BOOTLOADER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-section 0;proc_main;
+//section 0;proc_main;

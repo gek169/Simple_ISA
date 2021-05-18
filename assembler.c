@@ -619,11 +619,15 @@ void fputbyte(unsigned char b, FILE* f){
 		fputc(b, f);
 	outputcounter++; outputcounter&=0xffffff;
 }
-void fASM_PUTShort(unsigned short sh, FILE* f){
+void putshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
-int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
+#define ASM_MAX_INCLUDE_LEVEL 20
+static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
+int main(int argc, char** argv){
+	FILE* infile,* ofile; char* metaproc;
+	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
 	const unsigned long maxmacrocalls = 0x10000;
 	unsigned long line_num = 0; 
@@ -718,8 +722,22 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	}
 	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
-	while(!feof(infile)){
+	while(1){
 		char was_macro = 0;	unsigned long nmacrocalls = 0;
+		if(!infile) {
+			puts("<ASM INTERNAL ERROR> infile is null? This should never happen.");
+		}
+		if(feof(infile)){
+			/*try popping from the fstack*/
+			if(include_level > 0){
+				fclose(infile); infile = NULL;
+				include_level -= 1;
+				infile = fstack[include_level];
+				continue;
+			}
+			/*else, break. End of pass.*/
+			break;
+		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		/*if this line ends in a backslash...*/
@@ -753,6 +771,41 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					fputbyte(line[i], ofile);
 			goto end;
 		}
+		if(strprefix("ASM_header ", line)){
+			FILE* tmp; char* metaproc;
+			metaproc = line + strlen("ASM_header ");
+			if(include_level >= ASM_MAX_INCLUDE_LEVEL){
+				puts("<ASM COMPILATION ERROR> Include level maximum reached.");
+				goto error;
+			}
+			tmp = fopen(metaproc, "r");
+			if(!tmp) {
+				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
+			if(!tmp && getenv("HOME")) {
+				char* bruh = NULL;
+				if(getenv("HOME")[strlen(getenv("HOME"))-1] == '/')
+					bruh = strcatallocf1(strcatalloc(getenv("HOME"),"sisa16/"), metaproc);
+				else
+					bruh = strcatallocf1(strcatalloc(getenv("HOME"),"/sisa16/"), metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
+			if(!tmp) { char* bruh = strcatalloc("C:\\SISA16\\", metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
+			if(!tmp) {
+				printf("<ASM COMPILATION ERROR> Unknown/unreachable header file %s\n", metaproc); 
+				goto error;
+			}
+			fstack[include_level] = infile;
+			include_level++;
+			infile = tmp;
+			goto end;
+		}
 		if(strprefix("ASM_data_include ", line)){
 			/*data include! format is
 			[newline]asm_data_include filename
@@ -760,6 +813,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			FILE* tmp; char* metaproc; unsigned long len;
 			metaproc = line + strlen("ASM_data_include ");
 			tmp = fopen(metaproc, "rb");
+			if(!tmp) {
+				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);
+				tmp = fopen(bruh, "rb");
+				free(bruh);
+			}
+			if(!tmp) {
+				char* bruh = strcatalloc("~/sisa16/", metaproc);
+				tmp = fopen(bruh, "rb");
+				free(bruh);
+			}
+			if(!tmp) { char* bruh = strcatalloc("C:\\SISA16\\", metaproc);
+				tmp = fopen(bruh, "rb");
+				free(bruh);
+			}
 			if(!tmp) {
 				printf("<ASM COMPILATION ERROR> Unknown/unreachable data file %s\n", metaproc); 
 				goto error;
@@ -1626,7 +1693,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						goto error;
 					}
 					shortval = strtoul(proc,NULL,0);
-					fASM_PUTShort(shortval, ofile);
+					putshort(shortval, ofile);
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");

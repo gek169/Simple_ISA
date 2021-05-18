@@ -564,8 +564,31 @@ any and all `.asm` files will be compiled and output to `.bin` files of the same
 in the top level directory of this project when you invoke `make`, thanks to `asm_compile.sh`
 
 ### Static Linking
+
+There are two ways of doing static linking: Headers and Precompilation.
+
+Headers are the more intuitive and probably more extensible way.
+
+to use headers, simply make a line that looks like this
+```c
+ASM_header myfile.asm
+```
+Note that this line is whitespace sensitive- the line must begin with `ASM_header ` (with one space).
+
+the end of the line is at the newline character, and all spaces and characters after `ASM_header ` are considered
+part of the filename.
+
+If a relative path is used for the filename it will be searched for in the following locations, in order:
+* current working directory
+* /usr/include/
+* ~/sisa16/
+* C:\SISA16\
+
+upon finding one successfully, it will open it.
+
 Through intelligent use of the assembler to compile libraries before programs that use them, one can achieve
-static linking by using `ASM_data_include` and then creating macros to call functions defined in the file included,
+static linking by using `ASM_data_include ` (same semantics as ASM_header) 
+and then creating macros to call functions defined in the file included,
 or macros to refer to variables which are instantiated and used inside the library.
 
 ```c
