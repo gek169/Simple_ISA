@@ -14,11 +14,11 @@ CPPFLAGS= $(MORECFLAGS) -Os -lm -Wno-unused-function -Wno-absolute-value -std=c+
 all: main asm_programs
 
 sisa16:
-	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses || $(CC) $(CFLAGS) isa.c -o sisa16
-	@echo "Built emulator."
+	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16 -DUSE_UNSIGNED_INT
+	@echo "~~Built emulator."
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
-	@echo "Built assembler"
+	@echo "~~Built assembler"
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 

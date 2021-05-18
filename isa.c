@@ -1,7 +1,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#ifndef USE_UNSIGNED_INT
 typedef unsigned long UU;
+#else
+typedef unsigned int UU;
+#endif
 typedef unsigned char u;
 typedef unsigned short U;
 static u R=0,M[(((UU)1)<<24)];
