@@ -65,6 +65,7 @@ char* outfilename = "outsisa16.bin";
 char* execute_sisa16 = "sisa16";
 char run_sisa16 = 0;
 char clear_output = 0;
+void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
@@ -586,12 +587,10 @@ unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
 char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
-				/*if(debugging)
-					printf("\nWriting individual byte %u\n", b);*/
 	if((unsigned long)ftell(f) != outputcounter){
 		/*seek to the end*/
 		if(debugging)
-			puts("Having to move the file counter.\n");
+			ASM_PUTS("Having to move the file counter.\n");
 		fseek(f,0,SEEK_END);
 		if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
 			fseek(f,outputcounter,SEEK_SET); 
@@ -602,25 +601,25 @@ void fputbyte(unsigned char b, FILE* f){
 		case 0: break;
 		case 1:{
 			if (((outputcounter>>8) & 0xFFFF)  != region_restriction){
-				printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
+				if(!clear_output)printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
 				exit(1);
 			}
 		}
 		break;
 		case 2:{
 			if (((outputcounter>>16) & 0xFF)  != region_restriction){
-				printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
+				if(!clear_output)printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
 				exit(1);
 			}
 		}
 		break;
-		default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
+		default: ASM_PUTS("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
 	}
 	if(npasses == 1)
 		fputc(b, f);
 	outputcounter++; outputcounter&=0xffffff;
 }
-void fputshort(unsigned short sh, FILE* f){
+void fASM_PUTShort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
@@ -655,7 +654,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
-			puts("<ASM> Executing after building...");
+			ASM_PUTS("<ASM> Executing after building...");
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
@@ -663,15 +662,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	{
 		if(strprefix("-E",argv[i])) {
 			quit_after_macros = 1;
-			puts("#Contents of file post macro expansion are as follows:");
+			ASM_PUTS("#Contents of file post macro expansion are as follows:");
 		}
 		if(strprefix("-DBG",argv[i])) {
 			debugging = 1;
-			puts("<ASM> Debugging.\n");
+			ASM_PUTS("<ASM> Debugging.\n");
 		}
 		if(strprefix("-pl",argv[i])){
 			printlines = 1;
-			puts("<ASM> Printing lines.");
+			ASM_PUTS("<ASM> Printing lines.");
 		}
 		if(
 			strprefix("-h",argv[i]) ||
@@ -679,33 +678,33 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			strprefix("--help",argv[i]) ||
 			strprefix("--version",argv[i])
 		){
-			printf("Usage: %s [ARGS...]\n", argv[0]);
-			puts("Optional argument: -i: specify input file.");
-			puts("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
-			puts("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
-			puts("Optional argument: -E: Print macro expansion only do not write to file");
-			puts("Optional argument: -pl: Print lines");
-			puts("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
-			puts("Optional argument: -v, -h, --help, --version: This printout.");
-			puts("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.2");
-			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
+			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
+			ASM_PUTS("Optional argument: -i: specify input file.");
+			ASM_PUTS("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
+			ASM_PUTS("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
+			ASM_PUTS("Optional argument: -E: Print macro expansion only do not write to file");
+			ASM_PUTS("Optional argument: -pl: Print lines");
+			ASM_PUTS("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
+			ASM_PUTS("Optional argument: -v, -h, --help, --version: This printout.");
+			ASM_PUTS("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.2");
+			ASM_PUTS("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			return 1;
 		}
 	}}
 	if(debugging) infile=stdin;
 
 	if(infilename){
-		if(debugging) printf("\nReading from a file...\n");
+		if(debugging) if(!clear_output)printf("\nReading from a file...\n");
 			infile = fopen(infilename, "r");
 		if(!infile) {
-			printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);
+			if(!clear_output)printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);
 			return 1;
 		}
 	} else {
-		if(debugging) printf("\nReading from stdin...");
+		if(debugging) if(!clear_output)printf("\nReading from stdin...");
 		if(!debugging) {
-			puts("\n<ASM ERROR> May not use reading from stdin when not in debugging mode.\n");
-			puts("\n<ASM> Assembler Aborted.");
+			ASM_PUTS("\n<ASM ERROR> May not use reading from stdin when not in debugging mode.\n");
+			ASM_PUTS("\n<ASM> Assembler Aborted.");
 			return 1;
 		}
 	}
@@ -713,17 +712,19 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 	if(!quit_after_macros)
 		ofile=fopen(outfilename, "wb");
 	if(!ofile){
-		printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);return 1;
+		if(!clear_output)
+			printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);
+		return 1;
 	}
 	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(!feof(infile)){
 		char was_macro = 0;	unsigned long nmacrocalls = 0;
-		if(debugging) printf("\nEnter a line...\n");
+		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		/*if this line ends in a backslash...*/
 		if(!line) {
-			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
+			ASM_PUTS("<ASM COMPILATION ERROR> cannot retrieve line.");
 			goto error;
 		}
 		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
@@ -745,8 +746,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(strprefix("!",line)) {unsigned long i;
 			/*We are writing out individual bytes for the rest of the line.*/
 			if(debugging)
-				printf("Detected Character Literal on Line:\n%s\n", line_copy);
-			if(printlines)puts(line);
+				if(!clear_output)printf("Detected Character Literal on Line:\n%s\n", line_copy);
+			if(printlines)ASM_PUTS(line);
 			if(!quit_after_macros)
 				for(i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
@@ -759,28 +760,28 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			FILE* tmp; char* metaproc; unsigned long len;
 			metaproc = line + strlen("ASM_data_include ");
 			tmp = fopen(metaproc, "rb");
-			if(!tmp) {printf("<ASM COMPILATION ERROR> Unknown/unreachable data file %s\n", metaproc); goto error;}
+			if(!tmp) {if(!clear_output)printf("<ASM COMPILATION ERROR> Unknown/unreachable data file %s\n", metaproc); goto error;}
 			fseek(tmp, 0, SEEK_END);
 			len = ftell(tmp);
 			if(len > 0x1000000) {
-				printf("<ASM COMPILATION ERROR> data file %s larger than entire address space.\n", metaproc); 
+				if(!clear_output)printf("<ASM COMPILATION ERROR> data file %s larger than entire address space.\n", metaproc); 
 				goto error;
 			}
 			if(len == 0){
-				printf("<ASM COMPILATION ERROR> data file %s is empty.\n", metaproc); 
+				if(!clear_output)printf("<ASM COMPILATION ERROR> data file %s is empty.\n", metaproc); 
 				goto error;
 			}
 			fseek(tmp, 0, SEEK_SET);
 			for(;len>0;len--)fputbyte(fgetc(tmp), ofile);
 			fclose(tmp);
-			if(printlines)puts(line);
+			if(printlines)ASM_PUTS(line);
 			goto end;
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		pre_pre_processing:
 
 		if(nmacrocalls > maxmacrocalls){
-			printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
+			if(!clear_output)printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
 			goto error;
 		}
 		nmacrocalls++;
@@ -790,23 +791,23 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			free(line_old);
 		}
 		if(strprefix("ASM_COMPILE", line)){
-			puts("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
+			ASM_PUTS("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
 			goto error;
 		}
 		if(strprefix("ASM_COPYRIGHT", line)){
-			puts("SISA-16 Assembler,(C)David M.H.S. Webster 2021\navailable to you under the Creative Commons Zero license.");
+			ASM_PUTS("SISA-16 Assembler,(C)David M.H.S. Webster 2021\navailable to you under the Creative Commons Zero license.");
 			goto end;
 		}
 		if(strprefix("asm_help", line)){
-			puts("This assembler should have come with a README.MD and an emulator \"isa.c\". If it did not, you got scammed! ");
-			puts("This is no ordinary assembler, it has a very complicated macro syntax, arbitrary data includes, and string literals.");
-			puts("There are, however, no structured programming control flow statements. you've only got the jmp, jmpifeq, jmpifneq, call, farcall, ret, and farret insns.");
-			puts("The assembler is a two-pass compiler. Both passes work roughly the same. The first pass won't actually write the file, though.");
-			puts("However, on the second pass, you can use variable defined from the first pass.");
-			puts("This allows you to do things like define goto labels. On the first pass, the jump target will evaluate as zero, but on the second it will be defined.");
-			puts("Note that it is possible to (purposefully or by mistake...) deysynchronize the two passes. That is, cause the number of bytes written to the output file to be different on different passes.");
-			puts("(You can fix this on the second pass with asm_correct_outp+amount; or asm_correct_outp-amount;)");
-			puts("You can try to figure out how it works from source but you really need the readme.");
+			ASM_PUTS("This assembler should have come with a README.MD and an emulator \"isa.c\". If it did not, you got scammed! ");
+			ASM_PUTS("This is no ordinary assembler, it has a very complicated macro syntax, arbitrary data includes, and string literals.");
+			ASM_PUTS("There are, however, no structured programming control flow statements. you've only got the jmp, jmpifeq, jmpifneq, call, farcall, ret, and farret insns.");
+			ASM_PUTS("The assembler is a two-pass compiler. Both passes work roughly the same. The first pass won't actually write the file, though.");
+			ASM_PUTS("However, on the second pass, you can use variable defined from the first pass.");
+			ASM_PUTS("This allows you to do things like define goto labels. On the first pass, the jump target will evaluate as zero, but on the second it will be defined.");
+			ASM_PUTS("Note that it is possible to (purposefully or by mistake...) deysynchronize the two passes. That is, cause the number of bytes written to the output file to be different on different passes.");
+			ASM_PUTS("(You can fix this on the second pass with asm_correct_outp+amount; or asm_correct_outp-amount;)");
+			ASM_PUTS("You can try to figure out how it works from source but you really need the readme.");
 		}
 
 		else if ((!strprefix("VAR#", line)) /*Do not parse asm_pleq's inside of a VAR# line.*/
@@ -838,11 +839,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			else if(loc_muleq < loc_pleq)
 				{loc = loc_muleq;command_name = "asm_muleq#";}
 			else {
-				printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
 				goto error;
 			}
 			if(loc_pleq == -1 && loc_muleq == -1){
-				printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
 				goto error;
 			}
 			len_to_replace = strlen(command_name);
@@ -850,7 +851,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			if(loc_call != -1 && 
 				loc_call < loc) 
 			{
-				/*printf("\nDeferring to a call statement before us. Line internally:\n%s\nUs:\n%s\nCall:\n%s\n", line, line + loc, line + loc_call);*/
+				/*if(!clear_output)printf("\nDeferring to a call statement before us. Line internally:\n%s\nUs:\n%s\nCall:\n%s\n", line, line + loc, line + loc_call);*/
 				goto process_asm_call;
 			} /*We have to evaluate it first.*/
 			/*Sequence break before this point- do not allow to continue.*/
@@ -860,18 +861,18 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			proc = line_old + loc + strlen(command_name);
 			before = str_null_terminated_alloc(line_old, loc);
 			if(proc[0] != '\\'){
-				printf("<ASM SYNTAX ERROR> %s cannot reference a variable. It is not escaped. Line:\n%s\n", command_name, line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> %s cannot reference a variable. It is not escaped. Line:\n%s\n", command_name, line_copy);
 				goto error;
 			}
 			proc++;len_to_replace++;
 			if(proc[0] == 0){
-				printf("<ASM SYNTAX ERROR> %s is at the end of the line. Line:\n%s\n",command_name, line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> %s is at the end of the line. Line:\n%s\n",command_name, line_copy);
 				goto error;
 			}
 			
 			loc_middle_pound = strfind(proc,"#");
 			if(loc_middle_pound < 1){
-				printf("<ASM SYNTAX ERROR> %s lacks second pound. Line:\n%s\n",command_name, line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> %s lacks second pound. Line:\n%s\n",command_name, line_copy);
 				goto error;
 			}
 			
@@ -880,7 +881,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			len_to_replace += loc_middle_pound+1;
 			loc_end_pound = strfind(proc,"#");
 			if(loc_middle_pound < 1){
-				printf("<ASM SYNTAX ERROR> %s lacks end pound. Line:\n%s\n", command_name, line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> %s lacks end pound. Line:\n%s\n", command_name, line_copy);
 				goto error;
 			}
 			if(proc[0] == '\\'){
@@ -891,7 +892,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			varname2 = str_null_terminated_alloc(proc, loc_end_pound);
 			len_to_replace++; len_to_replace+=loc_end_pound;
 			if(npasses == 1 && debugging)
-			printf("\n%s invoked with \'%s\' and \'%s\'. the second is %s \n",command_name, varname1, varname2,
+			if(!clear_output)printf("\n%s invoked with \'%s\' and \'%s\'. the second is %s \n",command_name, varname1, varname2,
 				var2_is_variable?"a variable.":"an integer literal.");
 			for(variable_i = nbuiltin_macros; variable_i < nmacros; variable_i++){
 				if(streq(varname1, variable_names[variable_i]))
@@ -900,7 +901,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					var2ind = variable_i;
 			}
 			if(var1ind == -1){
-				printf("<ASM SYNTAX ERROR> asm_pleq cannot identify macro \'%s\'. Line:\n%s\n", varname1, line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> asm_pleq cannot identify macro \'%s\'. Line:\n%s\n", varname1, line_copy);
 				goto error;
 			}
 			variable_is_redefining_flag[var1ind] = 1;
@@ -910,7 +911,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			else
 				val2 = strtol(varname2, NULL, 0);
 			if(debugging)
-			printf("val 1 is %ld, 2 is %ld\n", val1, val2);
+			if(!clear_output)printf("val 1 is %ld, 2 is %ld\n", val1, val2);
 			/*Free variable names.*/
 			free(varname1);
 			free(varname2);var2ind=-1;
@@ -931,7 +932,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			if(variable_expansions[var1ind])
 				free(variable_expansions[var1ind]);
 			else {
-				printf("<ASM INTERNAL ERROR> variable had a null expansion? Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM INTERNAL ERROR> variable had a null expansion? Line:\n%s\n", line_copy);
 				goto error;
 			}
 			
@@ -939,7 +940,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			/*TODO: handle before, after, and line expansion stuff.*/
 			after = strcatalloc(line+loc+len_to_replace, "");
 			if(debugging)
-				printf("before: \n%s\n after: \n%s", before, after);
+				if(!clear_output)printf("before: \n%s\n after: \n%s", before, after);
 			line = strcatallocfb(
 				before,
 				after
@@ -961,22 +962,22 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			the arguments thereafter are arg1, arg2, arg3... */
 			next_pound = strfind(f, "#");
 			if(next_pound == -1) {
-				printf("<ASM SYNTAX ERROR> macro call lacking any succeeding pounds.Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> macro call lacking any succeeding pounds.Line:\n%s\n", line_copy);
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(f, next_pound);
-			/*printf("\nMacro call attempt detected on macro \'%s\'", macro_name);*/
+			/*if(!clear_output)printf("\nMacro call attempt detected on macro \'%s\'", macro_name);*/
 			{
 				unsigned long macro_i;
 				for(macro_i = 0; macro_i < nmacros; macro_i++)
 					if(streq(macro_name, variable_names[macro_i])){found_macro_id=macro_i;break;}
 				if(found_macro_id == -1){
-					printf("<ASM SYNTAX ERROR> macro call on non-existent macro.Line:\n%s\n", line_copy);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> macro call on non-existent macro.Line:\n%s\n", line_copy);
 					goto error;
 				}
 			}
 			content = strcatalloc(variable_expansions[found_macro_id],"");
-			if(debugging) printf("\nMacro call attempt on macro \'%s\'", macro_name);
+			if(debugging) if(!clear_output)printf("\nMacro call attempt on macro \'%s\'", macro_name);
 			f+=next_pound+1;
 			for(i=1;*f!='\0' && *f!='#';i++){
 				unsigned long macro_i;
@@ -989,13 +990,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				long overwriting = -1;/*if not negative, this means it's replacing something.*/
 				/*Check to see if we even can define a macro.*/
 				if(nmacros == 0xffff) {
-					printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
+					if(!clear_output)printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
+					goto error;
 				}
 				/*There is enough room for a macro.*/
 				sprintf(namebuf, "_arg%lu_", i);
 				varname = strcatalloc(namebuf, "");
 				if(debugging)
-					printf("\nReplacing %s...", varname);
+					if(!clear_output)printf("\nReplacing %s...", varname);
 				/*We need to see if this macro already exists.*/
 				for(macro_i = 0; macro_i < nmacros; macro_i++)
 					if(streq(varname, variable_names[macro_i]))
@@ -1007,7 +1009,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				/*get the definition*/
 				next_pound = strfind(f, "#");
 				if(next_pound == -1) {
-					printf("<ASM SYNTAX ERROR> macro call lacking end first pound.Line:\n%s\n", line_copy);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> macro call lacking end first pound.Line:\n%s\n", line_copy);
 					goto error;
 				}
 				vardef = str_null_terminated_alloc(f, next_pound);
@@ -1017,11 +1019,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				variable_names[overwriting] = varname;
 				variable_expansions[overwriting] = vardef;
 				if(debugging)
-					printf("\nReplacing %s with %s", varname, vardef);
+					if(!clear_output)printf("\nReplacing %s with %s", varname, vardef);
 				/*replace _argXXX in content.*/
 				while(strfind(content, varname)!= -1 && replacements < max_repl){
 					char* content_before, *content_after;replacements++;
-					if(debugging) puts("Found an instance of a required replacement!");
+					if(debugging) ASM_PUTS("Found an instance of a required replacement!");
 					content_before = str_null_terminated_alloc(content,strfind(content, varname));
 					content_after = strcatalloc(content+strfind(content, varname)+strlen(varname),"");
 					free(content); /**/
@@ -1032,7 +1034,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				}
 			}
 			if(*f != '#'){
-				printf("<ASM SYNTAX ERROR> macro call lacking end second pound.Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> macro call lacking end second pound.Line:\n%s\n", line_copy);
 				goto error;
 			}f++;
 			/*Get the after.*/
@@ -1043,7 +1045,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strcatallocfb(content, after)
 			);
 			free(macro_name);
-			if(debugging) printf("\nThe line is now \n%s\nas a result of a macro call!\n", line);
+			if(debugging) if(!clear_output)printf("\nThe line is now \n%s\nas a result of a macro call!\n", line);
 			goto pre_pre_processing; /*Allow recursive calling.*/
 		}
 
@@ -1051,7 +1053,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
 		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'
 			&& line[0] != '\\' && line[0] != '|'){
-			printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
+			if(!clear_output)printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
@@ -1062,9 +1064,9 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			do{
 				have_expanded = 0;
 				if(debugging){
-					printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					if(!clear_output)printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 					if(was_macro)
-						puts("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
+						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
 				{
 				long loc_vbar = strfind(line, "|");
@@ -1097,7 +1099,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						/*Also, don't parse muleq or pleq*/
 					}
 					line_old = line;
-					if(debugging)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
+					if(debugging)if(!clear_output)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
 					if(!was_macro)
@@ -1120,7 +1122,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						}
 					}
 					if(found_longer_match)
-					{if(debugging)puts("Found longer Macro.");continue;}
+					{if(debugging)ASM_PUTS("Found longer Macro.");continue;}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
@@ -1138,15 +1140,15 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							/*Find the next plus*/
 							long loc_eparen = strfind(line_old+loc+2,"+");
 							if(loc_eparen == -1){
-								printf("<ASM SYNTAX ERROR> @ with no ending plus. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM SYNTAX ERROR> @ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
 							}
 							if(loc_eparen == 0){
-								printf("<ASM WARNING> @ with empty add section. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM WARNING> @ with empty add section. Line:\n%s\n", line_copy);
 							}
 							addval = strtoul(add_text,0,0);
 							if(addval == 0 && npasses == 1)
-								printf("<ASM WARNING> @ with add evaluating to zero. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM WARNING> @ with add evaluating to zero. Line:\n%s\n", line_copy);
 							if(addval)
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
@@ -1163,20 +1165,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							/*Find the next plus*/
 							loc_eparen = strfind(line_old+loc+2,"+");
 							if(loc_eparen == -1){
-								printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM SYNTAX ERROR> $ with no ending plus. Line:\n%s\n", line_copy);
 								goto error;
 							}
 							if(loc_eparen == 0){
-								printf("<ASM WARNING> $ with empty add section. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM WARNING> $ with empty add section. Line:\n%s\n", line_copy);
 							}
 							addval = strtoul(add_text,0,0);
 							if(addval == 0 && npasses == 1)
-								printf("<ASM WARNING> $ with add evaluating to zero. Line:\n%s\n", line_copy);
+								if(!clear_output)printf("<ASM WARNING> $ with add evaluating to zero. Line:\n%s\n", line_copy);
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
 						
-						/*snprintf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));*/
+						/*snif(!clear_output)printf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));*/
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
@@ -1184,17 +1186,17 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					unsigned long res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
-							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
+							if(!clear_output)printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
 						loc_eparen = strfind(line_old+loc+1,"%");
 						loc_slash = strfind(line_old+loc+1,"/");
 						if(loc_eparen == -1){
-							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							if(!clear_output)printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
 						}
 						if(loc_eparen == 0){
-							/*printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
+							/*if(!clear_output)printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
 						}
 						if(loc_slash==0) do_32bit = 1;
 						/*the character we were going to replace anyway, plus
@@ -1207,12 +1209,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 							res = strtoul(line_old+loc+2, NULL, 0);
 						if(!do_32bit){
 							if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
-								printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
+								if(!clear_output)printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
 						} else {
 							if(res == 0  && npasses == 1 && line_old[loc+2] != '%' && line_old[loc+2] != '0')
-								printf("<ASM WARNING> Unusual 32-bit SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
+								if(!clear_output)printf("<ASM WARNING> Unusual 32-bit SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
 						}
-						if(debugging) printf("\nSplitting value %lu\n", res);
+						if(debugging) if(!clear_output)printf("\nSplitting value %lu\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
 						if(do_32bit == 0)
 							sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
@@ -1236,50 +1238,54 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 		if(strprefix("!",line) || strfind(line, "!") != -1) {
-			printf("<ASM SYNTAX ERROR> Invalid character literal.");
-			printf("Character literals must be on their own line with no preceding whitespace.");
-			printf("\nLine:\n%s\n", line_copy);
+			if(!clear_output)printf("<ASM SYNTAX ERROR> Invalid character literal.");
+			if(!clear_output)printf("Character literals must be on their own line with no preceding whitespace.");
+			if(!clear_output)printf("\nLine:\n%s\n", line_copy);
 			goto error;
 		}
 		
 		/*Step 2: Check to see if this is a macro*/
 		if(debugging){
-			printf("\n~~Is this a macro?~~\n");
+			if(!clear_output)printf("\n~~Is this a macro?~~\n");
 		}
 
 		if(strprefix("VAR",line)){ long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
 			unsigned short index;
 			if(debugging){
-				printf("\nThis is a macro!\n");
+				if(!clear_output)printf("\nThis is a macro!\n");
 			}
 			was_macro = 1;
 			if(nmacros == 0xffff) {
-				printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); goto error;
+				if(!clear_output)printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
+				goto error;
 			}
 			loc_pound = strfind(line, "#");
 			loc_pound2 = 0;
 			if(loc_pound == -1) {
-				printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line:\n%s\n", line_copy); goto error;
+				if(!clear_output)printf("<ASM SYNTAX ERROR>  missing leading # in macro declaration. Line:\n%s\n", line_copy); 
+				goto error;
 			}
 			/*We have a macro.*/
 			macro_name = line + loc_pound;
 			if(debugging){
-				printf("\nMacro Name Pre-Allocation is identified as %s\n", macro_name);
+				if(!clear_output)printf("\nMacro Name Pre-Allocation is identified as %s\n", macro_name);
 			}
 			if(strlen(macro_name) == 1){
-				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); goto error;
+				if(!clear_output)printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); 
+				goto error;
 			}
 			macro_name += 1; loc_pound += 1; /*We use these again.*/
 			loc_pound2 = strfind(macro_name, "#");
 			if(loc_pound2 == -1) {
-				printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); goto error;
+				if(!clear_output)printf("\n<ASM SYNTAX ERROR> missing second # in macro declaration. Line:\n%s\n", line_copy); 
+				goto error;
 			}
 			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);
 			if(debugging){
-				printf("\nMacro Name is identified as %s\n", macro_name);
+				if(!clear_output)printf("\nMacro Name is identified as %s\n", macro_name);
 			}
 			if(strlen(line + loc_pound + loc_pound2) < 2){
-				printf("<ASM SYNTAX ERROR> macro without a definition. Line:\n%s\n", line_copy);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> macro without a definition. Line:\n%s\n", line_copy);
 				goto error;
 			}
 			loc_pound2++;
@@ -1290,7 +1296,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				if( (strfind(insns[i],macro_name)>-1) ||
 					(strfind(macro_name, insns[i])==0) 
 				){
-					printf("<ASM SYNTAX ERROR> This macro would prevent instruction %s from being used:\n%s\n", insns[i], line_copy);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> This macro would prevent instruction %s from being used:\n%s\n", insns[i], line_copy);
 					goto error;	
 				}
 			}}
@@ -1325,8 +1331,8 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				(macro_name[0] <= '9' && macro_name[0] >= '0')
 			)
 			{
-				printf("<ASM SYNTAX ERROR> This macro deliberately attempts to define or trample a reserved name or character. You may not use this name:\n%s\n", macro_name);
-				puts("NOTE: You cannot use names beginning with numbers, either.");
+				if(!clear_output)printf("<ASM SYNTAX ERROR> This macro deliberately attempts to define or trample a reserved name or character. You may not use this name:\n%s\n", macro_name);
+				ASM_PUTS("NOTE: You cannot use names beginning with numbers, either.");
 				goto error;	
 			}
 
@@ -1368,7 +1374,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				strfind("asm_quit", macro_name) != -1
 			)
 			{
-				printf("<ASM SYNTAX ERROR> This macro would prevent language features from being used. You may not use this name:\n%s\n", macro_name);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> This macro would prevent language features from being used. You may not use this name:\n%s\n", macro_name);
 				goto error;	
 			}
 			{unsigned short i;for(i = 0; i < nmacros; i++){
@@ -1376,7 +1382,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if( (strfind(variable_names[i],macro_name)>-1) ||
 						streq(macro_name, variable_names[i]))
 					{
-						printf("<ASM SYNTAX ERROR> This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
+						if(!clear_output)printf("<ASM SYNTAX ERROR> This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
 						goto error;	
 					}
 				if(
@@ -1387,17 +1393,17 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						(strfind(macro_name, variable_names[i])>-1)
 					)
 				){
-					printf("<ASM WARNING> This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
+					if(!clear_output)printf("<ASM WARNING> This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
 				}
 				
 				if(streq(macro_name, variable_names[i])){
 					if(is_overwriting){
-						printf("<ASM INTERNAL ERROR> Multiple macros exist with the same name. Line:\n%s\n", line_copy);
+						if(!clear_output)printf("<ASM INTERNAL ERROR> Multiple macros exist with the same name. Line:\n%s\n", line_copy);
 						goto error;
 					}
 					is_overwriting = 1;
 					if(i < nbuiltin_macros){
-						printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
+						if(!clear_output)printf("<ASM SYNTAX ERROR> attempted redefinition of critical macro, Line:\n%s\n", line_copy);
 						goto error;	
 					}
 					index = i;
@@ -1413,7 +1419,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else {char* temp;
 				if(npasses == 0)
 					{
-						/*printf("<ASM WARNING> redefining macro, potentially desyncing compilation. Check that. line: %s\n", line_copy);*/
+						/*if(!clear_output)printf("<ASM WARNING> redefining macro, potentially desyncing compilation. Check that. line: %s\n", line_copy);*/
 						variable_is_redefining_flag[index] = 1;
 					}
 				if(variable_names[index]) free(variable_names[index]);
@@ -1429,7 +1435,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					)
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
 					if(!streq(temp, variable_expansions[index])){
-						printf("<ASM HUGE WARNING>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
+						if(!clear_output)printf("<ASM HUGE WARNING>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
 						free(variable_expansions[index]);
 						variable_expansions[index] = temp;
 					}
@@ -1441,13 +1447,13 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				}
 			}
 			if(debugging){
-				printf("\nMacro Contents are %s, size %u\n", variable_expansions[nmacros-1], (unsigned int)strlen(variable_expansions[nmacros-1]));
-				printf("\nMacro Name is %s, size %u\n", variable_names[nmacros-1], (unsigned int)strlen(variable_names[nmacros-1]));
+				if(!clear_output)printf("\nMacro Contents are %s, size %u\n", variable_expansions[nmacros-1], (unsigned int)strlen(variable_expansions[nmacros-1]));
+				if(!clear_output)printf("\nMacro Name is %s, size %u\n", variable_names[nmacros-1], (unsigned int)strlen(variable_names[nmacros-1]));
 			}
 		}
 		if(quit_after_macros || debugging) {
-			printf("\n#Line post macro expansion and evaluation:\n");
-			puts(line); 
+			if(!clear_output)printf("\n#Line post macro expansion and evaluation:\n");
+			ASM_PUTS(line); 
 			if(quit_after_macros) goto end;
 		}
 
@@ -1480,7 +1486,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			do{
 				have_expanded = 0;
 				if(debugging){
-					printf("\n~~Insn Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					if(!clear_output)printf("\n~~Insn Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 				}
 				{unsigned long i;for(i = 0; i<n_insns; i++){char* line_old; long loc, linesize; unsigned long j;
 					char found_longer_match; int num_commas_needed;
@@ -1514,7 +1520,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 								)
 							)
 							{
-								if(debugging) puts("Found longer insn.");
+								if(debugging) ASM_PUTS("Found longer insn.");
 									found_longer_match = 1;
 									break;
 							}
@@ -1524,7 +1530,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(loc>0){
 						/*Check to make sure this isn't prefixed by something which is obviously erroneous.*/
 						if(*(line+loc-1) != ';')
-							printf("<ASM WARNING> Instruction parsing reached with "
+							if(!clear_output)printf("<ASM WARNING> Instruction parsing reached with "
 									"unusual prefixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\nInternally:\n%s\n",*(line+loc-1),insns[i],line_copy, line);
 					}
 					if(
@@ -1536,7 +1542,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						) &&
 						*(line+loc+strlen(insns[i])) != ' '
 					)
-						printf("<ASM WARNING> Instruction parsing reached with "
+						if(!clear_output)printf("<ASM WARNING> Instruction parsing reached with "
 								"unusual postfixing character \'%c\'. May be syntax error. Instruction to parse is %s. Line:\n%s\nInternally:\n%s\n",*(line+loc+strlen(insns[i])),insns[i],line_copy,line);
 					/*We know the location of an insn to be expanded and it is at loc.*/
 					/*Crawl along the string. */
@@ -1546,14 +1552,14 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 						if(line[j] == ','){
 							if(num_commas_needed > 0) num_commas_needed--;
 							else { /*Too many commas.*/
-								printf("\n<ASM SYNTAX ERROR> too many arguments to insn %s, line %s", insns[i], line_copy);
+								if(!clear_output)printf("\n<ASM SYNTAX ERROR> too many arguments to insn %s, line %s", insns[i], line_copy);
 								goto error;
 							}
 						}
 						if(line[j] == ';' || line[j] == '\n' || line[j] == '\0'){
 							if(num_commas_needed > 0)
 							{ /*Too many commas.*/
-								printf("\n<ASM SYNTAX ERROR> Insn requires more arguments. line %s", line_copy);
+								if(!clear_output)printf("\n<ASM SYNTAX ERROR> Insn requires more arguments. line %s", line_copy);
 								goto error;
 							}
 							break; /*Out of this for loop.*/
@@ -1561,7 +1567,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					}
 					if(num_commas_needed > 0)
 					{ /*Too many commas.*/
-						printf("\n<ASM SYNTAX ERROR> Insn requires more arguments. line %s", line_copy);
+						if(!clear_output)printf("\n<ASM SYNTAX ERROR> Insn requires more arguments. line %s", line_copy);
 						goto error;
 					}
 					/**/
@@ -1583,7 +1589,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		*/
 		/*Inch along*/
 		if(printlines && npasses==1){
-			printf("%s\n",line);
+			if(!clear_output)printf("%s\n",line);
 		}
 		metaproc = line; /*declaration at beginning of main.*/
 		do{ long incr, incrdont;
@@ -1592,7 +1598,7 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				do{
 					unsigned char byteval; unsigned long preval; 
 					if(int_checker(proc)){
-						printf("<ASM SYNTAX ERROR> invalid integer literal for bytes command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for bytes command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 						goto error;
 					}
 					
@@ -1613,11 +1619,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				do{
 					unsigned short shortval;
 					if(int_checker(proc)){
-						printf("<ASM SYNTAX ERROR> invalid integer literal for shorts command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for shorts command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 						goto error;
 					}
 					shortval = strtoul(proc,NULL,0);
-					fputshort(shortval, ofile);
+					fASM_PUTShort(shortval, ofile);
 					/*Find the next comma.*/
 					incr = strfind(proc, ",");
 					incrdont = strfind(proc, ";");
@@ -1629,52 +1635,52 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 			} else if(strprefix("section", metaproc)){ unsigned long dest;
 				char* proc = metaproc + 7;
 				if(strlen(proc) == 0){
-					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
+					ASM_PUTS("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
 				}
 				if(int_checker(proc)){
-					printf("<ASM SYNTAX ERROR> invalid integer literal for section command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for section command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 					goto error;
 				}
 				dest = strtoul(proc, NULL, 0);
 				if(dest == 0){
 				/*Explicitly check to see if they actually typed zero.*/
 					if(proc[0]!='0'  && npasses == 1)
-					printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
+					if(!clear_output)printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
 
 				}
 				if(debugging)
-					printf("Moving the output counter to %lu\n", dest);
+					if(!clear_output)printf("Moving the output counter to %lu\n", dest);
 				outputcounter = dest;
 			} else if(strprefix("fill", metaproc)){ unsigned long fillsize; long next_comma; unsigned char fillval;
 				char* proc = metaproc + 4;
 				if(strlen(proc) == 0){
-					puts("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
+					ASM_PUTS("<ASM SYNTAX ERROR> Cannot have empty fill tag.");
 					goto error;
 				}
 				if(int_checker(proc)){
-					printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 					goto error;
 				}
 				fillsize = strtoul(proc, NULL, 0);
 				if(fillsize == 0){
 					if(proc[0]!='0') /*Check if they actually typed zero.*/
-					printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
+					if(!clear_output)printf("<ASM WARNING> fill tag size is zero. Might be a bad number. Line %s", line_copy);
 				}
 				/**/
 				next_comma = strfind(proc, ",");
 				if(next_comma == -1) {
-					printf("<ASM SYNTAX ERROR> Fill tag missing value. Line %s", line_copy);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> Fill tag missing value. Line %s", line_copy);
 					goto error;
 				}
 				proc += next_comma + 1;
 				if(int_checker(proc)){
-					printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for fill command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 					goto error;
 				}
 				fillval = strtoul(proc, NULL, 0);
 				if(fillval == 0) /*potential for a mistake*/
 					if(proc[0]!='0') /*Did they actually MEAN zero?*/
-						printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line:\n%s\n", line_copy);
+						if(!clear_output)printf("<ASM WARNING> fill tag value is zero. Might be a bad number. Line:\n%s\n", line_copy);
 				for(;fillsize>0;fillsize--)fputbyte(fillval, ofile);
 			} else if(strprefix("asm_fix_outputcounter", metaproc)){ /*Perform a second-pass correction of the output counter.*/
 				char* proc; char mode; unsigned long outputcounterold;
@@ -1683,12 +1689,12 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					if(proc[0] == '+') mode=0; else
 					if(proc[0] == '-') mode=1; else
 					{
-						printf("\n<ASM SYNTAX ERROR> asm_correct_outp lacks a + or -.Line:\n%s\n", line_copy);
+						if(!clear_output)printf("\n<ASM SYNTAX ERROR> asm_correct_outp lacks a + or -.Line:\n%s\n", line_copy);
 						goto error;
 					}proc++;
 					outputcounterold = outputcounter;
 					if(int_checker(proc)){
-						printf("<ASM SYNTAX ERROR> invalid integer literal for asm_fix_outputcounter command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+						if(!clear_output)printf("<ASM SYNTAX ERROR> invalid integer literal for asm_fix_outputcounter command. Line:\n%s\nInternal:\n%s\n",line_copy, line);
 						goto error;
 					}
 					if(!mode)
@@ -1696,11 +1702,11 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 					else
 						outputcounter -= strtoul(proc, NULL, 0);
 					outputcounter &= 0xffFFff;
-					printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s\n", outputcounterold, outputcounter, line_copy);
+					if(!clear_output)printf("<ASM WARNING> output counter was:%lx, now: %lx. Line:\n%s\n", outputcounterold, outputcounter, line_copy);
 				}
 			} else if(strprefix("asm_print", metaproc)){
 				if(npasses == 1 && !printlines)
-					printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
+					if(!clear_output)printf("\nRequest to print status at this insn. STATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
 			} else if(strprefix("asm_begin_region_restriction", metaproc)){
 				/*The assembler will warn you if the region changes during the creation of the function.*/
 				region_restriction = (outputcounter>>16) & 0xFF;
@@ -1719,37 +1725,37 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 				region_restriction_mode = 0; /*end block*/
 			} else if(strprefix("asm_vars", metaproc)){
 				unsigned long i;
-				printf("\nSTATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
-				printf("<DUMPING SYMBOL TABLE ON PASS %ld>\n", npasses+1);
+				if(!clear_output)printf("\nSTATUS:\nLine:\n%s\nLine Internally:\n%s\nCounter: %04lx\n", line_copy, line, outputcounter);
+				if(!clear_output)printf("<DUMPING SYMBOL TABLE ON PASS %ld>\n", npasses+1);
 				for(i=0;i<nmacros;i++){
-					if(i==nmacros) puts("Showing User Macros");
-					if(strprefix("_arg", variable_names[i])) printf("\n<auto>:");
+					if(i==nmacros) ASM_PUTS("Showing User Macros");
+					if(strprefix("_arg", variable_names[i])) if(!clear_output)printf("\n<auto>:");
 					if(i==0){char expansion[1024];
 						sprintf(expansion, "%lu", outputcounter);
 						expansion[1023] = '\0'; /*Just in case...*/
-						printf("VAR#%s#%s\n",variable_names[i],expansion);
+						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],expansion);
 					} else if(i==1){char expansion[1024];
 						sprintf(expansion, "%lu,%lu", (unsigned long)(outputcounter/256),(unsigned long)(outputcounter&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
-						printf("VAR#%s#%s\n",variable_names[i],expansion);	
+						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],expansion);	
 					}else
-						printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
+						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)
-					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
+					if(!clear_output)printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
 			}else if(strprefix("!", metaproc)){
-				printf("<ASM SYNTAX ERROR> Cannot put string literal here, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
+				if(!clear_output)printf("<ASM SYNTAX ERROR> Cannot put string literal here, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
 			}else if (strprefix("#", metaproc) || strprefix("//", metaproc)){
 				if(debugging)
-					printf("<ASM WARNING> Inline Comment invalidates rest of line, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
+					if(!clear_output)printf("<ASM WARNING> Inline Comment invalidates rest of line, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
 				break; /*Comment on line.*/
 			} else {
 				if(strlen(metaproc) > 0 && !
 					(strfind(metaproc,";") == 0 ||
 					strfind(metaproc,"|") == 0)){
-					printf("<ASM SYNTAX ERROR> invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
+					if(!clear_output)printf("<ASM SYNTAX ERROR> invalid statement on line %s\nStatement:%s\n", line_copy, metaproc);
 					goto error;
 				}
 			}
@@ -1773,19 +1779,20 @@ int main(int argc, char** argv){FILE* infile,* ofile; char* metaproc;
 		continue;
 		/*Yikes!*/
 		error:
-		puts("<ASM> Assembler Aborted.\n");
+		ASM_PUTS("<ASM> Assembler Aborted.\n");
 		return 1;
 	}
-	printf("<ASM> Successfully assembled %s\n", outfilename);
+	if(!clear_output)printf("<ASM> Successfully assembled %s\n", outfilename);
 	fclose(ofile);
 	fclose(infile);
 	if(clear_output){
+/*
 #if defined(__unix__) || defined(linux)
 		system("clear");
 #else
-/*Probably windows.*/
 		system("cls");
 #endif
+*/
 	}
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		char* tmp;

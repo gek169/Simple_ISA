@@ -15,12 +15,14 @@ all: main asm_programs
 
 sisa16:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses || $(CC) $(CFLAGS) isa.c -o sisa16
+	@echo "Built emulator."
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
+	@echo "Built assembler"
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 
-main: sisa16 sisa16_asm
+main: sisa16_asm sisa16
 
 fifth:
 	$(CC) $(CFLAGS) fifth.c -o fifth
