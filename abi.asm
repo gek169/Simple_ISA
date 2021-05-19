@@ -87,8 +87,12 @@ bytes 0;
 
 
 
+VAR#BOOT_REGION#__START__
+ASM_header bootdol.hasm
+
 
 //MAIN FUNCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 section __START___ADDR; asm_begin_region_restriction;
 VAR#proc_main#sc%__START___ADDR%;lla %__START__%;farcall;
 ZERO_STACK_POINTER;
@@ -113,8 +117,4 @@ asm_end_region_restriction;
 
 
 
-VAR#BOOT_REGION#__START__
-ASM_header bootdol.hasm
 
-//BOOTLOADER~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//section 0;proc_main;
