@@ -534,7 +534,17 @@ asm_fix_outputcounter +50
 
 
 .TP
-.B 
+.B asm_begin_region_restriction
+
+restrict the output counter to the current region and emit an assemblytime error if the output
+counter leaves the current region (64k)
+
+.TP
+.B asm_begin_block_restriction
+
+the same, but for pages (256 bytes)
+
+
 
 .SH AUTHOR
 David MHS Webster, May 19, 2021
