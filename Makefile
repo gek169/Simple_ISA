@@ -37,7 +37,7 @@ asm_programs: sisa16_asm
 install: main manpage_install
 	@cp ./sisa16* $(INSTALL_DIR)/;echo "Installed into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16 tools."
 manpage_install:
-	@cp ./*.1 MAN_INSTALL_DIR
+	@cp ./*.1 $(MAN_INSTALL_DIR)
 
 
 uninstall:

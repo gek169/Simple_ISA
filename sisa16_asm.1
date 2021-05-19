@@ -515,7 +515,26 @@ is semantically equivalent to...
 
 bytes 0xFF, 0xEE, 0x00, 0x11;
 
+.TP
+.B asm_vars
 
+write out all variables (not done with -run) to standard out during assembly
+
+.TP
+.B asm_print
+
+print the status of the assembler at the line.
+
+.TP
+.B asm_fix_outputcounter
+
+make a correction to the output counter on the second pass.
+
+asm_fix_outputcounter +50
+
+
+.TP
+.B 
 
 .SH AUTHOR
 David MHS Webster, May 19, 2021
