@@ -62,9 +62,16 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 #include <stdint.h>
 #include <string.h>
 char* outfilename = "outsisa16.bin";
+
 char* execute_sisa16 = "sisa16";
 char run_sisa16 = 0;
 char clear_output = 0;
+char use_tempfile = 0;
+void del_outfile(){
+	if(use_tempfile)
+		remove(outfilename);
+	return;
+}
 void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 char* infilename = NULL;
 char* variable_names[65535] = {0};
@@ -658,7 +665,7 @@ int main(int argc, char** argv){
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
-			ASM_PUTS("<ASM> Executing after building...");
+			use_tempfile = 1;
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
@@ -713,8 +720,9 @@ int main(int argc, char** argv){
 		}
 	}
 	ofile = NULL;
-	if(!quit_after_macros)
+	if(!quit_after_macros){
 		ofile=fopen(outfilename, "wb");
+	}
 	if(!ofile){
 		if(!clear_output)
 			printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);
@@ -1890,6 +1898,7 @@ int main(int argc, char** argv){
 	}
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		char* tmp; char* l_execute_sisa16 = execute_sisa16;
+		atexit(del_outfile);
 		if(getenv("SISA16BIN") && (
 				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/')|| 
 				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\')
