@@ -1,15 +1,17 @@
-/*Implement your own driver here. You can access memory with M[index]*/
+/*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
-/*#if defined(__unix__) || defined(linux)*/
 #if defined(USE_NCURSES)
 #include <ncurses.h>
+#include "isa_pre.h"
 static void di(){initscr();}
 static void dcl(){endwin();}
 #else
+#include "isa_pre.h"
 static void di(){return;}
 static void dcl(){return;}
 #endif
+
 static unsigned short gch(){
 	return getchar();
 }
