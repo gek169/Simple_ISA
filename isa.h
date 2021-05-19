@@ -77,11 +77,7 @@ k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}
 int e(){
 register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0; 
-register UU
-RX0=0,RX1=0,RX2=0,RX3=0;
-R=0;
-	di();
-
+register UU RX0=0,RX1=0,RX2=0,RX3=0;R=0;di();
 G_NOP:D
 G_HALT:dcl();return 0;
 G_AND:a&=b;D
@@ -180,7 +176,6 @@ U7:a=(((UU)a)*((UU)b))>>13;D
 U8:a=(((UU)a)*((UU)b))>>14;D
 U9:a=(((UU)a)*((UU)b))>>15;D
 UA:a=(((UU)a)*((UU)b))>>16;D
-
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
@@ -265,7 +260,6 @@ YA:if(RX1!=0)RX0=(RX0/RX1)&0xffFFffFF;else{R=3;goto G_HALT;}D
 YB:if(RX1!=0)RX0=(RX0%RX1)&0xffFFffFF;else{R=4;goto G_HALT;}D
 YC:RX0=(RX0>>(RX1&31))&0xffFFffFF;D
 YD:RX0=(RX0<<(RX1&31))&0xffFFffFF;D
-
 /*pushes*/
 YE:write_4bytes(RX0, stack_pointer);stack_pointer+=4;D
 YF:write_4bytes(RX1, stack_pointer);stack_pointer+=4;D
