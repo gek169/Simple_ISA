@@ -31,17 +31,37 @@ section 0x1F0
 
 #Simple loop
 
+
+	
 //prepare the loop by preparing our looping variable at 5,
 //and the address register C to repeatedly jump to the top.
-	sta 0,0;lb 0;stb 0,5;
-
-	sc $;asm_print
-
-	lda 0,0;lb 1;add;sta 0,0;
-	putchar;
-	lda 0,5;add;sta 0,5;
-#if A is less than 3 value, jump to the loop
-	llb %3%;cmp;lb 0;cmp;jmpifeq;
+	lb 0;stb 0,5;
+	sta 0,0;
+//small loop.
+VAR#miniLoopTop#@
+//Perform wizardry
+	lda %0%;
+		lb 8;
+		//lb 1;
+		//add;
+		imul14.2;
+	sta %0%;
+//if this is less than 127, then we go to dont manip.
+		lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
+VAR#still_above_127#@
+//generate negative one, twos complement, and put it in b.
+	la 1;compl;lb1;add;ba;
+	lda %0%;
+		add;
+	sta %0%;
+//jump to still_above if the value is >= 127.
+	lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifneq;
+VAR#dont_manip#@	
+	lda %0%;putchar;
+//perform our variable increment.
+	lb1;lda%5%;add;sta %5%;
+//if A is less than 3 value, jump to the small loop
+	sc %miniLoopTop%;llb %4%;cmp;lb 0;cmp;jmpifeq;
 
 
 //signify the end of the loop by printing some newlines.
@@ -51,9 +71,13 @@ halt
 
 //if you type in a q, you get ten Qs.
 VAR#Lbl_BONUSDUCKS#@
+	la 0xa;putchar;
+	la 0xd;putchar;
 	la 0;rx0a;
 
 VAR#Bonusducks_looptop#@
+//how many Qs to print.
+VAR#numQs#10
 	la 0x51;putchar;
 	arx0;lb1;add;rx0a;
-	sc %Bonusducks_looptop%;arx0;lb10;cmp;lb0;cmp;jmpifeq;
+	sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
