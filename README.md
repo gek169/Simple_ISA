@@ -19,13 +19,19 @@ The included assembly programs and assembler are designed for isa.c.
 Here is how you use the emulator on a unix system:
 ```bash
 #compile the emulator
-cc isa.c -o sisa16
+#most systems have UNSIGNED_INT as four byte unsigned types, that's what the define is for.
+cc isa.c -o sisa16 -DUSE_UNSIGNED_INT
 #compile the assembler
 cc assembler.c -o sisa16_asm
 #assemble your program
 ./sisa16_asm -i program.asm -o program.bin
 #run your program
 ./sisa16 program.bin
+#install sisa16
+sudo cp sisa16* /usr/bin/
+
+#run asm program starting with shebang as script
+./program.asm
 ```
 On a windows machine, the compiled C programs would be EXEs rather than lacking an extension.
 
