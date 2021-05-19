@@ -1,3 +1,8 @@
+/*
+Unfinished idea for a very simple BASIC-like language.
+
+*/
+
 #include "stringutil.h"
 #include <stdio.h>
 #include <stdint.h>
