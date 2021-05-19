@@ -706,7 +706,7 @@ int main(int argc, char** argv){
 
 	if(infilename){
 		if(debugging) if(!clear_output)printf("\nReading from a file...\n");
-			infile = fopen(infilename, "r");
+			infile = fopen(infilename, "rb");
 		if(!infile) {
 			if(!clear_output)printf("\nUNABLE TO OPEN INPUT FILE %s!!!\n", infilename);
 			return 1;
