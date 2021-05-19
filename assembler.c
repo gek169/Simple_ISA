@@ -781,31 +781,33 @@ int main(int argc, char** argv){
 		}
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
+			const char* env_sisa16bin = getenv("SISA16BIN");
+			const char* env_home = getenv("HOME");
 			metaproc = line + strlen("ASM_header ");
 			if(include_level >= ASM_MAX_INCLUDE_LEVEL){
 				puts("<ASM COMPILATION ERROR> Include level maximum reached.");
 				goto error;
 			}
 			tmp = fopen(metaproc, "r");
-			if(!tmp && getenv("SISA16BIN") &&
+			if(!tmp && env_sisa16bin &&
 				(
-					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/' ||
-					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\'
+					env_sisa16bin[strlen(env_sisa16bin)-1] == '/' ||
+					env_sisa16bin[strlen(env_sisa16bin)-1] == '\\'
 				)
 			) 
 			{
-				char* bruh = strcatalloc(getenv("SISA16BIN"), metaproc);
+				char* bruh = strcatalloc(env_sisa16bin, metaproc);
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
-			if(!tmp && getenv("SISA16BIN") &&
+			if(!tmp && env_sisa16bin &&
 				(
-					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/' ||
-					getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\'
+					env_sisa16bin[strlen(env_sisa16bin)-1] == '/' ||
+					env_sisa16bin[strlen(env_sisa16bin)-1] == '\\'
 				)
 			) 
 			{
-				char* bruh = strcatallocf1(strcatalloc(getenv("SISA16BIN"),"/"), metaproc);
+				char* bruh = strcatallocf1(strcatalloc(env_sisa16bin,"/"), metaproc);
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
@@ -814,12 +816,12 @@ int main(int argc, char** argv){
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
-			if(!tmp && getenv("HOME")) {
+			if(!tmp && env_home) {
 				char* bruh = NULL;
-				if(getenv("HOME")[strlen(getenv("HOME"))-1] == '/')
-					bruh = strcatallocf1(strcatalloc(getenv("HOME"),"sisa16/"), metaproc);
+				if(env_home[strlen(env_home)-1] == '/')
+					bruh = strcatallocf1(strcatalloc(env_home,"sisa16/"), metaproc);
 				else
-					bruh = strcatallocf1(strcatalloc(getenv("HOME"),"/sisa16/"), metaproc);
+					bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
@@ -1898,15 +1900,16 @@ int main(int argc, char** argv){
 	}
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		char* tmp; char* l_execute_sisa16 = execute_sisa16;
+		const char* env_sisa16bin = getenv("SISA16BIN");
 		atexit(del_outfile);
-		if(getenv("SISA16BIN") && (
-				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '/')|| 
-				(getenv("SISA16BIN")[strlen(getenv("SISA16BIN"))-1] == '\\')
+		if(env_sisa16bin && (
+				(env_sisa16bin[strlen(env_sisa16bin)-1] == '/')|| 
+				(env_sisa16bin[strlen(env_sisa16bin)-1] == '\\')
 			)
 		){
-			l_execute_sisa16 = strcatalloc(getenv("SISA16BIN"),execute_sisa16);
-		} else if(getenv("SISA16BIN")){
-			l_execute_sisa16 = strcatallocf1(strcatalloc(getenv("SISA16BIN"),"/"),execute_sisa16);
+			l_execute_sisa16 = strcatalloc(env_sisa16bin,execute_sisa16);
+		} else if(env_sisa16bin){
+			l_execute_sisa16 = strcatallocf1(strcatalloc(env_sisa16bin,"/"),execute_sisa16);
 		}
 		tmp = strcatallocf1(strcatalloc(l_execute_sisa16, " "),outfilename);
 		system(tmp);
