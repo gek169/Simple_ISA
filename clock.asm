@@ -96,7 +96,7 @@ section 0xAF0000;
 !Did you enjoy that print?
 bytes 0;
 VAR#seconds_strings#@
-bytes 0xd, 0xa;
+bytes 0xd;
 !Secs:
 bytes 0;
 VAR#iterations_strings#@

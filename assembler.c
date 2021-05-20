@@ -663,7 +663,7 @@ int main(int argc, char** argv){
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
 		if(strprefix("-run",argv[i-1])){
-			FILE* f; unsigned long which;
+			FILE* f; unsigned long which = 0;
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
@@ -677,9 +677,10 @@ int main(int argc, char** argv){
 				f = fopen(temporary_name, "r");
 				if(f)fclose(f);else break;
 				/*add a number to it.*/
-				strcpy(temporary_name, "sisa16_out.bin");
-				sprintf(buf, "%lx",which++);
+				strcpy(temporary_name, "sisa16_out");
+				sprintf(buf,"%lx",which++);
 				strcat(temporary_name, buf);
+				strcat(temporary_name, ".bin");
 			}
 			outfilename = temporary_name;
 		}
