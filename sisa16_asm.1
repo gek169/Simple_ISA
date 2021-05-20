@@ -544,7 +544,49 @@ counter leaves the current region (64k)
 
 the same, but for pages (256 bytes)
 
+.TP
+.B asm_quit
 
+halt assembly
+
+.TP
+.B the dollar sign ($)
+
+builtin macro that expands to the current output counter as a high-low byte pair. Is expanded inside of
+macro definitions to allow for labels to be constructed.
+
+.TP
+.B the at sign (@)
+
+builtin macro that expands to the current output counter. Is expanded inside of macro
+definitions for labels.
+
+.TP
+.B SPLIT (%%)
+
+builtin macro expand a number into a high-low byte pair.
+
+sc %32%;
+
+expands to
+
+sc 0,32;
+
+it is NOT evaluated at macro definition time.
+
+.TP
+.B SPLIT32 (%/%)
+
+builtin macro to expand numbers into 4 bytes (highest, high, low, lowest)
+
+lrx0 %/50%;
+
+expands to
+
+lrx0 0,0,0,50;
+
+.TP
+Interesting little language.
 
 .SH AUTHOR
 David MHS Webster, May 19, 2021
