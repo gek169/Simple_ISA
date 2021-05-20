@@ -631,7 +631,7 @@ void putshort(unsigned short sh, FILE* f){
 }
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
-char temporary_name[512];
+char temporary_name[512] = "tmpsisa_XXXXXX";
 int main(int argc, char** argv){
 	FILE* infile,* ofile; char* metaproc;
 	unsigned long include_level = 0;
@@ -667,8 +667,9 @@ int main(int argc, char** argv){
 			run_sisa16 = 1;
 			clear_output = 1;
 			use_tempfile = 1;
-			/*We need to generate a temporary file.*/
-			outfilename = tmpnam(NULL);
+			/*We need to generate  temporary file.*/
+			outfilename = temporary_name;
+			mkstemp(temporary_name);
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
