@@ -93,7 +93,7 @@ VAR#st_iter#sc %0xAE%;lla %0%;faristrx0;
 bytes %/0%;
 
 section 0xAF0000;
-!Did you enjoy that print?
+!Your patience is exemplary.
 bytes 0;
 VAR#seconds_strings#@
 bytes 0xd, 0xa;
