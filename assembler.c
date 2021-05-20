@@ -668,8 +668,13 @@ int main(int argc, char** argv){
 			clear_output = 1;
 			use_tempfile = 1;
 			/*We need to generate  temporary file.*/
+#if defined(__unix__) || defined(__linux__) || defined(__MINGW32__)
 			outfilename = temporary_name;
 			mkstemp(temporary_name);
+#else
+	/*Compiler will throw a warning.*/
+			outfilename = tmpnam(NULL);
+#endif
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
