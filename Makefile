@@ -35,8 +35,8 @@ asm_programs: sisa16_asm
 	./asm_compile.sh
 
 install: main manpage_install
-	@cp ./sisa16 $(INSTALL_DIR)/;echo "Installed sisa16 into INSTALL_DIR directory." || @cp ./sisa16.exe $(INSTALL_DIR)/;echo "Installed sisa16.exe into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16"
-	@cp ./sisa16_asm $(INSTALL_DIR)/;echo "Installed sisa16_asm into INSTALL_DIR directory." || @cp ./sisa16_asm.exe $(INSTALL_DIR)/;echo "Installed sisa16_asm.exe into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16_asm"
+	@cp ./sisa16 $(INSTALL_DIR)/ || @cp ./sisa16.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16"
+	@cp ./sisa16_asm $(INSTALL_DIR)/ || @cp ./sisa16_asm.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16_asm"
 manpage_install:
 	@cp ./*.1 $(MAN_INSTALL_DIR)/
 
