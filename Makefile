@@ -3,7 +3,7 @@
 CC= gcc
 #CC= tcc
 INSTALL_DIR=/usr/bin
-MAN_INSTALL_DIR=/usr/share/man/man1/
+MAN_INSTALL_DIR=/usr/share/man/man1
 #CC= clang
 CCC= g++
 CFLAGS_SMALL= -Os -s
@@ -35,14 +35,17 @@ asm_programs: sisa16_asm
 	./asm_compile.sh
 
 install: main manpage_install
-	@cp ./sisa16* $(INSTALL_DIR)/;echo "Installed into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16 tools."
+	@cp ./sisa16 $(INSTALL_DIR)/;echo "Installed sisa16 into INSTALL_DIR directory." || @cp ./sisa16.exe $(INSTALL_DIR)/;echo "Installed sisa16.exe into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16"
+	@cp ./sisa16_asm $(INSTALL_DIR)/;echo "Installed sisa16_asm into INSTALL_DIR directory." || @cp ./sisa16_asm.exe $(INSTALL_DIR)/;echo "Installed sisa16_asm.exe into INSTALL_DIR directory." || @echo "ERROR!!! Cannot install sisa16_asm"
 manpage_install:
-	@cp ./*.1 $(MAN_INSTALL_DIR)
+	@cp ./*.1 $(MAN_INSTALL_DIR)/
 
 
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16
 	rm -f $(INSTALL_DIR)/sisa16_asm
+	rm -f $(MAN_INSTALL_DIR)/sisa16.1
+	rm -f $(MAN_INSTALL_DIR)/sisa16_asm.1
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
