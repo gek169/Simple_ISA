@@ -632,6 +632,7 @@ void putshort(unsigned short sh, FILE* f){
 }
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
+char temporary_name[512];
 int main(int argc, char** argv){
 	FILE* infile,* ofile; char* metaproc;
 	unsigned long include_level = 0;
@@ -662,10 +663,25 @@ int main(int argc, char** argv){
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
 		if(strprefix("-run",argv[i-1])){
+			FILE* f; unsigned long which;
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
 			use_tempfile = 1;
+			/*
+				generate a temporary name.
+			*/
+			strcpy(temporary_name, "sisa16_out.bin");
+			while(1){
+				char buf[50];
+				f = fopen(temporary_name, "r");
+				if(f)fclose(f);else break;
+				/*add a number to it.*/
+				strcpy(temporary_name, "sisa16_out.bin");
+				sprintf(buf, "%lx",which++);
+				strcat(temporary_name, buf);
+			}
+			outfilename = temporary_name;
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
