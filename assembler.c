@@ -1,4 +1,3 @@
-
 /*
 assembler for the ISA.
 Supports doing any of the following:
@@ -663,26 +662,13 @@ int main(int argc, char** argv){
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
 		if(strprefix("-i",argv[i-1]))infilename = argv[i];
 		if(strprefix("-run",argv[i-1])){
-			FILE* f; unsigned long which = 0;
+			/*FILE* f; unsigned long which = 0;*/
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
 			use_tempfile = 1;
-			/*
-				generate a temporary name.
-			*/
-			strcpy(temporary_name, "sisa16_out.bin");
-			while(1){
-				char buf[50];
-				f = fopen(temporary_name, "r");
-				if(f)fclose(f);else break;
-				/*add a number to it.*/
-				strcpy(temporary_name, "sisa16_out");
-				sprintf(buf,"%lx",which++);
-				strcat(temporary_name, buf);
-				strcat(temporary_name, ".bin");
-			}
-			outfilename = temporary_name;
+			/*We need to generate a temporary file.*/
+			outfilename = tmpnam(NULL);
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
