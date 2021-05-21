@@ -797,6 +797,33 @@ lb 3;cmp;lb0;cmp;sc%myLabel%;jmpifeq;
 RX0-3 are used for 32 bit mathematics.
 
 .TP
+.B Potentially confusing behavior in the assembler
+
+.TP
+Macro Expansion
+
+if you have one macro,
+
+myMacro
+
+and another macro,
+
+myMacro1
+
+and myMacro1 is defined after myMacro, then all references to myMacro1
+before its definition will be expanded as if it was myMacro followed
+by the "1" character. (on pass 1!)
+
+This can be particularly confusing for goto labels, since goto labels
+are often defined after where they are used (So that they will expand
+correctly on the second pass.)
+
+Note that the order is important here. if you define myMacro1 before myMacro,
+then the assembler will detect there is a longer macro to expand on the current line,
+
+and will instead use that.
+
+.TP
 Interesting little language, don't you think?
 
 .SH AUTHOR
