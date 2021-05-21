@@ -199,6 +199,7 @@ faristla: store short into far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) 
 farilldb: load short using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (40)
 
 faristlb: store short into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (41)
+
 NOTE: Page size is 256 bytes.
 
 farpagel: copy 256 bytes from any page indexed by c to home region page indexed by a (1 byte) (42)
@@ -471,6 +472,12 @@ ASM_header can be used to include asm files into a program, from the current wor
 your home folder / sisa16/, or /usr/include/sisa16/
 
 .TP
+.B Data
+
+ASM_data_include can be used to include raw binary data into the output.
+
+
+.TP
 .B String Literal Lines
 
 string literal lines start with an exclamation mark. Every character after the exclamation mark is part of the string.
@@ -545,6 +552,11 @@ counter leaves the current region (64k)
 the same, but for pages (256 bytes)
 
 .TP
+.B asm_end_restriction
+
+End the active restriction.
+
+.TP
 .B asm_quit
 
 halt assembly
@@ -584,6 +596,205 @@ lrx0 %/50%;
 expands to
 
 lrx0 0,0,0,50;
+
+.TP
+.B Macro definition semantics
+
+.TP
+Macros may only be defined by the following:
+
+1) asm_call (re) defines _argXXX_ macros.
+
+2) VAR# lines define a macro to be all of the text after the second pound symbol.
+
+.TP
+This is what happens when you define a macro:
+
+1) a VAR# line is recognized.
+
+2) Builtin macros @ and $ are parsed inside of the line, but no others (including whitespace reduction)
+
+3) Assembler Pass Semantics:
+
+If on the first pass of the assembler, the macro is checked to see if it already exists.
+
+if it does, a warning may be emitted about a redefinining macro.
+
+If on the second passs of the assembler and the macro was not redefining on the first pass,
+
+checks to ensure that the macro evaluates to the same value are done. if the macro does not evaluate the same,
+
+a warning is emitted, even if using -run.
+
+4) Line processing does not proceed to instruction translation or file writing.
+
+.TP
+.B Macro Evaluation semantics
+
+The assembler follows this order of execution, for every line, roughly:
+
+1) Backslash newline escapes (for non-special line types) are handled, and preceding whitespace is removed.
+
+2) Special line types are recognized (String litera, ASM_header, ASM_data_include, and ASM_compile)
+which do not involve any macro definition.
+
+3) Pre-processing asm_muleq, asm_pleq, and asm_call are recognized (Only on non-VAR# lines, before the vertical bar)
+
+4) The line is checked to see if it is a macro line (VAR#)
+
+5) Macros are expanded on the current line, until the first vertical bar. If at any point one of the
+pre-processing macros is discovered before the first vertical bar, jump back to 3. VAR# lines only have the $ and @ symbols parsed...
+until the first vertical bar. Past the first vertical bar inside the macro definition, no macro
+expansion is done whatsoever.
+
+6) Once all macros are expanded on the line until the first vertical bar (|, the unix pipe character)...
+
+7) Macro definition is handled.
+
+8) Instruction expansion (into bytes) is done.
+
+9) File writing and assembler instruction is done, up to the first vertical bar. File writing is only done
+on the second pass, but on the first pass, the output counter is still moved.
+
+10) if the line contains vertical bars, the line up to the first vertical bar is removed and the line is re-evaluated,
+from 3 onward. Note that you should NOT put VAR# definitions ANYWHERE except on their own line, it is undefined behavior.
+
+.TP
+.B Error handling semantics
+
+if at any point a critical error occurs and the assembler detects it, assembly is aborted.
+
+Unusual or noteworthy phenomenon will be made into warnings, unless on -run
+
+Macro desynchronization between passes (Helpful for recognizing bad labels!) will cause a warning even if
+the assembler is invoked with -run.
+
+.TP
+.B Undefined and Prohibited behavior
+
+1) You may not put a VAR# definition anywhere other than the beginning of a line.
+
+2) You may not evaluate the at sign or dollar sign inside of a macro if it is beyond a vertical bar.
+
+3) You may not define a macro whose name contains reserved symbols such as $, @, %, |, etc.
+
+4) You may not define a macro which would prevent the use of an instruction.
+
+5) You may not construct a macro whose name starts with the name of an instruction. "lbl_mylabel" is prohibited,
+for instance, because it starts with "lb". This prevents you from defining "lb0" which would prevent you from loading
+zero into register B.
+
+6) You may not include a file larger than SISA16's address space (16MB)
+
+7) You may not violate an active block (page) or region restriction unless it is disabled or changed.
+
+8) You may not enter a sequence of characters which does not finally resolve into valid commands for the assembler.
+
+9) You may not use an incorrect number of arguments for an instruction.
+
+10) You may not put a comma immediately after an instruction's name.
+
+11) You may not exceed the macro recursion limit (You will break it if you try) of 65535 expansions.
+
+12) You may not have more than 20 levels of header includes (This is configurable.)
+
+.TP
+.B Command and argument Separation
+Individual commands are separated with semicolons, and sequence points on the same line are defined with vertical bars.
+
+Arguments to commands are separated with commas, but the first never needs a comma.
+
+la13;lb1;add;apush;
+
+is semantically equivalent to
+
+la 13;
+lb 1;
+add;
+push;
+
+but the latter is four separate lines and may assemble slightly slower.
+
+.TP
+.B Debugging Assembly
+
+you can pass -DBG to the assembler to get extended debug output.
+
+you can pass -E to the assembler to expand all macros.
+
+you can pass -pl to the assembler to print the lines as they're parsed (Sequence points break this somewhat)
+
+if you want more concise debugging, you can use asm_print or asm_vars.
+
+Both asm_print and asm_vars do no checking of their arguments but normal evaluation is done, 
+so if you want to have debug values display, it is optimal to make a line:
+
+//a line.
+
+	asm_print myMacro;
+
+the line will be printed asn you will see this:
+
+asm_printmyMacroExpansionNoticeNoWhitespaces;
+
+alongside the original line in the printout.
+
+.TP
+.B Debugging programs
+
+No debugger exists for SISA16 as of writing this. However, you can implement interrupts to perform
+
+memory dumps, display registers, etcetera.
+
+you can also print to the terminal with getchar and putchar (with the default d.h terminal driver...)
+
+Inside of clock.asm, string printing and byte printing in hex is implemented. You can use this in place
+of printf if you were doing C code.
+
+.TP
+.B Platform Semantics
+
+1) SISA16 is big endian. the highest bytes are stored first.
+
+2) the stack pointer grows up.
+
+3) the stack pointer points to the first free byte.
+
+4) The stack pointer is sixteen bit and trapped in the home region, 0x0000 to 0xFFFF.
+
+5) all memory reads and writes wrap around inside of regions. if you try to far indirect load on a
+
+region boundary, it will wrap around inside that region.
+
+6) Program execution begins at 0. It is best practice to immediately set the A register to some region number
+and lfarpc into a main routine as a bootloader.
+
+7) All integers are unsigned, but twos complement can be simulated. add subtract multiply all work
+with twos complement numbers. To make a number negative, simply take the complement (compl or rxcompl) and add one.
+
+8) when a command refers to the A or B registers, an extra "l" will be included to indicate 16 bit instructions,
+otherwise, it is 8 bit. The C register is always 16 bit and no such distinction is made for it.
+
+alpop vs apop, apop works with a single byte on the stack, but alpop loads 2 bytes (big endian).
+but there is no clpop, only cpop, which is 16 bit.
+
+9) call and ret work within the same region, if you want to write subroutines across regions, use farcall and farret.
+
+call and ret are more efficient than farcall and farret, though. If you know you're only going to use a function
+within a single region, then call is safe.
+
+10) there are no jmpiflt or jmpifgt instructions. use cmp.
+
+//macro to load your value into register A.
+
+ld_value1;
+
+//this will jump to myLabel if value1 is less than 3. cmp returns 0 if a is less than b, 1 if equal, or 2 if greater than.
+
+lb 3;cmp;lb0;cmp;sc%myLabel%;jmpifeq;
+
+11) Generally, as a convention, the 16 bit registers ABC are used for control flow and low level math, but
+RX0-3 are used for 32 bit mathematics.
 
 .TP
 Interesting little language, don't you think?
