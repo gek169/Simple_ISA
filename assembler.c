@@ -1170,7 +1170,7 @@ int main(int argc, char** argv){
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*Not performed on MACRO Lines.*/
 		
-		if(strfind(line,"VAR#")!= -1) was_macro=1;
+		if(strfind(line,"VAR#")!= -1) was_macro=1; else was_macro = 0;
 		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
 			do{
 				have_expanded = 0;
@@ -1225,6 +1225,12 @@ int main(int argc, char** argv){
 								(
 									checkme+strlen(variable_names[j]) >= loc + strlen(variable_names[i]) &&
 																	checkme <= loc
+								) || (
+									(checkme < (long)(loc + strlen(variable_names[i]))) &&
+									(checkme >= loc)
+								) || (
+									(checkme+strlen(variable_names[j]) < loc + strlen(variable_names[i])) &&
+									((long)(checkme+strlen(variable_names[j])) >= loc)
 								)
 							){
 								found_longer_match = 1;
@@ -1233,7 +1239,10 @@ int main(int argc, char** argv){
 						}
 					}
 					if(found_longer_match)
-					{if(debugging)ASM_PUTS("Found longer Macro.");continue;}
+					{
+						if(debugging){ASM_PUTS("Found longer Macro.");}
+						continue;
+					}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
 					have_expanded = 1;
@@ -1628,6 +1637,10 @@ int main(int argc, char** argv){
 								(
 									((checkme+(long)strlen(insns[j])) < loc + (long)strlen(insns[i])) &&
 									((checkme+(long)strlen(insns[j])) >= loc)
+								) || 
+								(
+									((checkme) < loc + (long)strlen(insns[i])) &&
+									((checkme) >= loc)
 								)
 							)
 							{
