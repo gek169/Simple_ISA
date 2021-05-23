@@ -8,7 +8,7 @@ The emulator and assembler are CONFIRMED to work on the following architectures 
 ```c
 	IA32 (Debian linux, native)
 	i536 (Alpine linux, jslinux)
-	x86_64 (Debian linux, native)
+	x86_64 (Debian linux, Windows 10, native)
 	riscv64 (Buildroot linux, jslinux)
 ```
 
