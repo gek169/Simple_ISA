@@ -1,4 +1,8 @@
 #!/usr/bin/sisa16_asm -run
+//create a whole-memory image.
+section 0xFFffFF;bytes 0,0;
+
+
 VAR#looptop#1,0xf0
 VAR#GOTO_TOP#sc looptop;jmp;
 VAR#jumpc#jmp;

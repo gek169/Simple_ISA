@@ -1,4 +1,7 @@
 #!/usr/bin/sisa16_asm -run
+
+//create a whole-memory image.
+section 0xFFffFF;bytes 0,0;
 //define the regions to use.
 //we also need to define these ADDR variables, just set them to zero.
 VAR#DATA_REGION_1#0x2A
