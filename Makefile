@@ -2,15 +2,16 @@
 #CC=cc
 CC= gcc
 #CC= tcc
+#CC= clang
 INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
-#CC= clang
 CCC= g++
 CFLAGS_SMALL= -Os -s
+OPTLEVEL= -O3
 MORECFLAGS=
-CFLAGS= $(MORECFLAGS) -O3 -s -std=c89 -pedantic
-CASMFLAGS=  $(MORECFLAGS) -O3 -s -lm -std=c89 -pedantic
-CPPFLAGS= $(MORECFLAGS) -Os -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
+CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
+CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
+CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
 
