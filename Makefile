@@ -53,5 +53,5 @@ uninstall:
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16 isa_constexpr rbytes sisa16_asm fifth
+	rm -f *.exe *.out *.o *.bin sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm fifth
 	clear
