@@ -99,10 +99,10 @@ section 0xAF0000;
 bytes 0;
 VAR#seconds_strings#@
 bytes 0xd, 0xa;
-!Secs:
+!Seconds:
 bytes 0;
 VAR#iterations_strings#@
-!  Iterations:
+! Iterations:
 bytes 0;
 VAR#STP_STRING#@
 ! Stack Pointer:
