@@ -17,7 +17,6 @@ all: main asm_programs
 
 sisa16:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16 -DUSE_UNSIGNED_INT
-	$(CC) $(CFLAGS) -DUSE_NCURSES isa_2.c -o sisa16_stdin -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa_2.c -o sisa16_stdin -DUSE_UNSIGNED_INT
 	@echo "~~Built emulator."
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
@@ -38,13 +37,13 @@ asm_programs: sisa16_asm
 
 install: main
 	@cp ./sisa16 $(INSTALL_DIR)/ || @cp ./sisa16.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16"
-	@cp ./sisa16_stdin $(INSTALL_DIR)/ || @cp ./sisa16_stdin.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16_stdin"
 	@cp ./sisa16_asm $(INSTALL_DIR)/ || @cp ./sisa16_asm.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16_asm"
 	@echo "Attempting manpage install."
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || @echo "Could not install manpages."
 
 
 uninstall:
+	rm -f $(INSTALL_DIR)/sisa16*
 	rm -f $(INSTALL_DIR)/sisa16
 	rm -f $(INSTALL_DIR)/sisa16_stdin
 	rm -f $(INSTALL_DIR)/sisa16_asm

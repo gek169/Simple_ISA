@@ -425,6 +425,12 @@ rxcompl: RX0 = ~RX0; bitwise inversion, 1's complement.(1 byte) (A9)
 
 rxcmp:	if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;  (1 byte) (AA)
 
+seg_ld: load segment RX1 into page RX0 of Main Memory. (1 byte) (AB)
+
+seg_st: store segment RX0 from main memory into page RX1 in the segment. (1 byte) (AC)
+
+seg_realloc: resize the segment to size specified by RX0. if RX0 is 0, then an error flag is returned. (1 byte) (AD)
+
 The rest: nop duplicates, free for expansion (1 byte)
 
 .TP
@@ -827,7 +833,7 @@ and will instead use that.
 Interesting little language, don't you think?
 
 .SH AUTHOR
-David MHS Webster, May 19, 2021
+David MHS Webster, 2021
 
 Email me: davidmhswebster@gmail.com
 

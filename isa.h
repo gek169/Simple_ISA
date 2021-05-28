@@ -1,7 +1,7 @@
 #define k case
 #define PP ((UU)(program_counter_region<<16))
 #define CONSUME_BYTE M[PP+((U)(program_counter++))]
-#define r(d)M[d]
+#define r(d) M[d]
 #define CONSUME_TWO_BYTES (program_counter+=2,\
 						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
 						(U)M[PP+((U)(program_counter-1))])
@@ -66,7 +66,8 @@ k 158:goto YE;k 159:goto YF;\
 k 160:goto Z0;k 161:goto Z1;k 162:goto Z2;k 163:goto Z3;\
 k 164:goto Z4;k 165:goto Z5;k 166:goto Z6;k 167:goto Z7;\
 k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
-k 171:k 172:k 173:k 174:k 175:k 176:k 177:\
+k 171:goto ZB;k 172:goto ZC;k 173:goto ZD;\
+k 174:k 175:k 176:k 177:\
 k 178:k 179:k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
 k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
 k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
@@ -276,4 +277,18 @@ Z7:RX0=RX0|RX1;D
 Z8:RX0=RX0^RX1;D
 Z9:RX0=~RX0;D
 ZA:if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;D
+ZB:
+	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
+	memcpy(M + 0x100 * ((size_t)(RX0&0xffFF)), SEGMENT + 0x100 * ((size_t)RX1), 0x100);
+	D
+ZC:
+	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
+	memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
+	D
+ZD:
+	if(RX0 == 0)	{R=6;goto G_HALT;}
+	SEGMENT_PAGES = RX0;
+	SEGMENT = realloc(SEGMENT, 0x100 * RX0);
+	if(!SEGMENT){R=7;goto G_HALT;}
+	D
 }
