@@ -7,7 +7,7 @@ INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 CFLAGS_SMALL= -Os -s
-OPTLEVEL= -Os
+OPTLEVEL= -Os -march=native
 MORECFLAGS=
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
 CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
