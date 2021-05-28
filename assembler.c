@@ -714,7 +714,7 @@ int main(int argc, char** argv){
 			ASM_PUTS("Optional argument: -pl: Print lines");
 			ASM_PUTS("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
 			ASM_PUTS("Optional argument: -v, -h, --help, --version: This printout.");
-			ASM_PUTS("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.2");
+			ASM_PUTS("\n\nSISA-16 Assembler in Pure Glorious C89, Version 1.3");
 			ASM_PUTS("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			return 1;
 		}
