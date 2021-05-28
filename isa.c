@@ -35,12 +35,12 @@ int main(int rc,char**rv){
 		puts("SISA16 emulator cannot open this file.");
 		exit(1);
 	}
+	/*make memory bigger to hold the entire file.*/
 	fseek(F,0,SEEK_END);
-	/*determine the size of the image*/
-	img_size = ftell(F);
-	if(img_size > 0x1000000){
-		M = realloc(M, img_size);
-	}
+		img_size = ftell(F);
+		if(img_size > 0x1000000){
+			M = realloc(M, img_size);
+		}
 	rewind(F);
 		for(i=0;F&&!feof(F);){M[i++]=fgetc(F);}
 	fclose(F);
