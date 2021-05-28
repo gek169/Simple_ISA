@@ -58,7 +58,6 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 
 #include "stringutil.h"
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 char* outfilename = "outsisa16.bin";
 
