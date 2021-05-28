@@ -63,6 +63,11 @@ the implementation of gch(), pch(), di(), dcl(), and interrupt from d.h which is
 accessible with getchar, putchar, and interrupt
 in the assembly language.
 
+.B Segment:
+The additional region of memory outside the normal SISA16 address space, which is 
+allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
+but can also be used to hold code.
+
 .TP
 Supported instructions:
 
