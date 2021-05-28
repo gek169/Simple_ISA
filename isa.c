@@ -6,7 +6,9 @@
 static FILE* F;
 
 int main(int rc,char**rv){
-	UU i=0,j;
+	size_t img_size;
+	size_t i=0;
+	UU j=0;
 	M = malloc((((UU)1)<<24));
 	if(!M){puts("Failed Malloc.");return 1;}
 	if(
@@ -33,8 +35,14 @@ int main(int rc,char**rv){
 		puts("SISA16 emulator cannot open this file.");
 		exit(1);
 	}
-	for(;F && !feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}
-	
+	fseek(F,0,SEEK_END);
+	/*determine the size of the image*/
+	img_size = ftell(F);
+	if(img_size > 0x1000000){
+		M = realloc(M, img_size);
+	}
+	rewind(F);
+		for(i=0;F&&!feof(F);){M[i++]=fgetc(F);}
 	fclose(F);
 	for(i=e();i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
