@@ -38,7 +38,7 @@ int main(int rc,char**rv){
 		SEGMENT = malloc(0x100);
 		SEGMENT_PAGES = 1;
 	}
-	if(!SEGMENT){puts("Segment Allocation Failed."); }
+	if(!SEGMENT){puts("Segment Allocation Failed.");return 1;}
 	e();
 
 	for(i=e();i<(1<<24)-31&&rc>2;i+=32)	
