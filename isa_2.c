@@ -10,6 +10,8 @@
 
 int main(){
 	UU i=0;
+	M = malloc((((UU)1)<<24));
+	if(!M){puts("Failed Malloc.");return 1;}
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||

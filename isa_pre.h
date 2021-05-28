@@ -7,4 +7,4 @@ typedef unsigned long UU;
 #else
 typedef unsigned UU;
 #endif
-static u R=0,M[(((UU)1)<<24)];
+static u R=0, *M;

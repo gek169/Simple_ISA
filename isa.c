@@ -7,6 +7,8 @@ static FILE* F;
 
 int main(int rc,char**rv){
 	UU i=0,j;
+	M = malloc((((UU)1)<<24));
+	if(!M){puts("Failed Malloc.");return 1;}
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
@@ -31,9 +33,7 @@ int main(int rc,char**rv){
 		puts("SISA16 emulator cannot open this file.");
 		exit(1);
 	}
-	for(;F && !feof(F);){
-		M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;
-	}
+	for(;F && !feof(F);){M[i++]=fgetc(F);i&=0xffffff;if(i==0)break;}
 	
 	fclose(F);
 	for(i=e();i<(1<<24)-31&&rc>2;i+=32)	
