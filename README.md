@@ -96,9 +96,16 @@ Region: 64 kilobytes starting at an address whose 2 low bytes is zero.
 
 Zero 'Home' or 'Stack' Region: the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
 
+You can consider the home region to be "Scratchpad Memory"
+
 Bus or Device: 
 the implementation of gch() and pch() from d.h which is used for I/O and accessible with getchar/putchar
 in the assembly language.
+
+Segment: 
+The additional region of memory outside the normal SISA16 address space, which is 
+allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
+but can also be used to hold code.
 ```
 Supported instructions:
 ```
