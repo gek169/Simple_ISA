@@ -45,6 +45,11 @@ int main(int rc,char**rv){
 		puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 #endif
 
+#if defined(__TenDRA__)
+		puts("Compiled with TenDRA. Gotta say, that's a cool name for a compiler.");
+		return 1;
+#endif
+
 #ifdef __INTEL_LLVM_COMPILER
 		puts("Compiled with Intel LLVM. Duopoly Inside.");
 		return 1;
@@ -55,19 +60,12 @@ int main(int rc,char**rv){
 		return 1;
 #endif
 
-#ifdef __clang__
-		puts("Compiled with Clang. In my testing, GCC compiles this project faster *and* produces faster x86_64 code.");
-		return 1;
-#else
-#ifdef __GNUC__
-		puts("Compiled with GCC. Free Software Is Freedom.");
-		return 1;
-#endif
-#endif
+
 #ifdef __TINYC__
 		puts("Compiled with TinyCC. All Respects to F. Bellard and Crew~~ Try TinyGL! https://github.com/C-Chads/tinygl/");
 		return 1;
 #endif
+
 #ifdef _MSVC_VER
 		puts("Gah! You didn't really compile my beautiful software with that disgusting compiler?");
 		puts("MSVC is the worst C compiler on earth. No, not just because Microsoft wrote it. They make *some* good products.");
@@ -75,8 +73,19 @@ int main(int rc,char**rv){
 		puts("Herb Sutter can go suck an egg! He's trying to kill C++.");
 		return 1;
 #endif
+
 #ifdef __SDCC
 		puts("Compiled with SDCC. Please leave feedback on github about your experiences compiling this with SDCC, I'd like to know.");
+		return 1;
+#endif
+
+#ifdef __clang__
+		puts("Compiled with Clang. In my testing, GCC compiles this project faster *and* produces faster x86_64 code.");
+		return 1;
+#endif
+
+#ifdef __GNUC__
+		puts("Compiled with GCC. Free Software Is Freedom.");
 		return 1;
 #endif
 		puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
