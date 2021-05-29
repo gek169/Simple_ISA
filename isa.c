@@ -45,6 +45,10 @@ int main(int rc,char**rv){
 		puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 #endif
 
+#ifdef __cilk
+		puts("Compiled with ICC. Duopoly inside.");
+		return 1;
+#endif
 
 #ifdef __clang__
 		puts("Compiled with Clang. In my testing, GCC compiles this project faster *and* produces faster x86_64 code.");
