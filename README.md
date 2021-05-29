@@ -411,6 +411,15 @@ you can disable the floating point unit by compiling isa.c with -DNO_FP
 
 there will be no floating point code in the resulting binary.
 
+## Portability
+
+The Emulator and Assembler compile and run on dozens of architectures of varying endiannesses.
+
+Compiletime and runtime checks on the environment are done to ensure that any platform that the ISA won't run on
+are prevented from passing even the most basic testing.
+
+
+
 ## Far memory system.
 
 Note that the program counter is 16 bit (not 32) and so the program counter cannot normally access
