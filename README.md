@@ -1,7 +1,10 @@
-# Simple, Embeddable, Elegant 16 bit instruction set simulator
+# Simple, Embeddable, Performant Virtual Machine Language
 
 C program to simulate the SISA-16 virtual portable computer architecture.
 
+The VM has 16 bit control flow and memory segmentation, but it has 8,16, and 32 bit arithmetic.
+
+Floating point arithmetic is also optinally supported.
 
 The emulator and assembler are CONFIRMED to work on the following architectures and platforms:
 
