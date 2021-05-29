@@ -609,6 +609,17 @@ expands to
 lrx0 0,0,0,50;
 
 .TP
+.B SPLITFLOAT (%?%)
+
+builtin macro to convert floating point numbers into their 32 bit unsigned integer representations.
+
+This is platform-dependent.
+
+lrx0 %?3.0%;
+
+expands to a platform-specific floating-point conversion of 3.0 to an unsigned integer, as individual bytes.
+
+.TP
 .B Macro definition semantics
 
 .TP

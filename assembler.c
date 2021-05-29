@@ -1310,7 +1310,7 @@ int main(int argc, char** argv){
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else if (i==2){long loc_slash;char do_32bit=0;long loc_eparen;char expansion[1024]; 
+					} else if (i==2){long loc_qmark;long loc_slash;char do_32bit=0;long loc_eparen;char expansion[1024]; 
 					unsigned long res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
@@ -1319,6 +1319,7 @@ int main(int argc, char** argv){
 						}
 						loc_eparen = strfind(line_old+loc+1,"%");
 						loc_slash = strfind(line_old+loc+1,"/");
+						loc_qmark = strfind(line_old+loc+1,"?");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
@@ -1327,18 +1328,44 @@ int main(int argc, char** argv){
 							/*if(!clear_output)printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
 						}
 						if(loc_slash==0) do_32bit = 1;
+						if(do_32bit == 0 && loc_qmark == 0){
+							do_32bit = 2;
+						} else if(do_32bit == 1 && loc_qmark != -1 && loc_qmark < loc_eparen){
+							puts(
+								"<ASM SYNTAX ERROR> Both a slash and a question mark are present in this split."
+								"\nThe split is already 32 bit if you use question mark."
+							);
+							printf("\nAt location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							exit(1);
+						}
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						
 						if(do_32bit == 0)
 							res = strtoul(line_old+loc+1, NULL, 0);
-						else /*Skip the forward slash.*/
+						else if(do_32bit == 1) /*Skip the forward slash.*/
 							res = strtoul(line_old+loc+2, NULL, 0);
+						else{
+							float a;unsigned int d1; unsigned long d2;
+							if(sizeof(a) != 4){puts("<ASM ENV ERROR> Floating point environment INCOMPATIBLE.");exit(1);}
+							a = atof(line_old+loc+2);
+							memcpy(&d1, &a, 4);
+							memcpy(&d2, &a, 4);
+							if(sizeof(unsigned long) == 4)
+								res = d2;
+							else if(sizeof(unsigned int) == 4)
+								res = d1;
+							else {
+								puts("<ASM ENV ERROR> Neither Unsigned Int or Unsigned Long are 32 bit.");
+								exit(1);
+							}
+						}
 						if(!do_32bit){
 							if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
 								if(!clear_output)printf("<ASM WARNING> Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
 						} else {
+							
 							if(res == 0  && npasses == 1 && line_old[loc+2] != '%' && line_old[loc+2] != '0')
 								if(!clear_output)printf("<ASM WARNING> Unusual 32-bit SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n", line_copy, line_old+loc+1, line_old);
 						}
@@ -1436,6 +1463,7 @@ int main(int argc, char** argv){
 			*/
 			if(
 				strfind(macro_name, "!") != -1 ||
+				strfind(macro_name, "?") != -1 ||
 				strfind(macro_name, "[") != -1 ||
 				strfind(macro_name, "]") != -1 ||
 				strfind(macro_name, "\\") != -1 ||
@@ -1466,6 +1494,7 @@ int main(int argc, char** argv){
 
 			if(
 				strfind("!", macro_name) != -1 ||
+				strfind("?", macro_name) != -1 ||
 				strfind("[", macro_name) != -1 ||
 				strfind("]", macro_name) != -1 ||
 				strfind("\\", macro_name) != -1 ||
