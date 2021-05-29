@@ -45,8 +45,13 @@ int main(int rc,char**rv){
 		puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 #endif
 
+#ifdef __INTEL_LLVM_COMPILER
+		puts("Compiled with Intel LLVM. Duopoly Inside.");
+		return 1;
+#endif
+
 #ifdef __cilk
-		puts("Compiled with ICC. Duopoly inside.");
+		puts("Compiled with Cilk. Duopoly inside.");
 		return 1;
 #endif
 
