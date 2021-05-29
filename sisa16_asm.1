@@ -436,6 +436,16 @@ seg_st: store segment RX0 from main memory into page RX1 in the segment. (1 byte
 
 seg_realloc: resize the segment to size specified by RX0. if RX0 is 0, then an error flag is returned. (1 byte) (AD)
 
+fltadd: floating point addition, RX0 += RX1, disabled with -DNO_FP (1 byte) (AE)
+
+fltsub: (1 byte) (AF)
+
+fltmul: (1 byte) (B0)
+
+fltdiv: divide by zero is erroneous. (1 byte) (B1)
+
+fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treated as floating point (B2)
+
 The rest: nop duplicates, free for expansion (1 byte)
 
 .TP

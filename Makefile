@@ -6,7 +6,6 @@ CC= gcc
 INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
-CFLAGS_SMALL= -Os -s
 OPTLEVEL= -Os -march=native
 MORECFLAGS=
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
@@ -36,10 +35,10 @@ asm_programs: sisa16_asm
 	./asm_compile.sh
 
 install: main
-	@cp ./sisa16 $(INSTALL_DIR)/ || @cp ./sisa16.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16"
-	@cp ./sisa16_asm $(INSTALL_DIR)/ || @cp ./sisa16_asm.exe $(INSTALL_DIR)/ || @echo "ERROR!!! Cannot install sisa16_asm"
-	@echo "Attempting manpage install."
-	@cp ./*.1 $(MAN_INSTALL_DIR)/ || @echo "Could not install manpages."
+	cp ./sisa16 $(INSTALL_DIR)/ || cp ./sisa16.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16"
+	cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
+	echo "Attempting manpage install."
+	cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 
 uninstall:

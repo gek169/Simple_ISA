@@ -269,6 +269,11 @@ char* insns[256] = {
 	"seg_ld",
 	"seg_st",
 	"seg_realloc",
+	"fltadd",
+	"fltsub",
+	"fltmul",
+	"fltdiv",
+	"fltcmp"
 };
 unsigned char insns_numargs[256] = {
 	0,/*halt*/
@@ -354,7 +359,9 @@ unsigned char insns_numargs[256] = {
 		/*rxcmp*/
 		0,
 		/*segment*/
-		0,0,0
+		0,0,0,
+		/*float*/
+		0,0,0,0,0
 };
 char* insn_repl[256] = {
 	"bytes0;", 
@@ -559,9 +566,16 @@ char* insn_repl[256] = {
 	/*segment*/
 		"bytes171;",
 		"bytes172;",
-		"bytes173;"
+		"bytes173;",
+	/*float*/
+		"bytes174;",
+		"bytes175;",
+		"bytes176;",
+		"bytes177;",
+	/*cmp*/
+		"bytes178;",
 };
-static const unsigned int n_insns = 174;
+static const unsigned int n_insns = 179;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;

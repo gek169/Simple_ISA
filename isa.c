@@ -12,6 +12,9 @@ int main(int rc,char**rv){
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
 		(sizeof(UU) != 4)
+#ifndef NO_FP
+		|| (sizeof(float) != 4)
+#endif
 	){
 		puts("SISA16 ERROR!!! Compilation Environment conditions unmet.");
 		if(sizeof(U) != 2)
@@ -20,6 +23,11 @@ int main(int rc,char**rv){
 			puts("u is not 2 bytes. Try using something other than unsigned char (default).");
 		if(sizeof(UU) != 4)
 			puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
+#ifndef NO_FP
+		if(sizeof(float) != 4){
+			puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");
+		}
+#endif
 		return 1;
 	}
 	if(rc<2){
@@ -50,4 +58,10 @@ int main(int rc,char**rv){
 	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
 	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
 	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
+#ifdef NO_FP
+	if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
+#else
+	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Some whacky bug.>\n");
+#endif
+	if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
 }

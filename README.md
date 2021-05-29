@@ -330,6 +330,16 @@ seg_ld: load segment RX1 into page RX0 of Main Memory. (1 byte) (AB)
 seg_st: store segment RX0 from main memory into page RX1 in the segment. (1 byte) (AC)
 seg_realloc: resize the segment to size specified by RX0. if RX0 is 0, then an error flag is returned. (1 byte) (AD)
 
+fltadd: floating point addition, RX0 += RX1, disabled with -DNO_FP (1 byte) (AE)
+
+fltsub: (1 byte) (AF)
+
+fltmul: (1 byte) (B0)
+
+fltdiv: divide by zero is erroneous. (1 byte) (B1)
+
+fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treated as floating point (B2)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
@@ -362,10 +372,10 @@ static unsigned short interrupt(unsigned short a,
 								unsigned short stack_pointer,
 								unsigned short program_counter,
 								unsigned char program_counter_region,
-								unsigned long RX0,
-								unsigned long RX1,
-								unsigned long RX2,
-								unsigned long RX3
+								UU RX0,
+								UU RX1,
+								UU RX2,
+								UU RX3
 							);
 ```
 
@@ -394,7 +404,12 @@ Memory speed:
 Again, not really simulated. The architecture is designed with cache-efficiency in-mind, though- hence
 the existence of the home region and its special properties.
 
-It is a TODO to provide clock interrupts from the host or add timer insns.
+Floating point unit:
+the only platform-dependent feature of the ISA.
+
+you can disable the floating point unit by compiling isa.c with -DNO_FP
+
+there will be no floating point code in the resulting binary.
 
 ## Far memory system.
 

@@ -67,8 +67,9 @@ k 160:goto Z0;k 161:goto Z1;k 162:goto Z2;k 163:goto Z3;\
 k 164:goto Z4;k 165:goto Z5;k 166:goto Z6;k 167:goto Z7;\
 k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
 k 171:goto ZB;k 172:goto ZC;k 173:goto ZD;\
-k 174:k 175:k 176:k 177:\
-k 178:k 179:k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
+k 174:goto ZE;k 175:goto ZF;\
+k 176:goto G_AA0;k 177:goto G_AA1;\
+k 178:goto G_AA2;k 179:k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
 k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
 k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
 k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
@@ -291,4 +292,52 @@ ZD:
 	SEGMENT = realloc(SEGMENT, 0x100 * RX0);
 	if(!SEGMENT){R=7;goto G_HALT;}
 	D
+#ifdef NO_FP
+/*no floating point unit.*/
+ZE: R=8; goto G_HALT;
+ZF: R=8; goto G_HALT;
+G_AA0: R=8; goto G_HALT;
+G_AA1: R=8; goto G_HALT;
+/*cmp*/
+G_AA2: R=8; goto G_HALT;
+#else
+ZE:{
+	UU RX0_CP = RX0;
+	UU RX1_CP = RX1;
+	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) + (*((float*)&RX1_CP));
+	RX0 = RX0_CP;
+}D
+ZF: {
+	UU RX0_CP = RX0;
+	UU RX1_CP = RX1;
+	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) - (*((float*)&RX1_CP));
+	RX0 = RX0_CP;
+}D
+G_AA0:{
+	UU RX0_CP = RX0;
+	UU RX1_CP = RX1;
+	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) * (*((float*)&RX1_CP));
+	RX0 = RX0_CP;
+}D
+G_AA1: {
+	UU RX0_CP = RX0;
+	UU RX1_CP = RX1;
+	if((*((float*)&RX1_CP)) == 0.0 || 
+		(*((float*)&RX1_CP)) == -0.0){
+			R=9; goto G_HALT;
+		}
+	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) / (*((float*)&RX1_CP));
+	RX0 = RX0_CP;
+}D
+/*cmp*/
+G_AA2: {
+	UU RX0_CP = RX0;
+	UU RX1_CP = RX1;
+	if(
+		(*((float*)&RX0_CP))<(*((float*)&RX1_CP))
+	)a=0;else if(
+		(*((float*)&RX0_CP))>(*((float*)&RX1_CP))
+	)a=2;else a=1;
+}D
+#endif
 }
