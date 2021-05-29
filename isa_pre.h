@@ -8,4 +8,4 @@ typedef unsigned long UU;
 typedef unsigned UU;
 #endif
 static u R=0, M[(((UU)1)<<24)], *SEGMENT;
-UU SEGMENT_PAGES=0;
+static UU SEGMENT_PAGES=0;
