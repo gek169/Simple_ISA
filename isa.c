@@ -31,7 +31,7 @@ int main(int rc,char**rv){
 		return 1;
 	}
 	if(rc<2){
-		printf("\nUsage: %s myprogram.bin mydatafile.bin\n", rv[0]);
+		printf("\nUsage: %s myprogram.bin [additional args if you want memory dump]\n", rv[0]);
 		puts("SISA-16 Emulator written by D[MHS]W for the Public Domain");
 		puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
 		puts("Developer's original repository: https://github.com/gek169/Simple_ISA.git");
