@@ -173,6 +173,7 @@ proc_puts;
 	lrx1 %/0x39%;
 	rxadd;
 	rx0push;rx0pop;
+//	seg_pages;
 	rx2_0;
 	arx0;apush;
 	lrx1 %/8%;rxrsh;arx0;apush;
