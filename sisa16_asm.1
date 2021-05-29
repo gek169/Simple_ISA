@@ -444,7 +444,9 @@ fltmul: (1 byte) (B0)
 
 fltdiv: divide by zero is erroneous. (1 byte) (B1)
 
-fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treated as floating point (B2)
+fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treated as floating point (1 byte) (B2)
+
+seg_pages: get the number of pages in the segment in RX0. (1 byte) (B3)
 
 The rest: nop duplicates, free for expansion (1 byte)
 

@@ -69,7 +69,9 @@ k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
 k 171:goto ZB;k 172:goto ZC;k 173:goto ZD;\
 k 174:goto ZE;k 175:goto ZF;\
 k 176:goto G_AA0;k 177:goto G_AA1;\
-k 178:goto G_AA2;k 179:k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
+k 178:goto G_AA2;k 179:\
+goto G_AA3;\
+k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
 k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
 k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
 k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
@@ -340,4 +342,5 @@ G_AA2: {
 	)a=2;else a=1;
 }D
 #endif
+G_AA3:RX0=SEGMENT_PAGES;D
 }
