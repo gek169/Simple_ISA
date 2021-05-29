@@ -139,7 +139,12 @@ VAR#msg_req_string#@
 bytes 0xd,0xa;
 !Another line.
 bytes 0;
-
+VAR#filename#@
+!f.txt
+bytes 0;
+VAR#failed_to_load_file#@
+!could not load file f.txt! Error!
+bytes 0;
 
 
 VAR#BOOT_REGION#__START__
@@ -186,6 +191,27 @@ proc_puts;
 	arx2;putchar;
 	la 10;putchar;
 	la 13;putchar;
+
+//Load a file.
+	sc %DATA_REGION_1%;llb%filename%;
+	lla %0xFFfE%;interrupt;
+
+//Test if the file was loaded correctly.
+	sc %file_txt_was_good%;lb1;cmp;jmpifeq;
+//file was bad
+		laDATA_REGION_1;apush;lla%failed_to_load_file%;alpush;
+		proc_puts;
+		halt;
+
+VAR#file_txt_was_good#@
+//load a single page.
+	lrx0 %/0xBB00%;
+	lrx1 %/0%;
+	seg_ld;
+//print the contents of the file.
+	la 0xBB;apush;lla %0%;alpush;
+	proc_puts;
+	
 halt;
 asm_end_region_restriction;
 
