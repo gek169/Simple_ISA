@@ -154,8 +154,8 @@ G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
 G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
-write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
-program_counter=c;D
+write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
+program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
 G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D/*Would require edit if you wanted a 32 bit PC*/
 G_FARCALL:
 write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
@@ -194,6 +194,7 @@ G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
 G_APOP:stack_pointer-=1;a=r(stack_pointer)D
 G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
+/*Would require edit if you wanted a 32 bit PC*/
 G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3)D
 G_CLOCK:{register clock_t q=clock();a=((1000*q)/CLOCKS_PER_SEC);b=q/CLOCKS_PER_SEC;c=q;}D
 /*load from RX0*/
