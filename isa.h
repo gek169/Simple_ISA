@@ -1,10 +1,14 @@
 #define k case
+/*Would require edit if you wanted a 32 bit PC*/
 #define PP ((UU)(program_counter_region<<16))
+/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_BYTE M[PP+((U)(program_counter++))]
 #define r(d) M[d]
+/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_TWO_BYTES (program_counter+=2,\
 						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
 						(U)M[PP+((U)(program_counter-1))])
+/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_FOUR_BYTES (program_counter+=4,\
 						((((UU)M[PP+((U)(program_counter-4))]))<<24)+\
 						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
@@ -80,7 +84,7 @@ k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}
 int e(){
-register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0; 
+register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
 register UU RX0=0,RX1=0,RX2=0,RX3=0;R=0;di();
 G_NOP:D
 G_HALT:dcl();return 0;
@@ -134,8 +138,8 @@ G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
 G_STA:write_byte(a,CONSUME_TWO_BYTES)D
 G_STB:write_byte(b,CONSUME_TWO_BYTES)D
-G_JMPIFEQ:if(a==1)program_counter=c;D
-G_JMPIFNEQ:if(a!=1)program_counter=c;D
+G_JMPIFEQ:if(a==1)program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
+G_JMPIFNEQ:if(a!=1)program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
@@ -148,16 +152,16 @@ G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
 G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)+((UU)a)))D
 G_FARPAGEL:memmove(M+(((UU)a&255)<<8),M+(((UU)c)<<8),256)D
 G_FARPAGEST:memmove(M+(((UU)c)<<8),M+(((UU)a&255)<<8),256)D
-G_LFARPC:program_counter_region=a;program_counter=0;D
+G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
 write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
 program_counter=c;D
-G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
+G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D/*Would require edit if you wanted a 32 bit PC*/
 G_FARCALL:
-write_2bytes(program_counter,stack_pointer);stack_pointer+=2;
-write_byte(program_counter_region,stack_pointer);stack_pointer+=1;
-program_counter_region=a;
-program_counter=c;D
+write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
+write_byte(program_counter_region,stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
+program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
+program_counter=c;/*Would require edit if you wanted a 32 bit PC*/D
 G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
 G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)+((UU)b)))D
