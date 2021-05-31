@@ -48,30 +48,29 @@ VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifn
 
 
 section LIBC_START_ADDR; asm_begin_region_restriction;
-VAR#proc_puts#sc%@%;lla%LIBC_START%;farcall;
-	//move the stack pointer back.
-	astp;lb6;sub;
-	illdaa;lb8;rsh;lb255;and;ca;
-	//load the thing thats there. But we also loaded the high byte of the
-	//next short, so we need to get rid of that. Goes in C
-	astp;lb5;sub;illdaa;//we need to grab that short.
+VAR#proc_puts#sc%@%;la LIBC_START;farcall;
+//move the stack pointer back.
+astp;lb6;sub;
+illdaa;lb8;rsh;lb255;and;ca;
+//load the thing thats there. But we also loaded the high byte of the
+//next short, so we need to get rid of that. Goes in C
+astp;lb5;sub;illdaa;//we need to grab that short.
 
-	//we now have our far pointer! put it on the top of the stack for easy access.
-	bc;bpush;alpush;
-	//FARPTR1|FARPTR2|FARPTRPROC
-	//				  (upper)[lower]
-	VAR#puts_looptop#@
-	POP_FARPTR_VARIABLE;
-	PUSH_FARPTR_VARIABLE;
-	farilda;
-	putchar;
+//we now have our far pointer! put it on the top of the stack for easy access.
+//we actually push 4 bytes, so we can rx0pop.
+lb0;bpush;bc;bpush;alpush;
+VAR#puts_looptop#@
+	//setup far pointer.
+	rx0pop;		rx0push;	cbrx0;
+	//load through far pointer and print
+	farilda;		putchar;
+	//if the character was zero, jump to the end of the loop
 	lb0;cmp;sc%puts_loopend%;jmpifeq;
-	POP_FARPTR_VARIABLE;
-	ab;lb1;add;ba;
-	PUSH_FARPTR_VARIABLE;
-	sc %puts_looptop%;jmp;
-	VAR#puts_loopend#@
-	POP_FARPTR_VARIABLE;
+	//else, increment
+	rx0pop;lb1;rx1b;rxadd;rx0push;
+sc %puts_looptop%;jmp;
+VAR#puts_loopend#@
+blpop;blpop;
 farret;
 nop;nop;nop;nop;
 VAR#proc_printbytehex#sc%@%;lla%LIBC_START%;farcall;

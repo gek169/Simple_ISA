@@ -71,19 +71,20 @@ illdaa;lb8;rsh;lb255;and;ca;
 astp;lb5;sub;illdaa;//we need to grab that short.
 
 //we now have our far pointer! put it on the top of the stack for easy access.
-bc;bpush;alpush;
+//we actually push 4 bytes, so we can rx0pop.
+lb0;bpush;bc;bpush;alpush;
 VAR#puts_looptop#@
-POP_FARPTR_VARIABLE;
-PUSH_FARPTR_VARIABLE;
-farilda;
-putchar;
-lb0;cmp;sc%puts_loopend%;jmpifeq;
-POP_FARPTR_VARIABLE;
-ab;lb1;add;ba;
-PUSH_FARPTR_VARIABLE;
+	//setup far pointer.
+	rx0pop;		rx0push;	cbrx0;
+	//load through far pointer and print
+	farilda;		putchar;
+	//if the character was zero, jump to the end of the loop
+	lb0;cmp;sc%puts_loopend%;jmpifeq;
+	//else, increment
+	rx0pop;lb1;rx1b;rxadd;rx0push;
 sc %puts_looptop%;jmp;
 VAR#puts_loopend#@
-POP_FARPTR_VARIABLE;
+blpop;blpop;
 farret;
 
 
@@ -127,7 +128,6 @@ VAR#main_looptop#@
 	alpop;apop;
 
 	arx2;apush;
-	arx2;
 	lb8;rsh;apush;
 //print the number of seconds.
 	proc_printbytehex;
