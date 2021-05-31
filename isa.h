@@ -359,8 +359,8 @@ G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) +
 			(((UU)M[(RX0+2)&0xffFFff])<<8) +
 			(((UU)M[(RX0+3)&0xffFFff]))D
 G_AA6:program_counter_region=(RX0>>16)&255;program_counter=RX0;D
-G_AA7:write_4bytes(RX0,RX1);D
-G_AA8:write_4bytes(RX1,RX0);D
+G_AA7:write_4bytes(RX0,RX1)D
+G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
 G_AA10:c=(RX0>>16);a=RX0;D
 }
