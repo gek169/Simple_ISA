@@ -747,6 +747,7 @@ int main(int argc, char** argv){
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
 #else
 			puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
+			if(sizeof(float) != 4) puts("Floats are an incorrect size. You may not use the floating point unit. Disable the floating point unit.");
 #endif
 			printf("Size of u is %zu, it should be 1, any other result is UB.\n", sizeof(u));
 			printf("Size of U is %zu, it should be 2, any other result is UB.\n", sizeof(U));
