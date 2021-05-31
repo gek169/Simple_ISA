@@ -17,6 +17,7 @@ asm_print %/32%;
 
 #right at the beginning.
 section 0
+//lrx0 %/65536%;seg_realloc;
 GOTO_TOP;
 #purposefully redefining here.
 
