@@ -1452,19 +1452,21 @@ int main(int argc, char** argv){
 						else if(do_32bit == 1) /*Skip the forward slash.*/
 							res = strtoul(line_old+loc+2, NULL, 0);
 						else{
-							float a;unsigned int d1; unsigned long d2;
+#if defined(NO_FP)
+							puts("<ASM ENV ERROR> Floating point unit was disabled during compilation. You may not use floating point SPLIT directives.");
+							exit(1);
+#else
+							float a;UU d1;
 							if(sizeof(a) != 4){puts("<ASM ENV ERROR> Floating point environment INCOMPATIBLE.");exit(1);}
 							a = atof(line_old+loc+2);
 							memcpy(&d1, &a, 4);
-							memcpy(&d2, &a, 4);
-							if(sizeof(unsigned long) == 4)
-								res = d2;
-							else if(sizeof(unsigned int) == 4)
+							if(sizeof(UU) == 4)
 								res = d1;
 							else {
-								puts("<ASM ENV ERROR> Neither Unsigned Int or Unsigned Long are 32 bit.");
+								puts("<ASM ENV ERROR> UU is not 32 bit, try toggling -DUSE_UNSIGNED_INT");
 								exit(1);
 							}
+#endif
 						}
 						if(!do_32bit){
 							if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
