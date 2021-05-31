@@ -18,7 +18,7 @@ sisa16:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16 -DUSE_UNSIGNED_INT
 	@echo "~~Built emulator."
 sisa16_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
 	@echo "~~Built assembler"
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes

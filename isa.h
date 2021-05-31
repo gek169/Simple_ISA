@@ -75,7 +75,8 @@ k 174:goto ZE;k 175:goto ZF;\
 k 176:goto G_AA0;k 177:goto G_AA1;\
 k 178:goto G_AA2;k 179:\
 goto G_AA3;\
-k 180:k 181:k 182:k 183:k 184:k 185:k 186:k 187:\
+k 180:goto G_AA4;k 181:goto G_AA5;k 182:goto G_AA6;\
+k 183:k 184:k 185:k 186:k 187:\
 k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
 k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
 k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
@@ -348,4 +349,13 @@ G_AA2: {
 }D
 #endif
 G_AA3:RX0=SEGMENT_PAGES;D
+G_AA4:RX0=(((UU)M[(RX1)&0xffFFff])<<24) + 
+			(((UU)M[(RX1+1)&0xffFFff])<<16) +
+			(((UU)M[(RX1+2)&0xffFFff])<<8) +
+			(((UU)M[(RX1+3)&0xffFFff]))D
+G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) + 
+			(((UU)M[(RX0+1)&0xffFFff])<<16) +
+			(((UU)M[(RX0+2)&0xffFFff])<<8) +
+			(((UU)M[(RX0+3)&0xffFFff]))D
+G_AA6:program_counter_region=(RX0>>16)&255;program_counter=RX0;D
 }

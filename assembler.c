@@ -59,8 +59,9 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 #include "stringutil.h"
 #include <stdio.h>
 #include <string.h>
+#include "d.h"
+#include "isa.h"
 char* outfilename = "outsisa16.bin";
-
 char* execute_sisa16 = "sisa16";
 char run_sisa16 = 0;
 char clear_output = 0;
@@ -75,7 +76,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[256] = {
+char* insns[183] = {
 	"halt",
 	"lda",
 	"la",
@@ -274,9 +275,12 @@ char* insns[256] = {
 	"fltmul",
 	"fltdiv",
 	"fltcmp",
-	"seg_pages"
+	"seg_pages",
+	"ilrx0_1",
+	"ilrx0_0",
+	"farjmprx0"
 };
-unsigned char insns_numargs[256] = {
+unsigned char insns_numargs[183] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -364,9 +368,13 @@ unsigned char insns_numargs[256] = {
 		/*float*/
 		0,0,0,0,0,
 		/*seg_pages*/
+		0,
+		/*ilrx0_1 and 0_0*/
+		0,0,
+		/*farjmprx0*/
 		0
 };
-char* insn_repl[256] = {
+char* insn_repl[183] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -578,7 +586,12 @@ char* insn_repl[256] = {
 	/*cmp*/
 		"bytes178;",
 	/*seg_pages*/
-		"bytes179;"
+		"bytes179;",
+	/*ilrx0_1 and ilrx0_0*/
+		"bytes180;",
+		"bytes181;",
+	/*farjmprx0*/
+		"bytes182;"
 };
 static const unsigned int n_insns = 180;
 char int_checker(char* proc){
@@ -620,16 +633,17 @@ unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
 char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
-	if((unsigned long)ftell(f) != outputcounter){
-		/*seek to the end*/
-		if(debugging)
-			ASM_PUTS("Having to move the file counter.\n");
-		fseek(f,0,SEEK_END);
-		if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
-			fseek(f,outputcounter,SEEK_SET); 
-		else /*Fill with 0's until we reach the output counter.*/
-			while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
-	}
+	if(!run_sisa16)
+		if((unsigned long)ftell(f) != outputcounter){
+			/*seek to the end*/
+			if(debugging)
+				ASM_PUTS("Having to move the file counter.\n");
+			fseek(f,0,SEEK_END);
+			if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
+				fseek(f,outputcounter,SEEK_SET); 
+			else /*Fill with 0's until we reach the output counter.*/
+				while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
+		}
 	switch(region_restriction_mode){
 		case 0: break;
 		case 1:{
@@ -648,8 +662,13 @@ void fputbyte(unsigned char b, FILE* f){
 		break;
 		default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
 	}
-	if(npasses == 1)
-		fputc(b, f);
+	if(!run_sisa16){
+		if(npasses == 1)
+			fputc(b, f);
+	} else {
+		if(npasses == 1)
+			M[outputcounter]=b;
+	}
 	outputcounter++; outputcounter&=0xffffff;
 }
 void putshort(unsigned short sh, FILE* f){
@@ -660,7 +679,7 @@ void putshort(unsigned short sh, FILE* f){
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 char temporary_name[512] = "tmpsisa_XXXXXX";
 int main(int argc, char** argv){
-	FILE* infile,* ofile; char* metaproc;
+	FILE* infile,*ofile; char* metaproc;
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
 	const unsigned long maxmacrocalls = 0x10000;
@@ -693,15 +712,8 @@ int main(int argc, char** argv){
 			infilename = argv[i];
 			run_sisa16 = 1;
 			clear_output = 1;
-			use_tempfile = 1;
-			/*We need to generate  temporary file.*/
-#if defined(__unix__) || defined(__linux__) || defined(__MINGW32__)
-			outfilename = temporary_name;
-			mkstemp(temporary_name);
-#else
-	/*Compiler will throw a warning.*/
-			outfilename = tmpnam(NULL);
-#endif
+			outfilename = NULL;
+
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
@@ -710,6 +722,65 @@ int main(int argc, char** argv){
 		if(strprefix("-E",argv[i])) {
 			quit_after_macros = 1;
 			ASM_PUTS("#Contents of file post macro expansion are as follows:");
+		}
+		if(strprefix("-C",argv[i])){
+			puts("SISA-16 Assembler and Emulator written by D[MHS]W for the Public Domain");
+			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
+			puts("Developer's original repository: https://github.com/gek169/Simple_ISA.git");
+			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
+			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
+			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
+#ifdef NO_FP
+			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
+#else
+			puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
+#endif
+
+#if defined(__TenDRA__)
+			puts("Compiled with TenDRA. Gotta say, that's a cool name for a compiler.");
+			return 0;
+#endif
+
+#ifdef __INTEL_LLVM_COMPILER
+			puts("Compiled with Intel LLVM. Duopoly Inside.");
+			return 0;
+#endif
+
+#ifdef __cilk
+			puts("Compiled with Cilk. Duopoly inside.");
+			return 0;
+#endif
+
+
+#ifdef __TINYC__
+			puts("Compiled with TinyCC. All Respects to F. Bellard and Crew~~ Try TinyGL! https://github.com/C-Chads/tinygl/");
+			return 0;
+#endif
+
+#ifdef _MSVC_VER
+			puts("Gah! You didn't really compile my beautiful software with that disgusting compiler?");
+			puts("MSVC is the worst C compiler on earth. No, not just because Microsoft wrote it. They make *some* good products.");
+			puts("The bytecode is horrible and the compiler is uncooperative and buggy.");
+			puts("Herb Sutter can go suck an egg! He's trying to kill C++.");
+			return 0;
+#endif
+
+#ifdef __SDCC
+			puts("Compiled with SDCC. Please leave feedback on github about your experiences compiling this with SDCC, I'd like to know.");
+			return 0;
+#endif
+
+#ifdef __clang__
+			puts("Compiled with Clang. In my testing, GCC compiles this project faster *and* produces faster x86_64 code.");
+			return 0;
+#endif
+
+#ifdef __GNUC__
+			puts("Compiled with GCC. Free Software Is Freedom.");
+			return 0;
+#endif
+			puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
+			return 0;
 		}
 		if(strprefix("-DBG",argv[i])) {
 			debugging = 1;
@@ -756,14 +827,15 @@ int main(int argc, char** argv){
 		}
 	}
 	ofile = NULL;
-	if(!quit_after_macros){
+	if(!quit_after_macros && !run_sisa16){
 		ofile=fopen(outfilename, "wb");
 	}
-	if(!ofile){
-		if(!clear_output)
-			printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);
-		return 1;
-	}
+	if(!run_sisa16)
+		if(!ofile){
+			if(!clear_output)
+				printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);
+			return 1;
+		}
 	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(1){
@@ -1965,18 +2037,51 @@ int main(int argc, char** argv){
 		return 1;
 	}
 	if(!clear_output)printf("<ASM> Successfully assembled %s\n", outfilename);
-	fclose(ofile);
-	fclose(infile);
-	if(clear_output){
-/*
-#if defined(__unix__) || defined(linux)
-		system("clear");
-#else
-		system("cls");
-#endif
-*/
-	}
+	if(ofile) 	fclose(ofile);
+	if(infile)	fclose(infile);
 	if(run_sisa16 && !quit_after_macros && !debugging){
+		SEGMENT = malloc(256);
+		SEGMENT_PAGES = 1;
+	if(
+		(sizeof(U) != 2) ||
+		(sizeof(u) != 1) ||
+		(sizeof(UU) != 4)
+#ifndef NO_FP
+		|| (sizeof(float) != 4)
+#endif
+	){
+		puts("SISA16 ERROR!!! Compilation Environment conditions unmet.");
+		if(sizeof(U) != 2)
+			puts("U is not 2 bytes. Try using something other than unsigned short (default).");
+		if(sizeof(u) != 1)
+			puts("u is not 2 bytes. Try using something other than unsigned char (default).");
+		if(sizeof(UU) != 4)
+			puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
+#ifndef NO_FP
+		if(sizeof(float) != 4){
+			puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");
+		}
+#endif
+		return 1;
+	}
+
+		
+		e();
+
+	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
+	if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
+	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
+	if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
+	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
+	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
+	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
+#ifdef NO_FP
+	if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
+#else
+	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/>\n");
+#endif
+	if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
+		/*
 		char* tmp; char* l_execute_sisa16 = execute_sisa16;
 		const char* env_sisa16bin = getenv("SISA16BIN");
 		atexit(del_outfile);
@@ -1993,6 +2098,7 @@ int main(int argc, char** argv){
 		system(tmp);
 		free(tmp); tmp = NULL;
 		if(l_execute_sisa16 != execute_sisa16) free(l_execute_sisa16);
+		*/
 	}
 	return 0;
 }

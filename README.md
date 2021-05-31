@@ -345,6 +345,12 @@ fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treate
 
 seg_pages: get the number of pages in the segment in RX0. (1 byte) (B3)
 
+ilrx0_1: indirectly load rx0 by using rx1. (1 byte) (B4)
+
+ilrx0_0: indirectly load rx0 by using rx0. (1 byte) (B5)
+
+farjmprx0: jump to location pointed to by rx0. (1 byte) (B6)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.

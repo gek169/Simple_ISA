@@ -8,6 +8,7 @@ Macro-enabled Assembler for the sisa16 virtual portable computer architecture.
 .B -o 
 .IR outfilename
 .B [-DBG]
+.B [-C]
 .B [-E]
 .B [-pl]
 .B [-v]
@@ -24,15 +25,16 @@ virtual portable computer architecture.
 specifies the imput assembly file. The last input file is used, no others are.
 
 .BR -run
-functions identically to -i, but executes the output file at the end of assembly, and deletes the output
-file after execution. Designed for use with Shebangs. Also minimizes assembler warnings to those that are truly
-critical.
+No output file is generated. An emulator built into the assembler is used to immediately execute code, making this an effective assembly language.
 
 .BR -o
 specifies the output filename
 
 .BR -DBG
 Enables debug output from the assembler
+
+.BR -C
+prints the compiletime environment information.
 
 .BR -E
 expands all macros and does not write an output file.
@@ -447,6 +449,12 @@ fltdiv: divide by zero is erroneous. (1 byte) (B1)
 fltcmp: if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;, but RX0 and RX1 are treated as floating point (1 byte) (B2)
 
 seg_pages: get the number of pages in the segment in RX0. (1 byte) (B3)
+
+ilrx0_1: indirectly load rx0 by using rx1. (1 byte) (B4)
+
+ilrx0_0: indirectly load rx0 by using rx0. (1 byte) (B5)
+
+farjmprx0: jump to location pointed to by rx0. (1 byte) (B6)
 
 The rest: nop duplicates, free for expansion (1 byte)
 
