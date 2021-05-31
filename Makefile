@@ -7,7 +7,8 @@ INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 OPTLEVEL= -Os -march=native
-MORECFLAGS=
+#make the emulator safe for fuzz testing.
+MORECFLAGS=-DFUZZTEST
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
 CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s -std=c89 -pedantic
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
