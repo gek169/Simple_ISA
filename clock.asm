@@ -89,9 +89,11 @@ farret;
 
 asm_end_region_restriction;
 
+
+//Variable Section.
 section 0xAE0000;
-VAR#ld_iter#sc %0xAE%;lla %0%;farildrx0;
-VAR#st_iter#sc %0xAE%;lla %0%;faristrx0;
+VAR#ld_iter#sc %0xAE%;lla $;farildrx0;
+VAR#st_iter#sc %0xAE%;lla $;faristrx0;
 bytes %/0%;
 
 section 0xAF0000;
