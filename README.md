@@ -355,6 +355,10 @@ istrx0_1: store rx0 at the location pointed to by rx1. (1 byte) (B7)
 
 istrx1_0: store rx1 at the location pointed to by rx0. (1 byte) (B8)
 
+cbrx0: c = RX0>>16; b = RX0 & 0xffFF; (1 byte) (B9)
+
+carx0: c = RX0>>16; a = RX0 & 0xffFF; (1 byte) (BA)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
