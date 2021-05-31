@@ -748,7 +748,113 @@ int main(int argc, char** argv){
 #else
 			puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 #endif
+			printf("Size of u is %zu, it should be 1, any other result is UB.\n", sizeof(u));
+			printf("Size of U is %zu, it should be 2, any other result is UB.\n", sizeof(U));
+			printf("Size of UU is %zu, it should be 4, any other result is UB.\n", sizeof(UU));
 
+#ifdef __STDC_IEC_559__
+#if __STDC_IEC_559__ == 0
+		puts("Floating point compatibility of the environment is specifically not guaranteed.");
+#else
+		puts("Floating point compatibility of the environment is specifically guaranteed.");
+#endif
+
+#else
+		puts("the STDC_IEC_559 define is not defined. Standard behavior is not guaranteed.");
+#endif
+		if(sizeof(void*) == 2) puts("Compiled for a... 16 bit architecture? This is going to be interesting...");
+		if(sizeof(void*) == 4) puts("Compiled for a 32 bit architecture.");
+		if(sizeof(void*) == 8) puts("Compiled for a 64 bit architecture.");
+#if defined(__i386__) || defined(_M_X86) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(__IA32__) || defined(__INTEL__) || defined(__386)
+		puts("Compiled for x86");
+#endif
+#if defined(__ia64__) || defined(_IA64) || defined(__ia64) || defined(_M_IA64) || defined(__itanium__)
+		puts("Compiled for Itanium.")
+#endif
+#if defined(__m68k__) || defined(M68000) || defined(__MC68K__)
+		puts("Compiled for the M68k");
+#endif
+#if defined(__mips__) || defined(__mips) || defined(_MIPS_ISA) || defined(__MIPS__)
+		puts("Compiled for MIPS.");
+#endif
+#if defined(__powerpc__) || defined(__powerpc) || defined(__powerpc64__) || defined(__POWERPC__) || defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(__PPCGECKO__) || defined(__PPCBROADWAY__) || defined(__ppc)
+		puts("Compiled for PowerPC");
+#endif
+#if defined(__THW_RS6000)
+		puts("Compiled for RS/6000");
+#endif
+#if defined(__sparc__) || defined(__sparc) || defined(__sparc_v8__) || defined(__sparc_v9__) || defined(__sparcv8) || defined(__sparcv9)
+		puts("Compiled for sparc.");
+#endif
+#if defined(__sh__)
+		puts("Compiled for SuperH.");
+#endif
+#if defined(__370__) || defined(__s390__) || defined(__s390x__) || defined(__zarch__) || defined(__SYSC_ZARCH__)
+		puts("Compiled for SystemZ");
+#endif
+#if defined(_TMS320C2XX) || defined(_TMS320C5X) || defined(_TMS320C6X)
+		puts("Compiled for TMS320");
+#endif
+#if defined(__TMS470__)
+		puts("Compiled for TMS470");
+#endif
+#if defined(__SISA16__)
+		puts("Compiled for... This architecture!\nIf you're reading this from the source code, let this be a challenge to you:"
+		"\nWrite a C compiler for SISA16 and tell me about it on Github. Then, show me some screenshots.\nI'll give you a special prize.");
+		puts("The first person to get sisa16_asm to be self-hosting will win something. If that's you, Submit an issue! https://github.com/gek169/Simple_ISA");
+#endif
+
+#if defined(__x86_64__) || defined(__amd64__) || defined(_M_X64) || defined(_M_AMD64)
+		puts("Compiled for x86_64");
+#endif
+#if defined(__alpha__) || defined(_M_ALPHA)
+		puts("Compiled for Alpha.");
+#endif
+#if defined(__arm__) || defined(_ARM) || defined(_M_ARM)|| defined(_M_ARMT) || defined(__thumb__) || defined(__TARGET_ARCH_ARM)|| defined(__TARGET_ARCH_THUMB)
+		puts("Compiled for arm.");
+#endif
+#if defined(__aarch64__)
+		puts("Compiled for aarch64");
+#endif
+#if defined(__bfin)
+		puts("Compiled for blackfin.");
+#endif
+#if defined(__convex__)
+		puts("Compiled for convex.");
+#endif
+#if defined(__epiphany__)
+		puts("Compiled for epiphany.");
+#endif
+#if defined(__hppa__) || defined(__HPPA__)
+		puts("Compiled for hppa.");
+#endif
+
+		{
+			volatile UU a;
+			a = 1;
+			if(*((unsigned char*) &a)){
+				puts("Executing on a Little-Endian Architecture.");
+			} else {
+				if(*(((unsigned char*)(&a))+2))
+					puts("Executing on a PDP-Endian Architecture... That's pretty strange.");
+				else if(*(((unsigned char*)(&a))+1))
+					puts("Executing on an unknown Middle-Endian Architecture... How Unusual.");
+				else
+					puts("Executing on a Big-Endian Architecture.");
+			}
+		}
+#if defined(WIN32) || defined(_WIN32)
+			puts("Compiled for Macrohard Doors.");
+#endif
+#if defined(__unix__)
+			puts("Targetting some Nix-like OS.");	
+#endif
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
+			puts("Targetting Linux. Free Software Is Freedom.");
+#endif
+#if defined(__MINGW32__)
+			puts("Compiler self-identifying as MINGW.");
+#endif
 #if defined(__TenDRA__)
 			puts("Compiled with TenDRA. Gotta say, that's a cool name for a compiler.");
 			return 0;
