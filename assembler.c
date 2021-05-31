@@ -593,7 +593,7 @@ char* insn_repl[183] = {
 	/*farjmprx0*/
 		"bytes182;"
 };
-static const unsigned int n_insns = 180;
+static const unsigned int n_insns = 183;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
