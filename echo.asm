@@ -17,7 +17,7 @@ asm_print %/32%;
 
 #right at the beginning.
 section 0
-//lrx0 %/65536%;seg_realloc;
+nop;nop;
 GOTO_TOP;
 #purposefully redefining here.
 
@@ -61,7 +61,13 @@ VAR#still_above_127#@
 	sta %0%;
 //jump to still_above if the value is >= 127.
 	lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifneq;
-VAR#dont_manip#@	
+VAR#dont_manip#@
+	//if a is not Q, then we dont subtract from it.
+	lda %0%;IS_A_Q;sc %A_IS_notQ%;jmpifneq;
+	lda %0%;lb5;sub;sta %0%;
+
+VAR#A_IS_notQ#@
+	
 	lda %0%;putchar;
 //perform our variable increment.
 	lb1;lda%5%;add;sta %5%;
