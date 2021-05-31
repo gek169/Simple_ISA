@@ -600,7 +600,7 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 ```
 ### How to use the SISA-16 assembler
 
-The assembler is compiled as `asm` by default on a *nix machine.
+The assembler is compiled as `sisa16_asm` by default on a *nix machine.
 you can invoke the assembler on a source file `source.asm` and create `source.bin` like this:
 
 `sisa16_asm -i source.asm -o source.bin`
@@ -678,19 +678,20 @@ First defined macros include the builtin macros such as $, @, the space, and the
 
 Builtin macros *except for %, space, and tab* are parsed on macro lines.
 ### Use as a scripting language
-SISA16 is an interpreted 32/16/8-bit bytecode virtual machine that compiles from .asm sources.
+the assembler can immediately execute an image instead of writing it to an output file.
 
-the primary advantage of SISA16 over other scripting languages is its portability and speed-
-it is an interpreted bytecode compiled from textual source with minimal dependencies, requiring
-a minimal libc to interface with the command prompt and load files from disk.
-
-You can use SISA16 on *nix-likes by added shebangs to the beginnings of your files and putting sisa16 in your path.
-
-SISA16's default driver interfaces directly with the command prompt, but can be made to interface with anything.
+This is actually much faster than normal assembly as it isn't constantly adjusting the file pointer with fseek.
 
 ### Use as an embedded language for program extension
+
 You can embed SISA16 by implementing a host program that operates through the device driver. 
 di, dcl, interrupt, gch and pch.
+
+Simply take control of the program when di is invoked, eventually return to sisa16,
+and use an interrupt from the assembly language to hand
+control back to your C code from SISA16. This is known as "cooperative multitasking."
+
+Use dcl() to close your driver's resources.
 
 ### Tips for doing stuff
 If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
