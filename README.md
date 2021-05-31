@@ -191,8 +191,8 @@ faristla: store short into far memory indexing at [(u8)c<<16 + (u16)b] (1 byte) 
 farilldb: load short using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (40)
 faristlb: store short into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (41)
 NOTE: Page size is 256 bytes.
-farpagel: copy 256 bytes from any page indexed by c to home region page indexed by a (1 byte) (42)
-farpagest: copy 256 bytes to any page indexed by c from home region page indexed by a (1 byte) (43)
+farpagel: copy 256 bytes from any page indexed by c to page indexed by a (1 byte) (42)
+farpagest: copy 256 bytes to any page indexed by c from page indexed by a (1 byte) (43)
 
 /*68 dec so far*/
 
