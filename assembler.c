@@ -76,7 +76,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[183] = {
+char* insns[185] = {
 	"halt",
 	"lda",
 	"la",
@@ -278,9 +278,11 @@ char* insns[183] = {
 	"seg_pages",
 	"ilrx0_1",
 	"ilrx0_0",
-	"farjmprx0"
+	"farjmprx0",
+	"istrx0_1",
+	"istrx1_0"
 };
-unsigned char insns_numargs[183] = {
+unsigned char insns_numargs[185] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -372,9 +374,11 @@ unsigned char insns_numargs[183] = {
 		/*ilrx0_1 and 0_0*/
 		0,0,
 		/*farjmprx0*/
-		0
+		0,
+		/*istrx0_1 and istrx1_0*/
+		0,0
 };
-char* insn_repl[183] = {
+char* insn_repl[185] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -591,9 +595,11 @@ char* insn_repl[183] = {
 		"bytes180;",
 		"bytes181;",
 	/*farjmprx0*/
-		"bytes182;"
+		"bytes182;",
+		"bytes183;",
+		"bytes184;"
 };
-static const unsigned int n_insns = 183;
+static const unsigned int n_insns = 185;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
