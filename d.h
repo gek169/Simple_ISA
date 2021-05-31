@@ -65,6 +65,7 @@ static unsigned short interrupt(unsigned short a,
 		}
 		return 1;
 	}
+#if !defined(FUZZTEST)
 	if(a == 0xffFD){ /*Disk Write*/
 		UU i; char buf[0x10000];
 		for(i = 0; i<0x10000; i++){
@@ -84,5 +85,6 @@ static unsigned short interrupt(unsigned short a,
 		}
 		return 1;
 	}
+#endif
 	return a;
 }
