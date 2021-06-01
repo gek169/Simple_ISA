@@ -105,10 +105,12 @@ lrx0 %/0%;st_iter;
 la0;st_current_char;
 VAR#echo_looptop#@
 	getchar;st_current_char;
-	//if the current char is equal to the terminating character, unix pipe, jump to the end of the loop.
 	sc %echo_loopend%;
+		//disabled: terminate on ascii pipe.
 		//ld_current_char;	lb 124;cmp;jmpifeq;
-		//I change my mind, terminate on non-ascii.
+		//terminate on null:
+		ld_current_char;	lb 0;cmp;jmpifeq;
+		//terminate on non-ascii:
 		ld_current_char;	lb126;cmp;lb2;cmp;jmpifeq;
 
 	sc %after_newline_processing%;
