@@ -92,3 +92,6 @@ VAR#numQs#10
 	la 0x51;putchar;
 	arx0;lb1;add;rx0a;
 	sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
+lrx0 %/12%;
+lrx1 %/0%;
+rxidiv;

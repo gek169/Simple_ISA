@@ -373,7 +373,7 @@ G_AA10:c=(RX0>>16);a=RX0;D
 G_AA11:{SUU SRX0, SRX1;
 		SRX0 = RX0;
 		SRX1 = RX1;
-	if(SRX1!=0)RX0=(SRX0/SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
+	if(SRX1!=0)RX0=(SRX0/SRX1)&0xffFFffFF;else{R=3;goto G_HALT;}
 	}D
 G_AA12:{SUU SRX0, SRX1;
 		SRX0 = RX0;
