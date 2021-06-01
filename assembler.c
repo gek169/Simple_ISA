@@ -888,9 +888,10 @@ char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-
+#define SISA16_DIASSEMBLER_MAX_HALTS 12
 int disassembler(char* fname, long location){
 	/*Disassemble for exactly 64k.*/
+	unsigned long n_halts = 0;
 	FILE* f; long i = location & 0xffFFff;
 	f = fopen(fname, "rb");
 	if(!f){
@@ -908,6 +909,8 @@ int disassembler(char* fname, long location){
 			exit(0);
 		}
 		opcode = fgetc(f);i++;
+		if(opcode == 0) n_halts++;
+		else n_halts = 0;
 		if(opcode >= n_insns){
 			puts("//Illegal opcode, nop duplicate:");
 			printf("bytes %u;\n", (unsigned int)opcode);
@@ -917,7 +920,7 @@ int disassembler(char* fname, long location){
 			printf("%s ",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				if((i & 0xffFF) == 0){
-					puts("This opcode cannot be executed properly during normal execution due to boundary.");
+					puts("\n<This opcode cannot be executed properly during normal execution due to boundary, here>");
 				}
 				if(arg_i > 0) printf(",");
 				if(feof(f) || ftell(f) != i){
@@ -928,10 +931,14 @@ int disassembler(char* fname, long location){
 			}
 			printf(";\n");
 		}
+		if(n_halts > SISA16_DIASSEMBLER_MAX_HALTS){
+			puts("\n//Reached Halt Limit. Disassembly finished.");
+			exit(0);
+		}
 	}
 	puts("//Disassembly Finished.");
 	fclose(f);
-	exit(9);
+	exit(0);
 	return 0;
 }
 
