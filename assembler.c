@@ -76,7 +76,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[203] = {
+char* insns[207] = {
 	"halt",
 	"lda",
 	"la",
@@ -299,9 +299,13 @@ char* insns[203] = {
 	"farstrx3",
 	"farstla",
 	"farstlb",
-	"farstc"
+	"farstc",
+	"aincr",
+	"adecr",
+	"rxincr",
+	"rxdecr"
 };
-unsigned char insns_numargs[203] = {
+unsigned char insns_numargs[207] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -403,10 +407,12 @@ unsigned char insns_numargs[203] = {
 		/*farld*/
 		3,3,3,3, 3,3,3,
 		/*farst*/
-		3,3,3,3, 3,3,3
+		3,3,3,3, 3,3,3,
+		/*incr decr*/
+		0,0,0,0
 		
 };
-char* insn_repl[203] = {
+char* insn_repl[207] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -634,9 +640,11 @@ char* insn_repl[203] = {
 		"bytes188;",
 	/*the 14 instructions that require 3 bytes as argument.*/
 		"bytes189,","bytes190,","bytes191,","bytes192,",   "bytes193,","bytes194,","bytes195,",
-		"bytes196,","bytes197,","bytes198,","bytes199,",   "bytes200,","bytes201,","bytes202,"
+		"bytes196,","bytes197,","bytes198,","bytes199,",   "bytes200,","bytes201,","bytes202,",
+	/*incr decr*/
+		"bytes203,","bytes204","bytes205","bytes206"
 };
-static const unsigned int n_insns = 203;
+static const unsigned int n_insns = 207;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;

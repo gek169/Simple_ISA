@@ -3,8 +3,8 @@
 typedef unsigned char u;
 typedef unsigned short U;
 #if defined(USE_UNSIGNED_INT)
-typedef unsigned UU;
-typedef signed SUU;
+typedef unsigned int UU;
+typedef signed int SUU;
 #else
 typedef unsigned long UU;
 typedef long SUU;

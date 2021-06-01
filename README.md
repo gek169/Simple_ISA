@@ -391,6 +391,14 @@ farstlb: (4 bytes) (C9)
 
 farstc: (4 bytes) (CA)
 
+aincr: (1 byte) (CB)
+
+adecr: (1 byte) (CC)
+
+rxincr: (1 byte) (CD)
+
+rxdecr: (1 byte) (CE)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.

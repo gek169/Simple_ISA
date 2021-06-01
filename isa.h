@@ -85,7 +85,8 @@ k 188:goto G_AA12;k 189:goto G_AA13;k 190:goto G_AA14;\
 k 191:goto G_AA15;k 192:goto G_AA16;k 193:goto G_AA17;\
 k 194:goto G_AA18;k 195:goto G_AA19;k 196:goto G_AA20;k 197:goto G_AA21;\
 k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
-k 202:goto G_AA26;k 203:k 204:k 205:k 206:k 207:\
+k 202:goto G_AA26;k 203:goto G_AA27;k 204:goto G_AA28;k 205:goto G_AA29;\
+k 206:goto G_AA30;k 207:\
 k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
@@ -451,5 +452,8 @@ G_AA12:{SUU SRX0, SRX1;
 		flight = CONSUME_THREE_BYTES;
 		write_2bytes(c, flight);
 	}D
-	
+	G_AA27:a++;D
+	G_AA28:a--;D
+	G_AA29:RX0++;D
+	G_AA30:RX0--;D
 }
