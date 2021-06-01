@@ -11,7 +11,8 @@ int main(int rc,char**rv){
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
-		(sizeof(UU) != 4)
+		(sizeof(UU) != 4)||
+		(sizeof(SUU) != 4)
 #ifndef NO_FP
 		|| (sizeof(float) != 4)
 #endif
@@ -23,6 +24,8 @@ int main(int rc,char**rv){
 			puts("u is not 2 bytes. Try using something other than unsigned char (default).");
 		if(sizeof(UU) != 4)
 			puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
+		if(sizeof(SUU) != 4)
+			puts("SUU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use int as SUU.");
 #ifndef NO_FP
 		if(sizeof(float) != 4){
 			puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");

@@ -950,6 +950,7 @@ int main(int argc, char** argv){
 			printf("Size of u is %zu, it should be 1, any other result is UB.\n", sizeof(u));
 			printf("Size of U is %zu, it should be 2, any other result is UB.\n", sizeof(U));
 			printf("Size of UU is %zu, it should be 4, any other result is UB.\n", sizeof(UU));
+			printf("Size of SUU is %zu, it should be 4, any other result is UB.\n", sizeof(SUU));
 
 #ifdef __STDC_IEC_559__
 #if __STDC_IEC_559__ == 0
@@ -2372,7 +2373,8 @@ int main(int argc, char** argv){
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
-		(sizeof(UU) != 4)
+		(sizeof(UU) != 4) ||
+		(sizeof(SUU) != 4)
 #ifndef NO_FP
 		|| (sizeof(float) != 4)
 #endif
@@ -2384,6 +2386,8 @@ int main(int argc, char** argv){
 			puts("u is not 2 bytes. Try using something other than unsigned char (default).");
 		if(sizeof(UU) != 4)
 			puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
+		if(sizeof(SUU) != 4)
+			puts("SUU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use int as SUU.");
 #ifndef NO_FP
 		if(sizeof(float) != 4){
 			puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");
