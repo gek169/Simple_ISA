@@ -23,7 +23,7 @@ Here is how you use the emulator on a unix system:
 ```bash
 #compile the emulator
 #most systems have UNSIGNED_INT as four byte unsigned types, that's what the define is for.
-cc isa.c -o sisa16 -DUSE_UNSIGNED_INT
+cc isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 #compile the assembler
 cc assembler.c -o sisa16_asm
 #assemble your program
@@ -34,6 +34,9 @@ cc assembler.c -o sisa16_asm
 sudo cp sisa16* /usr/bin/
 
 #run asm program starting with shebang as script
+#the shebang looks like this for the default INSTALL_DIR:
+#!/usr/bin/sisa16_asm -run
+#you put that at the top of your file and chmod+x the .asm file, and it will run.
 ./program.asm
 ```
 On a windows machine, the compiled C programs would be EXEs rather than lacking an extension.
@@ -440,10 +443,19 @@ static unsigned short interrupt(unsigned short a,
 
 The emulator requires a filename as the first parameter when running.
 
-A very basic assembler is included with the ability to define sections, 
+A reasonably competent assembler is included with the ability to define sections, 
 include arbitrary data,
 and write your own multi-statement macros.
 It also does a limited amount of error checking.
+
+The assembler can now perform disassembly if you give it a file and a location to disassemble from.
+
+```sh
+sudo make -B install
+./asm_compile.sh
+#and then...
+sisa16_asm -dis clock.bin 0x20000
+```
 
 ## What is this ISA called?
 
@@ -504,6 +516,8 @@ jumps and calls that happen after a farcall or lfarpc will always jump within th
 current 64k that the program counter is inside of.
 
 the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
+
+Far memory loads and stores are now much easier with the farld and farst instructions and the indirect variants.
 
 ## Programming conventions established by hardware
 
@@ -664,6 +678,11 @@ stdin mode is used if an input file is not specified and is solely for quickly d
 if you have bash on your system, or another compatible shell with typical core utils, then note that
 any and all `.asm` files will be compiled and output to `.bin` files of the same name if they are placed
 in the top level directory of this project when you invoke `make`, thanks to `asm_compile.sh`
+
+if you wish to verify that the assembler generated the output you expected, you can view the output with 
+`sisa16_asm -dis <file.bin> <location>`
+
+this will show you the full disassembly.
 
 ### Static Linking
 

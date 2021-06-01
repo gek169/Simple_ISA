@@ -888,7 +888,7 @@ char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-#define SISA16_DIASSEMBLER_MAX_HALTS 12
+#define SISA16_DIASSEMBLER_MAX_HALTS 10
 int disassembler(char* fname, long location){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
@@ -917,7 +917,7 @@ int disassembler(char* fname, long location){
 			continue;
 		}else{
 			unsigned long arg_i;
-			printf("%s ",insns[opcode]);
+			printf("//%lx:\n%s ",i,insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				if((i & 0xffFF) == 0){
 					puts("\n<This opcode cannot be executed properly during normal execution due to boundary, here>");
