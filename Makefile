@@ -26,9 +26,6 @@ rbytes:
 
 main: sisa16_asm sisa16
 
-fifth:
-	$(CC) $(CFLAGS) fifth.c -o fifth
-
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
@@ -52,5 +49,5 @@ uninstall:
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm fifth
+	rm -f *.exe *.out *.o *.bin sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm
 	clear
