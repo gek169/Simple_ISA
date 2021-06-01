@@ -100,20 +100,35 @@ bytes %/0%;
 bytes %/0%;
 bytes %/0%;
 
-section 0x10000;
+section 0x10000;asm_begin_region_restriction;
 lrx0 %/0%;st_iter;
 la0;st_current_char;
 VAR#echo_looptop#@
 	getchar;st_current_char;
 	
 	
-	//if the current char is equal to one of the terminating characters, jump.
+	//if the current char is equal to the terminating character, unix pipe, jump to the end of the loop.
 	sc %echo_loopend%;
-	ld_current_char;	lb 0xa;cmp;jmpifeq;
-	ld_current_char;	lb 0xd;cmp;jmpifeq;
-	//ld_current_char;	lb 124;cmp;jmpifeq;
-	//non-ascii, terminate.
-	ld_current_char;	lb126;cmp;lb2;cmp;jmpifeq;
+		//ld_current_char;	lb 124;cmp;jmpifeq;
+		ld_current_char;	lb126;cmp;lb2;cmp;jmpifeq;
+
+	sc %after_newline_processing%;
+	//Do not process characters greater than the 0xd character or less than the 0xa character.
+		ld_current_char;	lb 0xd;cmp;lb2;cmp;jmpifeq;
+		ld_current_char;	lb 0xa;cmp;lb0;cmp;jmpifeq;
+	//Do not process 0xc or 0xb.
+		ld_current_char;	lb 0xc;cmp;jmpifeq;
+		ld_current_char;	lb 0xb;cmp;jmpifeq;
+	//the character is now either 0xa or 0xd.
+		la 0xa;st_current_char;
+		ld_iter;lrx1 %/0x40000%;rxadd;
+		cbrx0;
+		farista;
+	//iter++
+		ld_iter;rxincr;st_iter;
+	//this character is now 0xd.
+		la 0xd;st_current_char;
+VAR#after_newline_processing#@
 	ld_current_char;
 	ld_iter;lrx1 %/0x40000%;rxadd;
 	cbrx0;
@@ -134,4 +149,5 @@ farista;
 la4;apush;lla%0%;alpush;
 proc_puts;
 halt;
+asm_end_region_restriction;
 //|
