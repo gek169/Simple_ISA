@@ -105,8 +105,6 @@ lrx0 %/0%;st_iter;
 la0;st_current_char;
 VAR#echo_looptop#@
 	getchar;st_current_char;
-	
-	
 	//if the current char is equal to the terminating character, unix pipe, jump to the end of the loop.
 	sc %echo_loopend%;
 		//ld_current_char;	lb 124;cmp;jmpifeq;
