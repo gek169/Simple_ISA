@@ -81,7 +81,7 @@ VAR#puts_looptop#@
 	//if the character was zero, jump to the end of the loop
 	lb0;cmp;sc%puts_loopend%;jmpifeq;
 	//else, increment
-	rx0pop;lb1;rx1b;rxadd;rx0push;
+	rx0pop;rxincr;rx0push;
 sc %puts_looptop%;jmp;
 VAR#puts_loopend#@
 blpop;blpop;
@@ -116,7 +116,7 @@ section 0x10000;
 clock;rx2b;
 VAR#main_looptop#@
 //iter++;
-	ld_iter;lrx1 %/1%;rxadd;st_iter;
+	ld_iter;rxincr;st_iter;
 	clock;
 	arx2;
 	sc %main_looptop%;cmp;jmpifeq;
