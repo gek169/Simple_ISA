@@ -49,7 +49,7 @@ VAR#miniLoopTop#@
 		lb 8;
 		//lb 1;
 		//add;
-		imul14.2;
+		imul13.3;
 	sta %0%;
 //if this is less than 127, then we go to dont manip.
 		lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
