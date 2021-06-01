@@ -722,12 +722,170 @@ void putshort(unsigned short sh, FILE* f){
 }
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
+unsigned long compiled_variable_allocation_start = 0xF00000;
+
+char* compiled_variable_names[65535] = {0};
+unsigned long compiled_variable_addresses[65535] = {0};
+unsigned long compiled_variable_array_lengths[65535] = {0};
+unsigned int compiled_variable_types[65535] = {0};
+unsigned long n_compiled_variables = 0;
+
+int check_ident(char* ident){
+	unsigned long i;
+	if(ident[0] == '\0') return 0; /*End of the damn string!*/
+	if(!(isalpha(ident[0]) || ident[0] == '_')) return 0; /*Bad identifier*/
+	for(i=1;ident[i]!=';' && ident[i] != '\0' && ident[i] != ' ';i++){
+		if(isalnum(ident[i]) || ident[i] == '_')
+			continue;
+		else
+			return 0; /*bad identifier!*/
+	}
+	if(ident[i] == '\0') return 0; /*Bad Identifier*/
+	if(ident[i] == ' ') return 1; /*Valid*/
+	if(ident[i] == ';') return 1; /*Valid*/
+	return 0; /*Theoretically unreachable.*/
+}
+
+char* compile_line(char* line_in){
+	char* line_proc = strcatalloc(line_in+strlen("ASM_COMPILE"), "");
+	char* line_out = strcatalloc("","");
+	while(strfind(line_proc, "\t") != -1) line_proc = str_repl_allocf(line_proc, "\t", " ");
+	while(strfind(line_proc, "  ") != -1) line_proc = str_repl_allocf(line_proc, "  ", " ");
+	while(strfind(line_proc, " ;") != -1) line_proc = str_repl_allocf(line_proc, " ;", ";");
+	while(strfind(line_proc, "; ") != -1) line_proc = str_repl_allocf(line_proc, "; ", ";");
+	while(strprefix(" ", line_proc)) {
+		char* old_line_proc = line_proc;
+		line_proc = strcatalloc(line_proc+1, "");
+		free(old_line_proc);
+	}
+	/*the line is now ready for processing.*/
+	if(strprefix("var ", line_proc)){
+		/*
+			FORMAT:
+											Required Space
+											   |Optional array declarator from [ to ]
+											   VV
+			var <type> @<location> <identifier> [<array length>];
+					   ^			^
+						optional	must start with alpha character or underscore, rest isalnum or is underscore.
+		*/
+		char* metaproc = line_proc + strlen("var ");
+		unsigned long vartype = 0;
+		unsigned long varaddr = compiled_variable_allocation_start;
+		unsigned long vararrlen = 0; /*Not an array!*/
+		char* varname = NULL;
+		/*handle a variable declaration.*/
+		if(strprefix("byte ", metaproc)){
+			vartype = 0; metaproc += strlen("byte ");
+			
+		} else if(strprefix("short ", metaproc)){
+			vartype = 1; metaproc += strlen("short ");
+		} else if(strprefix("u32 ", metaproc)){
+			vartype = 2; metaproc += strlen("u32 ");
+		} else if(strprefix("i32 ", metaproc)){
+			vartype = 3; metaproc += strlen("i32 ");
+		} else if(strprefix("f32 ", metaproc)){
+			vartype = 4; metaproc += strlen("f32 ");
+		} else {
+			puts("<COMPILED LINE SYNTAX ERROR> variable declaration without valid type or possibly missing space");
+			puts("Line:");
+			puts(line_in);
+			exit(1);
+		}
+		if(strprefix("@", metaproc)){
+			long loc_next_space;
+			metaproc++;
+			varaddr = strtoul(metaproc,0,0);
+			compiled_variable_allocation_start = varaddr;
+			loc_next_space = strfind(metaproc, " ");
+			if(loc_next_space == -1) {
+				puts("<COMPILED LINE SYNTAX ERROR> variable declaration is incomplete.");
+				puts("Line:");
+				puts(line_in);
+				exit(1);
+			}
+			metaproc += loc_next_space+1;
+		}
+		if(!check_ident(metaproc)){
+			puts("<COMPILED LINE SYNTAX ERROR> variable declaration with invalid identifier. Remember that arrays must be declared");
+			puts("Line:");
+			puts(line_in);
+			exit(1);
+		}
+
+		{long loc_next_space;
+			loc_next_space = strfind(metaproc, " ");
+			if(loc_next_space == -1) loc_next_space = strfind(metaproc, ";");
+			if(loc_next_space == -1) {
+				puts("<COMPILED LINE SYNTAX ERROR> variable declaration is incomplete. Identifier must be followed by a space or semicolon.");
+				puts("Line:");
+				puts(line_in);
+				exit(1);
+			}
+			varname = str_null_terminated_alloc(metaproc, loc_next_space);
+			metaproc += loc_next_space;
+			if(*metaproc == ' ')metaproc++;
+		}
+		/*test to see if this is an array declaration.*/
+		if(*metaproc == '[' /*]*/){
+			long loc_end_bracket;
+			metaproc++;
+			vararrlen = strtoul(metaproc, 0,0);
+			loc_end_bracket = strfind(metaproc, /*[*/ "]");
+			if(loc_end_bracket == -1){
+				puts("<COMPILED LINE SYNTAX ERROR> Array declarators must have an ending bracket!");
+				puts("Line:");
+				puts(line_in);
+				exit(1);
+			}
+			metaproc += loc_end_bracket+1;
+		}
+		if(metaproc[0] != ';'){
+			puts("<COMPILED LINE SYNTAX ERROR> Variable declaration lacking post semicolon.");
+			puts("Line:");
+			puts(line_in);
+			exit(1);
+		}
+		compiled_variable_types[n_compiled_variables] = vartype;
+		compiled_variable_names[n_compiled_variables] = varname;
+		if(varname == NULL || strlen(varname) == 0){
+			puts("<COMPILED LINE INTERNAL ERROR> Variable declaration stmt reached completion with no name.");
+			puts("Line:");
+			puts(line_in);
+			exit(1);
+		}
+		compiled_variable_addresses[n_compiled_variables] = varaddr;
+		if(vararrlen == 0){
+			if(vartype == 0) compiled_variable_allocation_start++;
+			else if(vartype == 1)  compiled_variable_allocation_start += 2;
+			else if(vartype == 2)  compiled_variable_allocation_start += 4;
+			else if(vartype == 3)  compiled_variable_allocation_start += 4;
+			else if(vartype == 4)  compiled_variable_allocation_start += 4;
+		} else if(vartype == 0){
+			compiled_variable_allocation_start += vararrlen;
+		} else if(vartype == 1){
+			compiled_variable_allocation_start += vararrlen*2;
+		} else if(vartype == 2 || vartype == 3 ){
+			compiled_variable_allocation_start += vararrlen*4;
+		}
+		compiled_variable_allocation_start &= 0xffFFff;
+		compiled_variable_array_lengths[n_compiled_variables] = vararrlen;
+		n_compiled_variables++;
+	} else {
+		puts("<COMPILED LINE SYNTAX ERROR>Unknown/unparseable compile line.");
+		puts("Line:");
+		puts(line_in);
+		exit(1);
+	}
+	free(line_in);
+	return line_out;
+}
 char temporary_name[512] = "tmpsisa_XXXXXX";
 int main(int argc, char** argv){
 	FILE* infile,*ofile; char* metaproc;
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
-	const unsigned long maxmacrocalls = 0x10000;
+	const unsigned long maxmacrocalls = 0x100000;
 	unsigned long line_num = 0; 
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
@@ -1154,23 +1312,17 @@ int main(int argc, char** argv){
 			free(line_old);
 		}
 		if(strprefix("ASM_COMPILE", line)){
-			puts("<ASM SYNTAX ERROR> Unimplemented feature ASM_COMPILE was used.");
-			goto error;
+			line = compile_line(line);
+			nmacrocalls = 0;
+			goto pre_pre_processing;
 		}
 		if(strprefix("ASM_COPYRIGHT", line)){
 			ASM_PUTS("SISA-16 Assembler,(C)David M.H.S. Webster 2021\navailable to you under the Creative Commons Zero license.");
 			goto end;
 		}
-		if(strprefix("asm_help", line)){
-			ASM_PUTS("This assembler should have come with a README.MD and an emulator \"isa.c\". If it did not, you got scammed! ");
-			ASM_PUTS("This is no ordinary assembler, it has a very complicated macro syntax, arbitrary data includes, and string literals.");
-			ASM_PUTS("There are, however, no structured programming control flow statements. you've only got the jmp, jmpifeq, jmpifneq, call, farcall, ret, and farret insns.");
-			ASM_PUTS("The assembler is a two-pass compiler. Both passes work roughly the same. The first pass won't actually write the file, though.");
-			ASM_PUTS("However, on the second pass, you can use variable defined from the first pass.");
-			ASM_PUTS("This allows you to do things like define goto labels. On the first pass, the jump target will evaluate as zero, but on the second it will be defined.");
-			ASM_PUTS("Note that it is possible to (purposefully or by mistake...) deysynchronize the two passes. That is, cause the number of bytes written to the output file to be different on different passes.");
-			ASM_PUTS("(You can fix this on the second pass with asm_correct_outp+amount; or asm_correct_outp-amount;)");
-			ASM_PUTS("You can try to figure out how it works from source but you really need the readme.");
+		if(strprefix("asm_help", line) || strprefix("ASM_HELP", line)){
+			ASM_PUTS("For help, See: man sisa16_asm");
+			goto end;
 		}
 
 		else if ((!strprefix("VAR#", line)) /*Do not parse asm_pleq's inside of a VAR# line.*/
