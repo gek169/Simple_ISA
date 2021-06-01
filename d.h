@@ -86,5 +86,6 @@ static unsigned short interrupt(unsigned short a,
 		return 1;
 	}
 #endif
+	/*TODO: add a disassembler.*/
 	return a;
 }
