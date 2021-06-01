@@ -15,16 +15,16 @@ CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value
 
 all: main asm_programs
 
-sisa16:
-	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16 -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16 -DUSE_UNSIGNED_INT
+sisa16_emu:
+	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16_emu -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 	@echo "~~Built emulator."
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
-	@echo "~~Built assembler"
+	@echo "~~Built assembler (Which has an emulator built into it.)"
 rbytes:
 	$(CC) $(CFLAGS) rbytes.c -o rbytes
 
-main: sisa16_asm sisa16
+main: sisa16_asm sisa16_emu
 
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
@@ -33,21 +33,23 @@ asm_programs: sisa16_asm
 	./asm_compile.sh
 
 install: main
-	cp ./sisa16 $(INSTALL_DIR)/ || cp ./sisa16.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16"
-	cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
-	echo "Attempting manpage install."
-	cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
+	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
+	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
+	@echo "Attempting manpage install."
+	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
 	rm -f $(INSTALL_DIR)/sisa16
+	rm -f $(INSTALL_DIR)/sisa16_emu
 	rm -f $(INSTALL_DIR)/sisa16_stdin
 	rm -f $(INSTALL_DIR)/sisa16_asm
+	rm -f $(MAN_INSTALL_DIR)/sisa16_emu.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_asm.1
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm
+	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm
 	clear
