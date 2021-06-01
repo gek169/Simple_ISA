@@ -646,7 +646,7 @@ unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
 char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 void fputbyte(unsigned char b, FILE* f){
-	if(!run_sisa16)
+	if(!run_sisa16 && !quit_after_macros)
 		if((unsigned long)ftell(f) != outputcounter){
 			/*seek to the end*/
 			if(debugging)
@@ -675,12 +675,14 @@ void fputbyte(unsigned char b, FILE* f){
 		break;
 		default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
 	}
-	if(!run_sisa16){
-		if(npasses == 1)
-			fputc(b, f);
-	} else {
-		if(npasses == 1)
-			M[outputcounter]=b;
+	if(!quit_after_macros){
+		if(!run_sisa16){
+			if(npasses == 1)
+				fputc(b, f);
+		} else {
+			if(npasses == 1)
+				M[outputcounter]=b;
+		}
 	}
 	outputcounter++; outputcounter&=0xffffff;
 }
@@ -952,7 +954,7 @@ int main(int argc, char** argv){
 		ofile=fopen(outfilename, "wb");
 	}
 	if(!run_sisa16)
-		if(!ofile){
+		if(!ofile && !quit_after_macros){
 			if(!clear_output)
 				printf("\nUNABLE TO OPEN OUTPUT FILE %s!!!\n", outfilename);
 			return 1;
