@@ -76,7 +76,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[187] = {
+char* insns[203] = {
 	"halt",
 	"lda",
 	"la",
@@ -282,9 +282,26 @@ char* insns[187] = {
 	"istrx0_1",
 	"istrx1_0",
 	"cbrx0",
-	"carx0"
+	"carx0",
+	"rxidiv",
+	"rximod",
+	/*requires 3 byte arguments.*/
+	"farldrx0",
+	"farldrx1",
+	"farldrx2",
+	"farldrx3",
+	"farllda",
+	"farlldb",
+	"farldc",
+	"farstrx0",
+	"farstrx1",
+	"farstrx2",
+	"farstrx3",
+	"farstla",
+	"farstlb",
+	"farstc"
 };
-unsigned char insns_numargs[187] = {
+unsigned char insns_numargs[203] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -380,9 +397,16 @@ unsigned char insns_numargs[187] = {
 		/*istrx0_1 and istrx1_0*/
 		0,0,
 		/*cbrx0 and carx0*/
-		0,0
+		0,0,
+		/*rxidiv and rximod*/
+		0,0,
+		/*farld*/
+		3,3,3,3, 3,3,3,
+		/*farst*/
+		3,3,3,3, 3,3,3
+		
 };
-char* insn_repl[187] = {
+char* insn_repl[203] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -604,9 +628,15 @@ char* insn_repl[187] = {
 		"bytes184;",
 	/*cbrx0 and carx0*/
 		"bytes185;",
-		"bytes186;"
+		"bytes186;",
+	/*rxidiv and rximod*/
+		"bytes187;",
+		"bytes188;",
+	/*the 14 instructions that require 3 bytes as argument.*/
+		"bytes189,","bytes190,","bytes191,","bytes192,",   "bytes193,","bytes194,","bytes195,",
+		"bytes196,","bytes197,","bytes198,","bytes199,",   "bytes200,","bytes201,","bytes202,"
 };
-static const unsigned int n_insns = 187;
+static const unsigned int n_insns = 203;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
@@ -1524,7 +1554,7 @@ int main(int argc, char** argv){
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else if (i==2){long loc_qmark;long loc_slash;char do_32bit=0;long loc_eparen;char expansion[1024]; 
+					} else if (i==2){long loc_qmark;long loc_slash;long loc_ampersand;char do_32bit=0;long loc_eparen;char expansion[1024]; 
 					unsigned long res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
@@ -1534,6 +1564,7 @@ int main(int argc, char** argv){
 						loc_eparen = strfind(line_old+loc+1,"%");
 						loc_slash = strfind(line_old+loc+1,"/");
 						loc_qmark = strfind(line_old+loc+1,"?");
+						loc_ampersand = strfind(line_old+loc+1,"&");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
@@ -1552,15 +1583,16 @@ int main(int argc, char** argv){
 							printf("\nAt location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							exit(1);
 						}
+						if(loc_ampersand==0) do_32bit = 3;
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						
 						if(do_32bit == 0)
 							res = strtoul(line_old+loc+1, NULL, 0);
-						else if(do_32bit == 1) /*Skip the forward slash.*/
+						else if(do_32bit == 1 || do_32bit == 3) /*Skip the forward slash or ampersand*/
 							res = strtoul(line_old+loc+2, NULL, 0);
-						else{
+						else if(do_32bit == 2){
 #if defined(NO_FP)
 							puts("<ASM ENV ERROR> Floating point unit was disabled during compilation. You may not use floating point SPLIT directives.");
 							exit(1);
@@ -1587,14 +1619,24 @@ int main(int argc, char** argv){
 						}
 						if(debugging) if(!clear_output)printf("\nSplitting value %lu\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
-						if(do_32bit == 0)
+						if(do_32bit == 0) {
 							sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
-						else
+						} else if(do_32bit == 1 || do_32bit == 2) {
 							sprintf(expansion, "%u,%u,%u,%u", (unsigned int)((res/(256*256*256))&0xff),
-																(unsigned int)((res/(256*256))&0xff),
+																(unsigned int)((res/(0x10000))&0xff),
 																(unsigned int)((res/(256))&0xff),
 																(unsigned int)((res)&0xff)
 																);
+						} else if(do_32bit == 3) {
+							sprintf(expansion, "%u,%u,%u",
+									(unsigned int)((res/(0x10000))&0xff),
+									(unsigned int)((res/(256))&0xff),
+									(unsigned int)((res)&0xff)
+									);
+						} else {
+							puts("<ASM INTERNAL ERROR> Invalid do_32bit mode in a split directive.");
+							exit(1);
+						}
 						before = strcatallocf1(before, expansion);
 					} 
 					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 

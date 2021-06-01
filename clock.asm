@@ -7,8 +7,8 @@ VAR#POP_FARPTR_VARIABLE#	blpop;apop;ca;
 VAR#PUSH_FARPTR_VARIABLE#	ac;apush;blpush;
 
 //global variables.
-VAR#ld_iteration_count#	sc%0x44%;lb 0;farillda;
-VAR#st_iteration_count#	sc%0x44%;lb 0;faristla;
+VAR#ld_iteration_count#	farllda %&0x440000%;
+VAR#st_iteration_count#	farstla %&0x440000%;
 
 
 
@@ -93,8 +93,8 @@ asm_end_region_restriction;
 
 //Variable Section.
 section 0xAE0000;
-VAR#ld_iter#sc %0xAE%;lla $;farildrx0;
-VAR#st_iter#sc %0xAE%;lla $;faristrx0;
+VAR#ld_iter#farldrx0 %&0xAE0000%;
+VAR#st_iter#farstrx0 %&0xAE0000%;
 bytes %/0%;
 
 section 0xAF0000;

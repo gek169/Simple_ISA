@@ -14,6 +14,10 @@
 						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
 						((((UU)M[PP+((U)(program_counter-2))]))<<8)+\
 						(UU)M[PP+((U)(program_counter-1))])
+#define CONSUME_THREE_BYTES (program_counter+=3,\
+						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
+						((((UU)M[PP+((U)(program_counter-2))]))<<8)+\
+						(UU)M[PP+((U)(program_counter-1))])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
@@ -73,13 +77,15 @@ k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
 k 171:goto ZB;k 172:goto ZC;k 173:goto ZD;\
 k 174:goto ZE;k 175:goto ZF;\
 k 176:goto G_AA0;k 177:goto G_AA1;\
-k 178:goto G_AA2;k 179:\
-goto G_AA3;\
+k 178:goto G_AA2;k 179:goto G_AA3;\
 k 180:goto G_AA4;k 181:goto G_AA5;k 182:goto G_AA6;\
 k 183:goto G_AA7;k 184:goto G_AA8;k 185:goto G_AA9;\
-k 186:goto G_AA10;k 187:\
-k 188:k 189:k 190:k 191:k 192:k 193:k 194:k 195:k 196:k 197:\
-k 198:k 199:k 200:k 201:k 202:k 203:k 204:k 205:k 206:k 207:\
+k 186:goto G_AA10;k 187:goto G_AA11;\
+k 188:goto G_AA12;k 189:goto G_AA13;k 190:goto G_AA14;\
+k 191:goto G_AA15;k 192:goto G_AA16;k 193:goto G_AA17;\
+k 194:goto G_AA18;k 195:goto G_AA19;k 196:goto G_AA20;k 197:goto G_AA21;\
+k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
+k 202:goto G_AA26;k 203:k 204:k 205:k 206:k 207:\
 k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
@@ -363,4 +369,87 @@ G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
 G_AA10:c=(RX0>>16);a=RX0;D
+G_AA11:{SUU SRX0, SRX1;
+		SRX0 = RX0;
+		SRX1 = RX1;
+	if(SRX1!=0)RX0=(SRX0/SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
+	}D
+G_AA12:{SUU SRX0, SRX1;
+		SRX0 = RX0;
+		SRX1 = RX1;
+	if(SRX1!=0)RX0=(SRX0%SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
+	}D
+	
+	G_AA13:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		RX0=(((UU)M[(flight)&0xffFFff])<<24) + 
+					(((UU)M[(flight+1)&0xffFFff])<<16) +
+					(((UU)M[(flight+2)&0xffFFff])<<8) +
+					(((UU)M[(flight+3)&0xffFFff]));
+	}D
+	G_AA14:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		RX1=(((UU)M[(flight)&0xffFFff])<<24) + 
+					(((UU)M[(flight+1)&0xffFFff])<<16) +
+					(((UU)M[(flight+2)&0xffFFff])<<8) +
+					(((UU)M[(flight+3)&0xffFFff]));
+	}D
+	G_AA15:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		RX2=(((UU)M[(flight)&0xffFFff])<<24) + 
+					(((UU)M[(flight+1)&0xffFFff])<<16) +
+					(((UU)M[(flight+2)&0xffFFff])<<8) +
+					(((UU)M[(flight+3)&0xffFFff]));
+	}D
+	G_AA16:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		RX3=(((UU)M[(flight)&0xffFFff])<<24) + 
+					(((UU)M[(flight+1)&0xffFFff])<<16) +
+					(((UU)M[(flight+2)&0xffFFff])<<8) +
+					(((UU)M[(flight+3)&0xffFFff]));
+	}D
+	G_AA17:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		a=(((UU)M[(flight)&0xffFFff])<<8) + 
+					(((UU)M[(flight+1)&0xffFFff]));
+	}D
+	G_AA18:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		b=(((UU)M[(flight)&0xffFFff])<<8) + 
+					(((UU)M[(flight+1)&0xffFFff]));
+	}D
+	G_AA19:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		c=(((UU)M[(flight)&0xffFFff])<<8) + 
+					(((UU)M[(flight+1)&0xffFFff]));
+	}D
+	G_AA20:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_4bytes(RX0, flight);
+	}D
+	G_AA21:{register UU flight;
+			flight = CONSUME_THREE_BYTES;
+			write_4bytes(RX1, flight);
+		}D
+	G_AA22:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_4bytes(RX2, flight);
+	}D
+	G_AA23:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_4bytes(RX3, flight);
+	}D
+	G_AA24:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_2bytes(a, flight);
+	}D
+	G_AA25:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_2bytes(b, flight);
+	}D
+	G_AA26:{register UU flight;
+		flight = CONSUME_THREE_BYTES;
+		write_2bytes(c, flight);
+	}D
+	
 }

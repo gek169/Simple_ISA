@@ -359,6 +359,38 @@ cbrx0: c = RX0>>16; b = RX0 & 0xffFF; (1 byte) (B9)
 
 carx0: c = RX0>>16; a = RX0 & 0xffFF; (1 byte) (BA)
 
+rxidiv: RX0 = (signed)RX0 / (signed)RX1 (1 byte) (BB)
+
+rximod: RX0 = (signed)RX0 % (signed)RX1 (1 byte) (BC)
+
+farldrx0: load RX0 from constant memory location (4 bytes) (BD)
+
+farldrx1: (4 bytes) (BE)
+
+farldrx2: (4 bytes) (BF)
+
+farldrx3: (4 bytes) (C0)
+
+farllda: (4 bytes) (C1)
+
+farlldb: (4 bytes) (C2)
+
+farldc: (4 bytes) (C3)
+
+farstrx0: store rx0 to constant memory location (4 bytes) (C4)
+
+farstrx1: (4 bytes) (C5)
+
+farstrx2: (4 bytes) (C6)
+
+farstrx3: (4 bytes) (C7)
+
+farstla: (4 bytes) (C8)
+
+farstlb: (4 bytes) (C9)
+
+farstc: (4 bytes) (CA)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
@@ -590,7 +622,8 @@ a piece of data which will be accessed as an array can be indexed "normally" usi
 		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@%.
 	%- two of these defines a split directive. %0xff0A% will be split into 255,10.
 		Additionally, if you have a 32 bit value you wish to be split into four bytes (highest, high, low, lowest)
-		then you can do %/myvalue% (with a forward slash) to 
+		then you can do %/myvalue% (with a forward slash) to get a 32 bit integer, or %?myvalue% to get a float, or %&myvalue% to get a 24 bit integer.
+		All of these are unsigned.
 	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded on the line.
 	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
 	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers. Do not split the integers.
