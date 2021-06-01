@@ -917,7 +917,7 @@ int disassembler(char* fname, long location){
 			continue;
 		}else{
 			unsigned long arg_i;
-			printf("//%lx:\n%s ",i,insns[opcode]);
+			printf("//%lx:\n%s ",(i-1),insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				if((i & 0xffFF) == 0){
 					puts("\n<This opcode cannot be executed properly during normal execution due to boundary, here>");
