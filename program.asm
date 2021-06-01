@@ -108,7 +108,7 @@ seg_st;
 //transfer a page of junk from the segment.
 lrx0 %/0xffff%;
 seg_ld;
-interrupt;
+//interrupt;
 halt
 
 
