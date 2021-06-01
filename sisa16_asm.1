@@ -17,15 +17,17 @@ Macro-enabled Assembler for the sisa16 virtual portable computer architecture.
 .B [--version]
 .SH DESCRIPTION
 .B sisa16_asm
-builds and optionally executes SISA16 virtual machine images.
+builds and optionally executes SISA16 virtual machine images. for the
 .B sisa16
 virtual portable computer architecture.
+
+
 .SH OPTIONS
 .BR -i
 specifies the imput assembly file. The last input file is used, no others are.
 
 .BR -run
-No output file is generated. An emulator built into the assembler is used to immediately execute code, making this an effective assembly language.
+No output file is generated. An emulator built into the assembler is used to immediately execute code, making this an effective scripting language.
 
 .BR -o
 specifies the output filename
@@ -69,6 +71,8 @@ in the assembly language.
 The additional region of memory outside the normal SISA16 address space, which is 
 allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
 but can also be used to hold code.
+
+.SH INSTRUCTIONS
 
 .TP
 Supported instructions:
