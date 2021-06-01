@@ -4,7 +4,9 @@ Macro-enabled Assembler for the sisa16 virtual portable computer architecture.
 .SH SYNOPSIS
 .B sisa16_asm
 .B -i [or -run]
+.B -dis
 .IR infilename
+.IR location
 .B -o 
 .IR outfilename
 .B [-DBG]
@@ -26,11 +28,24 @@ virtual portable computer architecture.
 .BR -i
 specifies the imput assembly file. The last input file is used, no others are.
 
+sisa16_asm -i myfile.asm -o myfile.bin
+
 .BR -run
 No output file is generated. An emulator built into the assembler is used to immediately execute code, making this an effective scripting language.
 
+sisa16_asm -run myfile.asm
+
+.BR -dis
+Specifies a file to diassemble.
+
+sisa16_asm -dis clock.bin 0x20000
+
+will disassemble 64k starting from 0x20000.
+
+you can also use --disassemble
+
 .BR -o
-specifies the output filename
+specifies the output filename.
 
 .BR -DBG
 Enables debug output from the assembler
@@ -42,7 +57,7 @@ prints the compiletime environment information.
 expands all macros and does not write an output file.
 
 .BR -pl
-prints all lines to base assembler file-building instructions
+prints all lines to base assembler file-building instructions (bytes)
 
 .SH LANGUAGE
 .TP

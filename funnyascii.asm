@@ -62,8 +62,7 @@ la0x45;putchar;sc%printbytehex_jmptable_2_end%;jmp
 la0x46;putchar;sc%printbytehex_jmptable_2_end%;jmp
 VAR#printbytehex_jmptable_2_end#@
 farret;
-
-
+nop;nop;nop;
 VAR#proc_puts#sc%@%;la2;farcall;
 //move the stack pointer back.
 astp;lb6;sub;

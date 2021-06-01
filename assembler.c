@@ -888,6 +888,53 @@ char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
+
+int disassembler(char* fname, long location){
+	/*Disassemble for exactly 64k.*/
+	FILE* f; long i = location & 0xffFFff;
+	f = fopen(fname, "rb");
+	if(!f){
+		puts("//ERROR: Could not open file to disassemble.");
+		exit(1);
+	}
+	fseek(f, location, SEEK_SET);
+	for(i = location; i < location + 0x10000;){
+		unsigned char opcode;
+		if((i & 0xffFF) == 0){
+			puts("//<Region Boundary>");
+		}
+		if(ftell(f) != i){
+			puts("//<Disassembly could not proceed, reason: end of file>");
+			exit(0);
+		}
+		opcode = fgetc(f);i++;
+		if(opcode >= n_insns){
+			puts("//Illegal opcode, nop duplicate:");
+			printf("bytes %u;\n", (unsigned int)opcode);
+			continue;
+		}else{
+			unsigned long arg_i;
+			printf("%s ",insns[opcode]);
+			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
+				if((i & 0xffFF) == 0){
+					puts("This opcode cannot be executed properly during normal execution due to boundary.");
+				}
+				if(arg_i > 0) printf(",");
+				if(feof(f) || ftell(f) != i){
+					puts("\n//Disassembly halted here. Reason: Missing opcode arguments.");
+					exit(0);
+				}
+				printf("%u",(unsigned int)fgetc(f));i++;
+			}
+			printf(";\n");
+		}
+	}
+	puts("//Disassembly Finished.");
+	fclose(f);
+	exit(9);
+	return 0;
+}
+
 char temporary_name[512] = "tmpsisa_XXXXXX";
 int main(int argc, char** argv){
 	FILE* infile,*ofile; char* metaproc;
@@ -925,6 +972,13 @@ int main(int argc, char** argv){
 			clear_output = 1;
 			outfilename = NULL;
 
+		}
+		if(strprefix("--disassemble",argv[i-2]) || strprefix("-dis",argv[i-2]) ){
+			unsigned long loc;
+			puts("//Beginning Disassembly");
+			loc = strtoul(argv[i],0,0) & 0xffFFff;
+			disassembler(argv[i-1], loc);
+			exit(1);
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
@@ -1321,6 +1375,8 @@ int main(int argc, char** argv){
 			free(line_old);
 		}
 		if(strprefix("ASM_COMPILE", line)){
+			puts("<ASM UNFINISHED FEATURE ERROR> Unfinished feature. You may not use ASM_COMPILE.");
+			exit(1);
 			line = compile_line(line);
 			nmacrocalls = 0;
 			goto pre_pre_processing;
