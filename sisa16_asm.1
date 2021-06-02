@@ -1,6 +1,6 @@
 .TH 1
 .SH sisa16_asm
-Macro-enabled Assembler for the sisa16 virtual portable computer architecture.
+Macro-enabled Assembler and Disassembler for the sisa16 virtual portable computer architecture.
 .SH SYNOPSIS
 .B sisa16_asm
 .B -i [or -run]
@@ -939,8 +939,7 @@ are often defined after where they are used (So that they will expand
 correctly on the second pass.)
 
 Note that the order is important here. if you define myMacro1 before myMacro,
-then the assembler will detect there is a longer macro to expand on the current line,
-
+then the assembler will detect there is a longer macro to expand which intersects the location,
 and will instead use that.
 
 .TP
@@ -951,5 +950,7 @@ David MHS Webster, 2021
 
 Email me: davidmhswebster@gmail.com
 
+"Let all that you do be done with love"
+
 .SH LICENSE
-See the CC0 License.
+For the Public Domain. See CC0 License.
