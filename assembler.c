@@ -973,7 +973,9 @@ static int disassembler(char* fname, unsigned long location){
 				puts("~~~~~~~~~~Maybe: Computed Jump through register A");
 			}else if(streq(insns[opcode], "cb")){
 				puts("~~~~~~~~~~Maybe: Computed Jump through register B");
-			}else if(streq(insns[opcode], "call") || streq(insns[opcode], "farcall")){
+			}else if(streq(insns[opcode], "call")){
+				puts("~~~~~~~~~~Region-Local Procedure Call");
+			}else if(streq(insns[opcode], "farcall")){
 				puts("~~~~~~~~~~Procedure Call");
 			}else if(streq(insns[opcode], "lfarpc")){
 				puts("~~~~~~~~~~Region Jump");
