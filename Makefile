@@ -32,9 +32,13 @@ cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
 asm_programs: sisa16_asm
+#effectively, a check.
 	./asm_compile.sh
 	./sisa16_asm -C
+	@echo "Running the ABI test program..."
+	./sisa16_emu abi.bin
 
+	
 install: main
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
 	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
