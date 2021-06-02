@@ -887,7 +887,7 @@ static char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-#define SISA16_DIASSEMBLER_MAX_HALTS 2
+#define SISA16_DIASSEMBLER_MAX_HALTS 20
 static int disassembler(char* fname, unsigned long location){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
@@ -1018,7 +1018,7 @@ static int disassembler(char* fname, unsigned long location){
 			goto end;
 		}
 	}
-	puts("\n//Reached End of 64k. Disassembly Over.\n");
+	puts("\n//Reached End. Disassembly Over.\n");
 	end:
 	fclose(f);
 	return 0;
