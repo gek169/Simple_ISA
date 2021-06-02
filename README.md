@@ -1,11 +1,13 @@
 # Simple, Embeddable, Performant Virtual Machine Language
 
+Build Statuses:
+
 ![build personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
-![build arm personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
+![build macos personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
 
 ![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
-![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
+![build macos cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
 C program to simulate the SISA-16 virtual portable computer architecture.
 
