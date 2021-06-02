@@ -946,9 +946,14 @@ int disassembler(char* fname, long location){
 			}else if(streq(insns[opcode], "sc")){
 				puts("//~~~~~~~~~~Likely: jump target");
 			}else if(streq(insns[opcode], "cba")){ /*In case I should find anything to say about them.*/
-			;
+				;
 			}else if(streq(insns[opcode], "cab")){
-			;
+				;
+			}else if(streq(insns[opcode], "crx0")
+					||streq(insns[opcode], "crx1")
+					||streq(insns[opcode], "crx2")
+					||streq(insns[opcode], "crx3")){
+				puts("//~~~~~~~~~~Likely: Computed Jump through RX register.");
 			}else if(streq(insns[opcode], "ca")){
 				puts("//~~~~~~~~~~Maybe: Computed Jump through register A");
 			}else if(streq(insns[opcode], "cb")){
