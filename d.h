@@ -60,7 +60,7 @@ static unsigned short interrupt(unsigned short a,
 				SEGMENT_PAGES = n_pages;
 				if(!SEGMENT){puts("Failed Malloc");exit(1);}
 			}
-			(void)fread(SEGMENT, 1, len, ff);
+			fread(SEGMENT, 1, len, ff);
 			fclose(ff);
 		}
 		return 1;
