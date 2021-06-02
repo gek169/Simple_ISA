@@ -914,19 +914,27 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 		opcode = fgetc(f);i++;
 		if(opcode == 0 || opcode >= n_insns) n_halts++;
 		else n_halts = 0;
+		if(
+			opcode < n_insns &&  /*Valid opcode*/
+			(insns_numargs[opcode] > 0) && /*With arguments*/
+			(((i-1)+insns_numargs[opcode])>>16) != ((i-1)>>16)
+		){
+			printf("\n//<E_BAD_BINARY>\n//op is '%s' which has %u args but crosses the region boundary.\n",insns[opcode],insns_numargs[opcode]);
+		}
 		if(opcode >= n_insns){
 			puts("//!!!Illegal!!! opcode, equivalent to a NOP:");
 			printf("bytes 0x%x;\n", (unsigned int)opcode);
 			continue;
 		}else{
 			unsigned long arg_i = 0;
+			unsigned char bad_flag = 0;
 			unsigned long required_spaces = 20;
 			unsigned long opcode_i = i-1;
-			printf("%-10s ",insns[opcode]);
+			printf("%-9s ",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				unsigned char thechar;
 				if(  ((i & 0xffFF) == 0) || (i >= 0x1000000)){
-					puts("\nasm_quit;\n<This opcode cannot be executed properly during normal execution due to boundary, here. NEEDS_FIX>\n");
+					bad_flag = 1;
 				}
 				if(arg_i > 0) {
 					printf(",");
@@ -946,6 +954,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				printf(" ");
 			}}
 			printf(";//0x%06lx  :", opcode_i);
+			if(bad_flag) printf("(E_WONT_RUN)");
 			if(streq(insns[opcode], "farret")){
 				puts("~~~~~~~~~~End of Procedure");
 			}else if(streq(insns[opcode], "ret")){
