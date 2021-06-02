@@ -13,5 +13,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: makeinstall
+    - name: build_the_demos
       run: sudo make -B asm_programs
