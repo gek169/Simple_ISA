@@ -26,7 +26,7 @@ rbytes:
 
 main: sisa16_asm sisa16_emu
 
-check: install
+check: asm_programs
 
 cpp_program:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
