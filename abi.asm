@@ -167,7 +167,7 @@ proc_puts;
 	la 10;putchar;
 	la 13;putchar;	
 	lrx0 %?1.0%;asm_print;
-	lrx1 %?2.0%;asm_print;
+	lrx1 %?2.7%;asm_print;
 	fltdiv;
 	lrx1 %/0x39%;
 	rxadd;

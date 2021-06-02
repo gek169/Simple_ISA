@@ -318,41 +318,60 @@ G_AA1: R=8; goto G_HALT;
 G_AA2: R=8; goto G_HALT;
 #else
 ZE:{
+	float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
-	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) + (*((float*)&RX1_CP));
+	memcpy(&fRX0, &RX0_CP, 4);
+	memcpy(&fRX1, &RX1_CP, 4);
+	fRX0 = fRX0 + fRX1;
+	memcpy(&RX0_CP, &fRX0, 4);
 	RX0 = RX0_CP;
 }D
 ZF: {
+	float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
-	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) - (*((float*)&RX1_CP));
+	memcpy(&fRX0, &RX0_CP, 4);
+	memcpy(&fRX1, &RX1_CP, 4);
+	fRX0 = fRX0 - fRX1;
+	memcpy(&RX0_CP, &fRX0, 4);
 	RX0 = RX0_CP;
 }D
 G_AA0:{
+		float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
-	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) * (*((float*)&RX1_CP));
+	memcpy(&fRX0, &RX0_CP, 4);
+	memcpy(&fRX1, &RX1_CP, 4);
+	fRX0 = fRX0 * fRX1;
+	memcpy(&RX0_CP, &fRX0, 4);
 	RX0 = RX0_CP;
 }D
 G_AA1: {
+	float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
-	if((*((float*)&RX1_CP)) == 0.0 || 
-		(*((float*)&RX1_CP)) == -0.0){
+	memcpy(&fRX0, &RX0_CP, 4);
+	memcpy(&fRX1, &RX1_CP, 4);
+	if(fRX1 == 0.0 || 
+		fRX1 == -0.0){
 			R=9; goto G_HALT;
 		}
-	*((float*)&RX0_CP) = (*((float*)&RX0_CP)) / (*((float*)&RX1_CP));
+	fRX0 = fRX0 / fRX1;
+	memcpy(&RX0_CP, &fRX0, 4);
 	RX0 = RX0_CP;
 }D
 /*cmp*/
 G_AA2: {
+	float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
+	memcpy(&fRX0, &RX0_CP, 4);
+	memcpy(&fRX1, &RX1_CP, 4);
 	if(
-		(*((float*)&RX0_CP))<(*((float*)&RX1_CP))
+		fRX0<fRX1
 	)a=0;else if(
-		(*((float*)&RX0_CP))>(*((float*)&RX1_CP))
+		fRX0>fRX1
 	)a=2;else a=1;
 }D
 #endif
