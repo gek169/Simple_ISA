@@ -35,8 +35,9 @@ asm_programs: sisa16_asm
 #effectively, a check.
 	./asm_compile.sh
 	./sisa16_asm -C
-	@echo "Running the ABI test program..."
-	./sisa16_emu abi.bin
+	@echo "Running test programs..."
+	./sisa16_asm -run abi.asm
+	./sisa16_asm -run program.asm
 
 	
 install: main
