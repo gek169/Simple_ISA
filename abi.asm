@@ -147,7 +147,7 @@ bytes 0;
 
 
 VAR#BOOT_REGION#__START__
-ASM_header bootdol_moved.hasm
+ASM_header bootdol.hasm
 
 
 //MAIN FUNCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

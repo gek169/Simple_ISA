@@ -1,6 +1,6 @@
 
 //Try moving this file to ~/sisa16/ or /usr/include/sisa16/
-//Only then can you run abi.asm.
+//Then you can include it in any program you write on your system just by doing ASM_header bootdol.hasm
 
 
 section 0;la BOOT_REGION;lfarpc;asm_print;
