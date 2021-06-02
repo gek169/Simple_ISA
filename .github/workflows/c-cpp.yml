@@ -15,3 +15,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: build_the_demos
       run: make -B asm_programs OPTLEVEL=-Og
+    - name: show_environment_info
+      run: uname -a && cat /proc/cpuinfo && uname -r && lsb_release -a
