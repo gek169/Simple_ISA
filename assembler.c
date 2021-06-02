@@ -642,7 +642,7 @@ char* insn_repl[207] = {
 		"bytes189,","bytes190,","bytes191,","bytes192,",   "bytes193,","bytes194,","bytes195,",
 		"bytes196,","bytes197,","bytes198,","bytes199,",   "bytes200,","bytes201,","bytes202,",
 	/*incr decr*/
-		"bytes203,","bytes204","bytes205","bytes206"
+		"bytes203;","bytes204;","bytes205;","bytes206;"
 };
 static const unsigned int n_insns = 207;
 char int_checker(char* proc){

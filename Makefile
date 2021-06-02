@@ -1,6 +1,6 @@
 #USE-NCURSES
-#CC=cc
-CC= gcc
+CC= cc
+#CC= gcc
 #CC= tcc
 #CC= clang
 INSTALL_DIR=/usr/bin

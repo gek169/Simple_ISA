@@ -9,13 +9,12 @@ Build Statuses:
 ![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
 ![build macos cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
-C program to simulate the SISA-16 virtual portable computer architecture.
+This repository contains the SISA16 standalone emulator source, 
+the macro assembler/disassembler which doubles as an emulator,
+and a C++ proof-of-concept of a compiletime instruction set simulator, which
+inspired this project.
 
-The VM has 16 bit control flow and memory segmentation, but it has 8,16, and 32 bit arithmetic.
-
-Floating point arithmetic is also optionally supported.
-
-The emulator and assembler are CONFIRMED to work on the following architectures and platforms:
+The emulator and assembler are compiled and tested on the following architectures and platforms:
 
 ```c
 	IA32 (Debian linux, native)
@@ -24,7 +23,12 @@ The emulator and assembler are CONFIRMED to work on the following architectures 
 	riscv64 (Buildroot linux, jslinux)
 ```
 
-The included assembly programs and assembler are designed for isa.c.
+Github actions is used to do automatic builds on Ubuntu and Macos. I'd like to expand build tests to more
+platforms, but Github Actions complains whenever I try to add a linux ARM64 test...
+
+(At the time of writing this, the macos builds are uncooperative... ignore the failing builds)
+
+The included assembly programs are written for the architecture and can be executed just like scripts!
 
 (the cpp file in this repository is a proof-of-concept unmaintained alpha version of this project.)
 
@@ -76,15 +80,16 @@ once you've installed the emulator and the assembler, you can quickly run assemb
 
 `sisa16_asm -run my_asm_file.asm`
 
-if you want to use sisa16 assembler as a scripting language, you can add a shebang to your files:
+if you want to use sisa16 assembler as a scripting language, you can add a hashbang to your files.
 
 for the default INSTALL_DIR which is `/usr/bin`:
 
 `#!/usr/bin/sisa16_asm -run`
 
-The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc.
+The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc on
+x86_64, x86, aarch64, and riscv.
 
-The emulator has the best performance compiled with clang at -Ofast.
+The emulator has the best performance compiled with gcc at -Os.
 
 The emulator itself has been confirmed to *compile* using compiler explorer on...
 
