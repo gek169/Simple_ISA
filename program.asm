@@ -1,6 +1,5 @@
 #!/usr/bin/sisa16_asm -run
-//create a whole-memory image.
-section 0xFFffFF;bytes 0,0;
+
 
 //Macros!
 

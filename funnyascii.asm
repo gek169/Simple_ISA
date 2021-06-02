@@ -1,6 +1,5 @@
 #!/usr/bin/sisa16_asm -run
-//create a whole-memory image.
-section 0xFFffFF;bytes 0,0;
+
 VAR#ZERO_STACK_POINTER#		astp;popa;
 VAR#POP_FARPTR_VARIABLE#	blpop;apop;ca;
 VAR#PUSH_FARPTR_VARIABLE#	ac;apush;blpush;
