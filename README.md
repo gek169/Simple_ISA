@@ -29,9 +29,10 @@ cc assembler.c -o sisa16_asm
 #assemble your program
 ./sisa16_asm -i program.asm -o program.bin
 #run your program
-./sisa16 program.bin
+./sisa16_em program.bin
 #install sisa16
-sudo cp sisa16* /usr/bin/
+sudo cp sisa16_asm /usr/bin/
+sudo cp sisa16_emu /usr/bin/
 
 #run asm program starting with shebang as script
 #the shebang looks like this for the default INSTALL_DIR:
