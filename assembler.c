@@ -1187,7 +1187,7 @@ int main(int argc, char** argv){
 			ASM_PUTS("Optional argument: -v, -h, --help, --version: This printout.");
 			ASM_PUTS("\n\nSISA-16 Assembler and Emulator in Pure Glorious C89, Version 1.5");
 			ASM_PUTS("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
-			return 1;
+			return 0;
 		}
 	}}
 	if(debugging) infile=stdin;
