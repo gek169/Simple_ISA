@@ -1,4 +1,6 @@
 #!/bin/bash
+
+#this version of the script is used if you have sisa16_asm installed.
 IFS=$'\n' ASMFILE=$(ls -1|grep '.\.asm')
 for filename in $ASMFILE
 do
