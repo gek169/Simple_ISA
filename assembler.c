@@ -62,7 +62,6 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 #include "d.h"
 #include "isa.h"
 char* outfilename = "outsisa16.bin";
-char* execute_sisa16 = "sisa16";
 char run_sisa16 = 0;
 char clear_output = 0;
 char use_tempfile = 0;
@@ -683,7 +682,7 @@ char printlines = 0;
 unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
 unsigned long region_restriction = 0;
 char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
-void fputbyte(unsigned char b, FILE* f){
+static void fputbyte(unsigned char b, FILE* f){
 	if(!run_sisa16 && !quit_after_macros)
 		if((unsigned long)ftell(f) != outputcounter){
 			/*seek to the end*/
@@ -724,7 +723,7 @@ void fputbyte(unsigned char b, FILE* f){
 	}
 	outputcounter++; outputcounter&=0xffffff;
 }
-void putshort(unsigned short sh, FILE* f){
+static void putshort(unsigned short sh, FILE* f){
 	fputbyte(sh/256, f);
 	fputbyte(sh, f);
 }
@@ -738,7 +737,7 @@ unsigned long compiled_variable_array_lengths[65535] = {0};
 unsigned int compiled_variable_types[65535] = {0};
 unsigned long n_compiled_variables = 0;
 
-int check_ident(char* ident){
+static int check_ident(char* ident){
 	unsigned long i;
 	if(ident[0] == '\0') return 0; /*End of the damn string!*/
 	if(!(isalpha(ident[0]) || ident[0] == '_')) return 0; /*Bad identifier*/
@@ -754,7 +753,7 @@ int check_ident(char* ident){
 	return 0; /*Theoretically unreachable.*/
 }
 
-char* compile_line(char* line_in){
+static char* compile_line(char* line_in){
 	char* line_proc = strcatalloc(line_in+strlen("ASM_COMPILE"), "");
 	char* line_out = strcatalloc("","");
 	while(strfind(line_proc, "\t") != -1) line_proc = str_repl_allocf(line_proc, "\t", " ");
@@ -889,7 +888,7 @@ char* compile_line(char* line_in){
 	return line_out;
 }
 #define SISA16_DIASSEMBLER_MAX_HALTS 2
-int disassembler(char* fname, unsigned long location){
+static int disassembler(char* fname, unsigned long location){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
 	FILE* f; unsigned long i = location & 0xffFFff;
@@ -901,9 +900,12 @@ int disassembler(char* fname, unsigned long location){
 	location &= 0xffFFff;
 	fseek(f, location, SEEK_SET);
 	printf("\nsection 0x%lx;\n", location);
-	for(i = location; i < location + 0x10000;){
+	for(i = location; i < 0x1000000;){
 		unsigned char opcode;
-		if((i & 0xffFF) == 0){
+		if(i >= 0x1000000){
+			puts("//Disassembly reached end of memory.");
+			goto end;
+		}else if((i & 0xffFF) == 0){
 			puts("//<Region Boundary>");
 		}
 		if((unsigned long)ftell(f) != i){
@@ -924,7 +926,7 @@ int disassembler(char* fname, unsigned long location){
 			printf("%-10s ",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				unsigned char thechar;
-				if((i & 0xffFF) == 0){
+				if(  ((i & 0xffFF) == 0) || (i >= 0x1000000)){
 					puts("\nasm_quit;\n<This opcode cannot be executed properly during normal execution due to boundary, here. NEEDS_FIX>\n");
 				}
 				if(arg_i > 0) {
@@ -1034,7 +1036,6 @@ int main(int argc, char** argv){
 			disassembler(argv[i-1], loc);
 			exit(0);
 		}
-		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
 	{int i;for(i = 1; i < argc; i++)
 	{
@@ -1232,6 +1233,7 @@ int main(int argc, char** argv){
 		){
 			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
 			ASM_PUTS("Optional argument: -i: specify input file.");
+			ASM_PUTS("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
 			ASM_PUTS("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
 			ASM_PUTS("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
 			ASM_PUTS("Optional argument: -E: Print macro expansion only do not write to file");
@@ -2488,72 +2490,58 @@ int main(int argc, char** argv){
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		SEGMENT = malloc(256);
 		SEGMENT_PAGES = 1;
-	if(
-		(sizeof(U) != 2) ||
-		(sizeof(u) != 1) ||
-		(sizeof(UU) != 4) ||
-		(sizeof(SUU) != 4)
-#ifndef NO_FP
-		|| (sizeof(float) != 4)
-#endif
-	){
-		puts("SISA16 ERROR!!! Compilation Environment conditions unmet.");
-		if(sizeof(U) != 2)
-			puts("U is not 2 bytes. Try using something other than unsigned short (default).");
-		if(sizeof(u) != 1)
-			puts("u is not 2 bytes. Try using something other than unsigned char (default).");
-		if(sizeof(UU) != 4)
-			puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
-		if(sizeof(SUU) != 4)
-			puts("SUU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use int as SUU.");
-#ifndef NO_FP
-		if(sizeof(float) != 4){
-			puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");
+		if(SEGMENT == NULL){
+			puts("<SISA16 EMULATOR ERROR: Could not allocate segment>");
+			return 1;
 		}
+		if(
+			(sizeof(U) != 2) ||
+			(sizeof(u) != 1) ||
+			(sizeof(UU) != 4) ||
+			(sizeof(SUU) != 4)
+#ifndef NO_FP
+			|| (sizeof(float) != 4)
 #endif
-		return 1;
-	}
+		){
+			puts("SISA16 ERROR!!! Compilation Environment conditions unmet.");
+			if(sizeof(U) != 2)
+				puts("U is not 2 bytes. Try using something other than unsigned short (default).");
+			if(sizeof(u) != 1)
+				puts("u is not 2 bytes. Try using something other than unsigned char (default).");
+			if(sizeof(UU) != 4)
+				puts("UU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use unsigned int as UU.");
+			if(sizeof(SUU) != 4)
+				puts("SUU is not 4 bytes. Try toggling -DUSE_UNSIGNED_INT. the default is to use int as SUU.");
+#ifndef NO_FP
+			if(sizeof(float) != 4){
+				puts("float is not 4 bytes. Disable the floating point unit during compilation, -DNO_FP");
+			}
+#endif
+			return 1;
+		}
 
 		
 		e();
 
-	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
-	if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
-	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
-	if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
-	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
-	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
-	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
+		if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
+		if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
+		if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
+		if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
+		if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
+		if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
+		if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
-	if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
+		if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
 #else
-	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
+		if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
 
-	if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
+		if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
 #if defined(NO_SIGNED_DIV)
-	if(R==10)puts("\n<Errfl, Signed 32 bit division disabled by compiletime options>\n");
+		if(R==10)puts("\n<Errfl, Signed 32 bit division disabled by compiletime options>\n");
 #else
-	if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
+		if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
-		/*
-		char* tmp; char* l_execute_sisa16 = execute_sisa16;
-		const char* env_sisa16bin = getenv("SISA16BIN");
-		atexit(del_outfile);
-		if(env_sisa16bin && (
-				(env_sisa16bin[strlen(env_sisa16bin)-1] == '/')|| 
-				(env_sisa16bin[strlen(env_sisa16bin)-1] == '\\')
-			)
-		){
-			l_execute_sisa16 = strcatalloc(env_sisa16bin,execute_sisa16);
-		} else if(env_sisa16bin){
-			l_execute_sisa16 = strcatallocf1(strcatalloc(env_sisa16bin,"/"),execute_sisa16);
-		}
-		tmp = strcatallocf1(strcatalloc(l_execute_sisa16, " "),outfilename);
-		system(tmp);
-		free(tmp); tmp = NULL;
-		if(l_execute_sisa16 != execute_sisa16) free(l_execute_sisa16);
-		*/
 	}
 	return 0;
 }
