@@ -888,7 +888,7 @@ char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-#define SISA16_DIASSEMBLER_MAX_HALTS 10
+#define SISA16_DIASSEMBLER_MAX_HALTS 3
 int disassembler(char* fname, long location){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
@@ -909,14 +909,15 @@ int disassembler(char* fname, long location){
 			exit(0);
 		}
 		opcode = fgetc(f);i++;
-		if(opcode == 0) n_halts++;
+		if(opcode == 0 || opcode >= n_insns) n_halts++;
 		else n_halts = 0;
 		if(opcode >= n_insns){
-			puts("//Illegal opcode, nop duplicate:");
+			puts("//!!!Illegal!!! opcode, equivalent to a NOP:");
 			printf("bytes 0x%x;\n", (unsigned int)opcode);
 			continue;
 		}else{
 			unsigned long arg_i;
+			
 			printf("//%lx:\n%s ",(i-1),insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				if((i & 0xffFF) == 0){
@@ -929,10 +930,41 @@ int disassembler(char* fname, long location){
 				}
 				printf("0x%x",(unsigned int)fgetc(f));i++;
 			}
-			printf(";\n");
+			printf(";");
+			if(streq(insns[opcode], "farret")){
+				puts("//~~~~~~~~~~End of Procedure");
+			}else if(streq(insns[opcode], "ret")){
+				puts("//~~~~~~~~~~End of Region-Local Procedure");
+			} else if(opcode == 0 && n_halts == 1){
+				puts("//~~~~~~~~~~End of Control Flow");
+			} else if(streq(insns[opcode], "jmp")){
+				puts("//~~~~~~~~~~Unconditional Jump");
+			}else if(streq(insns[opcode], "jmpifeq")){
+				puts("//~~~~~~~~~~Conditional Jump");
+			}else if(streq(insns[opcode], "jmpifneq")){
+				puts("//~~~~~~~~~~Conditional Jump");
+			}else if(streq(insns[opcode], "sc")){
+				puts("//~~~~~~~~~~Likely: jump target");
+			}else if(streq(insns[opcode], "cba")){ /*In case I should find anything to say about them.*/
+			;
+			}else if(streq(insns[opcode], "cab")){
+			;
+			}else if(streq(insns[opcode], "ca")){
+				puts("//~~~~~~~~~~Maybe: Computed Jump through register A");
+			}else if(streq(insns[opcode], "cb")){
+				puts("//~~~~~~~~~~Maybe: Computed Jump through register B");
+			}else if(streq(insns[opcode], "call") || streq(insns[opcode], "farcall")){
+				puts("//~~~~~~~~~~Procedure Call");
+			}else if(streq(insns[opcode], "lfarpc")){
+				puts("//~~~~~~~~~~Region Jump");
+			}else if(streq(insns[opcode], "farjmprx0")){
+				puts("//~~~~~~~~~~Far Jump");
+			}else if(streq(insns[opcode], "cpc")){
+				puts("//~~~~~~~~~~Likely: loop top or future jump target.");
+			}else {printf("\n");}
 		}
 		if(n_halts > SISA16_DIASSEMBLER_MAX_HALTS){
-			puts("\n//Reached Halt Limit. Disassembly finished.");
+			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
 			exit(0);
 		}
 	}
