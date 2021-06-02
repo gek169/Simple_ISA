@@ -14,6 +14,11 @@ the macro assembler/disassembler which doubles as an emulator,
 and a C++ proof-of-concept of a compiletime instruction set simulator, which
 inspired this project.
 
+A portion of a disassembled binary:
+
+![disassembly_out](Disassembler_Output_1.png)
+
+
 The emulator and assembler are compiled and tested on the following architectures and platforms:
 
 ```c
