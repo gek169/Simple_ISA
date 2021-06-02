@@ -33,6 +33,7 @@ cpp_program:
 
 asm_programs: sisa16_asm
 	./asm_compile.sh
+	./sisa16_asm -C
 
 install: main
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"

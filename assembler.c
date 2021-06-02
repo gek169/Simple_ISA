@@ -1008,10 +1008,10 @@ int main(int argc, char** argv){
 			puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 			if(sizeof(float) != 4) puts("Floats are an incorrect size. You may not use the floating point unit. Disable the floating point unit.");
 #endif
-			printf("Size of u is %zu, it should be 1, any other result is UB.\n", sizeof(u));
-			printf("Size of U is %zu, it should be 2, any other result is UB.\n", sizeof(U));
-			printf("Size of UU is %zu, it should be 4, any other result is UB.\n", sizeof(UU));
-			printf("Size of SUU is %zu, it should be 4, any other result is UB.\n", sizeof(SUU));
+			printf("Size of u is %u, it should be 1, any other result is UB.\n", (unsigned int)sizeof(u));
+			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
+			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
+			printf("Size of SUU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(SUU));
 
 #ifdef __STDC_IEC_559__
 #if __STDC_IEC_559__ == 0
