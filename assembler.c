@@ -888,25 +888,27 @@ char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-#define SISA16_DIASSEMBLER_MAX_HALTS 3
-int disassembler(char* fname, long location){
+#define SISA16_DIASSEMBLER_MAX_HALTS 2
+int disassembler(char* fname, unsigned long location){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
-	FILE* f; long i = location & 0xffFFff;
+	FILE* f; unsigned long i = location & 0xffFFff;
 	f = fopen(fname, "rb");
 	if(!f){
 		puts("//ERROR: Could not open file to disassemble.");
 		exit(1);
 	}
+	location &= 0xffFFff;
 	fseek(f, location, SEEK_SET);
+	printf("\nsection 0x%lx;\n", location);
 	for(i = location; i < location + 0x10000;){
 		unsigned char opcode;
 		if((i & 0xffFF) == 0){
 			puts("//<Region Boundary>");
 		}
-		if(ftell(f) != i){
+		if((unsigned long)ftell(f) != i){
 			puts("//<Disassembly could not proceed, reason: end of file>");
-			exit(0);
+			goto end;
 		}
 		opcode = fgetc(f);i++;
 		if(opcode == 0 || opcode >= n_insns) n_halts++;
@@ -916,66 +918,74 @@ int disassembler(char* fname, long location){
 			printf("bytes 0x%x;\n", (unsigned int)opcode);
 			continue;
 		}else{
-			unsigned long arg_i;
-			
-			printf("//%lx:\n%s ",(i-1),insns[opcode]);
+			unsigned long arg_i = 0;
+			unsigned long required_spaces = 20;
+			unsigned long opcode_i = i-1;
+			printf("%-10s ",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
+				unsigned char thechar;
 				if((i & 0xffFF) == 0){
-					puts("\n<This opcode cannot be executed properly during normal execution due to boundary, here>");
+					puts("\nasm_quit;\n<This opcode cannot be executed properly during normal execution due to boundary, here. NEEDS_FIX>\n");
 				}
-				if(arg_i > 0) printf(",");
-				if(feof(f) || ftell(f) != i){
+				if(arg_i > 0) {
+					printf(",");
+					required_spaces -= 5;
+				}else{
+					required_spaces -= 4;
+				}
+				if(feof(f) || (unsigned long)ftell(f) != i){
 					puts("\n//Disassembly halted here. Reason: Missing opcode arguments.");
 					exit(0);
 				}
-				printf("0x%x",(unsigned int)fgetc(f));i++;
+				thechar = fgetc(f);
+				printf("0x%02x",(unsigned int)thechar);i++;
 			}
-			printf(";");
+			if(required_spaces < 50)
+			{unsigned long li; for(li=0;li<required_spaces;li++){
+				printf(" ");
+			}}
+			printf(";//0x%06lx  :", opcode_i);
 			if(streq(insns[opcode], "farret")){
-				puts("//~~~~~~~~~~End of Procedure");
+				puts("~~~~~~~~~~End of Procedure");
 			}else if(streq(insns[opcode], "ret")){
-				puts("//~~~~~~~~~~End of Region-Local Procedure");
+				puts("~~~~~~~~~~End of Region-Local Procedure");
 			} else if(opcode == 0 && n_halts == 1){
-				puts("//~~~~~~~~~~End of Control Flow");
+				puts("~~~~~~~~~~End of Control Flow");
 			} else if(streq(insns[opcode], "jmp")){
-				puts("//~~~~~~~~~~Unconditional Jump");
+				 puts("~~~~~~~~~~Unconditional Jump");
 			}else if(streq(insns[opcode], "jmpifeq")){
-				puts("//~~~~~~~~~~Conditional Jump");
+				puts("~~~~~~~~~~Conditional Jump");
 			}else if(streq(insns[opcode], "jmpifneq")){
-				puts("//~~~~~~~~~~Conditional Jump");
+					puts("~~~~~~~~~~Conditional Jump");
 			}else if(streq(insns[opcode], "sc")){
-				puts("//~~~~~~~~~~Likely: jump target");
-			}else if(streq(insns[opcode], "cba")){ /*In case I should find anything to say about them.*/
-				;
-			}else if(streq(insns[opcode], "cab")){
-				;
+				puts("~~~~~~~~~~Likely: jump target");
 			}else if(streq(insns[opcode], "crx0")
 					||streq(insns[opcode], "crx1")
 					||streq(insns[opcode], "crx2")
 					||streq(insns[opcode], "crx3")){
-				puts("//~~~~~~~~~~Likely: Computed Jump through RX register.");
+				puts("~~~~~~~~~~Likely: Computed Jump through RX register.");
 			}else if(streq(insns[opcode], "ca")){
-				puts("//~~~~~~~~~~Maybe: Computed Jump through register A");
+				puts("~~~~~~~~~~Maybe: Computed Jump through register A");
 			}else if(streq(insns[opcode], "cb")){
-				puts("//~~~~~~~~~~Maybe: Computed Jump through register B");
+				puts("~~~~~~~~~~Maybe: Computed Jump through register B");
 			}else if(streq(insns[opcode], "call") || streq(insns[opcode], "farcall")){
-				puts("//~~~~~~~~~~Procedure Call");
+				puts("~~~~~~~~~~Procedure Call");
 			}else if(streq(insns[opcode], "lfarpc")){
-				puts("//~~~~~~~~~~Region Jump");
+				puts("~~~~~~~~~~Region Jump");
 			}else if(streq(insns[opcode], "farjmprx0")){
-				puts("//~~~~~~~~~~Far Jump");
+				puts("~~~~~~~~~~Far Jump");
 			}else if(streq(insns[opcode], "cpc")){
-				puts("//~~~~~~~~~~Likely: loop top or future jump target.");
+				puts("~~~~~~~~~~Likely: loop top or future jump target.");
 			}else {printf("\n");}
 		}
 		if(n_halts > SISA16_DIASSEMBLER_MAX_HALTS){
 			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
-			exit(0);
+			goto end;
 		}
 	}
-	puts("//Disassembly Finished.");
+	puts("\n//Reached End of 64k. Disassembly Over.\n");
+	end:
 	fclose(f);
-	exit(0);
 	return 0;
 }
 
@@ -1022,7 +1032,7 @@ int main(int argc, char** argv){
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
 			disassembler(argv[i-1], loc);
-			exit(1);
+			exit(0);
 		}
 		if(strprefix("-exec",argv[i-1]))execute_sisa16 = argv[i];
 	}}
