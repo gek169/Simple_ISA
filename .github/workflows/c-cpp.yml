@@ -14,4 +14,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: build_the_demos
-      run: make -B asm_programs
+      run: make -B asm_programs OPTLEVEL=-Og
