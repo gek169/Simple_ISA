@@ -389,6 +389,7 @@ G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
 G_AA10:c=(RX0>>16);a=RX0;D
+#if !defined(NO_SIGNED_DIV)
 G_AA11:{SUU SRX0, SRX1;
 		SRX0 = RX0;
 		SRX1 = RX1;
@@ -399,7 +400,10 @@ G_AA12:{SUU SRX0, SRX1;
 		SRX1 = RX1;
 	if(SRX1!=0)RX0=(SRX0%SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
 	}D
-	
+#else
+	G_AA11:R=10;goto G_HALT;
+	G_AA12:R=10;goto G_HALT;
+#endif
 	G_AA13:{register UU flight;
 		flight = CONSUME_THREE_BYTES;
 		RX0=(((UU)M[(flight)&0xffFFff])<<24) + 

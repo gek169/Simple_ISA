@@ -1002,12 +1002,19 @@ int main(int argc, char** argv){
 			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
 			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
-#ifdef NO_FP
+#if defined(NO_FP)
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
 #else
 			puts("Floating point unit was enabled during compilation. You may use fltadd, fltsub, fltmul, fltdiv, and fltcmp");
 			if(sizeof(float) != 4) puts("Floats are an incorrect size. You may not use the floating point unit. Disable the floating point unit.");
 #endif
+#if defined(NO_SIGNED_DIV)
+			puts("32 bit signed integer division instructions were disabled during compilation, they generate error code 10.");
+			puts("You can manually implement signed twos-complement integer division.");
+#else
+			puts("32 bit signed integer division instructions were enabled during compilation. Don't divide by zero!");
+#endif
+
 			printf("Size of u is %u, it should be 1, any other result is UB.\n", (unsigned int)sizeof(u));
 			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
 			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
@@ -2470,12 +2477,18 @@ int main(int argc, char** argv){
 	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
 	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
 	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
-#ifdef NO_FP
+#if defined(NO_FP)
 	if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
 #else
-	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/>\n");
+	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
+
 	if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
+#if defined(NO_SIGNED_DIV)
+	if(R==10)puts("\n<Errfl, Signed 32 bit division disabled by compiletime options>\n");
+#else
+	if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
+#endif
 		/*
 		char* tmp; char* l_execute_sisa16 = execute_sisa16;
 		const char* env_sisa16bin = getenv("SISA16BIN");
