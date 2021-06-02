@@ -1,5 +1,8 @@
 # Simple, Embeddable, Performant Virtual Machine Language
 
+![build personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
+![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
+
 C program to simulate the SISA-16 virtual portable computer architecture.
 
 The VM has 16 bit control flow and memory segmentation, but it has 8,16, and 32 bit arithmetic.
