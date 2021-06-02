@@ -887,8 +887,7 @@ static char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
-#define SISA16_DIASSEMBLER_MAX_HALTS 20
-static int disassembler(char* fname, unsigned long location){
+static int disassembler(char* fname, unsigned long location, unsigned long SISA16_DISASSEMBLER_MAX_HALTS){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
 	FILE* f; unsigned long i = location & 0xffFFff;
@@ -1013,7 +1012,7 @@ static int disassembler(char* fname, unsigned long location){
 				puts("~~~~~~~~~~Likely: loop top or future jump target.");
 			}else {printf("\n");}
 		}
-		if(n_halts > SISA16_DIASSEMBLER_MAX_HALTS){
+		if(n_halts > SISA16_DISASSEMBLER_MAX_HALTS){
 			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
 			goto end;
 		}
@@ -1066,7 +1065,14 @@ int main(int argc, char** argv){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
-			disassembler(argv[i-1], loc);
+			disassembler(argv[i-1], loc, 3);
+			exit(0);
+		}
+		if(strprefix("--full-disassemble",argv[i-2]) || strprefix("-fdis",argv[i-2]) ){
+			unsigned long loc;
+			puts("//Beginning Disassembly");
+			loc = strtoul(argv[i],0,0) & 0xffFFff;
+			disassembler(argv[i-1], loc, 0x1000001);
 			exit(0);
 		}
 	}}
@@ -1267,6 +1273,7 @@ int main(int argc, char** argv){
 			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
 			ASM_PUTS("Optional argument: -i: specify input file.");
 			ASM_PUTS("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
+			ASM_PUTS("Optional argument: -fdis, --full-disassemble: disassemble a file, without ending on halts/illegal opcodes. Same semantics as -dis");
 			ASM_PUTS("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
 			ASM_PUTS("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
 			ASM_PUTS("Optional argument: -E: Print macro expansion only do not write to file");

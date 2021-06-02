@@ -5,6 +5,7 @@ Macro-enabled Assembler and Disassembler for the sisa16 virtual portable compute
 .B sisa16_asm
 .B -i [or -run]
 .B -dis
+.B -fdis
 .IR infilename
 .IR location
 .B -o 
@@ -40,9 +41,14 @@ Specifies a file to diassemble.
 
 sisa16_asm -dis clock.bin 0x20000
 
-will disassemble continuously starting from 0x20000 (the third region).
+will disassemble continuously starting from 0x20000 (the third region) until three halts or illegal opcodes are found.
 
 you can also use --disassemble
+
+.BR -fdis
+Specifies a file to disassemble, but does not block on excess illegal opcodes. The entire image is disassembled.
+
+sisa16_asm -fdis clock.bin 0x20000
 
 .BR -o
 specifies the output filename.
