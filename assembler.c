@@ -957,8 +957,11 @@ static int disassembler(char* fname, unsigned long location){
 				 puts("~~~~~~~~~~Unconditional Jump");
 			}else if(streq(insns[opcode], "jmpifeq")){
 				puts("~~~~~~~~~~Conditional Jump");
+			}else if(streq(insns[opcode], "cbrx0")
+					||streq(insns[opcode], "carx0")	){
+				puts("~~~~~~~~~~Likely: Far memory array access through RX0");
 			}else if(streq(insns[opcode], "jmpifneq")){
-					puts("~~~~~~~~~~Conditional Jump");
+				puts("~~~~~~~~~~Conditional Jump");
 			}else if(streq(insns[opcode], "sc")){
 				puts("~~~~~~~~~~Likely: jump target");
 			}else if(streq(insns[opcode], "crx0")
@@ -976,6 +979,34 @@ static int disassembler(char* fname, unsigned long location){
 				puts("~~~~~~~~~~Region Jump");
 			}else if(streq(insns[opcode], "farjmprx0")){
 				puts("~~~~~~~~~~Far Jump");
+			}else if( streq(insns[opcode], "farllda")
+					||streq(insns[opcode], "farlldb")
+					||streq(insns[opcode], "farldc")
+					||streq(insns[opcode], "farldrx0")
+					||streq(insns[opcode], "farldrx1")
+					||streq(insns[opcode], "farldrx2")
+					||streq(insns[opcode], "farldrx3")
+					||streq(insns[opcode], "lda")
+					||streq(insns[opcode], "ldb")
+					||streq(insns[opcode], "ldc")
+					||streq(insns[opcode], "llda")
+					||streq(insns[opcode], "lldb")
+			){
+				puts("~~~~~~~~~~Likely: Loading from fixed position variable.");
+			}else if( streq(insns[opcode], "farstla")
+					||streq(insns[opcode], "farstlb")
+					||streq(insns[opcode], "farstc")
+					||streq(insns[opcode], "farstrx0")
+					||streq(insns[opcode], "farstrx1")
+					||streq(insns[opcode], "farstrx2")
+					||streq(insns[opcode], "farstrx3")
+					||streq(insns[opcode], "sta")
+					||streq(insns[opcode], "stb")
+					||streq(insns[opcode], "stc")
+					||streq(insns[opcode], "stla")
+					||streq(insns[opcode], "stlb")
+			){
+				puts("~~~~~~~~~~Likely: Storing to fixed position variable.");
 			}else if(streq(insns[opcode], "cpc")){
 				puts("~~~~~~~~~~Likely: loop top or future jump target.");
 			}else {printf("\n");}
