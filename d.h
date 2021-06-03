@@ -4,8 +4,8 @@
 #if defined(USE_NCURSES)
 #include <ncurses.h>
 #include "isa_pre.h"
-static void di(){initscr();}
-static void dcl(){endwin();}
+static void di(){if(EMULATE_DEPTH==0)initscr();}
+static void dcl(){if(EMULATE_DEPTH==0)endwin();}
 #else
 #include "isa_pre.h"
 static void di(){return;}
