@@ -6,8 +6,10 @@
 static FILE* F;
 
 int main(int rc,char**rv){
-	UU i , j=0;
+	UU i , j=~(UU)0;
+	SUU q_test = (SUU)-1;
 	/*M = malloc((((UU)1)<<24));*/
+	
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
@@ -33,6 +35,20 @@ int main(int rc,char**rv){
 #endif
 		return 1;
 	}
+#if !defined(NO_SIGNED_DIV)
+	memcpy(&i,&q_test, sizeof(UU));
+	if(i != j){
+		puts("<COMPILETIME ENVIRONMENT ERROR> This is not a two's complement architecture. You must define NO_SIGNED_DIV");
+		exit(1);
+	}
+	j = (UU)0x80000000;
+	q_test = -2147483648;
+	memcpy(&i,&q_test, sizeof(UU));
+	if(i != j){
+		puts("<COMPILETIME ENVIRONMENT ERROR> This is not a -conformant- two's complement architecture. It appears the sign bit is not the highest bit.\nYou must define NO_SIGNED_DIV");
+		exit(1);
+	}
+#endif
 	if(rc<2){
 			puts("SISA-16 Standalone Emulator written by D[MHS]W for the Public Domain");
 			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");

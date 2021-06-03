@@ -2560,6 +2560,8 @@ int main(int argc, char** argv){
 	if(ofile) 	fclose(ofile);
 	if(infile)	fclose(infile);
 	if(run_sisa16 && !quit_after_macros && !debugging){
+		UU i=0, j=~(UU)0;
+		SUU q_test=(SUU)-1;
 		SEGMENT = malloc(256);
 		SEGMENT_PAGES = 1;
 		if(SEGMENT == NULL){
@@ -2592,7 +2594,20 @@ int main(int argc, char** argv){
 			return 1;
 		}
 
-		
+#if !defined(NO_SIGNED_DIV)
+		memcpy(&i,&q_test, sizeof(UU));
+		if(i != j){
+			puts("<COMPILETIME ENVIRONMENT ERROR> This is not a two's complement architecture. You must define NO_SIGNED_DIV");
+			exit(1);
+		}
+		j = (UU)0x80000000;
+		q_test = -2147483648;
+		memcpy(&i,&q_test, sizeof(UU));
+		if(i != j){
+			puts("<COMPILETIME ENVIRONMENT ERROR> This is not a -conformant- two's complement architecture. It appears the sign bit is not the highest bit.\nYou must define NO_SIGNED_DIV");
+			exit(1);
+		}
+#endif
 		e();
 
 		if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
