@@ -980,7 +980,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			}else if(streq(insns[opcode], "jmpifneq")){
 				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "emulate")){
-				puts(" Sandboxing Insn. Jumps to 0 in the zero page.");
+				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
 			}else if(streq(insns[opcode], "sc")){
 				puts(" Likely: jump target");
 			}else if(streq(insns[opcode], "crx0")
