@@ -249,6 +249,9 @@ int main(int rc,char**rv){
 	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
 	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
+	if(R==13)
+		{puts("\n<Errfl, Either signed division or the FPU were disabled during compilation.>\n");
+		R=0;}
 	if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
 #else
 	if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
@@ -256,10 +259,18 @@ int main(int rc,char**rv){
 
 	if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
 #if defined(NO_SIGNED_DIV)
+	if(R==13)
+		{puts("\n<Errfl, Either signed division or the FPU were disabled during compilation.>\n");
+		R=0;}
 	if(R==10)puts("\n<Errfl, Signed 32 bit division disabled by compiletime options>\n");
 #else
 	if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
 	if(R==11)puts("\n<Errfl, Sandboxing limit reached >\n");
 	if(R==12)puts("\n<Errfl, Sandboxing could not allocate needed memory.>\n");
+	if(R==13)
+		{
+			puts("\n<Errfl, Internal error, Broken Float-Int Interop. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
+			R=0;
+		}
 }

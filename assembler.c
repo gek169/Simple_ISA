@@ -75,7 +75,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[208] = {
+char* insns[210] = {
 	"halt",
 	"lda",
 	"la",
@@ -303,9 +303,11 @@ char* insns[208] = {
 	"adecr",
 	"rxincr",
 	"rxdecr",
-	"emulate"
+	"emulate",
+	"rxitof",
+	"rxftoi"
 };
-unsigned char insns_numargs[208] = {
+unsigned char insns_numargs[210] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -411,9 +413,11 @@ unsigned char insns_numargs[208] = {
 		/*incr decr*/
 		0,0,0,0,
 		/*emulate*/
-		0
+		0,
+		/*float-int interop*/
+		0,0
 };
-char* insn_repl[208] = {
+char* insn_repl[210] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -645,9 +649,11 @@ char* insn_repl[208] = {
 	/*incr decr*/
 		"bytes203;","bytes204;","bytes205;","bytes206;",
 	/*emulate*/
-		"bytes207;"
+		"bytes207;",
+	/*Float-Int Interop*/
+		"bytes208;","bytes209;"
 };
-static const unsigned int n_insns = 208;
+static const unsigned int n_insns = 210;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
@@ -2622,6 +2628,9 @@ int main(int argc, char** argv){
 		if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
 		if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
+		if(R==13)
+		{puts("\n<Errfl, Either signed division or the FPU were disabled during compilation.>\n");
+		R=0;}
 		if(R==8)puts("\n<Errfl, Floating point unit disabled by compiletime options>\n");
 #else
 		if(R==8)puts("\n<Errfl, Internal error, reporting broken SISA16 FPU. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
@@ -2629,12 +2638,21 @@ int main(int argc, char** argv){
 
 		if(R==9)puts("\n<Errfl, Floating point divide by zero>\n");
 #if defined(NO_SIGNED_DIV)
+		if(R==13)
+				{puts("\n<Errfl, Either signed division or the FPU were disabled during compilation.>\n");
+				R=0;}
 		if(R==10)puts("\n<Errfl, Signed 32 bit division disabled by compiletime options>\n");
 #else
 		if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
 		if(R==11)puts("\n<Errfl, Sandboxing limit reached >\n");
 		if(R==12)puts("\n<Errfl, Sandboxing could not allocate needed memory.>\n");
+		if(R==13)
+		{
+			puts("\n<Errfl, Internal error, Broken Float-Int Interop. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
+			R=0;
+		}
+		
 	}
 	return 0;
 }

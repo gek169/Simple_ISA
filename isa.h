@@ -87,7 +87,7 @@ k 194:goto G_AA18;k 195:goto G_AA19;k 196:goto G_AA20;k 197:goto G_AA21;\
 k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AA27;k 204:goto G_AA28;k 205:goto G_AA29;\
 k 206:goto G_AA30;k 207:goto G_AA31;\
-k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
+k 208:goto G_AA32;k 209:goto G_AA33;k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -524,4 +524,26 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 	}D
+#if defined(NO_FP) || defined(NO_SIGNED_DIV)
+	G_AA32:
+	G_AA33:
+	R=8;
+	goto G_HALT;
+#else
+	G_AA32:{
+		float fRX0;
+		SUU lRX0 = RX0;
+		fRX0 = (float)lRX0;
+		memcpy(&lRX0, &fRX0, 4);
+		RX0 = lRX0;
+	}D
+	G_AA33:{
+		float fRX0;
+		SUU lRX0 = RX0;
+			memcpy(&fRX0,&lRX0,4);
+			lRX0 = fRX0;
+			memcpy(&lRX0, &fRX0,4);
+		RX0 = lRX0;
+	}D
+#endif
 }
