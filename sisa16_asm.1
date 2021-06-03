@@ -713,6 +713,17 @@ expands to
 lrx0 0,0,0,50;
 
 .TP
+.B SPLIT32NEG (%-%)
+
+builtin macro to expand numbers into 4 bytes (highest, high, low, lowest) two's complement.
+
+lrx0 %-1%;
+
+expands to
+
+lrx0 255,255,255,255;
+
+.TP
 .B SPLITFLOAT (%?%)
 
 builtin macro to convert floating point numbers into their 32 bit unsigned integer representations.
