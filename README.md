@@ -18,9 +18,13 @@ The assembly language, a simple function which prints a byte's value as two hex-
 
 ![assembler screenshot](Assembler_Language_Screenshot.png)
 
-Advanced example with macros, demonstrating compiletime computation of region offsets:
+Advanced example with macros, demonstrating compiletime macro calling with asm_call:
 
 ![assembler screenshot 2](Assembler_Language_Screenshot_2.png)
+
+Assembly-time computation of region offsets using macros to place a "libc" at 0x120000, as well as other macros.
+
+![assembler screenshot 2](Assembler_Language_Screenshot_3.png)
 
 
 A portion of a disassembled binary:
