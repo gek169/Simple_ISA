@@ -69,7 +69,7 @@ cc assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
 #assemble your program
 ./sisa16_asm -i program.asm -o program.bin
 #run your program
-./sisa16_em program.bin
+./sisa16_emu program.bin
 #install sisa16
 sudo cp sisa16_asm /usr/bin/
 sudo cp sisa16_emu /usr/bin/
