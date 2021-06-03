@@ -58,7 +58,7 @@ static unsigned short interrupt(unsigned short a,
 			if(SEGMENT_PAGES < n_pages){
 				SEGMENT = realloc(SEGMENT, 0x100 * n_pages);
 				SEGMENT_PAGES = n_pages;
-				if(!SEGMENT){puts("Failed Malloc");exit(1);}
+				if(!SEGMENT){puts("DRIVER: Failed Malloc");exit(1);}
 			}
 			fread(SEGMENT, 1, len, ff);
 			fclose(ff);

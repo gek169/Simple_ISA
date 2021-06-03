@@ -9,5 +9,5 @@ typedef signed int SUU;
 typedef unsigned long UU;
 typedef long SUU;
 #endif
-static u R=0, M[(((UU)1)<<24)], *SEGMENT;
-static UU SEGMENT_PAGES=0;
+static u R=0, M[(((UU)1)<<24)], PTEMP[0x100], *SEGMENT;
+static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;

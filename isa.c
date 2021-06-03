@@ -244,4 +244,6 @@ int main(int rc,char**rv){
 #else
 	if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
+	if(R==11)puts("\n<Errfl, Sandboxing limit reached >\n");
+	if(R==12)puts("\n<Errfl, Sandboxing could not allocate needed memory.>\n");
 }

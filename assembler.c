@@ -75,7 +75,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[207] = {
+char* insns[208] = {
 	"halt",
 	"lda",
 	"la",
@@ -302,9 +302,10 @@ char* insns[207] = {
 	"aincr",
 	"adecr",
 	"rxincr",
-	"rxdecr"
+	"rxdecr",
+	"emulate"
 };
-unsigned char insns_numargs[207] = {
+unsigned char insns_numargs[208] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -408,10 +409,11 @@ unsigned char insns_numargs[207] = {
 		/*farst*/
 		3,3,3,3, 3,3,3,
 		/*incr decr*/
-		0,0,0,0
-		
+		0,0,0,0,
+		/*emulate*/
+		0
 };
-char* insn_repl[207] = {
+char* insn_repl[208] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -641,9 +643,11 @@ char* insn_repl[207] = {
 		"bytes189,","bytes190,","bytes191,","bytes192,",   "bytes193,","bytes194,","bytes195,",
 		"bytes196,","bytes197,","bytes198,","bytes199,",   "bytes200,","bytes201,","bytes202,",
 	/*incr decr*/
-		"bytes203;","bytes204;","bytes205;","bytes206;"
+		"bytes203;","bytes204;","bytes205;","bytes206;",
+	/*emulate*/
+		"bytes207;"
 };
-static const unsigned int n_insns = 207;
+static const unsigned int n_insns = 208;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
@@ -2608,6 +2612,8 @@ int main(int argc, char** argv){
 #else
 		if(R==10)puts("\n<Errfl, Internal error, reporting broken SISA16 signed integer division module. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 #endif
+		if(R==11)puts("\n<Errfl, Sandboxing limit reached >\n");
+		if(R==12)puts("\n<Errfl, Sandboxing could not allocate needed memory.>\n");
 	}
 	return 0;
 }

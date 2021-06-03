@@ -437,6 +437,10 @@ rxincr: (1 byte) (CD)
 
 rxdecr: (1 byte) (CE)
 
+emulate: Run a SISA16 sandboxed machine sharing the segment and a single page of choice according to register A (1 byte) (CF)
+	Errors in the sandboxed machine are trapped (Except for segment memory allocations) and returned to register A.
+
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
