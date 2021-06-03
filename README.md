@@ -27,6 +27,10 @@ A portion of a disassembled binary:
 
 ![disassembly_out](Disassembler_Output_1.png)
 
+Another binary disassembled:
+
+![disassembly_out](Disassembler_Output_3.png)
+
 '/dev/urandom' disassembly:
 
 ![disassembly_out](Disassembler_Output_2.png)
