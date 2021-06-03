@@ -33,7 +33,12 @@ asm_programs: sisa16_asm
 #effectively, a check.
 	./asm_compile.sh
 	./sisa16_asm -C
-	./sisa16_asm --help
+	./sisa16_asm -v
+	./sisa16_asm -dis clock.bin 0x10000
+	./sisa16_asm -dis clock.bin 0x20000
+	./sisa16_asm -fdis echo.bin 0
+	./sisa16_asm -dis echo2.bin 0x20000
+	
 
 	
 install: main
