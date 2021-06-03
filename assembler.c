@@ -902,7 +902,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 	for(i = location; i < 0x1000000;){
 		unsigned char opcode;
 		if(i >= 0x1000000){
-			puts("//Disassembly reached end of memory.");
+			puts("//Disassembly reached end of usable memory.");
 			goto end;
 		}else if((i & 0xffFF) == 0){
 			puts("//<Region Boundary>");
@@ -955,39 +955,39 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			printf(";//0x%06lx  :", opcode_i);
 			if(bad_flag) printf("(E_WONT_RUN)");
 			if(streq(insns[opcode], "farret")){
-				puts("~~~~~~~~~~End of Procedure");
+				puts(" End of Procedure");
 			}else if(streq(insns[opcode], "ret")){
-				puts("~~~~~~~~~~End of Region-Local Procedure");
+				puts(" End of Region-Local Procedure");
 			} else if(opcode == 0 && n_halts == 1){
-				puts("~~~~~~~~~~End of Control Flow");
+				puts(" End of Control Flow");
 			} else if(streq(insns[opcode], "jmp")){
-				 puts("~~~~~~~~~~Unconditional Jump");
+				 puts(" Unconditional Jump");
 			}else if(streq(insns[opcode], "jmpifeq")){
-				puts("~~~~~~~~~~Conditional Jump");
+				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "cbrx0")
 					||streq(insns[opcode], "carx0")	){
-				puts("~~~~~~~~~~Likely: Far memory array access through RX0");
+				puts(" Likely: Far memory array access through RX0");
 			}else if(streq(insns[opcode], "jmpifneq")){
-				puts("~~~~~~~~~~Conditional Jump");
+				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "sc")){
-				puts("~~~~~~~~~~Likely: jump target");
+				puts(" Likely: jump target");
 			}else if(streq(insns[opcode], "crx0")
 					||streq(insns[opcode], "crx1")
 					||streq(insns[opcode], "crx2")
 					||streq(insns[opcode], "crx3")){
-				puts("~~~~~~~~~~Likely: Computed Jump through RX register.");
+				puts(" Likely: Computed Jump through RX register.");
 			}else if(streq(insns[opcode], "ca")){
-				puts("~~~~~~~~~~Maybe: Computed Jump through register A");
+				puts(" Maybe: Computed Jump through register A");
 			}else if(streq(insns[opcode], "cb")){
-				puts("~~~~~~~~~~Maybe: Computed Jump through register B");
+				puts(" Maybe: Computed Jump through register B");
 			}else if(streq(insns[opcode], "call")){
-				puts("~~~~~~~~~~Region-Local Procedure Call");
+				puts(" Region-Local Procedure Call");
 			}else if(streq(insns[opcode], "farcall")){
-				puts("~~~~~~~~~~Procedure Call");
+				puts(" Procedure Call");
 			}else if(streq(insns[opcode], "lfarpc")){
-				puts("~~~~~~~~~~Region Jump");
+				puts(" Region Jump");
 			}else if(streq(insns[opcode], "farjmprx0")){
-				puts("~~~~~~~~~~Far Jump");
+				puts(" Far Jump");
 			}else if( streq(insns[opcode], "farllda")
 					||streq(insns[opcode], "farlldb")
 					||streq(insns[opcode], "farldc")
@@ -1001,7 +1001,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					||streq(insns[opcode], "llda")
 					||streq(insns[opcode], "lldb")
 			){
-				puts("~~~~~~~~~~Likely: Loading from fixed position variable.");
+				puts(" Likely: Loading from fixed position variable.");
 			}else if( streq(insns[opcode], "farstla")
 					||streq(insns[opcode], "farstlb")
 					||streq(insns[opcode], "farstc")
@@ -1015,9 +1015,9 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					||streq(insns[opcode], "stla")
 					||streq(insns[opcode], "stlb")
 			){
-				puts("~~~~~~~~~~Likely: Storing to fixed position variable.");
+				puts(" Likely: Storing to fixed position variable.");
 			}else if(streq(insns[opcode], "cpc")){
-				puts("~~~~~~~~~~Likely: loop top or future jump target.");
+				puts(" Likely: loop top or future jump target.");
 			}else {printf("\n");}
 		}
 		if(n_halts > SISA16_DISASSEMBLER_MAX_HALTS){
