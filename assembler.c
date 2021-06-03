@@ -979,6 +979,8 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				puts(" Likely: Far memory array access through RX0");
 			}else if(streq(insns[opcode], "jmpifneq")){
 				puts(" Conditional Jump");
+			}else if(streq(insns[opcode], "emulate")){
+				puts(" Sandboxing Insn. Jumps to 0 in the zero page.");
 			}else if(streq(insns[opcode], "sc")){
 				puts(" Likely: jump target");
 			}else if(streq(insns[opcode], "crx0")
