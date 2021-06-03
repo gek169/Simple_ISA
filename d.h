@@ -56,9 +56,15 @@ static unsigned short interrupt(unsigned short a,
 			n_pages = (len + 255)/256;
 			if(n_pages == 0) return 0;
 			if(SEGMENT_PAGES < n_pages){
+				u* SEGMENT_OLD = SEGMENT;
+				UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 				SEGMENT = realloc(SEGMENT, 0x100 * n_pages);
 				SEGMENT_PAGES = n_pages;
-				if(!SEGMENT){puts("DRIVER: Failed Malloc");exit(1);}
+				if(!SEGMENT){
+					SEGMENT = SEGMENT_OLD;
+					SEGMENT_PAGES = SEGMENT_PAGES_OLD;
+					return 0;
+				}
 			}
 			fread(SEGMENT, 1, len, ff);
 			fclose(ff);
