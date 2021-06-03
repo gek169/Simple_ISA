@@ -440,8 +440,8 @@ rxdecr: (1 byte) (CE)
 emulate: Run a SISA16 sandboxed machine sharing the segment and a single page of choice according to register A (1 byte) (CF)
 	Errors in the sandboxed machine are trapped and returned to register A.
 
-	Failure to allocate the segment is trapped and provides an error code, but the segment remains unchanged.
-
+	The segment is also sandboxed and a new 256 byte segment is allocated for the child program.
+	
 	the maximum recursion allowed by the implementation is defined by SISA16_MAX_RECURSION_DEPTH in isa_pre.h
 
 The rest: nop duplicates, free for expansion (1 byte)

@@ -491,23 +491,32 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA30:RX0--;D
 	G_AA31:{
 		u* M_SAVED = NULL;
-		register UU SEG_TO_SAVE = a;
+		
+		u* SEG_SAVED = NULL;
+		UU SEG_PAGES_SAVED;
+		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
 		M_SAVED = malloc((((UU)1)<<24));
-		if(!M_SAVED){
+		SEG_SAVED = SEGMENT;
+		SEG_PAGES_SAVED = SEGMENT_PAGES;
+		SEGMENT = malloc(0x100);
+		SEGMENT_PAGES = 1;
+		if(!M_SAVED || !SEGMENT){
+			SEGMENT = SEG_SAVED;
+			SEGMENT_PAGES = SEG_PAGES_SAVED;
 			R=12; goto G_HALT;
 		}
 		memcpy(M_SAVED, M, (((UU)1)<<24));
 		EMULATE_DEPTH++;
-		e();
-		a=R;
-		R=0;
+			e();
+			a=R;
+			R=0;
 		EMULATE_DEPTH--;
-		memcpy(PTEMP, M + (SEG_TO_SAVE<<8), 256);
+		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, (((UU)1)<<24));
-		memcpy(M + (SEG_TO_SAVE<<8),PTEMP, 256);
+		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 	}D
 }
