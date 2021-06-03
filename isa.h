@@ -504,5 +504,6 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(PTEMP, M + (SEG_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, (((UU)1)<<24));
 		memcpy(M + (SEG_TO_SAVE<<8),PTEMP, 256);
+		free(M_SAVED);
 	}D
 }
