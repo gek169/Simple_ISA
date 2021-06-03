@@ -487,7 +487,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA30:RX0--;D
 	G_AA31:{
 		u* M_SAVED = NULL;
-		UU SEG_TO_SAVE = a;
+		register UU SEG_TO_SAVE = a;
 		if(EMULATE_DEPTH >= 16) {
 			R=11; goto G_HALT;
 		}
@@ -504,6 +504,5 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(PTEMP, M + (SEG_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, (((UU)1)<<24));
 		memcpy(M + (SEG_TO_SAVE<<8),PTEMP, 256);
-	}
-	D
+	}D
 }
