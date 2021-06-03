@@ -1384,7 +1384,7 @@ int main(int argc, char** argv){
 			/*We are writing out individual bytes for the rest of the line.*/
 			if(debugging)
 				if(!clear_output)printf("Detected Character Literal on Line:\n%s\n", line_copy);
-			if(printlines)ASM_PUTS(line);
+			if(printlines && npasses == 1)ASM_PUTS(line);
 			if(!quit_after_macros)
 				for(i = 1; i < strlen(line);i++)
 					fputbyte(line[i], ofile);
@@ -1487,7 +1487,7 @@ int main(int argc, char** argv){
 			fseek(tmp, 0, SEEK_SET);
 			for(;len>0;len--)fputbyte(fgetc(tmp), ofile);
 			fclose(tmp);
-			if(printlines)ASM_PUTS(line);
+			if(printlines && npasses == 1)ASM_PUTS(line);
 			goto end;
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
@@ -2361,7 +2361,11 @@ int main(int argc, char** argv){
 		*/
 		/*Inch along*/
 		if(printlines && npasses==1){
+			long loc_vbar = 0;
+			loc_vbar = strfind(line, "|");
+			if(loc_vbar != -1) line[loc_vbar] = '\0';
 			if(!clear_output)printf("%s\n",line);
+			if(loc_vbar != -1) line[loc_vbar] = '|';
 		}
 		metaproc = line; /*declaration at beginning of main.*/
 		do{ long incr, incrdont;
