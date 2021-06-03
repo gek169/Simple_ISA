@@ -922,7 +922,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			printf("\n//(E_BAD_BINARY)\n//op is '%s' which has %u args but crosses the region boundary.\n//This is most likely the result of interpreting embedded data as code.\n",insns[opcode],insns_numargs[opcode]);
 		}
 		if(opcode >= n_insns){
-			printf("%-13s 0x%x                ;//0x%06lx  :(E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
+			printf("%-12s 0x%x                ;//0x%06lx  :(E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
 			continue;
 		}else{
 			unsigned long arg_i = 0;
