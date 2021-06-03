@@ -14,6 +14,15 @@ the macro assembler/disassembler which doubles as an emulator,
 and a C++ proof-of-concept of a compiletime instruction set simulator, which
 inspired this project.
 
+The assembly language, a simple function which prints a byte's value as two hex-digits:
+
+![assembler screenshot](Assembler_Language_Screenshot.png)
+
+Advanced example with macros, demonstrating compiletime computation of region offsets:
+
+![assembler screenshot 2](Assembler_Language_Screenshot_2.png)
+
+
 A portion of a disassembled binary:
 
 ![disassembly_out](Disassembler_Output_1.png)
