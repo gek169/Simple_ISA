@@ -78,14 +78,32 @@ Another binary disassembled:
 
 ![disassembly_out](Disassembler_Output_2.png)
 
+# Notable Features and Limitations
+
+* 'emulate' instruction which allows for sandboxed execution.
+
+* Infinite 'segment' which allows for access to more than 16 megs of memory.
+
+* the registers a, b, c, and the program counter are 16 bit. the program conter region is 8 bit.
+
+* RX0-3 are 32 bit.
+
+* No MOV instruction, SISA16 is a load/store RISC.
+
+* 16 bit segmented memory model
+
+* Single-threaded
+
+* Roughly similar performance in the virtual machine with unoptimized or optimized builds of the VM.
+
 # How portable?
 
-The emulator and assembler are compiled and tested on the following architectures and platforms:
+The emulator and assembler have been compiled and tested on the following architectures and platforms:
 
 ```c
-	IA32 (Debian linux, native)
-	i536 (Alpine linux, jslinux)
-	x86_64 (Debian linux, Windows 10, native)
+	IA32 (using: Debian linux, Alpine linux, on: native, jslinux)
+	i536 (using: Debian linux, Alpine linux, on: native, jslinux)
+	x86_64 (using: Debian linux, Windows 10, on: native)
 	riscv64 (Buildroot linux, jslinux)
 ```
 
@@ -853,6 +871,7 @@ control back to your C code from SISA16. This is known as "cooperative multitask
 Use dcl() to close your driver's resources.
 
 ### Tips for doing stuff
+
 If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
 
 You may also find it particularly annoying that complete pointer arithmetic is impossible.
