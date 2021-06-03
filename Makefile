@@ -21,8 +21,6 @@ sisa16_emu:
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
 	@echo "~~Built assembler (Which has an emulator built into it.)"
-rbytes:
-	$(CC) $(CFLAGS) rbytes.c -o rbytes
 
 main: sisa16_asm sisa16_emu
 
