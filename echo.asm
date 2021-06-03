@@ -45,38 +45,38 @@ section 0x1F0
 	sta %50%;
 //small loop.
 VAR#miniLoopTop#@
-//Perform wizardry
-	lda %50%;
-		lb 8;
-		//lb 1;
-		//add;
-		imul13.3;
-	sta %50%;
-//if this is less than 127, then we go to dont manip.
-		lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
-VAR#still_above_127#@
-//generate negative one, twos complement, and put it in b.
-	la 1;compl;lb1;add;ba;
-	lda %50%;
-		add;
-	sta %50%;
-//jump to still_above if the value is >= 127.
-	lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifneq;
-VAR#dont_manip#@
-	//if a is not invalid, we dont subtract from it.
-	lda %50%;IS_A_Q;sc %A_IS_notQ%;jmpifneq;
-	lda %50%;
-	lb5;
-	sub;
-	sta %50%;
+	//Perform wizardry
+		lda %50%;
+			lb 8;
+			//lb 1;
+			//add;
+			imul13.3;
+		sta %50%;
+	//if this is less than 127, then we go to dont manip.
+			lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
+	VAR#still_above_127#@
+	//generate negative one, twos complement, and put it in b.
+		la 1;compl;lb1;add;ba;
+		lda %50%;
+			add;
+		sta %50%;
+	//jump to still_above if the value is >= 127.
+		lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifneq;
+	VAR#dont_manip#@
+		//if a is not invalid, we dont subtract from it.
+		lda %50%;IS_A_Q;sc %A_IS_notQ%;jmpifneq;
+		lda %50%;
+		lb5;
+		sub;
+		sta %50%;
 
-VAR#A_IS_notQ#@
-	
-	lda %50%;putchar;
-//perform our variable increment.
-	lb1;lda%59%;add;sta %59%;
-//if A is less than 3 value, jump to the small loop
-	sc %miniLoopTop%;llb %4%;cmp;lb 0;cmp;jmpifeq;
+	VAR#A_IS_notQ#@
+		
+		lda %50%;putchar;
+	//perform our variable increment.
+		lb1;lda%59%;add;sta %59%;
+	//if A is less than 3 value, jump to the small loop
+		sc %miniLoopTop%;llb %4%;cmp;lb 0;cmp;jmpifeq;
 
 
 //signify the end of the loop by printing some newlines.
