@@ -1,12 +1,49 @@
 # Simple, Embeddable, Performant Virtual Machine Language
 
+SISA16 is an extremely lightweight virtual machine designed to replace languages like Lua for program extension.
+
+## Why is SISA16 special?
+
+* Minimal dependence on the host operating system. A very minimal C standard library will build the assembler
+	and emulator just fine.
+
+* CPU architecture independence- With the exception of floating point arithmetic (And to a limited extent, signed integer division) all SISA16 operations are fully
+	architecture independent. A softFP implementation is planned. 
+	Fixed point arithmetic is provided as an alternative to floating point if needed, and
+	signed integer division can be simulated in software if needed.
+
+	The emulator and assembler are confirmed to work on many different architectures of varying endiannesses.
+
+* Unique. SISA16 is no ordinary virtual machine. 
+	it is self-sandboxing (Self-encapsulating, capable of creating Jails)
+
+* Trivially embeddable. Implement five small and easy-to-understand functions in a single header file
+	to add SISA16 scripting to any system.
+
+* Ready for deployment. the assembler can build, execute, and disassemble binaries for debugging.
+
+* Public domain. No IP attachments whatsoever. The only IP restriction on the entire repository is the
+	Ncurses binding in d.h. There are 4 lines under the Ncurses license,
+	which is a permissive free software license.
+	If you want to have fully public-domain code,
+	compile without Ncurses.
+
 Build Statuses:
 
+gek169/Simple_ISA:
+
+Ubuntu (x86_64):
 ![build personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
+
+Macos:
 ![build macos personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
+C-Chads/Simple_ISA:
 
+Ubuntu (x86_64):
 ![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
+
+Macos:
 ![build macos cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
 This repository contains the SISA16 standalone emulator source, 
@@ -14,7 +51,9 @@ the macro assembler/disassembler which doubles as an emulator,
 and a C++ proof-of-concept of a compiletime instruction set simulator, which
 inspired this project.
 
-The assembly language, a simple function which prints a byte's value as two hex-digits:
+# What does the Assembly language look like?
+
+a simple function which prints a byte's value as two hex-digits:
 
 ![assembler screenshot](Assembler_Language_Screenshot.png)
 
@@ -39,7 +78,7 @@ Another binary disassembled:
 
 ![disassembly_out](Disassembler_Output_2.png)
 
-
+# How portable?
 
 The emulator and assembler are compiled and tested on the following architectures and platforms:
 
@@ -115,7 +154,9 @@ for the default INSTALL_DIR which is `/usr/bin`:
 `#!/usr/bin/sisa16_asm -run`
 
 The emulator and assembler are confirmed to compile *and run correctly* on linux with GCC, clang, and tinyc on
-x86_64, x86, aarch64, and riscv.
+x86_64, x86, aarch64, riscv, and several other architectures.
+
+Testing with the compcert compiler is planned.
 
 The emulator has the best performance compiled with gcc at -Os.
 
