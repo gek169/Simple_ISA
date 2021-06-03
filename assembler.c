@@ -922,11 +922,12 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			printf("\n//(E_BAD_BINARY)\n//op is '%s' which has %u args but crosses the region boundary.\n//This is most likely the result of interpreting embedded data as code.\n",insns[opcode],insns_numargs[opcode]);
 		}
 		if(opcode >= n_insns){
-			printf("%-12s 0x%x                ;//0x%06lx  :(E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
+			printf("%-12s 0x%x                ;//0x%06lx  : (E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
 			continue;
 		}else{
 			unsigned long arg_i = 0;
 			unsigned char bad_flag = 0;
+			unsigned int unfinished_flag = 0;
 			unsigned long required_spaces = 20;
 			unsigned long opcode_i = i-1;
 			printf("%-13s",insns[opcode]);
@@ -942,18 +943,19 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					required_spaces -= 4;
 				}
 				if(feof(f) || (unsigned long)ftell(f) != i){
-					puts("\n//Disassembly halted here. Reason: Missing opcode arguments.");
-					exit(0);
+					unfinished_flag = arg_i + 1;
 				}
 				thechar = fgetc(f);
 				printf("0x%02x",(unsigned int)thechar);i++;
 			}
+			
 			if(required_spaces < 50)
 			{unsigned long li; for(li=0;li<required_spaces;li++){
 				printf(" ");
 			}}
 			printf(";//0x%06lx  :", opcode_i);
 			if(bad_flag) printf("(E_WONT_RUN)");
+			if(unfinished_flag) printf("(E_UNFINISHED_EOF AT ARGUMENT %u)", unfinished_flag-1);
 			if(streq(insns[opcode], "farret")){
 				puts(" End of Procedure");
 			}else if(streq(insns[opcode], "ret")){
@@ -965,7 +967,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			}else if(streq(insns[opcode], "jmpifeq")){
 				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "cbrx0")
-					||streq(insns[opcode], "carx0")	){
+					||streq(insns[opcode], "carx0")){
 				puts(" Likely: Far memory array access through RX0");
 			}else if(streq(insns[opcode], "jmpifneq")){
 				puts(" Conditional Jump");
@@ -1019,7 +1021,12 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			}else if(streq(insns[opcode], "cpc")){
 				puts(" Likely: loop top or future jump target.");
 			}else {printf("\n");}
+			if(unfinished_flag){
+				puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
+				goto end;
+			}
 		}
+
 		if(n_halts > SISA16_DISASSEMBLER_MAX_HALTS){
 			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
 			goto end;
