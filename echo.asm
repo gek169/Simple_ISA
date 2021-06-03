@@ -120,6 +120,9 @@ VAR#Lbl_Emulator#@
 	//print an R.
 	la0x52;
 	putchar;
+	//specifically to use a bunch of memory. 2.56 Megabytes (not Mebib).
+	//lrx0 %/100000%;
+	//seg_realloc;
 	la 0xff;
 	//execute the emulator!
 	emulate;
