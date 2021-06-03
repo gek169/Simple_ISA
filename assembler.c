@@ -1906,7 +1906,14 @@ int main(int argc, char** argv){
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
-					} else if (i==2){long loc_qmark;long loc_slash;long loc_ampersand;char do_32bit=0;long loc_eparen;char expansion[1024]; 
+					} else if (i==2){
+					long loc_qmark;
+					long loc_slash;
+					long loc_tilde; /*BAD NAME! it's actually a DASH*/
+					long loc_ampersand;
+					char do_32bit=0;
+					long loc_eparen;
+					char expansion[1024]; 
 					unsigned long res; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
@@ -1916,26 +1923,20 @@ int main(int argc, char** argv){
 						loc_eparen = strfind(line_old+loc+1,"%");
 						loc_slash = strfind(line_old+loc+1,"/");
 						loc_qmark = strfind(line_old+loc+1,"?");
+						loc_tilde = strfind(line_old+loc+1,"-");
 						loc_ampersand = strfind(line_old+loc+1,"&");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 							goto error;
 						}
 						if(loc_eparen == 0){
-							/*if(!clear_output)printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);*/
+							if(!clear_output)printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 						}
 						if(loc_slash==0) do_32bit = 1;
-						if(do_32bit == 0 && loc_qmark == 0){
-							do_32bit = 2;
-						} else if(do_32bit == 1 && loc_qmark != -1 && loc_qmark < loc_eparen){
-							puts(
-								"<ASM SYNTAX ERROR> Both a slash and a question mark are present in this split."
-								"\nThe split is already 32 bit if you use question mark."
-							);
-							printf("\nAt location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
-							exit(1);
-						}
+						if(loc_tilde==0) do_32bit = 4;
 						if(loc_ampersand==0) do_32bit = 3;
+						if(loc_qmark==0) do_32bit = 2;
+						
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
@@ -1944,7 +1945,14 @@ int main(int argc, char** argv){
 							res = strtoul(line_old+loc+1, NULL, 0);
 						else if(do_32bit == 1 || do_32bit == 3) /*Skip the forward slash or ampersand*/
 							res = strtoul(line_old+loc+2, NULL, 0);
-						else if(do_32bit == 2){
+						else if(do_32bit == 4){
+							UU d1;
+							/*Two's complement.*/
+							d1 = strtoul(line_old+loc+2, NULL, 0); /*Skip the dash.*/
+							d1 = ~d1; 	/*ones compl*/
+							d1++; 		/*twos compl*/
+							res = d1;
+						}else if(do_32bit == 2){
 #if defined(NO_FP)
 							puts("<ASM ENV ERROR> Floating point unit was disabled during compilation. You may not use floating point SPLIT directives.");
 							exit(1);
@@ -1973,7 +1981,7 @@ int main(int argc, char** argv){
 						/*Write the upper and lower halves out, separated, to expansion.*/
 						if(do_32bit == 0) {
 							sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
-						} else if(do_32bit == 1 || do_32bit == 2) {
+						} else if(do_32bit == 1 || do_32bit == 2 || do_32bit == 4) {
 							sprintf(expansion, "%u,%u,%u,%u", (unsigned int)((res/(256*256*256))&0xff),
 																(unsigned int)((res/(0x10000))&0xff),
 																(unsigned int)((res/(256))&0xff),
