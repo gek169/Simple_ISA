@@ -310,6 +310,9 @@ ZD:
 	D
 #ifdef NO_FP
 /*no floating point unit.*/
+/*
+	TODO: implement software floating point unit.
+*/
 ZE: R=8; goto G_HALT;
 ZF: R=8; goto G_HALT;
 G_AA0: R=8; goto G_HALT;
@@ -401,6 +404,9 @@ G_AA12:{SUU SRX0, SRX1;
 	if(SRX1!=0)RX0=(SRX0%SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
 	}D
 #else
+	/*
+		TODO: Emulate signed integer division for two's complement guaranteed behavior.
+	*/
 	G_AA11:R=10;goto G_HALT;
 	G_AA12:R=10;goto G_HALT;
 #endif
