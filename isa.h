@@ -91,7 +91,7 @@ k 208:k 209:k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
-k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}
+k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:goto G_NOP;}goto G_HALT;
 int e(){
 register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
 register UU RX0=0,RX1=0,RX2=0,RX3=0;R=0;di();
@@ -504,6 +504,8 @@ G_AA12:{SUU SRX0, SRX1;
 		SEGMENT = malloc(0x100);
 		SEGMENT_PAGES = 1;
 		if(!M_SAVED || !SEGMENT){
+			if(SEGMENT)free(SEGMENT);
+			if(M_SAVED)free(M_SAVED);
 			SEGMENT = SEG_SAVED;
 			SEGMENT_PAGES = SEG_PAGES_SAVED;
 			R=12; goto G_HALT;
