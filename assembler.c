@@ -2043,8 +2043,15 @@ int main(int argc, char** argv){
 				}
 			}}
 			/*
-				Prevent macros from being defined which contain other 
+				Prevent macros from being defined which are illegal.
 			*/
+			{unsigned long q;
+				for(q = 0; q < strlen(macro_name); q++)
+					if(!isalnum(macro_name[q]) && macro_name[q] != '_'){
+						printf("<ASM SYNTAX ERROR> This macro contains illegal character '%c':\n%s\n",macro_name[q], line_copy);
+						goto error;
+					}
+			}
 			/*
 				Check and make sure this is not a reserved name
 			*/

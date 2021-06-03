@@ -65,14 +65,14 @@ putchar
 
 
 #asm_fix_outputcounter+2;
-sc %~myLabel~%;
+sc %_myLabel_%;
 
 
 #					asm_vars
 
 
 jmp;
-VAR#~myLabel~#@
+VAR#_myLabel_#@
 sc 0,0
 
 #perform the loop check
@@ -128,9 +128,9 @@ lla %0xB000%;illdaa;
 putchar;putchar;
 putchar;putchar;
 
-VAR#goto_myLabel2#sc %~myLabel2~%;jmp;
+VAR#goto_myLabel2#sc %_myLabel2_%;jmp;
 goto_myLabel2
-VAR#~myLabel2~#   @    
+VAR#_myLabel2_#@
 
 //test far memory indexing functionality
 lla %0xffea%;
