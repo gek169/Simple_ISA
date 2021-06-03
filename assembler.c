@@ -1206,12 +1206,12 @@ int main(int argc, char** argv){
 		{
 			volatile UU a;
 			a = 1;
-			if(*((unsigned char*) &a)){
+			if(*((volatile unsigned char*) &a)){
 				puts("Executing on a Little-Endian Architecture.");
 			} else {
-				if(*(((unsigned char*)(&a))+2))
+				if(*(((volatile unsigned char*)(&a))+2))
 					puts("Executing on a PDP-Endian Architecture... That's pretty strange.");
-				else if(*(((unsigned char*)(&a))+1))
+				else if(*(((volatile unsigned char*)(&a))+1))
 					puts("Executing on an unknown Middle-Endian Architecture... How Unusual.");
 				else
 					puts("Executing on a Big-Endian Architecture.");
