@@ -11,3 +11,7 @@ typedef long SUU;
 #endif
 static u R=0, M[(((UU)1)<<24)], PTEMP[0x100], *SEGMENT;
 static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;
+
+#if !defined(SISA16_MAX_RECURSION_DEPTH)
+#define SISA16_MAX_RECURSION_DEPTH 64
+#endif

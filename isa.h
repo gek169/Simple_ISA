@@ -492,7 +492,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA31:{
 		u* M_SAVED = NULL;
 		register UU SEG_TO_SAVE = a;
-		if(EMULATE_DEPTH >= 16) {
+		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
 		M_SAVED = malloc((((UU)1)<<24));

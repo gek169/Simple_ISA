@@ -534,6 +534,8 @@ emulate: Run a SISA16 sandboxed machine sharing the segment and a single page of
 
 	Failure to allocate the segment is trapped and provides an error code, but the segment remains unchanged.
 
+	the maximum recursion allowed by the implementation is defined by SISA16_MAX_RECURSION_DEPTH in isa_pre.h
+
 The rest: nop duplicates, free for expansion (1 byte)
 
 .TP

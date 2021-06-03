@@ -76,7 +76,7 @@ VAR#miniLoopTop#@
 	//perform our variable increment.
 		lb1;lda%59%;add;sta %59%;
 	//if A is less than 3 value, jump to the small loop
-		sc %miniLoopTop%;llb %4%;cmp;lb 0;cmp;jmpifeq;
+		sc %miniLoopTop%;llb %2%;cmp;lb 0;cmp;jmpifeq;
 
 
 //signify the end of the loop by printing some newlines.
@@ -93,14 +93,14 @@ VAR#Lbl_BONUSDUCKS#@
 	la 0xd;putchar;
 	la 0;rx0a;
 	VAR#Bonusducks_looptop#@
-	//how many Qs to print.
-	VAR#numQs#10
-		la 0x51;putchar;
-		arx0;lb1;add;rx0a;
-		sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
-	lrx0 %/12%;
-	lrx1 %/0%;
-	rxidiv;
+		//how many Qs to print.
+		VAR#numQs#5
+			la 0x51;putchar;
+			arx0;lb1;add;rx0a;
+			sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
+		lrx0 %/12%;
+		lrx1 %/0%;
+		rxidiv;
 
 VAR#Lbl_BROKE_EMU#@
 	la0xd;putchar;
