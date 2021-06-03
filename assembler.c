@@ -923,7 +923,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 		}
 		if(opcode >= n_insns){
 			puts("//!!!Illegal!!! opcode, equivalent to a NOP:");
-			printf("%-9s 0x%x;//0x%06lx : (E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
+			printf("%-9s 0x%x                ;//0x%06lx  :(E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
 			continue;
 		}else{
 			unsigned long arg_i = 0;

@@ -1,3 +1,4 @@
+#!/usr/local/bin/tcc -run
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
