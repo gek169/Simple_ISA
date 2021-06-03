@@ -57,7 +57,7 @@ Here is how you use the emulator on a unix system:
 #most systems have UNSIGNED_INT as four byte unsigned types, that's what the define is for.
 cc isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 #compile the assembler
-cc assembler.c -o sisa16_asm
+cc assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
 #assemble your program
 ./sisa16_asm -i program.asm -o program.bin
 #run your program
@@ -72,7 +72,8 @@ sudo cp sisa16_emu /usr/bin/
 #you put that at the top of your file and chmod+x the .asm file, and it will run.
 ./program.asm
 ```
-On a windows machine, the compiled C programs would be EXEs rather than lacking an extension.
+On a windows machine, the compiled C programs would be EXEs rather than lacking an extension, but your
+SISA16 programs should be binary compatible.
 
 DuckDuckGo is your friend if you need to learn how to compile C programs on your target platform.
 
