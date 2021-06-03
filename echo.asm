@@ -92,25 +92,42 @@ VAR#Lbl_BONUSDUCKS#@
 	la 0xa;putchar;
 	la 0xd;putchar;
 	la 0;rx0a;
+	VAR#Bonusducks_looptop#@
+	//how many Qs to print.
+	VAR#numQs#10
+		la 0x51;putchar;
+		arx0;lb1;add;rx0a;
+		sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
+	lrx0 %/12%;
+	lrx1 %/0%;
+	rxidiv;
 
-VAR#Bonusducks_looptop#@
-//how many Qs to print.
-VAR#numQs#10
-	la 0x51;putchar;
-	arx0;lb1;add;rx0a;
-	sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
-lrx0 %/12%;
-lrx1 %/0%;
-rxidiv;
-
+VAR#Lbl_BROKE_EMU#@
+	la0xd;putchar;
+	la69;putchar;
+	la82;putchar;
+	la82;putchar;
+	la0x30;putchar;
+	la82;putchar;
+	la0x20;putchar;
+	la0x20;putchar;
+	la0x20;putchar;
+	la0x20;putchar;
+	lrx1 %/0%;
+	rximod;
+	nop;nop;nop;
 VAR#Lbl_Emulator#@
-//print an R.
-la0x52;
-putchar;
-lla %0xffFF%;
-//execute the emulator!
-emulate;
-sc %0x1f0%;jmp;
-//So that a disassembly will not show beyond this point.
-halt;halt;
-halt;halt;
+	//print an R.
+	la0x52;
+	putchar;
+	la 0xff;
+	//execute the emulator!
+	emulate;
+	sta %0x1000%;
+					lb 11;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
+	lda %0x1000%;	lb 12;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
+	lda %0x1000%;	lb  4;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
+	sc %0x1f0%;jmp;
+	//So that a disassembly will not show beyond this point.
+	halt;halt;
+	halt;halt;
