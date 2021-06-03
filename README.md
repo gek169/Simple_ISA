@@ -18,6 +18,11 @@ A portion of a disassembled binary:
 
 ![disassembly_out](Disassembler_Output_1.png)
 
+'/dev/urandom' disassembly:
+
+![disassembly_out](Disassembler_Output_2.png)
+
+
 
 The emulator and assembler are compiled and tested on the following architectures and platforms:
 
