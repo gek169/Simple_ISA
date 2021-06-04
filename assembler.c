@@ -741,12 +741,13 @@ static void putshort(unsigned short sh, FILE* f){
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 unsigned long compiled_variable_allocation_start = 0xF00000;
 
+/*
 char* compiled_variable_names[65535] = {0};
 unsigned long compiled_variable_addresses[65535] = {0};
 unsigned long compiled_variable_array_lengths[65535] = {0};
 unsigned int compiled_variable_types[65535] = {0};
 unsigned long n_compiled_variables = 0;
-
+*/
 static int check_ident(char* ident){
 	unsigned long i;
 	if(ident[0] == '\0') return 0; /*End of the damn string!*/
