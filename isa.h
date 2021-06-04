@@ -414,74 +414,74 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA11:R=10;goto G_HALT;
 	G_AA12:R=10;goto G_HALT;
 #endif
-	G_AA13:{register UU flight;
+	G_AA13:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		RX0=(((UU)M[(flight)&0xffFFff])<<24) + 
 					(((UU)M[(flight+1)&0xffFFff])<<16) +
 					(((UU)M[(flight+2)&0xffFFff])<<8) +
 					(((UU)M[(flight+3)&0xffFFff]));
 	}D
-	G_AA14:{register UU flight;
+	G_AA14:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		RX1=(((UU)M[(flight)&0xffFFff])<<24) + 
 					(((UU)M[(flight+1)&0xffFFff])<<16) +
 					(((UU)M[(flight+2)&0xffFFff])<<8) +
 					(((UU)M[(flight+3)&0xffFFff]));
 	}D
-	G_AA15:{register UU flight;
+	G_AA15:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		RX2=(((UU)M[(flight)&0xffFFff])<<24) + 
 					(((UU)M[(flight+1)&0xffFFff])<<16) +
 					(((UU)M[(flight+2)&0xffFFff])<<8) +
 					(((UU)M[(flight+3)&0xffFFff]));
 	}D
-	G_AA16:{register UU flight;
+	G_AA16:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		RX3=(((UU)M[(flight)&0xffFFff])<<24) + 
 					(((UU)M[(flight+1)&0xffFFff])<<16) +
 					(((UU)M[(flight+2)&0xffFFff])<<8) +
 					(((UU)M[(flight+3)&0xffFFff]));
 	}D
-	G_AA17:{register UU flight;
+	G_AA17:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		a=(((UU)M[(flight)&0xffFFff])<<8) + 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
-	G_AA18:{register UU flight;
+	G_AA18:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		b=(((UU)M[(flight)&0xffFFff])<<8) + 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
-	G_AA19:{register UU flight;
+	G_AA19:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		c=(((UU)M[(flight)&0xffFFff])<<8) + 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
-	G_AA20:{register UU flight;
+	G_AA20:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_4bytes(RX0, flight);
 	}D
-	G_AA21:{register UU flight;
+	G_AA21:{UU flight;
 			flight = CONSUME_THREE_BYTES;
 			write_4bytes(RX1, flight);
 		}D
-	G_AA22:{register UU flight;
+	G_AA22:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_4bytes(RX2, flight);
 	}D
-	G_AA23:{register UU flight;
+	G_AA23:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_4bytes(RX3, flight);
 	}D
-	G_AA24:{register UU flight;
+	G_AA24:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_2bytes(a, flight);
 	}D
-	G_AA25:{register UU flight;
+	G_AA25:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_2bytes(b, flight);
 	}D
-	G_AA26:{register UU flight;
+	G_AA26:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_2bytes(c, flight);
 	}D
