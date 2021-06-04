@@ -900,6 +900,7 @@ static char* compile_line(char* line_in){
 static int disassembler(char* fname, unsigned long location, unsigned long SISA16_DISASSEMBLER_MAX_HALTS){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
+	unsigned long n_illegals = 0;
 	FILE* f; unsigned long i = location & 0xffFFff;
 	f = fopen(fname, "rb");
 	if(!f){
@@ -915,15 +916,15 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			puts("//Disassembly reached end of usable memory.");
 			goto end;
 		}else if((i & 0xffFF) == 0){
-			puts("//<Region Boundary>");
+			printf("//<Region Boundary 0x%06lx >\n", i);
 		}
 		if((unsigned long)ftell(f) != i){
 			puts("//<Disassembly could not proceed, reason: end of file>");
 			goto end;
 		}
 		opcode = fgetc(f);i++;
-		if(opcode == 0 || opcode >= n_insns) n_halts++;
-		else n_halts = 0;
+		if(opcode == 0) 		n_halts++; 		else if(opcode < n_insns) 	n_halts = 0;
+		if(opcode >= n_insns) 	n_illegals++; 	else if(opcode != 0) 		n_illegals = 0;
 		if(
 			opcode < n_insns &&  /*Valid opcode*/
 			(insns_numargs[opcode] > 0) && /*With arguments*/
@@ -936,7 +937,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 		}
 		
 		if(opcode >= n_insns){
-			printf("%-12s 0x%x                ;//0x%06lx  : (E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
+			printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE) Probably Data.\n","bytes", (unsigned int)opcode, i-1);
 			continue;
 		}else{
 			unsigned long arg_i = 0;
@@ -944,6 +945,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			unsigned int unfinished_flag = 0;
 			unsigned long required_spaces = 20;
 			unsigned long opcode_i = i-1;
+			U short_interpretation = 0;
 			printf("%-13s",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				unsigned char thechar;
@@ -960,6 +962,8 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					unfinished_flag = arg_i + 1;
 				}
 				thechar = fgetc(f);
+				short_interpretation += thechar;
+				if(arg_i == 0)short_interpretation *= 256;
 				printf("0x%02x",(unsigned int)thechar);i++;
 			}
 			
@@ -973,22 +977,26 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			if(streq(insns[opcode], "farret")){
 				puts(" End of Procedure");
 			}else if(streq(insns[opcode], "ret")){
-				puts(" End of Region-Local Procedure");
+				puts(" End of Local Procedure");
 			} else if(opcode == 0 && n_halts == 1){
 				puts(" End of Control Flow");
 			} else if(streq(insns[opcode], "jmp")){
-				 puts(" Unconditional Jump");
+				puts(" Jump");
 			}else if(streq(insns[opcode], "jmpifeq")){
 				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "cbrx0")
 					||streq(insns[opcode], "carx0")){
-				puts(" Likely: Far memory array access through RX0");
+				puts(" Likely: Far memory array access through RX0. Check array alignment!");
 			}else if(streq(insns[opcode], "jmpifneq")){
 				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "emulate")){
-				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
+				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions. Throws on failure.");
 			}else if(streq(insns[opcode], "sc")){
-				puts(" Likely: jump target");
+				if(short_interpretation == (opcode_i & 0xffFF)){
+					puts(" Very Likely: Loop top. Optimization tip: replace this with cpc.");
+				}else{
+					puts(" Likely: arg is jump target");
+				}
 			}else if(streq(insns[opcode], "crx0")
 					||streq(insns[opcode], "crx1")
 					||streq(insns[opcode], "crx2")
@@ -998,8 +1006,10 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				puts(" Maybe: Computed Jump through register A");
 			}else if(streq(insns[opcode], "cb")){
 				puts(" Maybe: Computed Jump through register B");
+			}else if(streq(insns[opcode], "astp")){
+				puts(" Stack manip, maybe retrieving function arguments?");
 			}else if(streq(insns[opcode], "call")){
-				puts(" Region-Local Procedure Call");
+				puts(" Local Procedure Call");
 			}else if(streq(insns[opcode], "farcall")){
 				puts(" Procedure Call");
 			}else if(streq(insns[opcode], "lfarpc")){
@@ -1035,15 +1045,14 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			){
 				puts(" Likely: Storing to fixed position variable.");
 			}else if(streq(insns[opcode], "cpc")){
-				puts(" Likely: loop top or future jump target.");
+				puts(" Very Likely: loop top or future jump target.");
 			}else {printf("\n");}
 			if(unfinished_flag){
 				puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
 				goto end;
 			}
 		}
-
-		if(n_halts > SISA16_DISASSEMBLER_MAX_HALTS){
+		if((n_halts + n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
 			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
 			goto end;
 		}
