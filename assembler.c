@@ -763,6 +763,8 @@ static int check_ident(char* ident){
 	return 0; /*Theoretically unreachable.*/
 }
 
+/*Idea for a programming language with BASIC-like syntax.*/
+/*
 static char* compile_line(char* line_in){
 	char* line_proc = strcatalloc(line_in+strlen("ASM_COMPILE"), "");
 	char* line_out = strcatalloc("","");
@@ -775,9 +777,9 @@ static char* compile_line(char* line_in){
 		line_proc = strcatalloc(line_proc+1, "");
 		free(old_line_proc);
 	}
-	/*the line is now ready for processing.*/
+	/the line is now ready for processing./
 	if(strprefix("var ", line_proc)){
-		/*
+		/
 			FORMAT:
 											Required Space
 											   |Optional array declarator from [ to ]
@@ -785,13 +787,13 @@ static char* compile_line(char* line_in){
 			var <type> @<location> <identifier> [<array length>];
 					   ^			^
 						optional	must start with alpha character or underscore, rest isalnum or is underscore.
-		*/
+		/
 		char* metaproc = line_proc + strlen("var ");
 		unsigned long vartype = 0;
 		unsigned long varaddr = compiled_variable_allocation_start;
-		unsigned long vararrlen = 0; /*Not an array!*/
+		unsigned long vararrlen = 0; /Not an array!/
 		char* varname = NULL;
-		/*handle a variable declaration.*/
+		/handle a variable declaration./
 		if(strprefix("byte ", metaproc)){
 			vartype = 0; metaproc += strlen("byte ");
 			
@@ -843,12 +845,11 @@ static char* compile_line(char* line_in){
 			metaproc += loc_next_space;
 			if(*metaproc == ' ')metaproc++;
 		}
-		/*test to see if this is an array declaration.*/
-		if(*metaproc == '[' /*]*/){
+		if(*metaproc == '[' ]){
 			long loc_end_bracket;
 			metaproc++;
 			vararrlen = strtoul(metaproc, 0,0);
-			loc_end_bracket = strfind(metaproc, /*[*/ "]");
+			loc_end_bracket = strfind(metaproc, /[/ "]");
 			if(loc_end_bracket == -1){
 				puts("<COMPILED LINE SYNTAX ERROR> Array declarators must have an ending bracket!");
 				puts("Line:");
@@ -897,6 +898,7 @@ static char* compile_line(char* line_in){
 	free(line_in);
 	return line_out;
 }
+*/
 static int disassembler(char* fname, unsigned long location, unsigned long SISA16_DISASSEMBLER_MAX_HALTS){
 	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
@@ -1527,19 +1529,18 @@ int main(int argc, char** argv){
 		if(strprefix("ASM_COMPILE", line)){
 			puts("<ASM UNFINISHED FEATURE ERROR> Unfinished feature. You may not use ASM_COMPILE.");
 			exit(1);
-			line = compile_line(line);
+			/*line = compile_line(line);*/
 			nmacrocalls = 0;
 			goto pre_pre_processing;
 		}
 		if(strprefix("ASM_COPYRIGHT", line)){
-			ASM_PUTS("SISA-16 Assembler,(C)David M.H.S. Webster 2021\navailable to you under the Creative Commons Zero license.");
+			ASM_PUTS("SISA-16 Assembler, Disassembler, and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.");
 			goto end;
 		}
 		if(strprefix("asm_help", line) || strprefix("ASM_HELP", line)){
 			ASM_PUTS("For help, See: man sisa16_asm");
 			goto end;
 		}
-
 		else if ((!strprefix("VAR#", line)) /*Do not parse asm_pleq's inside of a VAR# line.*/
 					&& (strfind(line, "asm_pleq#") != -1 || strfind(line, "asm_muleq#") != -1) /*We have found one!*/
 					){ /*SYNTAX: asm_pleq#variable_name#variable_name# or asm_muleq*/
