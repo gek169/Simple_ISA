@@ -216,7 +216,3 @@ VAR#file_txt_was_good#@
 	
 halt;
 asm_end_region_restriction;
-
-
-
-
