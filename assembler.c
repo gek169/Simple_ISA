@@ -994,9 +994,9 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			}else if(streq(insns[opcode], "interrupt")){
 				puts(" <DEVICE> Device interaction using all registers returning value to A.");
 			}else if(streq(insns[opcode], "putchar")){
-				puts(" <DEVICE> write A from device.");
+				puts(" <DEVICE> write A to device.");
 			}else if(streq(insns[opcode], "getchar")){
-				puts(" <DEVICE> read from device into A.");
+				puts(" <DEVICE> read A from device.");
 			}else if(streq(insns[opcode], "sc")){
 				if(short_interpretation == (opcode_i & 0xffFF)){
 					puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
