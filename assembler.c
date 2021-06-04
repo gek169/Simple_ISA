@@ -993,7 +993,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions. Throws on failure.");
 			}else if(streq(insns[opcode], "sc")){
 				if(short_interpretation == (opcode_i & 0xffFF)){
-					puts(" Very Likely: Loop top. Optimization tip: replace this with cpc.");
+					puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
 				}else{
 					puts(" Likely: arg is jump target");
 				}
