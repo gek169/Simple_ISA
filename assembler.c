@@ -991,6 +991,12 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				puts(" Conditional Jump");
 			}else if(streq(insns[opcode], "emulate")){
 				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions. Throws on failure.");
+			}else if(streq(insns[opcode], "interrupt")){
+				puts(" <DEVICE> Device interaction using all registers returning value to A.");
+			}else if(streq(insns[opcode], "putchar")){
+				puts(" <DEVICE> write A from device.");
+			}else if(streq(insns[opcode], "getchar")){
+				puts(" <DEVICE> read from device into A.");
 			}else if(streq(insns[opcode], "sc")){
 				if(short_interpretation == (opcode_i & 0xffFF)){
 					puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
