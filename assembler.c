@@ -1045,7 +1045,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			){
 				puts(" Likely: Storing to fixed position variable.");
 			}else if(streq(insns[opcode], "cpc")){
-				puts(" Very Likely: loop top or future jump target.");
+				puts(" Very Likely: Loop top.");
 			}else {printf("\n");}
 			if(unfinished_flag){
 				puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
