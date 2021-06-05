@@ -238,7 +238,7 @@ int main(int rc,char**rv){
 		SEGMENT_PAGES = 1;
 	}
 	if(!SEGMENT){puts("Segment Allocation Failed.");return 1;}
-	e();
+	R=0;e();
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
 			printf("%02x%c",M[j],((j+1)%8)?' ':'|');

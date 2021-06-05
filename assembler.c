@@ -2652,8 +2652,7 @@ int main(int argc, char** argv){
 			exit(1);
 		}
 #endif
-		e();
-
+		R=0;e();
 		if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
 		if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
 		if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");

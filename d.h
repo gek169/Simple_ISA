@@ -48,7 +48,7 @@ static void dcl(){return;}
 #endif
 
 static unsigned short gch(){
-	return getchar();
+	return (unsigned short)getchar();
 }
 static void pch(unsigned short a){
 	putchar(a);
@@ -95,7 +95,7 @@ static unsigned short interrupt(unsigned short a,
 				UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 				SEGMENT = realloc(SEGMENT, 0x100 * n_pages);
 				SEGMENT_PAGES = n_pages;
-				if(!SEGMENT){
+				if(!SEGMENT){ /*error*/
 					SEGMENT = SEGMENT_OLD;
 					SEGMENT_PAGES = SEGMENT_PAGES_OLD;
 					return 0;

@@ -93,8 +93,10 @@ k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_NOP;}
 int e(){
-register u program_counter_region=0;register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
-register UU RX0=0,RX1=0,RX2=0,RX3=0;R=0;di();
+register u program_counter_region=0;
+register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
+register UU RX0=0,RX1=0,RX2=0,RX3=0;
+R=0;di();
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -515,7 +517,7 @@ G_AA12:{SUU SRX0, SRX1;
 			a=R;
 			R=0;
 		EMULATE_DEPTH--;
-		free(SEGMENT);
+		if(SEGMENT)free(SEGMENT);
 		SEGMENT = SEG_SAVED;
 		SEGMENT_PAGES = SEG_PAGES_SAVED;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
@@ -545,7 +547,6 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = lRX0;
 	}D
 #endif
-
-
+/*add more insns here.*/
 G_HALT:dcl();return 0;
 }
