@@ -2094,6 +2094,10 @@ int main(int argc, char** argv){
 				Prevent macros from being defined which are illegal.
 			*/
 			{unsigned long q;
+				if(strlen(macro_name) == 0){
+					printf("<ASM SYNTAX ERROR> This macro has an EMPTY NAME. Invalid:\n%s\n", line_copy);
+					goto error;
+				}
 				for(q = 0; q < strlen(macro_name); q++)
 					if(!isalnum(macro_name[q]) && macro_name[q] != '_'){
 						printf("<ASM SYNTAX ERROR> This macro contains illegal character '%c':\n%s\n",macro_name[q], line_copy);
