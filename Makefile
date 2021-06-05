@@ -1,6 +1,6 @@
 #USE-NCURSES
-CC= cc
-#CC= tcc
+#CC= cc
+CC= tcc
 INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
