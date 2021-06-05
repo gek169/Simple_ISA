@@ -39,6 +39,9 @@
 static void di(){if(EMULATE_DEPTH==0)initscr();}
 static void dcl(){if(EMULATE_DEPTH==0)endwin();}
 #else
+/*
+	Fully Public domain textmode driver.
+*/
 #include "isa_pre.h"
 static void di(){return;}
 static void dcl(){return;}
@@ -79,7 +82,7 @@ static unsigned short interrupt(unsigned short a,
 		/*
 			Attempt to load it into the segment.
 		*/
-		{FILE* ff;size_t len;size_t n_pages;
+		{FILE* ff;size_t len;UU n_pages;
 			ff = fopen(buf, "rb");
 			if(!ff) return 0;
 			fseek(ff, 0, SEEK_END);
