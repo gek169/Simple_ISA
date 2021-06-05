@@ -1,4 +1,4 @@
-#!/usr/local/bin/tcc -run -lncurses -DUSE_UNSIGNED_INT -DUSE_NCURSES
+/*#!/usr/local/bin/tcc -run -lncurses -DUSE_UNSIGNED_INT -DUSE_NCURSES*/
 #include "d.h"
 #include "isa.h"
 /*
