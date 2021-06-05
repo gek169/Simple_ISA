@@ -1,6 +1,8 @@
-#!/usr/local/bin/tcc -run -b -bt65 -lncurses -DUSE_UNSIGNED_INT -DUSE_NCURSES
+#!/usr/local/bin/tcc -run -b -bt80 -lncurses -DUSE_UNSIGNED_INT -DUSE_NCURSES
 /*
-	A very quick, convenient way to run the assembler.
+	A very quick, convenient way to run the assembler with built-in emulator.
+	This version is for debugging the assembler
+	
 	Truly we are blessed 
 */
 #include "assembler.c"
