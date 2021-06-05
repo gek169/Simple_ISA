@@ -2606,7 +2606,7 @@ int main(int argc, char** argv){
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		UU i=0, j=~(UU)0;
 		SUU q_test=(SUU)-1;
-		SEGMENT = malloc(256);
+		SEGMENT = calloc(1,256);
 		SEGMENT_PAGES = 1;
 		if(SEGMENT == NULL){
 			puts("<SISA16 EMULATOR ERROR: Could not allocate segment>");

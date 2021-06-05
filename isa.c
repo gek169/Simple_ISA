@@ -234,7 +234,7 @@ int main(int rc,char**rv){
 		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
 	fclose(F);
 	{
-		SEGMENT = malloc(0x100);
+		SEGMENT = calloc(1,256);
 		SEGMENT_PAGES = 1;
 	}
 	if(!SEGMENT){puts("Segment Allocation Failed.");return 1;}
