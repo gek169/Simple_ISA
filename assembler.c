@@ -2099,6 +2099,10 @@ int main(int argc, char** argv){
 						printf("<ASM SYNTAX ERROR> This macro contains illegal character '%c':\n%s\n",macro_name[q], line_copy);
 						goto error;
 					}
+				if(!(isalpha(macro_name[0]) || macro_name[0] == '_')){
+					printf("<ASM SYNTAX ERROR> This macro begins with a number! '%c':\n%s\n",macro_name[0], line_copy);
+					goto error;
+				}
 			}
 			/*
 				Check and make sure this is not a reserved name
