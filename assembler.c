@@ -1,4 +1,3 @@
-/*#!/usr/local/bin/tcc -run -lncurses -DUSE_UNSIGNED_INT -DUSE_NCURSES*/
 /*
 assembler for the ISA.
 Supports doing any of the following:
