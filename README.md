@@ -35,16 +35,10 @@ gek169/Simple_ISA:
 Ubuntu (x86_64):
 ![build personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
 
-Macos:
-![build macos personal](https://github.com/gek169/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
-
 C-Chads/Simple_ISA:
 
 Ubuntu (x86_64):
 ![build cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp.yml/badge.svg)
-
-Macos:
-![build macos cchads](https://github.com/C-Chads/Simple_ISA/actions/workflows/c-cpp_macos.yml/badge.svg)
 
 This repository contains the SISA16 standalone emulator source, 
 the macro assembler/disassembler which doubles as an emulator,
@@ -106,11 +100,6 @@ The emulator and assembler have been compiled and tested on the following archit
 	x86_64 (using: Debian linux, Windows 10, on: native)
 	riscv64 (Buildroot linux, jslinux)
 ```
-
-Github actions is used to do automatic builds on Ubuntu and Macos. I'd like to expand build tests to more
-platforms, but Github Actions complains whenever I try to add a linux ARM64 test...
-
-(At the time of writing this, the macos builds are uncooperative... ignore the failing builds)
 
 The included assembly programs are written for the architecture and can be executed just like scripts!
 
