@@ -43,7 +43,6 @@ install: main
 	@echo "Attempting manpage install."
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
-
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
 	rm -f $(INSTALL_DIR)/sisa16
