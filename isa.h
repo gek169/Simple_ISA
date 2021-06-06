@@ -303,15 +303,25 @@ ZC:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
 	D
-ZD:{u* SEGMENT_OLD = SEGMENT;
-	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
-	if(RX0 == 0)	{R=6;goto G_HALT;}
-	SEGMENT_PAGES = RX0;
-	SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
-	if(!SEGMENT){
-		SEGMENT_PAGES = SEGMENT_PAGES_OLD;
-		SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
-	}
+ZD:{
+		u* SEGMENT_OLD = SEGMENT;
+		register UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
+		if(RX0 == 0)	{R=6;goto G_HALT;}
+		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
+			SEGMENT_PAGES = RX0;
+			SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
+		}
+		if(!SEGMENT){
+			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
+			SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
+		}
+		if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
+			/*Must initialize memory to zero.*/
+			register size_t end, i;
+			i = ((size_t)SEGMENT_PAGES_OLD) * 256;
+			end = ((size_t)SEGMENT_PAGES) * 256;
+			for(;i<end;i++)SEGMENT[i] = 0;
+		}
 	}D
 #ifdef NO_FP
 /*no floating point unit.*/
