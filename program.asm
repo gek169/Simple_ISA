@@ -107,7 +107,7 @@ seg_st;
 //transfer back from the segment.
 lrx0 %/0xffff%;
 seg_ld;
-//interrupt;
+interrupt;
 halt
 
 
