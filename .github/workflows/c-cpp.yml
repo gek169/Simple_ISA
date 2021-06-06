@@ -28,4 +28,4 @@ jobs:
     - name: execute_echo2_asm_with_tcc
       run: tcc -run\ -DUSE_UNSIGNED_INT a.c -run echo2.asm < isa.c
     - name: show_tcc_version
-      run: tcc --version
+      run: tcc -v
