@@ -76,6 +76,9 @@ int main(int rc,char**rv){
 			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
 			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
 			printf("Size of SUU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(SUU));
+#if !defined(NO_FP)
+			printf("Size of float is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(float));
+#endif
 
 #ifdef __STDC_IEC_559__
 #if __STDC_IEC_559__ == 0
@@ -155,7 +158,7 @@ int main(int rc,char**rv){
 #endif
 
 		{
-			volatile UU a;
+			volatile UU a = 0;
 			a = 1;
 			if(*((unsigned char*) &a)){
 				puts("Executing on a Little-Endian Architecture.");
