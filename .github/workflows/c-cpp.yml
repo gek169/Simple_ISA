@@ -22,10 +22,10 @@ jobs:
     - name: show_environment_info
       run: uname -a && cat /proc/cpuinfo && uname -r && lsb_release -a && gcc --version
     - name: execute_abi_asm_with_tcc
-      run: tcc -run -DUSE_UNSIGNED_INT a.c -run abi.asm
+      run: tcc -run\ -DUSE_UNSIGNED_INT a.c -run abi.asm
     - name: execute_program_asm_with_tcc
-      run: tcc -run -DUSE_UNSIGNED_INT -run program.asm
+      run: tcc -run\ -DUSE_UNSIGNED_INT a.c -run program.asm
     - name: execute_echo2_asm_with_tcc
-      run: tcc -run -DUSE_UNSIGNED_INT -run echo2.asm < isa.c
+      run: tcc -run\ -DUSE_UNSIGNED_INT a.c -run echo2.asm < isa.c
     - name: show_tcc_version
       run: tcc --version
