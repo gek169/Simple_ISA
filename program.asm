@@ -100,11 +100,11 @@ putchar;putchar;putchar;
 //enable these two lines to dump the memory of the emulator after execution.
 lla %0xFFff%;
 //transfer code from the segment.
-lrx0 %/20%;seg_realloc;
+lrx0 %/2000%;seg_realloc;
 lrx0 %/0x0%;
 lrx1 %/0%;
 seg_st;
-//transfer a page of junk from the segment.
+//transfer back from the segment.
 lrx0 %/0xffff%;
 seg_ld;
 //interrupt;
