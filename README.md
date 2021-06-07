@@ -500,9 +500,11 @@ emulate: Run a SISA16 sandboxed machine sharing the segment and a single page of
 	
 	the maximum recursion allowed by the implementation is defined by SISA16_MAX_RECURSION_DEPTH in isa_pre.h
 
-rxitof: convert RX0 from signed int to float. (1 byte) (CF)
+rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 
-rxftoi: convert RX0 from float to signed int. (1 byte) (D0)
+rxftoi: convert RX0 from float to signed int. (1 byte) (D1)
+
+emulate_seg: Same as Emulate, but the segment is passed down to the child. (1 byte) (D2)
 
 The rest: nop duplicates, free for expansion (1 byte)
 ```

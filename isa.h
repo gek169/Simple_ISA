@@ -87,7 +87,8 @@ k 194:goto G_AA18;k 195:goto G_AA19;k 196:goto G_AA20;k 197:goto G_AA21;\
 k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AA27;k 204:goto G_AA28;k 205:goto G_AA29;\
 k 206:goto G_AA30;k 207:goto G_AA31;\
-k 208:goto G_AA32;k 209:goto G_AA33;k 210:k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
+k 208:goto G_AA32;k 209:goto G_AA33;\
+k 210:goto G_AA34;k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -557,6 +558,27 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = lRX0;
 	}D
 #endif
+	G_AA34:{
+		u* M_SAVED = NULL;
+		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
+		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+			R=11; goto G_HALT;
+		}
+		M_SAVED = malloc((((UU)1)<<24));
+		if(!M_SAVED){
+			R=12; goto G_HALT;
+		}
+		memcpy(M_SAVED, M, (((UU)1)<<24));
+		EMULATE_DEPTH++;
+			e();
+			a=R;
+			R=0;
+		EMULATE_DEPTH--;
+		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
+		memcpy(M, M_SAVED, (((UU)1)<<24));
+		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
+		free(M_SAVED);
+	}D
 /*add more insns here.*/
 G_HALT:dcl();return 0;
 }

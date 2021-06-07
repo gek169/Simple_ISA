@@ -126,7 +126,7 @@ VAR#Lbl_Emulator#@
 	//seg_realloc;
 	la 0xff;
 	//execute the emulator!
-	emulate;
+	emulate_seg;
 	sta %0x1000%;
 					lb 11;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
 	lda %0x1000%;	lb 12;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
