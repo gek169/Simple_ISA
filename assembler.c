@@ -998,8 +998,10 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				puts(" Likely: Far memory array access through RX0. Check array alignment!");
 			}else if(streq(insns[opcode], "jmpifneq")){
 				puts(" Conditional Jump");
+			}else if(streq(insns[opcode], "emulate_seg")){
+				puts(" Sandboxing Insn with Shared Segment. Jumps to 0x000000 and catches exceptions");
 			}else if(streq(insns[opcode], "emulate")){
-				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions. Throws on failure.");
+				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
 			}else if(streq(insns[opcode], "interrupt")){
 				puts(" <DEVICE> Device interaction using all registers returning value to A.");
 			}else if(streq(insns[opcode], "putchar")){
