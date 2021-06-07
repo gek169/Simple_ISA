@@ -90,6 +90,8 @@ Another binary disassembled:
 
 * Roughly similar performance in the virtual machine with unoptimized or optimized builds of the VM.
 
+* Uses computed goto on supported compilers, define USE_COMPUTED_GOTO
+
 # How portable?
 
 The emulator and assembler have been compiled and tested on the following architectures and platforms:
