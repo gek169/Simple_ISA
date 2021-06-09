@@ -1,8 +1,8 @@
 #USE-NCURSES
 CC= cc
 #CC= tcc
-INSTALL_DIR=/usr/bin
-MAN_INSTALL_DIR=/usr/share/man/man1
+INSTALL_DIR=/usr/local/bin
+MAN_INSTALL_DIR=/usr/local/share/man/man1
 CCC= g++
 OPTLEVEL= -Os -march=native
 #make the emulator safe for fuzz testing.
