@@ -1943,7 +1943,7 @@ int main(int argc, char** argv){
 					char do_32bit=0;
 					long loc_eparen;
 					char expansion[1024]; 
-					unsigned long res; /*Split directive.*/
+					unsigned long res=0; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
