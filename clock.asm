@@ -1,4 +1,4 @@
-#!/usr/bin/sisa16_asm -run
+#!/usr/local/bin/sisa16_asm -run
 //create a whole-memory image.
 
 VAR#ZERO_STACK_POINTER#		astp;popa;
