@@ -78,7 +78,8 @@ VAR#asciifun_looptop#@
 		sc %iter_is_not_endval%;jmp;
 
 	VAR#iter_is_endval#@
-		la 0xa; putchar; la 0xd; putchar;
+		la 0xa; putchar; 
+		la 0xd; putchar;
 		ld_iteration_count; 
 			aincr;
 		st_iteration_count;
@@ -111,4 +112,7 @@ asm_end_region_restriction;
 
 //MAIN~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-section 0;la 1;lfarpc;
+section 0;
+la 0xa;putchar;
+la 0xd;putchar;
+la 1;lfarpc;
