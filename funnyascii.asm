@@ -56,8 +56,8 @@ farret;
 asm_end_region_restriction;
 
 
-VAR#line_length#100
-VAR#line_length_plus_1#101
+VAR#line_length#120
+VAR#line_length_plus_1#121
 VAR#wait_time#100
 
 section 0x10000;
