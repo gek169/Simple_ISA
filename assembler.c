@@ -1087,8 +1087,6 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 	fclose(f);
 	return 0;
 }
-
-char temporary_name[512] = "tmpsisa_XXXXXX";
 int main(int argc, char** argv){
 	FILE* infile,*ofile; char* metaproc;
 	unsigned long include_level = 0;
