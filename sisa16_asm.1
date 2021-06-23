@@ -11,6 +11,8 @@ Macro-enabled Assembler and Disassembler for the sisa16 virtual portable compute
 .B -o 
 .IR outfilename
 .B [-DBG]
+.B [-nc]
+.B [--no-comments]
 .B [-C]
 .B [-E]
 .B [-pl]
@@ -55,6 +57,12 @@ specifies the output filename.
 
 .BR -DBG
 Enables debug output from the assembler
+
+.BR -nc
+Disable comments from disassembly output.
+
+.BR --no-comments
+same as -nc
 
 .BR -C
 prints the compiletime environment information.

@@ -63,6 +63,7 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 #include "isa.h"
 char* outfilename = "outsisa16.bin";
 char run_sisa16 = 0;
+char enable_dis_comments = 1;
 char clear_output = 0;
 char use_tempfile = 0;
 void del_outfile(){
@@ -946,7 +947,10 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 		}
 		
 		if(opcode >= n_insns){
-			printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE) Probably Data.\n","bytes", (unsigned int)opcode, i-1);
+			if(enable_dis_comments)
+				printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE) Probably Data.\n","bytes", (unsigned int)opcode, i-1);
+			else
+				printf("%-12s 0x%x                ;\n","bytes", (unsigned int)opcode);
 			continue;
 		}else{
 			unsigned long arg_i = 0;
@@ -980,93 +984,97 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			{unsigned long li; for(li=0;li<required_spaces;li++){
 				printf(" ");
 			}}
-			printf(";//0x%06lx  :", opcode_i);
-			if(bad_flag) printf("(E_WONT_RUN)");
-			if(unfinished_flag) printf("(E_UNFINISHED_EOF AT ARGUMENT %u)", unfinished_flag-1);
-			if(streq(insns[opcode], "farret")){
-				puts(" End of Procedure");
-			}else if(streq(insns[opcode], "ret")){
-				puts(" End of Local Procedure");
-			} else if(opcode == 0 && n_halts == 1){
-				puts(" End of Control Flow");
-			} else if(streq(insns[opcode], "jmp")){
-				puts(" Jump");
-			}else if(streq(insns[opcode], "jmpifeq")){
-				puts(" Conditional Jump");
-			}else if(streq(insns[opcode], "cbrx0")
-					||streq(insns[opcode], "carx0")){
-				puts(" Likely: Far memory array access through RX0. Check array alignment!");
-			}else if(streq(insns[opcode], "jmpifneq")){
-				puts(" Conditional Jump");
-			}else if(streq(insns[opcode], "emulate_seg")){
-				puts(" Sandboxing Insn with Shared Segment. Jumps to 0x000000 and catches exceptions");
-			}else if(streq(insns[opcode], "emulate")){
-				puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
-			}else if(streq(insns[opcode], "interrupt")){
-				puts(" <DEVICE> Device interaction using all registers returning value to A.");
-			}else if(streq(insns[opcode], "putchar")){
-				puts(" <DEVICE> write A to device.");
-			}else if(streq(insns[opcode], "getchar")){
-				puts(" <DEVICE> read A from device.");
-			}else if(streq(insns[opcode], "sc")){
-				if(short_interpretation == (opcode_i & 0xffFF)){
-					puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
-				}else{
-					puts(" Likely: arg is jump target");
+			if(!enable_dis_comments) printf(";\n");
+			if(enable_dis_comments)
+			{
+				printf(";//0x%06lx  :", opcode_i);
+				if(bad_flag) printf("(E_WONT_RUN)");
+				if(unfinished_flag) printf("(E_UNFINISHED_EOF AT ARGUMENT %u)", unfinished_flag-1);
+				if(streq(insns[opcode], "farret")){
+					puts(" End of Procedure");
+				}else if(streq(insns[opcode], "ret")){
+					puts(" End of Local Procedure");
+				} else if(opcode == 0 && n_halts == 1){
+					puts(" End of Control Flow");
+				} else if(streq(insns[opcode], "jmp")){
+					puts(" Jump");
+				}else if(streq(insns[opcode], "jmpifeq")){
+					puts(" Conditional Jump");
+				}else if(streq(insns[opcode], "cbrx0")
+						||streq(insns[opcode], "carx0")){
+					puts(" Likely: Far memory array access through RX0. Check array alignment!");
+				}else if(streq(insns[opcode], "jmpifneq")){
+					puts(" Conditional Jump");
+				}else if(streq(insns[opcode], "emulate_seg")){
+					puts(" Sandboxing Insn with Shared Segment. Jumps to 0x000000 and catches exceptions");
+				}else if(streq(insns[opcode], "emulate")){
+					puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
+				}else if(streq(insns[opcode], "interrupt")){
+					puts(" <DEVICE> Device interaction using all registers returning value to A.");
+				}else if(streq(insns[opcode], "putchar")){
+					puts(" <DEVICE> write A to device.");
+				}else if(streq(insns[opcode], "getchar")){
+					puts(" <DEVICE> read A from device.");
+				}else if(streq(insns[opcode], "sc")){
+					if(short_interpretation == (opcode_i & 0xffFF)){
+						puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
+					}else{
+						puts(" Likely: arg is jump target");
+					}
+				}else if(streq(insns[opcode], "crx0")
+						||streq(insns[opcode], "crx1")
+						||streq(insns[opcode], "crx2")
+						||streq(insns[opcode], "crx3")){
+					puts(" Likely: Computed Jump through RX register.");
+				}else if(streq(insns[opcode], "ca")){
+					puts(" Maybe: Computed Jump through register A");
+				}else if(streq(insns[opcode], "cb")){
+					puts(" Maybe: Computed Jump through register B");
+				}else if(streq(insns[opcode], "astp")){
+					puts(" Stack manip, maybe retrieving function arguments?");
+				}else if(streq(insns[opcode], "call")){
+					puts(" Local Procedure Call");
+				}else if(streq(insns[opcode], "farcall")){
+					puts(" Procedure Call");
+				}else if(streq(insns[opcode], "lfarpc")){
+					puts(" Region Jump");
+				}else if(streq(insns[opcode], "farjmprx0")){
+					puts(" Far Jump");
+				}else if( streq(insns[opcode], "farllda")
+						||streq(insns[opcode], "farlldb")
+						||streq(insns[opcode], "farldc")
+						||streq(insns[opcode], "farldrx0")
+						||streq(insns[opcode], "farldrx1")
+						||streq(insns[opcode], "farldrx2")
+						||streq(insns[opcode], "farldrx3")
+						||streq(insns[opcode], "lda")
+						||streq(insns[opcode], "ldb")
+						||streq(insns[opcode], "ldc")
+						||streq(insns[opcode], "llda")
+						||streq(insns[opcode], "lldb")
+				){
+					puts(" Likely: Loading from fixed position variable.");
+				}else if( streq(insns[opcode], "farstla")
+						||streq(insns[opcode], "farstlb")
+						||streq(insns[opcode], "farstc")
+						||streq(insns[opcode], "farstrx0")
+						||streq(insns[opcode], "farstrx1")
+						||streq(insns[opcode], "farstrx2")
+						||streq(insns[opcode], "farstrx3")
+						||streq(insns[opcode], "sta")
+						||streq(insns[opcode], "stb")
+						||streq(insns[opcode], "stc")
+						||streq(insns[opcode], "stla")
+						||streq(insns[opcode], "stlb")
+				){
+					puts(" Likely: Storing to fixed position variable.");
+				}else if(streq(insns[opcode], "cpc")){
+					puts(" Very Likely: Loop top.");
+				}else {printf("\n");}
+				if(unfinished_flag){
+					puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
+					goto end;
 				}
-			}else if(streq(insns[opcode], "crx0")
-					||streq(insns[opcode], "crx1")
-					||streq(insns[opcode], "crx2")
-					||streq(insns[opcode], "crx3")){
-				puts(" Likely: Computed Jump through RX register.");
-			}else if(streq(insns[opcode], "ca")){
-				puts(" Maybe: Computed Jump through register A");
-			}else if(streq(insns[opcode], "cb")){
-				puts(" Maybe: Computed Jump through register B");
-			}else if(streq(insns[opcode], "astp")){
-				puts(" Stack manip, maybe retrieving function arguments?");
-			}else if(streq(insns[opcode], "call")){
-				puts(" Local Procedure Call");
-			}else if(streq(insns[opcode], "farcall")){
-				puts(" Procedure Call");
-			}else if(streq(insns[opcode], "lfarpc")){
-				puts(" Region Jump");
-			}else if(streq(insns[opcode], "farjmprx0")){
-				puts(" Far Jump");
-			}else if( streq(insns[opcode], "farllda")
-					||streq(insns[opcode], "farlldb")
-					||streq(insns[opcode], "farldc")
-					||streq(insns[opcode], "farldrx0")
-					||streq(insns[opcode], "farldrx1")
-					||streq(insns[opcode], "farldrx2")
-					||streq(insns[opcode], "farldrx3")
-					||streq(insns[opcode], "lda")
-					||streq(insns[opcode], "ldb")
-					||streq(insns[opcode], "ldc")
-					||streq(insns[opcode], "llda")
-					||streq(insns[opcode], "lldb")
-			){
-				puts(" Likely: Loading from fixed position variable.");
-			}else if( streq(insns[opcode], "farstla")
-					||streq(insns[opcode], "farstlb")
-					||streq(insns[opcode], "farstc")
-					||streq(insns[opcode], "farstrx0")
-					||streq(insns[opcode], "farstrx1")
-					||streq(insns[opcode], "farstrx2")
-					||streq(insns[opcode], "farstrx3")
-					||streq(insns[opcode], "sta")
-					||streq(insns[opcode], "stb")
-					||streq(insns[opcode], "stc")
-					||streq(insns[opcode], "stla")
-					||streq(insns[opcode], "stlb")
-			){
-				puts(" Likely: Storing to fixed position variable.");
-			}else if(streq(insns[opcode], "cpc")){
-				puts(" Very Likely: Loop top.");
-			}else {printf("\n");}
-			if(unfinished_flag){
-				puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
-				goto end;
 			}
 		}
 		if((n_halts + n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
@@ -1117,6 +1125,10 @@ int main(int argc, char** argv){
 			clear_output = 1;
 			outfilename = NULL;
 
+		}
+		if(	strprefix("-nc",argv[i-2])
+			||strprefix("--no-comments",argv[i-2])) {
+			enable_dis_comments = 0;
 		}
 		if(strprefix("--disassemble",argv[i-2]) || strprefix("-dis",argv[i-2]) ){
 			unsigned long loc;
@@ -1317,6 +1329,7 @@ int main(int argc, char** argv){
 			puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
 			return 0;
 		}
+
 		if(strprefix("-DBG",argv[i])) {
 			debugging = 1;
 			ASM_PUTS("<ASM> Debugging.\n");
