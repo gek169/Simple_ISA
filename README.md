@@ -2,6 +2,8 @@
 
 SISA16 is an extremely lightweight virtual machine designed to replace languages like Lua for program extension.
 
+it executes identically on every major platform and computer architecture. 
+
 ## Why is SISA16 special?
 
 * Minimal dependence on the host operating system. A very minimal C standard library will build the assembler
@@ -22,11 +24,8 @@ SISA16 is an extremely lightweight virtual machine designed to replace languages
 
 * Ready for deployment. the assembler can build, execute, and disassemble binaries for debugging.
 
-* Public domain. No IP attachments whatsoever. The only IP restriction on the entire repository is the
-	Ncurses binding in d.h. There are 4 lines under the Ncurses license,
-	which is a permissive free software license.
-	If you want to have fully public-domain code,
-	compile without Ncurses.
+* Public domain. 
+	NOTE: The provided example textmode driver includes four lines under the Ncurses license. See d.h.
 
 Build Statuses:
 
