@@ -50,7 +50,7 @@ asm_end_region_restriction;
 
 VAR#line_length#120
 VAR#line_length_plus_1#121
-VAR#wait_time#30
+VAR#wait_time#20
 
 section 0x10000;
 asm_begin_region_restriction;
