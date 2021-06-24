@@ -14,38 +14,7 @@ VAR#ascii_greyscale#@
 bytes 0
 
 
-section 0x20000;asm_begin_region_restriction;
-//variable used for waiting thousandths of a second.
-VAR#ld_wait_ms#sc%0x2%;llb %@%;farillda;
-VAR#st_wait_ms#sc%0x2%;llb %@%;faristla;
-//storage for that variable
-nop;nop;
-//prototype: wait(short milliseconds)
-//for very small values it may erroneously wait a long time.
-VAR#proc_wait#sc%@%;la2;farcall;
-	//retrieve our argument and store it in the desginated spot.
-	astp;
-	lb5;
-	sub;
-	illdaa;
-	st_wait_ms;
-	//calculate the target time to stop at.
-	clock;
-	alpush;
-		ld_wait_ms;
-	blpop;
-	add;
-	st_wait_ms;
-	VAR#wait_looptop#@
-	clock;
-	alpush;
-		ld_wait_ms;
-	blpop;
-	cmp;
-	sc %wait_looptop%;
-	jmpifneq;
-farret;
-asm_end_region_restriction;
+ASM_header libc.hasm
 
 
 VAR#line_length#120

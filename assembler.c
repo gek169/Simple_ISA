@@ -1005,6 +1005,8 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					puts(" Likely: Far memory array access through RX0. Check array alignment!");
 				}else if(streq(insns[opcode], "jmpifneq")){
 					puts(" Conditional Jump");
+				}else if(streq(insns[opcode], "clock")){
+					puts(" Interact with system time (see manpage) the A register is the time in milliseconds after this insn.");
 				}else if(streq(insns[opcode], "emulate_seg")){
 					puts(" Sandboxing Insn with Shared Segment. Jumps to 0x000000 and catches exceptions");
 				}else if(streq(insns[opcode], "emulate")){
