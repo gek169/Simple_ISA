@@ -19,7 +19,7 @@ section 0x20000;asm_begin_region_restriction;
 VAR#ld_wait_ms#sc%0x2%;llb %@%;farillda;
 VAR#st_wait_ms#sc%0x2%;llb %@%;faristla;
 //storage for that variable
-halt;halt;
+nop;nop;
 //prototype: wait(short milliseconds)
 //for very small values it may erroneously wait a long time.
 VAR#proc_wait#sc%@%;la2;farcall;
