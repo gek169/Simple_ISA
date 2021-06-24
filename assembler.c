@@ -908,7 +908,6 @@ static char* compile_line(char* line_in){
 }
 */
 static int disassembler(char* fname, unsigned long location, unsigned long SISA16_DISASSEMBLER_MAX_HALTS){
-	/*Disassemble for exactly 64k.*/
 	unsigned long n_halts = 0;
 	unsigned long n_illegals = 0;
 	FILE* f; unsigned long i = location & 0xffFFff;
@@ -992,6 +991,13 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				if(unfinished_flag) printf("(E_UNFINISHED_EOF AT ARGUMENT %u)", unfinished_flag-1);
 				if(streq(insns[opcode], "farret")){
 					puts(" End of Procedure");
+				}else if(
+					streq(insns[opcode], "lla") 
+					|| streq(insns[opcode], "llb")
+				)
+				{
+					if( (short_interpretation & 0xFF00) == 0)
+						puts(" <TIP> replace with single-byte assignment, high byte is zero.");
 				}else if(streq(insns[opcode], "ret")){
 					puts(" End of Local Procedure");
 				} else if(opcode == 0 && n_halts == 1){
