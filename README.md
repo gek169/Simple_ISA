@@ -16,8 +16,13 @@ it executes identically on every major platform and computer architecture.
 
 	The emulator and assembler are confirmed to work on many different architectures of varying endiannesses.
 
-* Unique. SISA16 is no ordinary virtual machine. 
-	it is self-sandboxing (Self-encapsulating, capable of creating Jails)
+* Unique. SISA16 is no ordinary virtual machine language...
+
+	* Self-sandboxing- run code while handling errors and handling side effects.
+
+	* Tiny- Less than 100 kilobytes for a full emulator and assembler toolchain!
+
+	* Hackable- More instructions can be added at a whim.
 
 * Trivially embeddable. Implement five small and easy-to-understand functions in a single header file
 	to add SISA16 scripting to any system.
@@ -25,7 +30,8 @@ it executes identically on every major platform and computer architecture.
 * Ready for deployment. the assembler can build, execute, and disassemble binaries for debugging.
 
 * Public domain. 
-	NOTE: The provided example textmode driver includes four lines under the Ncurses license. See d.h.
+
+	* (NOTE: The provided example textmode driver includes four lines under the Ncurses license. See d.h.)
 
 Build Statuses:
 
@@ -41,8 +47,6 @@ Ubuntu (x86_64):
 
 This repository contains the SISA16 standalone emulator source, 
 the macro assembler/disassembler which doubles as an emulator,
-and a C++ proof-of-concept of a compiletime instruction set simulator, which
-inspired this project.
 
 # What does the Assembly language look like?
 
