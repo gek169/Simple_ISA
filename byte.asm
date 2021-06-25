@@ -1,11 +1,8 @@
 #!/usr/local/bin/sisa16_asm -run
-//leave 10 bytes of free space at the beginning.
 section 0;
 	sc %10%; jmp;
-
 section 10;
 	getchar;
-//push it
 	apush;
 	lb 4;rsh;
 	lb0xf;and;
