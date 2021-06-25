@@ -59,6 +59,12 @@ int main(int rc,char**rv){
 			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
 			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
+#if defined(NO_SEGMENT)
+			puts("The segment was disabled during compilation. Emulate is also disabled.");
+#else
+			puts("The segment is enabled, so is Emulate.");
+#endif
+
 #if defined(NO_FP)
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
 #else
@@ -235,11 +241,13 @@ int main(int rc,char**rv){
 	}
 		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
 	fclose(F);
+#if !defined(NO_SEGMENT)
 	{
 		SEGMENT = calloc(1,256);
 		SEGMENT_PAGES = 1;
 	}
 	if(!SEGMENT){puts("Segment Allocation Failed.");return 1;}
+#endif
 	R=0;e();
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
@@ -276,4 +284,11 @@ int main(int rc,char**rv){
 			puts("\n<Errfl, Internal error, Broken Float-Int Interop. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 			R=0;
 		}
+	if(R==14){
+#if defined(NO_SEGMENT)
+		puts("\n<Errfl, Segment Disabled>");
+#else
+		puts("\n<Errfl, Internal error, Reporting segment disabled but not set that way at compiletime. Report this bug! https://github.com/gek169/Simple_ISA/   >");
+#endif
+	}
 }

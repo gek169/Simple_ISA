@@ -508,14 +508,24 @@ Z8:RX0=RX0^RX1;D
 Z9:RX0=~RX0;D
 ZA:if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;D
 ZB:
+#if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	memcpy(M + 0x100 * ((size_t)(RX0&0xffFF)), SEGMENT + 0x100 * ((size_t)RX1), 0x100);
 	D
+#else
+	R=14; goto G_HALT;
+#endif
 ZC:
+#if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
 	D
-ZD:{
+#else
+	R=14; goto G_HALT;
+#endif
+ZD:
+#if !defined(NO_SEGMENT)
+{
 		u* SEGMENT_OLD = SEGMENT;
 		register UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 		if(RX0 == 0)	{R=6;goto G_HALT;}
@@ -535,6 +545,11 @@ ZD:{
 			for(;i<end;i++)SEGMENT[i] = 0;
 		}
 	}D
+#else
+	R=14; goto G_HALT;
+#endif
+
+
 #ifdef NO_FP
 /*no floating point unit.*/
 /*
@@ -712,6 +727,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA28:a--;D
 	G_AA29:RX0++;D
 	G_AA30:RX0--;D
+#if !defined(NO_SEGMENT)
 	G_AA31:{
 		u* M_SAVED = NULL;
 		
@@ -747,6 +763,9 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 	}D
+#else
+	G_AA31: R=14; goto G_HALT;
+#endif
 #if defined(NO_FP) || defined(NO_SIGNED_DIV)
 	G_AA32:
 	G_AA33:
@@ -769,6 +788,7 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = lRX0;
 	}D
 #endif
+#if !defined(NO_SEGMENT)
 	G_AA34:{
 		u* M_SAVED = NULL;
 		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
@@ -790,6 +810,9 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 	}D
+#else
+	G_AA34: R=14; goto G_HALT;
+#endif
 /*add more insns here.*/
 G_HALT:dcl();return 0;
 }

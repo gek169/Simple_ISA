@@ -1164,6 +1164,11 @@ int main(int argc, char** argv){
 			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
 			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
+#if defined(NO_SEGMENT)
+			puts("The segment was disabled during compilation. Emulate is also disabled.");
+#else
+			puts("The segment is enabled, so is Emulate.");
+#endif
 #if defined(NO_FP)
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
 #else
@@ -2636,12 +2641,14 @@ int main(int argc, char** argv){
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		UU i=0, j=~(UU)0;
 		SUU q_test=(SUU)-1;
+#if !defined(NO_SEGMENT)
 		SEGMENT = calloc(1,256);
 		SEGMENT_PAGES = 1;
 		if(SEGMENT == NULL){
 			puts("<SISA16 EMULATOR ERROR: Could not allocate segment>");
 			return 1;
 		}
+#endif
 		if(
 			(sizeof(U) != 2) ||
 			(sizeof(u) != 1) ||
@@ -2714,6 +2721,13 @@ int main(int argc, char** argv){
 		{
 			puts("\n<Errfl, Internal error, Broken Float-Int Interop. Report this bug! https://github.com/gek169/Simple_ISA/  >\n");
 			R=0;
+		}
+		if(R==14){
+#if defined(NO_SEGMENT)
+			puts("\n<Errfl, Segment Disabled>");
+#else
+			puts("\n<Errfl, Internal error, Reporting bad segment but not set that way at compiletime. Report this bug! https://github.com/gek169/Simple_ISA/   >");
+#endif
 		}
 		
 	}

@@ -67,11 +67,19 @@ static unsigned short interrupt(unsigned short a,
 {
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
-		for(i=0;i<(1<<24)-31;i+=32)	
+		for(i=0;i<(1<<24)-31;i+=32)
 			for(j=i,printf("%s\r\n%04lx|",(i&255)?"":"\r\n~",i);j<i+32;j++)
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 	}
-	if(a == 0xffFE){ /*Disk Read.*/
+
+
+	if(
+#if !defined(NO_SEGMENT)
+	a == 0xffFE
+#else
+	0
+#endif
+	){ /*Disk Read.*/
 		UU i; char buf[0x10000];
 		for(i = 0; i<0x10000; i++){
 			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
@@ -111,7 +119,13 @@ static unsigned short interrupt(unsigned short a,
 		return 1;
 	}
 #if !defined(FUZZTEST)
-	if(a == 0xffFD){ /*Disk Write*/
+	if(
+#if !defined(NO_SEGMENT)
+	a == 0xffFD
+#else
+	0
+#endif
+	){ /*Disk Write*/
 		UU i; char buf[0x10000];
 		for(i = 0; i<0x10000; i++){
 			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
