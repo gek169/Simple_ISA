@@ -1,4 +1,3 @@
-#!/usr/local/bin/tcc -run
 #include <stdio.h>
 
 /*
