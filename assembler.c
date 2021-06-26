@@ -331,7 +331,8 @@ unsigned char insns_numargs[212] = {
 	0,0,0,0,/*Indirect Stores*/
 	0, /*Direct jump.*/
 	2,2,2, /*store shorts A,B,and C*/
-	2,2,0,0, /*stack pointer ops*/
+	2,2, /*push, pop*/
+	0,0, /*pusha, popa*/
 	0,0, /*retrieve the stack pointer and put it in a or b*/
 	0, /*Compl*/
 	/*call structure.*/
