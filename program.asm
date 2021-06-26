@@ -108,6 +108,9 @@ seg_st;
 lrx0 %/0xffff%;
 seg_ld;
 interrupt;
+lrx0 %-20%;
+lrx1 %/5%;
+rxicmp
 halt
 
 

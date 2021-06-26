@@ -92,7 +92,7 @@ k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AA27;k 204:goto G_AA28;k 205:goto G_AA29;\
 k 206:goto G_AA30;k 207:goto G_AA31;\
 k 208:goto G_AA32;k 209:goto G_AA33;\
-k 210:goto G_AA34;k 211:k 212:k 213:k 214:k 215:k 216:k 217:\
+k 210:goto G_AA34;k 211:goto G_RXICMP;k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -301,7 +301,8 @@ const void* const goto_table[] = {&&G_HALT,&&G_LDA,&&G_LA,&&G_LDB,&&G_LB,&&G_SC,
 &&G_AA32,
 &&G_AA33,
 &&G_AA34,
-&&G_NOP,&&G_NOP,&&G_NOP,
+&&G_RXICMP,
+&&G_NOP,&&G_NOP,
 &&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,
 &&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,
 &&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,
@@ -814,5 +815,16 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA34: R=14; goto G_HALT;
 #endif
 /*add more insns here.*/
+G_RXICMP:
+{
+SUU RX0I = RX0;
+SUU RX1I = RX1;
+	if(
+		RX0I<RX1I
+	)a=0;else if(
+		RX0I>RX1I
+	)a=2;else a=1;
+}
+D
 G_HALT:dcl();return 0;
 }

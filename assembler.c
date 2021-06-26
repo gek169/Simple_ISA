@@ -76,7 +76,7 @@ char* infilename = NULL;
 char* variable_names[65535] = {0};
 char* variable_expansions[65535] = {0};
 char variable_is_redefining_flag[65535] = {0};
-char* insns[211] = {
+char* insns[212] = {
 	"halt",
 	"lda",
 	"la",
@@ -307,9 +307,10 @@ char* insns[211] = {
 	"emulate",
 	"rxitof",
 	"rxftoi",
-	"emulate_seg"
+	"emulate_seg",
+	"rxicmp"
 };
-unsigned char insns_numargs[211] = {
+unsigned char insns_numargs[212] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -419,10 +420,12 @@ unsigned char insns_numargs[211] = {
 		/*float-int interop*/
 		0,0,
 		/*emulate_seg*/
+		0,
+		/*rxicmp*/
 		0
 		
 };
-char* insn_repl[211] = {
+char* insn_repl[212] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -658,9 +661,10 @@ char* insn_repl[211] = {
 	/*Float-Int Interop*/
 		"bytes208;","bytes209;",
 	/*emulate_seg*/
-		"bytes210;"
+		"bytes210;",
+		"bytes211;"
 };
-static const unsigned int n_insns = 211;
+static const unsigned int n_insns = 212;
 char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;

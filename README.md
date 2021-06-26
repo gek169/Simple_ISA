@@ -511,6 +511,8 @@ rxftoi: convert RX0 from float to signed int. (1 byte) (D1)
 
 emulate_seg: Same as Emulate, but the segment is passed down to the child. (1 byte) (D2)
 
+rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
+
 The rest: nop duplicates, free for expansion (1 byte)
 ```
 There are plenty of free instruction spots for you to play around with in your experimentation.
