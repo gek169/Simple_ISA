@@ -53,8 +53,7 @@ VAR#asciifun_looptop#@
 		ld_iteration_count;
 		blpop;blpush;
 		add;
-		lb 18;
-		mod;
+		lb 18;mod;
 		//we now have the offset calculated in register a.
 		sc %0x4%; 
 		llb %ascii_greyscale%;
