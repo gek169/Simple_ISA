@@ -1825,8 +1825,7 @@ int main(int argc, char** argv){
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
-		/*Not performed on MACRO Lines.*/
-		
+		/*MACRO_EXPANSION*/
 		if(strfind(line,"VAR#")!= -1) was_macro=1; else was_macro = 0;
 		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
 			do{
@@ -2074,7 +2073,7 @@ int main(int argc, char** argv){
 		if(debugging){
 			if(!clear_output)printf("\n~~Is this a macro?~~\n");
 		}
-
+		/*MACRO_DEFINITION_STAGE*/
 		if(strprefix("VAR",line)){ long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
 			unsigned short index;
 			if(debugging){
@@ -2301,12 +2300,6 @@ int main(int argc, char** argv){
 		}
 
 		if(was_macro) goto end;
-		/*
-			if(strfind(line, "|")!=-1){
-				line[strfind(line, "|")] = ';';
-				goto pre_pre_processing;
-			}
-		*/
 		/*We must first determine if this line contains a line comment. Don't search past the line comment for insns.*/
 		if(strfind(line, "//") != -1){
 			long loc_line_comment = strfind(line, "//");
@@ -2324,7 +2317,7 @@ int main(int argc, char** argv){
 			how many commas we're supposed to encounter.
 			the first comma beyond that before the next semicolon, is replaced with a semicolon.
 		*/
-		
+		/*INSN_EXPANSION_STAGE*/
 			{unsigned char have_expanded = 0; unsigned short iteration = 0;
 			do{
 				have_expanded = 0;
@@ -2444,7 +2437,7 @@ int main(int argc, char** argv){
 		}
 		metaproc = line; /*declaration at beginning of main.*/
 		do{ long incr, incrdont;
-			if(strprefix("bytes", metaproc)){ char* proc;
+			if(strprefix("bytes", metaproc)){ char* proc; /*VERY_BASIC_THINGS_IT_CAN_DO*/
 				proc = metaproc + 5;
 				do{
 					unsigned char byteval; unsigned long preval; 
@@ -2541,7 +2534,7 @@ int main(int argc, char** argv){
 					if(proc[0] == '+') mode=0; else
 					if(proc[0] == '-') mode=1; else
 					{
-						printf("\n<ASM SYNTAX ERROR> asm_correct_outp lacks a + or -.Line:\n%s\n", line_copy);
+						printf("\n<ASM SYNTAX ERROR> asm_fix_outputcounter lacks a + or -.Line:\n%s\n", line_copy);
 						goto error;
 					}proc++;
 					outputcounterold = outputcounter;
