@@ -1419,7 +1419,6 @@ int main(int argc, char** argv){
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
-		/*if this line ends in a backslash...*/
 		if(!line) {
 			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
 			goto error;
@@ -1429,6 +1428,7 @@ int main(int argc, char** argv){
 			line = strcatalloc(line+1,"");
 			free(line_old);
 		}
+		/*if this line ends in a backslash...*/
 		while(!feof(infile) && strlen(line) > 0 && !strprefix("!",line) && !strprefix("//",line) && !strprefix("#",line) && line[strlen(line)-1] == '\\'){char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced(infile, &linesize, '\n', 1);
@@ -1436,7 +1436,6 @@ int main(int argc, char** argv){
 			linesize = strlen(line);
 		}
 		line_copy = strcatalloc(line,"");line_num++;
-
 		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
@@ -1571,7 +1570,7 @@ int main(int argc, char** argv){
 			goto pre_pre_processing;
 		}
 		if(strprefix("ASM_COPYRIGHT", line)){
-			ASM_PUTS("SISA-16 Assembler, Disassembler, and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.");
+			ASM_PUTS("SISA-16 Assembler, Disassembler, and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.\nLet all that you do be done with love.\n");
 			goto end;
 		}
 		if(strprefix("asm_help", line) || strprefix("ASM_HELP", line)){
