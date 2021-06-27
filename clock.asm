@@ -1,13 +1,13 @@
 #!/usr/local/bin/sisa16_asm -run
 //create a whole-memory image.
 
-VAR#ZERO_STACK_POINTER#		astp;popa;
-VAR#POP_FARPTR_VARIABLE#	blpop;apop;ca;
-VAR#PUSH_FARPTR_VARIABLE#	ac;apush;blpush;
+.ZERO_STACK_POINTER:		astp;popa;
+.POP_FARPTR_VARIABLE:	blpop;apop;ca;
+.PUSH_FARPTR_VARIABLE:	ac;apush;blpush;
 
 //global variables.
-VAR#ld_iteration_count#	farllda %&0x440000%;
-VAR#st_iteration_count#	farstla %&0x440000%;
+.ld_iteration_count:	farllda %&0x440000%;
+.st_iteration_count:	farstla %&0x440000%;
 
 
 
