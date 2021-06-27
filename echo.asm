@@ -89,13 +89,13 @@ nop;nop;nop;nop;nop;
 nop;nop;nop;nop;nop;
 
 //if you type in a q, you get ten Qs.
-VAR#Lbl_BONUSDUCKS#@
+:Lbl_BONUSDUCKS:
 	la 0xa;putchar;
 	la 0xd;putchar;
 	la 0;rx0a;
-	VAR#Bonusducks_looptop#@
+	:Bonusducks_looptop:
 		//how many Qs to print.
-		VAR#numQs#5
+		.numQs:7
 			la 0x51;putchar;
 			arx0;lb1;add;rx0a;
 			sc %Bonusducks_looptop%;arx0;lb numQs;cmp;lb0;cmp;jmpifeq;
@@ -103,7 +103,7 @@ VAR#Lbl_BONUSDUCKS#@
 		lrx1 %/0%;
 		rxidiv;
 
-VAR#Lbl_BROKE_EMU#@
+:Lbl_BROKE_EMU:
 	la0xd;putchar;
 	la69;putchar;
 	la82;putchar;
@@ -117,13 +117,10 @@ VAR#Lbl_BROKE_EMU#@
 	lrx1 %/0%;
 	rximod;
 	nop;nop;nop;
-VAR#Lbl_Emulator#@
+:Lbl_Emulator:
 	//print an R.
 	la0x52;
 	putchar;
-	//specifically to use a bunch of memory. 2.56 Megabytes (not Mebib).
-	//lrx0 %/100000%;
-	//seg_realloc;
 	la 0xff;
 	//execute the emulator!
 	emulate_seg;
