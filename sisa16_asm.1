@@ -747,9 +747,7 @@ farstrx0 0xAE, 0x00, 0x00;
 .TP
 Macros may only be defined by the following:
 
-1) asm_call (re) defines _argXXX_ macros.
-
-2) VAR# lines define a macro to be all of the text after the second pound symbol.
+1) VAR# lines define a macro to be all of the text after the second pound symbol.
 
 .TP
 This is what happens when you define a macro:
@@ -779,12 +777,10 @@ The assembler follows this order of execution, for every line, roughly:
 
 1) Backslash newline escapes (for non-special line types) are handled, and preceding whitespace is removed.
 
-2) Special line types are recognized (String litera, ASM_header, ASM_data_include, and ASM_compile)
-which do not involve any macro definition.
+2) Special line types are recognized (String literal, ASM_header, ASM_data_include, syntactic sugars, and ASM_compile)
+which do not involve any macro definition. 
 
-3) Pre-processing asm_muleq, asm_pleq, and asm_call are recognized (Only on non-VAR# lines, before the vertical bar)
-
-4) The line is checked to see if it is a macro line (VAR#)
+3) The line is checked to see if it is a macro line (VAR#)
 
 5) Macros are expanded on the current line, until the first vertical bar. If at any point one of the
 pre-processing macros is discovered before the first vertical bar, jump back to 3. VAR# lines only have the $ and @ symbols parsed...
