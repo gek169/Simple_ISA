@@ -4,7 +4,8 @@
 getchar; 
 farstla %&0x20000%; 
 putchar;
-lb 0x38; cmp; lb 0; cmp; sc %Lbl_val_is_lt%; jmpifeq;
+lb 0x38; cmp; lb 0; cmp; 
+sc %Lbl_val_is_lt%; jmpifeq;
 sc %Lbl_val_is_gte%; jmp;
 
 :Lbl_val_is_lt:
