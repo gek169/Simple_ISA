@@ -4,18 +4,11 @@ section 0xFFffFF;bytes 0,0;
 //define the regions to use.
 //we also need to define these ADDR variables, just set them to zero.
 VAR#DATA_REGION_1#0x2A
-VAR#DATA_REGION_1_ADDR#0
+VAR#DATA_REGION_1_ADDR#0x2A0000
 VAR#__START__#0x1
-VAR#__START___ADDR#0
+VAR#__START___ADDR#0x10000
 VAR#LIBC_START#0x12
-VAR#LIBC_START_ADDR#0
-
-
-VAR#CALCULATE_REGION_LOCATION#asm_muleq#\_arg1__ADDR#0#;|asm_pleq#\_arg1__ADDR#0x10000#;|asm_muleq#\_arg1__ADDR#\_arg1_#;
-
-asm_call#CALCULATE_REGION_LOCATION#DATA_REGION_1##;
-asm_call#CALCULATE_REGION_LOCATION#__START__##;
-asm_call#CALCULATE_REGION_LOCATION#LIBC_START##;
+VAR#LIBC_START_ADDR#0x120000
 
 
 //macros

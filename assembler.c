@@ -1454,6 +1454,32 @@ int main(int argc, char** argv){
 					fputbyte(line[i], ofile);
 			goto end;
 		}
+		if(strprefix(".",line)){
+			long loc_colon = strfind(line, ":");
+			if(loc_colon != -1){
+				line = str_repl_allocf(line, ".", "VAR#");
+				line = str_repl_allocf(line, ":", "#");
+			} else {
+				printf("<ASM SYNTAX ERROR> Syntactic sugar macro declaration without colon! Line:\n%s\n", line_copy);
+				goto error;
+			}
+		}
+		if(strprefix(":", line)){
+			char*  line_old = line;
+			long loc_colon2 = strfind(line+1, ":");
+			if(loc_colon2 == -1){
+				printf("<ASM SYNTAX ERROR> Syntactic sugar label declaration without second colon! Line:\n%s\n", line_copy);
+				goto error;
+			}
+			line = strcatallocf2(
+				"VAR#",
+				strcatallocf1(
+					str_null_terminated_alloc(line+1, loc_colon2),
+					"#@"
+				)
+			);
+			free(line_old);
+		}
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
 			const char* env_sisa16bin = getenv("SISA16BIN");
@@ -1582,244 +1608,6 @@ int main(int argc, char** argv){
 			ASM_PUTS("For help, See: man sisa16_asm");
 			goto end;
 		}
-		else if ((!strprefix("VAR#", line)) /*Do not parse asm_pleq's inside of a VAR# line.*/
-					&& (strfind(line, "asm_pleq#") != -1 || strfind(line, "asm_muleq#") != -1) /*We have found one!*/
-					){ /*SYNTAX: asm_pleq#variable_name#variable_name# or asm_muleq*/
-			char expansion[1024]; long val1; long val2; long loc_middle_pound = -1; long len_to_replace = 0;
-			char* proc; char* line_old; char var2_is_variable=0;
-			char* varname1 = NULL; 
-			char* varname2 = NULL; char* before; char* after;
-			char* command_name; long loc_pleq=-1, loc_muleq=-1, loc = -1; 
-			long loc_call = -1;
-			long var1ind = -1;
-			long var2ind = -1;
-			unsigned long variable_i;
-			long loc_end_pound = -1;
-			/*CODE SECTION*/
-			line_old = line;
-			/*First we have to figure out what this even is. Is this a pleq command? Muleq?
-			And, is there a call we should evaluate first? */
-			loc_pleq = strfind(line, "asm_pleq#");
-			loc_muleq = strfind(line, "asm_muleq#");
-			loc_call = strfind(line, "asm_call#");
-			if(loc_pleq != -1 && loc_muleq == -1)
-				{loc = loc_pleq;command_name = "asm_pleq#";}
-			else if(loc_pleq == -1 && loc_muleq != -1)
-				{loc = loc_muleq;command_name = "asm_muleq#";}
-			else if(loc_pleq < loc_muleq)
-				{loc = loc_pleq;command_name = "asm_pleq#";}
-			else if(loc_muleq < loc_pleq)
-				{loc = loc_muleq;command_name = "asm_muleq#";}
-			else {
-				printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
-				goto error;
-			}
-			if(loc_pleq == -1 && loc_muleq == -1){
-				printf("<ASM INTERNAL ERROR> Faulty math statement recognition. Line:\n%s\n", line_copy);
-				goto error;
-			}
-			len_to_replace = strlen(command_name);
-			/*If there is a call before us, we must process it first.*/
-			if(loc_call != -1 && 
-				loc_call < loc) 
-			{
-				/*if(!clear_output)printf("\nDeferring to a call statement before us. Line internally:\n%s\nUs:\n%s\nCall:\n%s\n", line, line + loc, line + loc_call);*/
-				goto process_asm_call;
-			} /*We have to evaluate it first.*/
-			/*Sequence break before this point- do not allow to continue.*/
-			if(strfind(line, "|") != -1 &&
-				strfind(line, "|") < loc)
-				goto process_asm_call;
-			proc = line_old + loc + strlen(command_name);
-			before = str_null_terminated_alloc(line_old, loc);
-			if(proc[0] != '\\'){
-				printf("<ASM SYNTAX ERROR> %s cannot reference a variable. It is not escaped. Line:\n%s\n", command_name, line_copy);
-				goto error;
-			}
-			proc++;len_to_replace++;
-			if(proc[0] == 0){
-				printf("<ASM SYNTAX ERROR> %s is at the end of the line. Line:\n%s\n",command_name, line_copy);
-				goto error;
-			}
-			
-			loc_middle_pound = strfind(proc,"#");
-			if(loc_middle_pound < 1){
-				printf("<ASM SYNTAX ERROR> %s lacks second pound. Line:\n%s\n",command_name, line_copy);
-				goto error;
-			}
-			
-			varname1 = str_null_terminated_alloc(proc, loc_middle_pound);
-			proc += loc_middle_pound+1;
-			len_to_replace += loc_middle_pound+1;
-			loc_end_pound = strfind(proc,"#");
-			if(loc_middle_pound < 1){
-				printf("<ASM SYNTAX ERROR> %s lacks end pound. Line:\n%s\n", command_name, line_copy);
-				goto error;
-			}
-			if(proc[0] == '\\'){
-				var2_is_variable = 1;
-				proc++; len_to_replace++;
-				loc_end_pound--;
-			}
-			varname2 = str_null_terminated_alloc(proc, loc_end_pound);
-			len_to_replace++; len_to_replace+=loc_end_pound;
-			if(npasses == 1 && debugging)
-			if(!clear_output)printf("\n%s invoked with \'%s\' and \'%s\'. the second is %s \n",command_name, varname1, varname2,
-				var2_is_variable?"a variable.":"an integer literal.");
-			for(variable_i = nbuiltin_macros; variable_i < nmacros; variable_i++){
-				if(streq(varname1, variable_names[variable_i]))
-					var1ind = variable_i;
-				if(streq(varname2, variable_names[variable_i]))
-					var2ind = variable_i;
-			}
-			if(var1ind == -1){
-				printf("<ASM SYNTAX ERROR> asm_pleq cannot identify macro \'%s\'. Line:\n%s\n", varname1, line_copy);
-				goto error;
-			}
-			variable_is_redefining_flag[var1ind] = 1;
-			val1 = strtol(variable_expansions[var1ind], NULL, 0);
-			if(var2_is_variable)
-				val2 = strtol(variable_expansions[var2ind], NULL, 0);
-			else
-				val2 = strtol(varname2, NULL, 0);
-			if(debugging)
-			if(!clear_output)printf("val 1 is %ld, 2 is %ld\n", val1, val2);
-			/*Free variable names.*/
-			free(varname1);
-			free(varname2);var2ind=-1;
-			
-			/*Do math.*/
-			{	unsigned long uval2, uval1;
-				memcpy(&uval1, &val1, sizeof(unsigned long));
-				memcpy(&uval2, &val2, sizeof(unsigned long));
-				if(streq(command_name, "asm_pleq#"))
-					uval1+=uval2;
-				else if(streq(command_name, "asm_muleq#"))
-					uval1*=uval2;
-				memcpy(&val1, &uval1, sizeof(unsigned long));
-			}
-			
-			sprintf(expansion, "%ld", val1);
-			
-			if(variable_expansions[var1ind])
-				free(variable_expansions[var1ind]);
-			else {
-				printf("<ASM INTERNAL ERROR> variable had a null expansion? Line:\n%s\n", line_copy);
-				goto error;
-			}
-			
-			variable_expansions[var1ind] = strcatalloc(expansion, "");
-			/*TODO: handle before, after, and line expansion stuff.*/
-			after = strcatalloc(line+loc+len_to_replace, "");
-			if(debugging)
-				if(!clear_output)printf("before: \n%s\n after: \n%s", before, after);
-			line = strcatallocfb(
-				before,
-				after
-			);
-			free(line_old);
-			goto pre_pre_processing;
-		}
-		process_asm_call:;
-		if(
-			(!strprefix("VAR#", line)) /*Do not parse asm_call's inside of a VAR# line.*/
-			&& (strfind(line, "asm_call#") != -1) /*We have found one!*/
-			&& !((strfind(line, "|") != -1) && strfind(line, "|") < strfind(line, "asm_call#")  ) /*No sequence point operator.*/
-			){
-			char* f, *before, *after, *content; long next_pound = -1; long found_macro_id=-1;
-			unsigned long i = 0;char* macro_name=0;
-			f = line + strfind(line, "asm_call#") + strlen("asm_call#");
-			before = str_null_terminated_alloc(line, strfind(line, "asm_call#"));
-			/*The string immediately after the first # is the macro to call.
-			the arguments thereafter are arg1, arg2, arg3... */
-			next_pound = strfind(f, "#");
-			if(next_pound == -1) {
-				printf("<ASM SYNTAX ERROR> macro call lacking any succeeding pounds.Line:\n%s\n", line_copy);
-				goto error;
-			}
-			macro_name = str_null_terminated_alloc(f, next_pound);
-			/*if(!clear_output)printf("\nMacro call attempt detected on macro \'%s\'", macro_name);*/
-			{
-				unsigned long macro_i;
-				for(macro_i = 0; macro_i < nmacros; macro_i++)
-					if(streq(macro_name, variable_names[macro_i])){found_macro_id=macro_i;break;}
-				if(found_macro_id == -1){
-					printf("<ASM SYNTAX ERROR> macro call on non-existent macro.Line:\n%s\n", line_copy);
-					goto error;
-				}
-			}
-			content = strcatalloc(variable_expansions[found_macro_id],"");
-			if(debugging) if(!clear_output)printf("\nMacro call attempt on macro \'%s\'", macro_name);
-			f+=next_pound+1;
-			for(i=1;*f!='\0' && *f!='#';i++){
-				unsigned long macro_i;
-				char namebuf[64]; /*Holds name of argXXX*/
-				/*Used for defining the macro.*/
-				char* varname = NULL;
-				unsigned long replacements = 0;
-				const unsigned long max_repl = 0x10000;
-				char* vardef = NULL;
-				long overwriting = -1;/*if not negative, this means it's replacing something.*/
-				/*Check to see if we even can define a macro.*/
-				if(nmacros == 0xffff) {
-					printf("<ASM ERROR>  Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
-					goto error;
-				}
-				/*There is enough room for a macro.*/
-				sprintf(namebuf, "_arg%lu_", i);
-				varname = strcatalloc(namebuf, "");
-				if(debugging)
-					if(!clear_output)printf("\nReplacing %s...", varname);
-				/*We need to see if this macro already exists.*/
-				for(macro_i = 0; macro_i < nmacros; macro_i++)
-					if(streq(varname, variable_names[macro_i]))
-						overwriting = macro_i; /*It does!*/
-				if(overwriting == -1) {
-					overwriting = nmacros++;
-				}
-
-				/*get the definition*/
-				next_pound = strfind(f, "#");
-				if(next_pound == -1) {
-					printf("<ASM SYNTAX ERROR> macro call lacking end first pound.Line:\n%s\n", line_copy);
-					goto error;
-				}
-				vardef = str_null_terminated_alloc(f, next_pound);
-				f+=next_pound+1;
-				if(variable_names[overwriting]){free(variable_names[overwriting]);variable_names[overwriting] = NULL;}
-				if(variable_expansions[overwriting]){free(variable_expansions[overwriting]);variable_expansions[overwriting] = NULL;}
-				variable_names[overwriting] = varname;
-				variable_expansions[overwriting] = vardef;
-				if(debugging)
-					if(!clear_output)printf("\nReplacing %s with %s", varname, vardef);
-				/*replace _argXXX in content.*/
-				while(strfind(content, varname)!= -1 && replacements < max_repl){
-					char* content_before, *content_after;replacements++;
-					if(debugging) ASM_PUTS("Found an instance of a required replacement!");
-					content_before = str_null_terminated_alloc(content,strfind(content, varname));
-					content_after = strcatalloc(content+strfind(content, varname)+strlen(varname),"");
-					free(content); /**/
-					content = strcatallocfb(
-						content_before,
-						strcatallocf2(vardef, content_after)
-					);
-				}
-			}
-			if(*f != '#'){
-				printf("<ASM SYNTAX ERROR> macro call lacking end second pound.Line:\n%s\n", line_copy);
-				goto error;
-			}f++;
-			/*Get the after.*/
-			after = strcatalloc(f,"");
-			if(line) free(line);
-			line = strcatallocfb(
-				before,
-				strcatallocfb(content, after)
-			);
-			free(macro_name);
-			if(debugging) if(!clear_output)printf("\nThe line is now \n%s\nas a result of a macro call!\n", line);
-			goto pre_pre_processing; /*Allow recursive calling.*/
-		}
 
 		if(strlen(line) < 1) goto end; /*the line is empty*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
@@ -1838,17 +1626,6 @@ int main(int argc, char** argv){
 					if(!clear_output)printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 					if(was_macro)
 						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
-				}
-				{
-				long loc_vbar = strfind(line, "|");
-				if(loc_vbar == -1) loc_vbar = strlen(line);
-				if(!was_macro)
-					if( (strfind(line, "asm_call") != -1   && strfind(line, "asm_call") <loc_vbar) ||
-						(strfind(line, "asm_pleq") != -1   && strfind(line, "asm_pleq") <loc_vbar) ||
-						(strfind(line, "asm_muleq") != -1  && strfind(line, "asm_muleq")<loc_vbar)
-						){
-						goto pre_pre_processing; /*A macro has been expanded, resulting in an asm_call or math forming.*/
-					}
 				}
 				for(i = (was_macro?nbuiltin_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
 					char* line_old; long loc; long linesize; char found_longer_match;

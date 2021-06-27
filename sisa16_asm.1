@@ -570,22 +570,6 @@ everything after the second # is part of the macro.
 Several built-in macros are evaluated inside of macro definitions, such as @ and $.
 
 .TP
-.B asm_call
-
-you can call a macro that uses _arg1_, _arg2_, etc.
-
-asm_call#myMacro#5#myVariable##;
-
-these can be inline.
-
-.TP
-.B asm_pleq, asm_muleq
-
-if you have defined a macro as being a number, you can add and multiply with it.
-
-these can also be inline
-
-.TP
 .B Evaluation Sequence Points (|)
 
 you can use the unix pipe character | to stop the evaluation of macros to a certain point. 
