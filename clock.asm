@@ -39,14 +39,12 @@ section 0x10000;
 		arx2;
 		//jump to the top if the number of seconds elapsed is the same.
 		sc %main_looptop%;cmp;jmpifeq;
-
 		//the time elapsed is different! it is still in b.
 		rx2b;
 	//print seconds string.
 		la 0xAF;apush;lla %seconds_strings%;alpush;
 			proc_puts;
 		pop %3%;
-
 		arx2;apush;
 		lb8;rsh;apush;
 	//print the number of seconds.
