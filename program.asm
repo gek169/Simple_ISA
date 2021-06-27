@@ -34,71 +34,56 @@ bytes 0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD;
 bytes 0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD,0xA,0xD;
 
 section 0
-#loop control
-lda %0x1e8%
-lb 1
-sc %%;
-add
-#using split syntax
-sta %0x1e8%
-#grab our character from our array of characters
-llb %2%;sub;
-llb %0xF000%
-add
-illdaa;
-llb %255%;and;
-putchar
-
-
-
-#asm_fix_outputcounter+2;
-sc %_myLabel_%;
-
-
-#					asm_vars
-
-
-jmp;
-VAR#_myLabel_#@
-sc 0,0
-
-#perform the loop check
-lda 1,0xe8
-lb 0x41
-cmp;lb 0;cmp;jmpifeq
-
-
-
-
-//zero the stack pointer and then set it to a sensible value
-astp;popa;lla %0xE000%;pusha;
-lda %0x1e8%;putchar;
-
-sc %0xA0D0%;
-lla %0x1%
-//these operations should do nothing.
-alpush;alpush;
-lla %0x0%;
-alpop;alpop;
-farcall;
-#we should see this when we return.
-la 0x41
-putchar;putchar;putchar;
-//enable these two lines to dump the memory of the emulator after execution.
-lla %0xFFff%;
-//transfer code from the segment.
-lrx0 %/2000%;seg_realloc;
-lrx0 %/0x0%;
-lrx1 %/0%;
-seg_st;
-//transfer back from the segment.
-lrx0 %/0xffff%;
-seg_ld;
-interrupt;
-lrx0 %-20%;
-lrx1 %/5%;
-rxicmp
-halt
+	#loop control
+	lda %0x1e8%
+	lb 1
+	sc %%;
+	add
+	#using split syntax
+	sta %0x1e8%
+	#grab our character from our array of characters
+	llb %2%;sub;
+	llb %0xF000%
+	add
+	illdaa;
+	llb %255%;and;
+	putchar
+	sc %_myLabel_%;
+	jmp;
+	:_myLabel_:
+	sc 0,0
+	#perform the loop check
+	lda 1,0xe8
+	lb 0x41
+	cmp;lb 0;cmp;jmpifeq
+	//zero the stack pointer and then set it to a sensible value
+	astp;popa;lla %0xE000%;pusha;
+	lda %0x1e8%;putchar;
+	sc %0xA0D0%;
+	lla %0x1%
+	//these operations should do nothing.
+	alpush;alpush;
+		lla %0x0%;
+	alpop;alpop;
+	farcall;
+	#we should see this when we return.
+	la 0x41
+	putchar;putchar;putchar;
+	//enable these two lines to dump the memory of the emulator after execution.
+	lla %0xFFff%;
+	//transfer code from the segment.
+	lrx0 %/2000%;seg_realloc;
+	lrx0 %/0x0%;
+	lrx1 %/0%;
+	seg_st;
+	//transfer back from the segment.
+	lrx0 %/0xffff%;
+	seg_ld;
+	interrupt;
+	lrx0 %-20%;
+	lrx1 %/5%;
+	rxicmp
+	halt
 
 
 
@@ -110,59 +95,58 @@ section 0xC000
 //defining a function out here.
 //this function prints Qs to the screen.
 section 0x1A0D0
-la 0xa
-putchar;
-la 0xd
-putchar;
-lla %0xB000%;illdaa;
-putchar;putchar;
-putchar;putchar;
+	la 0xa
+	putchar;
+	la 0xd
+	putchar;
+	lla %0xB000%;illdaa;
+	putchar;putchar;
+	putchar;putchar;
 
-VAR#goto_myLabel2#sc %_myLabel2_%;jmp;
-goto_myLabel2
-VAR#_myLabel2_#@
+	.goto_myLabel2:sc %_myLabel2_%;jmp;
+	goto_myLabel2
+	:_myLabel2_:
 
-//test far memory indexing functionality
-lla %0xffea%;
-sc %0xff%;
-lb 0x59
-faristlb;
-lb 0xa
-farilldb;
-ab;
-putchar;putchar;
-putchar;
-
-
-//test far memory indexing functionality for bytes
-lla %0xeeff%;
-sc %0xed%;
-lb 0x57
-faristb;
-lb 0xa
-farildb;
-ab;
-putchar;putchar;
-putchar;
+	//test far memory indexing functionality
+	lla %0xffea%;
+	sc %0xff%;
+	lb 0x59
+	faristlb;
+	lb 0xa
+	farilldb;
+	ab;
+	putchar;putchar;
+	putchar;
 
 
-//test farpagel and farpagest
-lla%0xee%;
-sc %0xffff%
-farpagel;
-//Copy that page around some so we can see it.
-sc %0xfffe%
-farpagest;
-sc %0xfffd%
-farpagest;
-sc %0xfffc%
-farpagest;
-sc %0xfffb%
-farpagest;
-la 0xa
-putchar;putchar;
+	//test far memory indexing functionality for bytes
+	lla %0xeeff%;
+	sc %0xed%;
+	lb 0x57
+	faristb;
+	lb 0xa
+	farildb;
+	ab;
+	putchar;putchar;
+	putchar;
 
-farret;//return back to the zero page.
+
+	//test farpagel and farpagest
+	lla%0xee%;
+	sc %0xffff%
+	farpagel;
+	//Copy that page around some so we can see it.
+	sc %0xfffe%
+	farpagest;
+	sc %0xfffd%
+	farpagest;
+	sc %0xfffc%
+	farpagest;
+	sc %0xfffb%
+	farpagest;
+	la 0xa
+	putchar;putchar;
+	farret;//return back to the zero page.
 
 
 //Testing variable addressing.
