@@ -1361,19 +1361,22 @@ int main(int argc, char** argv){
 			strprefix("--version",argv[i])
 		){
 			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
-			ASM_PUTS("Optional argument: -i: specify input file.");
-			ASM_PUTS("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
-			ASM_PUTS("Optional argument: -fdis, --full-disassemble: disassemble a file, without ending on halts/illegal opcodes. Same semantics as -dis");
-			ASM_PUTS("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
-			ASM_PUTS("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
-			ASM_PUTS("Optional argument: -E: Print macro expansion only do not write to file");
-			ASM_PUTS("Optional argument: -pl: Print lines");
-			ASM_PUTS("Optional argument: -C: display compiletime environment information (What C compiler you used) as well as Author.");
-			ASM_PUTS("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
-			ASM_PUTS("Optional argument: -v, -h, --help, --version: This printout.");
-			ASM_PUTS("\n\nSISA-16 Macro Assembler, Disassembler, and Emulator in Pure Glorious ANSI/ISO C90, Version 1.6");
-			ASM_PUTS("\"Let all that you do be done with love\"");
-			ASM_PUTS("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
+			puts("Optional argument: -i: specify input file.");
+			puts("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
+			puts("Optional argument: -fdis, --full-disassemble: disassemble a file, without ending on halts/illegal opcodes. Same semantics as -dis");
+			puts("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
+			puts("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
+			puts("Optional argument: -E: Print macro expansion only do not write to file");
+			puts("Optional argument: -pl: Print lines");
+			puts("Optional argument: -C: display compiletime environment information (What C compiler you used) as well as Author.");
+			puts("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
+			puts("Optional argument: -v, -h, --help, --version: This printout.");
+			puts("\n\nSISA-16 Macro Assembler, Disassembler, and Emulator in Pure Glorious ANSI/ISO C90, Version 1.6");
+			puts("\"Let all that you do be done with love\"");
+			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
+			puts("Language information:");
+			printf("There are %d instructions in the instruction set for this version.\n", n_insns);
+			printf("The last instruction added to the instruction set is %s\n", insns[n_insns-1]);
 			return 0;
 		}
 	}}
