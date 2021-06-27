@@ -559,6 +559,20 @@ The rest: nop duplicates, free for expansion (1 byte)
 comment lines are lines that begin with // or #.
 
 .TP
+.B Labels
+
+Labels must always be on their own lines. Labels are just macros that contain only a number indicating
+a location in the code.
+
+VAR#myLabel#@
+
+is one way of doing a label.
+
+:myLabel:
+
+is the syntactic sugar for the same.
+
+.TP
 .B Macros
 
 Macros are defined with VAR# lines.
