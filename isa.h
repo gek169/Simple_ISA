@@ -824,7 +824,6 @@ SUU RX1I = RX1;
 	)a=0;else if(
 		RX0I>RX1I
 	)a=2;else a=1;
-}
-D
+}D
 G_HALT:dcl();return 0;
 }
