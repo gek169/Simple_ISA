@@ -940,25 +940,24 @@ int main(int argc, char** argv){
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
 	const unsigned long maxmacrocalls = 0x100000;
-	unsigned long line_num = 0; 
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
 	variable_expansions[1] = variable_expansions[0];
 	variable_names[2] = "%";
 	variable_expansions[2] = variable_expansions[0];
-	/*Macros to remove whitespace- this assembler works without using any whitespace at all.*/
+	/*Macros to remove whitespace- this assembler works without using any whitespace at all. There is no tokenizer.*/
 	variable_names[3] = "\t";
 	variable_expansions[3] = variable_expansions[0];
 	variable_names[4] = " ";
 	variable_expansions[4] = variable_expansions[0];
-	variable_names[5] = "  ";
+	variable_names[5] = "\v";
 	variable_expansions[5] = variable_expansions[0];
-	variable_names[6] = ";;";
-	variable_expansions[6] = ";";
-	/*Do math.*/
-	/*Assembly-time directives.*/
-	nmacros = 7;
+	variable_names[6] = "\f";
+	variable_expansions[6] = variable_expansions[0];
+	variable_names[7] = "\r";
+	variable_expansions[7] = variable_expansions[0];
+	nmacros = 8;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
@@ -1225,12 +1224,9 @@ int main(int argc, char** argv){
 			return 1;
 		}
 	} else {
-		if(debugging) if(!clear_output)printf("\nReading from stdin...");
-		if(!debugging) {
-			puts("\n<ASM ERROR> May not use reading from stdin when not in debugging mode.\n");
-			puts("\n<ASM> Assembler Aborted.");
-			return 1;
-		}
+		puts("\n<ASM ERROR> No input files.\n");
+		puts("\n<ASM> Assembler Aborted.");
+		return 1;
 	}
 	ofile = NULL;
 	if(!quit_after_macros && !run_sisa16){
@@ -1263,22 +1259,31 @@ int main(int argc, char** argv){
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		if(!line) {
-			puts("<ASM COMPILATION ERROR> cannot retrieve line.");
+			puts("<ASM COMPILATION ERROR> line returned from read_until_terminator_alloced was null.");
 			goto error;
 		}
-		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace... we do this twice, actually...*/
+		while(
+				strprefix(" ",line) 
+				|| strprefix("\t",line)
+				|| (isspace(line[0]) && line[0] != '\0')
+				){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");
 			free(line_old);
 		}
 		/*if this line ends in a backslash...*/
-		while(!feof(infile) && strlen(line) > 0 && !strprefix("!",line) && !strprefix("//",line) && !strprefix("#",line) && line[strlen(line)-1] == '\\'){char* line_temp;
+		while(!feof(infile) && strlen(line) > 0 
+							&& !strprefix("!",line) 
+							&& !strprefix("//",line) 
+							&& !strprefix("#",line) 
+							&& line[strlen(line)-1] == '\\'){
+			char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 			line = strcatallocfb(line,line_temp);
 			linesize = strlen(line);
 		}
-		line_copy = strcatalloc(line,"");line_num++;
+		line_copy = strcatalloc(line,"");
 		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
@@ -1292,6 +1297,11 @@ int main(int argc, char** argv){
 					fputbyte(line[i], ofile);
 			goto end;
 		}
+		/*
+			syntactic sugars.
+		*/
+		/*syntactic sugar for */
+		/*syntactic sugar for VAR*/
 		if(strprefix(".",line)){
 			long loc_colon = strfind(line, ":");
 			if(loc_colon != -1){
@@ -1302,6 +1312,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 		}
+		/*syntactic sugar for labels*/
 		if(strprefix(":", line)){
 			char*  line_old = line;
 			long loc_colon2 = strfind(line+1, ":");
@@ -1328,23 +1339,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			tmp = fopen(metaproc, "r");
-			if(!tmp && env_sisa16bin &&
-				(
-					env_sisa16bin[strlen(env_sisa16bin)-1] == '/' ||
-					env_sisa16bin[strlen(env_sisa16bin)-1] == '\\'
-				)
-			) 
-			{
-				char* bruh = strcatalloc(env_sisa16bin, metaproc);
-				tmp = fopen(bruh, "r");
-				free(bruh);
-			}
-			if(!tmp && env_sisa16bin &&
-				(
-					env_sisa16bin[strlen(env_sisa16bin)-1] == '/' ||
-					env_sisa16bin[strlen(env_sisa16bin)-1] == '\\'
-				)
-			) 
+			if(!tmp && env_sisa16bin) 
 			{
 				char* bruh = strcatallocf1(strcatalloc(env_sisa16bin,"/"), metaproc);
 				tmp = fopen(bruh, "r");
@@ -1357,10 +1352,7 @@ int main(int argc, char** argv){
 			}
 			if(!tmp && env_home) {
 				char* bruh = NULL;
-				if(env_home[strlen(env_home)-1] == '/')
-					bruh = strcatallocf1(strcatalloc(env_home,"sisa16/"), metaproc);
-				else
-					bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
+				bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
@@ -1382,16 +1374,26 @@ int main(int argc, char** argv){
 			[newline]asm_data_include filename
 			*/
 			FILE* tmp; char* metaproc; unsigned long len;
+			const char *env_sisa16bin, *env_home;
 			metaproc = line + strlen("ASM_data_include ");
+			env_sisa16bin = getenv("SISA16BIN");
+			env_home = getenv("HOME");
 			tmp = fopen(metaproc, "rb");
+			if(!tmp && env_sisa16bin) 
+			{
+				char* bruh = strcatallocf1(strcatalloc(env_sisa16bin,"/"), metaproc);
+				tmp = fopen(bruh, "r");
+				free(bruh);
+			}
 			if(!tmp) {
 				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);
 				tmp = fopen(bruh, "rb");
 				free(bruh);
 			}
 			if(!tmp) {
-				char* bruh = strcatalloc("~/sisa16/", metaproc);
-				tmp = fopen(bruh, "rb");
+				char* bruh = NULL;
+				bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
+				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
 			if(!tmp) { char* bruh = strcatalloc("C:\\SISA16\\", metaproc);
@@ -1420,7 +1422,6 @@ int main(int argc, char** argv){
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		pre_pre_processing:
-
 		if(nmacrocalls > maxmacrocalls){
 			printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
 			goto error;
@@ -1477,18 +1478,14 @@ int main(int argc, char** argv){
 					if(loc == -1) continue;
 					if(loc >= loc_vbar) continue; /*Respect the sequence operator.*/
 					if(loc > 0 && *(line+loc-1) == '\\') continue;
-					if(was_macro && i==2){
-						continue; /*Do not parse the split directive inside of a macro.*/
-					}
-					if(was_macro && (i==3 || i==4)){
-						continue; /*Do not parse the space or tab inside of a macro.*/
-						/*Also, don't parse muleq or pleq*/
+					if(was_macro && (i > 1)){
+						continue; /*Do not parse any other macros excepts dollar sign and at inside of a macro.*/
 					}
 					line_old = line;
-					if(debugging)if(!clear_output)printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
+					if(debugging) printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
-					if(!was_macro)
+					if(!was_macro) /*It is unnecessary to check for longer macros when only searching for builtins.*/
 					for(j = 0; j<(long)nmacros; j++){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
@@ -1515,7 +1512,7 @@ int main(int argc, char** argv){
 					}
 					if(found_longer_match)
 					{
-						if(debugging){ASM_PUTS("Found longer Macro.");}
+						if(debugging){puts("Found longer Macro.");}
 						continue;
 					}
 					/*We know the location of a macro to be expanded and it is at loc.*/
@@ -1526,7 +1523,7 @@ int main(int argc, char** argv){
 					before = str_null_terminated_alloc(line_old, loc);
 					if(i > 2) /*0,1,2 are special cases. 3,4,X are not.*/
 						before = strcatallocf1(before, variable_expansions[i]);
-					else if (i == 0){ /*SYNTAX: @+7+*/
+					else if (i == 0){ /*SYNTAX: @+7+ or @ alone*/
 						char expansion[1024];
 						unsigned long addval = 0;
 						/*We need to check if there is a plus sign immediately after the at sign. */
