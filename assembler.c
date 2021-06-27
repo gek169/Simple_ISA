@@ -61,22 +61,17 @@ you can call a macro of name macroname with _arg1, _arg2, _arg3... being automat
 #include <string.h>
 #include "d.h"
 #include "isa.h"
-char* outfilename = "outsisa16.bin";
-char run_sisa16 = 0;
-char enable_dis_comments = 1;
-char clear_output = 0;
-char use_tempfile = 0;
-void del_outfile(){
-	if(use_tempfile)
-		remove(outfilename);
-	return;
-}
-void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
-char* infilename = NULL;
-char* variable_names[65535] = {0};
-char* variable_expansions[65535] = {0};
-char variable_is_redefining_flag[65535] = {0};
-char* insns[212] = {
+static char* outfilename = "outsisa16.bin";
+static char run_sisa16 = 0;
+static char enable_dis_comments = 1;
+static char clear_output = 0;
+static char use_tempfile = 0;
+static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
+static char* infilename = NULL;
+static char* variable_names[65535] = {0};
+static char* variable_expansions[65535] = {0};
+static char variable_is_redefining_flag[65535] = {0};
+static char* insns[212] = {
 	"halt",
 	"lda",
 	"la",
@@ -310,7 +305,7 @@ char* insns[212] = {
 	"emulate_seg",
 	"rxicmp"
 };
-unsigned char insns_numargs[212] = {
+static unsigned char insns_numargs[212] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -426,7 +421,7 @@ unsigned char insns_numargs[212] = {
 		0
 		
 };
-char* insn_repl[212] = {
+static char* insn_repl[212] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -666,7 +661,7 @@ char* insn_repl[212] = {
 		"bytes211;"
 };
 static const unsigned int n_insns = 212;
-char int_checker(char* proc){
+static char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means */
 	char first_character = 1;
 	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
@@ -695,15 +690,15 @@ char int_checker(char* proc){
 }
 
 
-unsigned long outputcounter = 0;
-unsigned long nmacros = 5; /*0,1,2,3,4*/
-char quit_after_macros = 0;
-char debugging = 0;
-unsigned long npasses = 0;
-char printlines = 0;
-unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
-unsigned long region_restriction = 0;
-char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
+static unsigned long outputcounter = 0;
+static unsigned long nmacros = 5; /*0,1,2,3,4*/
+static char quit_after_macros = 0;
+static char debugging = 0;
+static unsigned long npasses = 0;
+static char printlines = 0;
+static unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
+static unsigned long region_restriction = 0;
+static char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 static void fputbyte(unsigned char b, FILE* f){
 	if(!run_sisa16 && !quit_after_macros)
 		if((unsigned long)ftell(f) != outputcounter){
@@ -751,167 +746,7 @@ static void putshort(unsigned short sh, FILE* f){
 }
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
-unsigned long compiled_variable_allocation_start = 0xF00000;
 
-/*
-char* compiled_variable_names[65535] = {0};
-unsigned long compiled_variable_addresses[65535] = {0};
-unsigned long compiled_variable_array_lengths[65535] = {0};
-unsigned int compiled_variable_types[65535] = {0};
-unsigned long n_compiled_variables = 0;
-*/
-static int check_ident(char* ident){
-	unsigned long i;
-	if(ident[0] == '\0') return 0; /*End of the damn string!*/
-	if(!(isalpha(ident[0]) || ident[0] == '_')) return 0; /*Bad identifier*/
-	for(i=1;ident[i]!=';' && ident[i] != '\0' && ident[i] != ' ';i++){
-		if(isalnum(ident[i]) || ident[i] == '_')
-			continue;
-		else
-			return 0; /*bad identifier!*/
-	}
-	if(ident[i] == '\0') return 0; /*Bad Identifier*/
-	if(ident[i] == ' ') return 1; /*Valid*/
-	if(ident[i] == ';') return 1; /*Valid*/
-	return 0; /*Theoretically unreachable.*/
-}
-
-/*Idea for a programming language with BASIC-like syntax.*/
-/*
-static char* compile_line(char* line_in){
-	char* line_proc = strcatalloc(line_in+strlen("ASM_COMPILE"), "");
-	char* line_out = strcatalloc("","");
-	while(strfind(line_proc, "\t") != -1) line_proc = str_repl_allocf(line_proc, "\t", " ");
-	while(strfind(line_proc, "  ") != -1) line_proc = str_repl_allocf(line_proc, "  ", " ");
-	while(strfind(line_proc, " ;") != -1) line_proc = str_repl_allocf(line_proc, " ;", ";");
-	while(strfind(line_proc, "; ") != -1) line_proc = str_repl_allocf(line_proc, "; ", ";");
-	while(strprefix(" ", line_proc)) {
-		char* old_line_proc = line_proc;
-		line_proc = strcatalloc(line_proc+1, "");
-		free(old_line_proc);
-	}
-	/the line is now ready for processing./
-	if(strprefix("var ", line_proc)){
-		/
-			FORMAT:
-											Required Space
-											   |Optional array declarator from [ to ]
-											   VV
-			var <type> @<location> <identifier> [<array length>];
-					   ^			^
-						optional	must start with alpha character or underscore, rest isalnum or is underscore.
-		/
-		char* metaproc = line_proc + strlen("var ");
-		unsigned long vartype = 0;
-		unsigned long varaddr = compiled_variable_allocation_start;
-		unsigned long vararrlen = 0; /Not an array!/
-		char* varname = NULL;
-		/handle a variable declaration./
-		if(strprefix("byte ", metaproc)){
-			vartype = 0; metaproc += strlen("byte ");
-			
-		} else if(strprefix("short ", metaproc)){
-			vartype = 1; metaproc += strlen("short ");
-		} else if(strprefix("u32 ", metaproc)){
-			vartype = 2; metaproc += strlen("u32 ");
-		} else if(strprefix("i32 ", metaproc)){
-			vartype = 3; metaproc += strlen("i32 ");
-		} else if(strprefix("f32 ", metaproc)){
-			vartype = 4; metaproc += strlen("f32 ");
-		} else {
-			puts("<COMPILED LINE SYNTAX ERROR> variable declaration without valid type or possibly missing space");
-			puts("Line:");
-			puts(line_in);
-			exit(1);
-		}
-		if(strprefix("@", metaproc)){
-			long loc_next_space;
-			metaproc++;
-			varaddr = strtoul(metaproc,0,0);
-			compiled_variable_allocation_start = varaddr;
-			loc_next_space = strfind(metaproc, " ");
-			if(loc_next_space == -1) {
-				puts("<COMPILED LINE SYNTAX ERROR> variable declaration is incomplete.");
-				puts("Line:");
-				puts(line_in);
-				exit(1);
-			}
-			metaproc += loc_next_space+1;
-		}
-		if(!check_ident(metaproc)){
-			puts("<COMPILED LINE SYNTAX ERROR> variable declaration with invalid identifier. Remember that arrays must be declared");
-			puts("Line:");
-			puts(line_in);
-			exit(1);
-		}
-
-		{long loc_next_space;
-			loc_next_space = strfind(metaproc, " ");
-			if(loc_next_space == -1) loc_next_space = strfind(metaproc, ";");
-			if(loc_next_space == -1) {
-				puts("<COMPILED LINE SYNTAX ERROR> variable declaration is incomplete. Identifier must be followed by a space or semicolon.");
-				puts("Line:");
-				puts(line_in);
-				exit(1);
-			}
-			varname = str_null_terminated_alloc(metaproc, loc_next_space);
-			metaproc += loc_next_space;
-			if(*metaproc == ' ')metaproc++;
-		}
-		if(*metaproc == '[' ]){
-			long loc_end_bracket;
-			metaproc++;
-			vararrlen = strtoul(metaproc, 0,0);
-			loc_end_bracket = strfind(metaproc, /[/ "]");
-			if(loc_end_bracket == -1){
-				puts("<COMPILED LINE SYNTAX ERROR> Array declarators must have an ending bracket!");
-				puts("Line:");
-				puts(line_in);
-				exit(1);
-			}
-			metaproc += loc_end_bracket+1;
-		}
-		if(metaproc[0] != ';'){
-			puts("<COMPILED LINE SYNTAX ERROR> Variable declaration lacking post semicolon.");
-			puts("Line:");
-			puts(line_in);
-			exit(1);
-		}
-		compiled_variable_types[n_compiled_variables] = vartype;
-		compiled_variable_names[n_compiled_variables] = varname;
-		if(varname == NULL || strlen(varname) == 0){
-			puts("<COMPILED LINE INTERNAL ERROR> Variable declaration stmt reached completion with no name.");
-			puts("Line:");
-			puts(line_in);
-			exit(1);
-		}
-		compiled_variable_addresses[n_compiled_variables] = varaddr;
-		if(vararrlen == 0){
-			if(vartype == 0) compiled_variable_allocation_start++;
-			else if(vartype == 1)  compiled_variable_allocation_start += 2;
-			else if(vartype == 2)  compiled_variable_allocation_start += 4;
-			else if(vartype == 3)  compiled_variable_allocation_start += 4;
-			else if(vartype == 4)  compiled_variable_allocation_start += 4;
-		} else if(vartype == 0){
-			compiled_variable_allocation_start += vararrlen;
-		} else if(vartype == 1){
-			compiled_variable_allocation_start += vararrlen*2;
-		} else if(vartype == 2 || vartype == 3 ){
-			compiled_variable_allocation_start += vararrlen*4;
-		}
-		compiled_variable_allocation_start &= 0xffFFff;
-		compiled_variable_array_lengths[n_compiled_variables] = vararrlen;
-		n_compiled_variables++;
-	} else {
-		puts("<COMPILED LINE SYNTAX ERROR>Unknown/unparseable compile line.");
-		puts("Line:");
-		puts(line_in);
-		exit(1);
-	}
-	free(line_in);
-	return line_out;
-}
-*/
 static int disassembler(char* fname, unsigned long location, unsigned long SISA16_DISASSEMBLER_MAX_HALTS){
 	unsigned long n_halts = 0;
 	unsigned long n_illegals = 0;
