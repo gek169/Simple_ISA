@@ -1300,10 +1300,34 @@ int main(int argc, char** argv){
 		/*
 			syntactic sugars.
 		*/
-		/*syntactic sugar for */
+		/*syntactic sugar for declaring procedures that call to the current output counter.*/
+		if(strprefix("..decl_farproc:", line)){
+			char buf[100];
+			char* line_old = line;
+			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
+			buf[99] = 0;
+			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
+			line = strcatalloc(buf,"");
+			free(line_old);
+			free(procedure_name);
+		}
+		if(strprefix("..decl_lproc:", line)){
+			char buf[100];
+			char* line_old = line;
+			char* procedure_name = strcatalloc(line + strlen("..decl_lproc:"), "");
+			buf[99] = 0;
+			sprintf(buf, "VAR#%s#sc%%%lu%%;call;", procedure_name, outputcounter & 0xFFff);
+			line = strcatalloc(buf,"");
+			free(line_old);
+			free(procedure_name);
+		}
 		/*syntactic sugar for VAR*/
-		if(strprefix(".",line)){
+		if(line[0] == '.'){
 			long loc_colon = strfind(line, ":");
+			if(line[1] == '.'){
+				printf("<ASM SYNTAX ERROR> Syntactic sugar has a second period but is recognized as a macro declaration. Most likely a spelling error. Line:\n%s\n", line_copy);
+				goto error;
+			}
 			if(loc_colon != -1){
 				line = str_repl_allocf(line, ".", "VAR#");
 				line = str_repl_allocf(line, ":", "#");
@@ -1313,7 +1337,7 @@ int main(int argc, char** argv){
 			}
 		}
 		/*syntactic sugar for labels*/
-		if(strprefix(":", line)){
+		if(line[0] == ':'){
 			char*  line_old = line;
 			long loc_colon2 = strfind(line+1, ":");
 			if(loc_colon2 == -1){
@@ -1432,18 +1456,17 @@ int main(int argc, char** argv){
 			line = strcatalloc(line+1,"");
 			free(line_old);
 		}
-		if(strprefix("ASM_COMPILE", line)){
-			puts("<ASM UNFINISHED FEATURE ERROR> Unfinished feature. You may not use ASM_COMPILE.");
-			exit(1);
-			/*line = compile_line(line);*/
-			nmacrocalls = 0;
-			goto pre_pre_processing;
-		}
-		if(strprefix("ASM_COPYRIGHT", line)){
+		if(	
+			strprefix("ASM_COPYRIGHT", line)
+			|| strprefix("asm_copyright", line)
+			){
 			ASM_PUTS("SISA-16 Assembler, Disassembler, and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.\nLet all that you do be done with love.\n");
 			goto end;
 		}
-		if(strprefix("asm_help", line) || strprefix("ASM_HELP", line)){
+		if(
+			strprefix("asm_help", line) 
+			|| strprefix("ASM_HELP", line)
+		){
 			ASM_PUTS("For help, See: man sisa16_asm");
 			goto end;
 		}
@@ -1575,14 +1598,14 @@ int main(int argc, char** argv){
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
 					} else if (i==2){
-					long loc_qmark;
-					long loc_slash;
-					long loc_tilde; /*BAD NAME! it's actually a DASH*/
-					long loc_ampersand;
-					char do_32bit=0;
-					long loc_eparen;
-					char expansion[1024]; 
-					unsigned long res=0; /*Split directive.*/
+						long loc_qmark=		-1;
+						long loc_slash=		-1;
+						long loc_dash_mark=		-1; /*BAD NAME! it's actually a DASH*/
+						long loc_ampersand=	-1;
+						char do_32bit=		0;
+						long loc_eparen=	-1;
+						char expansion[1024];
+						unsigned long res=0; /*Split directive.*/
 						/*Locate the next ending one*/
 						if(strlen(line_old+loc) == 0){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
@@ -1591,7 +1614,7 @@ int main(int argc, char** argv){
 						loc_eparen = strfind(line_old+loc+1,"%");
 						loc_slash = strfind(line_old+loc+1,"/");
 						loc_qmark = strfind(line_old+loc+1,"?");
-						loc_tilde = strfind(line_old+loc+1,"-");
+						loc_dash_mark = strfind(line_old+loc+1,"-");
 						loc_ampersand = strfind(line_old+loc+1,"&");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
@@ -1601,7 +1624,7 @@ int main(int argc, char** argv){
 							if(!clear_output)printf("<ASM WARNING> SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
 						}
 						if(loc_slash==0) do_32bit = 1;
-						if(loc_tilde==0) do_32bit = 4;
+						if(loc_dash_mark==0) do_32bit = 4;
 						if(loc_ampersand==0) do_32bit = 3;
 						if(loc_qmark==0) do_32bit = 2;
 						

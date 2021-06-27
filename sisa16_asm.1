@@ -584,6 +584,37 @@ everything after the second # is part of the macro.
 Several built-in macros are evaluated inside of macro definitions, such as @ and $.
 
 .TP
+.B Syntactic Sugar
+
+There are various extremely common operations in sisa16 that have syntactic sugars available
+
+".myMacro:definition"
+
+is syntactic sugar for
+
+VAR#myMacro#definition
+
+":myLabel:"
+
+is syntactic sugar for
+
+VAR#myLabel#@
+
+"..decl_farproc:myProcedure"
+
+is syntactic sugar for
+
+VAR#myProcedure#sc %@%;la region;farcall;
+
+"..decl_lproc:myProcedure"
+
+is syntactic sugar for
+
+VAR#myProcedure#sc%@%;call;
+
+(Note that you shouldn't enter quotes for any of these)
+
+.TP
 .B Evaluation Sequence Points (|)
 
 you can use the unix pipe character | to stop the evaluation of macros to a certain point. 

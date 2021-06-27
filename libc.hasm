@@ -1,7 +1,9 @@
 
 
 section 0x20000;asm_begin_region_restriction;
-.proc_printbytehex:sc 0,0;la 2;farcall; 
+//.proc_printbytehex:sc 0,0;la 2;farcall; 
+..decl_farproc:proc_printbytehex
+
 //retrieve our argument.
 	astp;lb4;sub;ca;ilda;
 //push it
@@ -51,7 +53,8 @@ llb%printbytehex_jmptable_2%;add;ca;jmp;
 farret;
 
 
-.proc_puts:sc%@%;la2;farcall;
+//.proc_puts:sc%@%;la2;farcall;
+..decl_farproc:proc_puts
 //move the stack pointer back.
 astp;lb6;sub;
 illdaa;lb8;rsh;lb255;and;ca;
@@ -84,7 +87,8 @@ farret;
 nop;nop;
 //prototype: wait(short milliseconds)
 //for very small values it may erroneously wait a long time.
-.proc_wait:sc%@%;la2;farcall;
+//.proc_wait:sc%@%;la2;farcall;
+..decl_farproc:proc_wait
 	//retrieve our argument and store it in the desginated spot.
 	astp;
 	lb5;
