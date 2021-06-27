@@ -1930,6 +1930,7 @@ int main(int argc, char** argv){
 			if(
 				strfind(macro_name, "!") != -1 ||
 				strfind(macro_name, "?") != -1 ||
+				strfind(macro_name, ".") != -1 ||
 				strfind(macro_name, "[") != -1 ||
 				strfind(macro_name, "]") != -1 ||
 				strfind(macro_name, "\\") != -1 ||
@@ -1961,6 +1962,7 @@ int main(int argc, char** argv){
 			if(
 				strfind("!", macro_name) != -1 ||
 				strfind("?", macro_name) != -1 ||
+				strfind(".", macro_name) != -1 ||
 				strfind("[", macro_name) != -1 ||
 				strfind("]", macro_name) != -1 ||
 				strfind("\\", macro_name) != -1 ||
