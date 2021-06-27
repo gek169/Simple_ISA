@@ -3,7 +3,8 @@
 
 //Macros!
 
-VAR#myComptimeVar#2
+VAR#myComptimeVar#2#
+
 
 //All the code before here was entirely meaningless. Ignore it.
 

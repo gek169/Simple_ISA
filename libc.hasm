@@ -1,7 +1,7 @@
 
 
 section 0x20000;asm_begin_region_restriction;
-VAR#proc_printbytehex#sc 0,0;la 2;farcall; 
+.proc_printbytehex:sc 0,0;la 2;farcall; 
 //retrieve our argument.
 	astp;lb4;sub;ca;ilda;
 //push it
@@ -10,7 +10,7 @@ VAR#proc_printbytehex#sc 0,0;la 2;farcall;
 	lb0xf;and;
 	lb 7;mul;
 llb %printbytehex_jmptable_1%; add;ca;jmp;
-VAR#printbytehex_jmptable_1#@
+:printbytehex_jmptable_1:
 	la0x30;putchar;sc%printbytehex_jmptable_1_end%;jmp
 	la0x31;putchar;sc%printbytehex_jmptable_1_end%;jmp
 	la0x32;putchar;sc%printbytehex_jmptable_1_end%;jmp
@@ -27,10 +27,10 @@ VAR#printbytehex_jmptable_1#@
 	la0x44;putchar;sc%printbytehex_jmptable_1_end%;jmp
 	la0x45;putchar;sc%printbytehex_jmptable_1_end%;jmp
 	la0x46;putchar;sc%printbytehex_jmptable_1_end%;jmp
-VAR#printbytehex_jmptable_1_end#@
+:printbytehex_jmptable_1_end:
 apop;lb 15;and;lb7;mul;
 llb%printbytehex_jmptable_2%;add;ca;jmp;
-VAR#printbytehex_jmptable_2#@
+:printbytehex_jmptable_2:
 	la0x30;putchar;sc%printbytehex_jmptable_2_end%;jmp
 	la0x31;putchar;sc%printbytehex_jmptable_2_end%;jmp
 	la0x32;putchar;sc%printbytehex_jmptable_2_end%;jmp
@@ -47,11 +47,11 @@ VAR#printbytehex_jmptable_2#@
 	la0x44;putchar;sc%printbytehex_jmptable_2_end%;jmp
 	la0x45;putchar;sc%printbytehex_jmptable_2_end%;jmp
 	la0x46;putchar;sc%printbytehex_jmptable_2_end%;jmp
-VAR#printbytehex_jmptable_2_end#@
+:printbytehex_jmptable_2_end:
 farret;
 
 
-VAR#proc_puts#sc%@%;la2;farcall;
+.proc_puts:sc%@%;la2;farcall;
 //move the stack pointer back.
 astp;lb6;sub;
 illdaa;lb8;rsh;lb255;and;ca;
@@ -62,7 +62,7 @@ astp;lb5;sub;illdaa;//we need to grab that short.
 //we now have our far pointer! put it on the top of the stack for easy access.
 //we actually push 4 bytes, so we can rx0pop.
 lb0;bpush;bc;bpush;alpush;
-VAR#puts_looptop#@
+:puts_looptop:
 	//setup far pointer.
 	rx0pop;		rx0push;	cbrx0;
 	//load through far pointer and print
@@ -72,19 +72,19 @@ VAR#puts_looptop#@
 	//else, increment
 	rx0pop;rxincr;rx0push;
 sc %puts_looptop%;jmp;
-VAR#puts_loopend#@
+:puts_loopend:
 blpop;blpop;
 farret;
 
 //WAIT~~~~~~~~~~~~
 //variable used for waiting thousandths of a second.
-VAR#libc_ld_wait_ms#sc%0x2%;llb %@%;farillda;
-VAR#libc_st_wait_ms#sc%0x2%;llb %@%;faristla;
+.libc_ld_wait_ms:sc%0x2%;llb %@%;farillda;
+.libc_st_wait_ms:sc%0x2%;llb %@%;faristla;
 //storage for that variable
 nop;nop;
 //prototype: wait(short milliseconds)
 //for very small values it may erroneously wait a long time.
-VAR#proc_wait#sc%@%;la2;farcall;
+.proc_wait:sc%@%;la2;farcall;
 	//retrieve our argument and store it in the desginated spot.
 	astp;
 	lb5;
@@ -98,7 +98,7 @@ VAR#proc_wait#sc%@%;la2;farcall;
 	blpop;
 	add;
 	libc_st_wait_ms;
-	VAR#wait_looptop#@
+	:wait_looptop:
 	clock;
 	alpush;
 		libc_ld_wait_ms;

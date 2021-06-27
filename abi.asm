@@ -40,7 +40,7 @@ VAR#goto_iflesser_const#	sc _arg2_;load__arg1_;llb%_arg3_%;cmp;llb%2%;cmp;jmpifn
 
 
 section LIBC_START_ADDR; asm_begin_region_restriction;
-VAR#proc_puts#sc%@%;la LIBC_START;farcall;
+.proc_puts:sc%@%;la LIBC_START;farcall;
 //move the stack pointer back.
 astp;lb6;sub;
 illdaa;lb8;rsh;lb255;and;ca;
@@ -51,7 +51,7 @@ astp;lb5;sub;illdaa;//we need to grab that short.
 //we now have our far pointer! put it on the top of the stack for easy access.
 //we actually push 4 bytes, so we can rx0pop.
 lb0;bpush;bc;bpush;alpush;
-VAR#puts_looptop#@
+:puts_looptop:
 	//setup far pointer.
 	rx0pop;		rx0push;	cbrx0;
 	//load through far pointer and print

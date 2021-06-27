@@ -3,14 +3,14 @@
 
 
 
-VAR#looptop#1,0xf0
-VAR#GOTO_TOP#sc looptop;jmp;
-VAR#jumpc#jmp;
-VAR#IS_A_NEWLINE#			sta%50%;lb0xa;cmp;
-VAR#IS_A_CR#				sta%50%;lb0xd;cmp;
-VAR#IS_A_Q#					sta%50%;lb0x51;cmp;
-VAR#IS_A_R#					sta%50%;lb0x52;cmp;
-VAR#GET_A_BACK#				lda%50%;
+.looptop:1,0xf0
+.GOTO_TOP:sc looptop;jmp;
+.jumpc:jmp;
+.IS_A_NEWLINE:			sta%50%;lb0xa;cmp;
+.IS_A_CR:				sta%50%;lb0xd;cmp;
+.IS_A_Q:					sta%50%;lb0x51;cmp;
+.IS_A_R:					sta%50%;lb0x52;cmp;
+.GET_A_BACK:				lda%50%;
 
 
 asm_print %/32%;
@@ -45,7 +45,7 @@ section 0x1F0
 	stb %59%;
 	sta %50%;
 //small loop.
-VAR#miniLoopTop#@
+:miniLoopTop:
 	//Perform wizardry
 		lda %50%;
 			lb 8;
@@ -55,7 +55,7 @@ VAR#miniLoopTop#@
 		sta %50%;
 	//if this is less than 127, then we go to dont manip.
 			lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
-	VAR#still_above_127#@
+	:still_above_127:
 	//generate negative one, twos complement, and put it in b.
 		la 1;compl;lb1;add;ba;
 		lda %50%;
@@ -63,7 +63,7 @@ VAR#miniLoopTop#@
 		sta %50%;
 	//jump to still_above if the value is >= 127.
 		lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifneq;
-	VAR#dont_manip#@
+	:dont_manip:
 		//if a is not invalid, we dont subtract from it.
 		lda %50%;IS_A_Q;sc %A_IS_notQ%;jmpifneq;
 		lda %50%;
@@ -71,7 +71,7 @@ VAR#miniLoopTop#@
 		sub;
 		sta %50%;
 
-	VAR#A_IS_notQ#@
+	:A_IS_notQ:
 		
 		lda %50%;putchar;
 	//perform our variable increment.
