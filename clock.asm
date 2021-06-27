@@ -16,28 +16,28 @@ ASM_header libc.hasm
 
 //Variable Section.
 section 0xAE0000;
-VAR#ld_iter#farldrx0 %&0xAE0000%;
-VAR#st_iter#farstrx0 %&0xAE0000%;
+.ld_iter:farldrx0 %&0xAE0000%;
+.st_iter:farstrx0 %&0xAE0000%;
 bytes %/0%;
 
 section 0xAF0000;
 !Your patience is exemplary.
 bytes 0;
-VAR#seconds_strings#@
+:seconds_strings:
 bytes 0xd, 0xa;
 !Seconds:
 bytes 0;
-VAR#iterations_strings#@
+:iterations_strings:
 ! Iterations:
 bytes 0;
-VAR#STP_STRING#@
+:STP_STRING:
 ! Stack Pointer:
 bytes 0;
 
 section 0x10000;
 //rx2 holds our time in seconds.
 clock;rx2b;
-VAR#main_looptop#@
+:main_looptop:
 //iter++;
 	ld_iter;rxincr;st_iter;
 	clock;
@@ -87,7 +87,7 @@ ld_iter;lrx1 %/24%;rxrsh;arx0;apush;
 	proc_puts;alpop;apop;
 	astp;apush;proc_printbytehex;apop;
 	sc %main_looptop%;jmp;
-VAR#main_loopout#@
+:main_loopout:
 la 0xd;putchar;la 0xa;putchar;
 la 0xAF;apush;lla %0%;alpush;
 	proc_puts;
@@ -97,4 +97,4 @@ halt;
 
 
 //bootloader
-section 0;la 1;lfarpc;asm_print;
+section 0;la 1;lfarpc;
