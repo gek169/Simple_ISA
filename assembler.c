@@ -1311,8 +1311,7 @@ int main(int argc, char** argv){
 				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)
 			);
 			free(line_old);
-		}
-		else if(strprefix("..decl_farproc:", line)){
+		} else if(strprefix("..decl_farproc:", line)){
 			char buf[100];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
@@ -1321,8 +1320,7 @@ int main(int argc, char** argv){
 			line = strcatalloc(buf,"");
 			free(line_old);
 			free(procedure_name);
-		}
-		else if(strprefix("..decl_lproc:", line)){
+		} else if(strprefix("..decl_lproc:", line)){
 			char buf[100];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_lproc:"), "");
