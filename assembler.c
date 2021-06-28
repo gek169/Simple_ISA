@@ -1,61 +1,3 @@
-/*
-assembler for the ISA.
-Supports doing any of the following:
-1) Entering opcodes with their BYTE arguments (short args unsupported)
-sa 0x53
-ldb 0xFF,69
-ldb 0xFF,0x69
-sc 0xFF,0x39
-nop
-Names must be lower case and properly spelled.
-Data must be separated by a comma.
-2) Comments
-Lines beginning with /, , or # are comments.
-3) Multiple commands per line
-You may have multiple commands on the same line like this:
-sa 0x53;cmp;jmpifeq;
-4) Macros
-You may declare a macro with VAR like this
-VAR#my_variable_name#0x53
-You may have at most, 65,535 macros in your file.
-5) Location retrieval
-You may use the location of the current instruction you are writing as a variable.
-It is called @ as a short, or $ as a pair of bytes.
-6) Arbitrary data
-You may specify arbitrary data as either BYTES or SHORTS
-bytes 0xFF,10,34,7
-shorts 0xff10,0x3407
-You may even use macros in the expansion
-bytes myvariablename myothervariablename
-You may use bytes and shorts in-line as if they were commands.
-bytes 5; sa 7;
-7) (Mostly) Arbitrary whitespace (On a single line)
-You can omit whitespace between keywords in most cases.
-However some operations require that there be no whitespace.
-Character literals for instance must start at the beginning of a line with no preceding whitespace.
-8) Skipto
-The assembler allows you to "skip" until a desired address (which may wrap around to the beginning...)
-by specifying it with the SECTION tag.
-If the space-in-between in the ROM does not exist it will be filled in with zeroes.
-section 0x1000
-9) Fill
-The assembler allows you to write a byte value for a number of 
-fill 0xFFFF,0
-10) Strings
-The assembler allows you to directly write ascii characters into your output bin.
-Lines beginning with ! are character literal lines and they will be written to the current output location.
-11) Assembly-time directives
-%short%... converts number to a split short. It must be literal.
-Assembly-time directives must have NO leading or trailing whitespace.
-12) Builtin macros
-You can retrieve the current location in the binary as a short with @, and as a byte pair with $
-You can offset these like this: $+93+ or @+15+
-13) asm_macro_call#macroname#arg1#arg2#
-you can call a macro of name macroname with _arg1, _arg2, _arg3... being automatically defined for you.
-14) |
-
-*/
-
 #include "stringutil.h"
 #include <stdio.h>
 #include <string.h>
@@ -72,7 +14,7 @@ static char* variable_names[65535] = {0};
 static char* variable_expansions[65535] = {0};
 static char variable_is_redefining_flag[65535] = {0};
 static char* insns[212] = {
-	"halt",
+	"halt", /*0*/
 	"lda",
 	"la",
 	"ldb",
