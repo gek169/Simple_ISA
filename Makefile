@@ -37,6 +37,8 @@ asm_programs: sisa16_asm
 	./sisa16_asm -dis clock.bin 0x20000
 	./sisa16_asm -fdis echo.bin 0
 	./sisa16_asm -dis echo2.bin 0x20000
+	./sisa16_asm -fdis switchcase.bin 0
+	./sisa16_asm -fdis controlflow_1.bin 0
 	
 install: sisa16_asm sisa16_emu
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
