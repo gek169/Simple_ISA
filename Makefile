@@ -37,7 +37,7 @@ asm_programs: sisa16_asm
 	./sisa16_asm -fdis echo.bin 0
 	./sisa16_asm -dis echo2.bin 0x20000
 	
-install: main
+install: sisa16_asm sisa16_emu
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
 	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
 	@echo "Attempting manpage install."
