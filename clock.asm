@@ -5,7 +5,7 @@
 .POP_FARPTR_VARIABLE:	blpop;apop;ca;
 .PUSH_FARPTR_VARIABLE:	ac;apush;blpush;
 
-ASM_header libc.hasm
+..include"libc.hasm"
 
 
 //Variable Section.

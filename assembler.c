@@ -1285,14 +1285,13 @@ int main(int argc, char** argv){
 			free(line_old);
 		} else if(strprefix("..include\"", line)){
 			char* line_old = line;
-			long loc_eparen = strfind(line, "\"");
+			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
 				puts(line_copy);
 				goto error;
 			}
-			loc_eparen -= strlen("..include\"");
 			line = strcatallocf2(
 				"ASM_header ",
 				str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)
@@ -1300,14 +1299,13 @@ int main(int argc, char** argv){
 			free(line_old);
 		} else if(strprefix("..include \"", line)){
 			char* line_old = line;
-			long loc_eparen = strfind(line, "\"");
+			long loc_eparen = strfind(line+ strlen("..include \""), "\"");
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
 				puts(line_copy);
 				goto error;
 			}
-			loc_eparen -= strlen("..include \"");
 			line = strcatallocf2(
 				"ASM_header ",
 				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)
