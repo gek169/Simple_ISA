@@ -761,6 +761,20 @@ sc 0,32;
 it is NOT evaluated at macro definition time.
 
 .TP
+.B SPLIT8 (%~%)
+
+builtin macro to evaluate the contained text as an 8 bit number.
+
+This allows forward declaration of an 8 bit constant to be utilized, the same way
+you can forward declare a 16/24/32 bit constant and use it with other splits.
+
+la %~5%;
+
+is equvalent to
+
+la 5;
+
+.TP
 .B SPLIT32 (%/%)
 
 builtin macro to expand numbers into 4 bytes (highest, high, low, lowest)

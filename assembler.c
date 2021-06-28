@@ -1634,9 +1634,11 @@ int main(int argc, char** argv){
 					} else if (i==2){
 						long loc_qmark=		-1;
 						long loc_slash=		-1;
-						long loc_dash_mark=		-1; /*BAD NAME! it's actually a DASH*/
+						long loc_dash_mark=		-1;
+						long loc_tilde=		-1;
 						long loc_ampersand=	-1;
 						char do_32bit=		0;
+						char do_8bit=		0;
 						long loc_eparen=	-1;
 						char expansion[1024];
 						unsigned long res=0; /*Split directive.*/
@@ -1649,6 +1651,7 @@ int main(int argc, char** argv){
 						loc_slash = strfind(line_old+loc+1,"/");
 						loc_qmark = strfind(line_old+loc+1,"?");
 						loc_dash_mark = strfind(line_old+loc+1,"-");
+						loc_tilde = strfind(line_old+loc+1,"~");
 						loc_ampersand = strfind(line_old+loc+1,"&");
 						if(loc_eparen == -1){
 							printf("<ASM SYNTAX ERROR> SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
@@ -1661,12 +1664,14 @@ int main(int argc, char** argv){
 						if(loc_dash_mark==0) do_32bit = 4;
 						if(loc_ampersand==0) do_32bit = 3;
 						if(loc_qmark==0) do_32bit = 2;
+						if(loc_tilde==0) {do_8bit = 1;do_32bit = 0;}
 						
 						/*the character we were going to replace anyway, plus
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
-						
-						if(do_32bit == 0)
+						if(do_8bit != 0)
+							res = strtoul(line_old+loc+2, NULL, 0);
+						else if(do_32bit == 0)
 							res = strtoul(line_old+loc+1, NULL, 0);
 						else if(do_32bit == 1 || do_32bit == 3) /*Skip the forward slash or ampersand*/
 							res = strtoul(line_old+loc+2, NULL, 0);
@@ -1705,7 +1710,10 @@ int main(int argc, char** argv){
 						if(debugging) if(!clear_output)printf("\nSplitting value %lu\n", res);
 						/*Write the upper and lower halves out, separated, to expansion.*/
 						if(do_32bit == 0) {
-							sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
+							if(do_8bit == 0)
+								sprintf(expansion, "%u,%u", ((unsigned int)(res/256)&0xff),(unsigned int)(res&0xff));
+							else
+								sprintf(expansion, "%u", (unsigned int)(res&0xff));
 						} else if(do_32bit == 1 || do_32bit == 2 || do_32bit == 4) {
 							sprintf(expansion, "%u,%u,%u,%u", (unsigned int)((res/(256*256*256))&0xff),
 																(unsigned int)((res/(0x10000))&0xff),
@@ -1823,6 +1831,9 @@ int main(int argc, char** argv){
 				strfind(macro_name, "!") != -1 ||
 				strfind(macro_name, "?") != -1 ||
 				strfind(macro_name, ".") != -1 ||
+				strfind(macro_name, ":") != -1 ||
+				strfind(macro_name, "~") != -1 ||
+				strfind(macro_name, "-") != -1 ||
 				strfind(macro_name, "[") != -1 ||
 				strfind(macro_name, "]") != -1 ||
 				strfind(macro_name, "\\") != -1 ||
@@ -1855,6 +1866,9 @@ int main(int argc, char** argv){
 				strfind("!", macro_name) != -1 ||
 				strfind("?", macro_name) != -1 ||
 				strfind(".", macro_name) != -1 ||
+				strfind(":", macro_name) != -1 ||
+				strfind("~", macro_name) != -1 ||
+				strfind("-", macro_name) != -1 ||
 				strfind("[", macro_name) != -1 ||
 				strfind("]", macro_name) != -1 ||
 				strfind("\\", macro_name) != -1 ||

@@ -43,7 +43,8 @@ bytes 0xd, 0xa;
 			proc_puts;
 		pop %3%;
 		arx2;apush;
-		lb8;rsh;apush;
+	//testing 8 bit split syntax
+		lb %~8%;rsh;apush;
 	//print the number of seconds.
 		proc_printbytehex;
 		apop;
