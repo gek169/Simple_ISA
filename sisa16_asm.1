@@ -615,16 +615,20 @@ is syntactic sugar for
 
 VAR#myProcedure#sc%@%;call;
 
-(Note that you shouldn't enter quotes for any of these)
+"..include"file.h"" is syntactic sugar for "ASM_header file.h"
 
-The following syntactic sugars are allowed to prefix a piece of code, 
+The following syntactic sugars are allowed to prefix something,
 they must be at the beginning of a line, after preceding whitespace:
 
 "..zero:" is syntactic sugar for "section0;"
 
 "..(37):" is syntactic sugar for "section2424832;". It selects a region. 
 
+"..ascii:Hello World!" is syntactic sugar for "!Hello World!"
 
+"..asciz:Hello World!" is syntactic sugar for "!Hello World!" followed by a line which says "bytes0"
+
+(Note that you shouldn't enter quotes for any of these)
 
 .TP
 .B Evaluation Sequence Points (|)

@@ -1194,6 +1194,7 @@ int main(int argc, char** argv){
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(1){
 		char was_macro = 0;	
+		char using_asciz = 0;
 		if(!infile) {
 			puts("<ASM INTERNAL ERROR> infile is null? This should never happen.");
 		}
@@ -1239,16 +1240,7 @@ int main(int argc, char** argv){
 		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-		if(strprefix("!",line)) {unsigned long i;
-			/*We are writing out individual bytes for the rest of the line.*/
-			if(debugging)
-				if(!clear_output)printf("Detected Character Literal on Line:\n%s\n", line_copy);
-			if(printlines && npasses == 1)ASM_PUTS(line);
-			if(!quit_after_macros)
-				for(i = 1; i < strlen(line);i++)
-					fputbyte(line[i], ofile);
-			goto end;
-		}
+
 		/*
 			syntactic sugars.
 		*/
@@ -1257,8 +1249,16 @@ int main(int argc, char** argv){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..zero:"));
 			free(line_old);
-		}
-		if(strprefix("..(", line)){
+		}else if(strprefix("..ascii:", line)){
+			char* line_old = line;
+			line = strcatalloc("!", line+strlen("..ascii:"));
+			free(line_old);
+		} else if(strprefix("..asciz:", line)){
+			char* line_old = line;
+			line = strcatalloc("!", line+strlen("..asciz:"));
+			free(line_old);
+			using_asciz = 1;
+		} else if(strprefix("..(", line)){
 			char buf[40];
 			unsigned long secnum = 0;
 			char* line_old = line;
@@ -1283,8 +1283,38 @@ int main(int argc, char** argv){
 				)
 			);
 			free(line_old);
+		} else if(strprefix("..include\"", line)){
+			char* line_old = line;
+			long loc_eparen = strfind(line, "\"");
+			if(loc_eparen == -1){
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts("Line:");
+				puts(line_copy);
+				goto error;
+			}
+			loc_eparen -= strlen("..include\"");
+			line = strcatallocf2(
+				"ASM_header ",
+				str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)
+			);
+			free(line_old);
+		} else if(strprefix("..include \"", line)){
+			char* line_old = line;
+			long loc_eparen = strfind(line, "\"");
+			if(loc_eparen == -1){
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts("Line:");
+				puts(line_copy);
+				goto error;
+			}
+			loc_eparen -= strlen("..include \"");
+			line = strcatallocf2(
+				"ASM_header ",
+				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)
+			);
+			free(line_old);
 		}
-		if(strprefix("..decl_farproc:", line)){
+		else if(strprefix("..decl_farproc:", line)){
 			char buf[100];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
@@ -1294,7 +1324,7 @@ int main(int argc, char** argv){
 			free(line_old);
 			free(procedure_name);
 		}
-		if(strprefix("..decl_lproc:", line)){
+		else if(strprefix("..decl_lproc:", line)){
 			char buf[100];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_lproc:"), "");
@@ -1305,7 +1335,7 @@ int main(int argc, char** argv){
 			free(procedure_name);
 		}
 		/*syntactic sugar for VAR*/
-		if(line[0] == '.'){
+		else if(line[0] == '.'){
 			long loc_colon = strfind(line, ":");
 			if(line[1] == '.'){
 				printf("<ASM SYNTAX ERROR> Syntactic sugar has a second period but is recognized as a macro declaration. Most likely a spelling error. Line:\n%s\n", line_copy);
@@ -1320,7 +1350,7 @@ int main(int argc, char** argv){
 			}
 		}
 		/*syntactic sugar for labels*/
-		if(line[0] == ':'){
+		else if(line[0] == ':'){
 			char*  line_old = line;
 			long loc_colon2 = strfind(line+1, ":");
 			if(loc_colon2 == -1){
@@ -1344,6 +1374,17 @@ int main(int argc, char** argv){
 			
 		}
 		*/
+		if(strprefix("!",line)) {unsigned long i;
+			/*We are writing out individual bytes for the rest of the line.*/
+			if(debugging)
+				if(!clear_output)printf("Detected Character Literal on Line:\n%s\n", line_copy);
+			if(printlines && npasses == 1)ASM_PUTS(line);
+			if(!quit_after_macros)
+				for(i = 1; i < strlen(line);i++)
+					fputbyte(line[i], ofile);
+			if(using_asciz) fputbyte(0, ofile);
+			goto end;
+		}
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
 			const char* env_sisa16bin = getenv("SISA16BIN");
