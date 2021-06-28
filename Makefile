@@ -16,6 +16,7 @@ all: main asm_programs
 sisa16_emu:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16_emu -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 	@echo "~~Built emulator."
+
 sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
 	@echo "~~Built assembler (Which has an emulator built into it.)"
@@ -24,7 +25,7 @@ main: sisa16_asm sisa16_emu
 
 check: asm_programs
 
-cpp_program:
+isa_constexpr:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
 asm_programs: sisa16_asm
@@ -55,5 +56,5 @@ uninstall:
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16 sisa16_stdin isa_constexpr rbytes sisa16_asm
+	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_stdin isa_constexpr rbytes
 	clear
