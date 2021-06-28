@@ -29,9 +29,9 @@ bytes 0;
 bytes 0;
 
 //main routine.
-section 0x10000;
+
 //rx2 holds our time in seconds.
-	clock;rx2b;
+..(1):	clock;rx2b;
 	:main_looptop:
 	//iter++;
 		ld_iter;rxincr;st_iter;
@@ -92,4 +92,4 @@ halt;
 
 
 //bootloader
-section 0;la 1;lfarpc;
+..zero:la 1;lfarpc;

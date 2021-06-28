@@ -884,10 +884,10 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 	return 0;
 }
 int main(int argc, char** argv){
-	FILE* infile,*ofile; char* metaproc;
+	FILE *infile,*ofile; 
+	char* metaproc;
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
-	const unsigned long maxmacrocalls = 0x100000;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
@@ -1193,7 +1193,7 @@ int main(int argc, char** argv){
 	/*Second pass to allow goto labels*/
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
 	while(1){
-		char was_macro = 0;	unsigned long nmacrocalls = 0;
+		char was_macro = 0;	
 		if(!infile) {
 			puts("<ASM INTERNAL ERROR> infile is null? This should never happen.");
 		}
@@ -1253,6 +1253,37 @@ int main(int argc, char** argv){
 			syntactic sugars.
 		*/
 		/*syntactic sugar for declaring procedures that call to the current output counter.*/
+		if(strprefix("..zero:", line)){
+			char* line_old = line;
+			line = strcatalloc("section0;", line+strlen("..zero:"));
+			free(line_old);
+		}
+		if(strprefix("..(", line)){
+			char buf[40];
+			unsigned long secnum = 0;
+			char* line_old = line;
+			long loc_eparen = strfind(line, /*(*/"):");
+			secnum = strtoul(line + 3, 0,0);
+			if(loc_eparen == -1){
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for region selection is missing ending \"):\"");
+				puts("Line:");
+				puts(line_copy);
+				goto error;
+			}
+			loc_eparen += 2;
+			sprintf(buf, "%lu", secnum * 256 * 256);
+			line = strcatallocfb(
+				strcatalloc(
+					"section",
+					buf
+				),
+				strcatalloc(
+					";",
+					line + loc_eparen
+				)
+			);
+			free(line_old);
+		}
 		if(strprefix("..decl_farproc:", line)){
 			char buf[100];
 			char* line_old = line;
@@ -1305,6 +1336,14 @@ int main(int argc, char** argv){
 			);
 			free(line_old);
 		}
+		/*
+		else if(
+			(strlen(line) > 0) &&
+			(line[strlen(line)-1] == ':')
+		){
+			
+		}
+		*/
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
 			const char* env_sisa16bin = getenv("SISA16BIN");
@@ -1398,11 +1437,6 @@ int main(int argc, char** argv){
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		pre_pre_processing:
-		if(nmacrocalls > maxmacrocalls){
-			printf("<ASM COMPILATION ERROR> the recursion limit for macro calls has been reached.Line:\n%s\n", line_copy);
-			goto error;
-		}
-		nmacrocalls++;
 		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace.*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");

@@ -588,6 +588,9 @@ Several built-in macros are evaluated inside of macro definitions, such as @ and
 
 There are various extremely common operations in sisa16 that have syntactic sugars available
 
+These Syntactic sugar lines must have nothing else on them, not even comments.
+They may have preceding whitespace only! nothing else.
+
 ".myMacro:definition"
 
 is syntactic sugar for
@@ -613,6 +616,15 @@ is syntactic sugar for
 VAR#myProcedure#sc%@%;call;
 
 (Note that you shouldn't enter quotes for any of these)
+
+The following syntactic sugars are allowed to prefix a piece of code, 
+they must be at the beginning of a line, after preceding whitespace:
+
+"..zero:" is syntactic sugar for "section0;"
+
+"..(37):" is syntactic sugar for "section2424832;". It selects a region. 
+
+
 
 .TP
 .B Evaluation Sequence Points (|)
