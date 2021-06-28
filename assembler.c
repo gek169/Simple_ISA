@@ -1460,8 +1460,10 @@ int main(int argc, char** argv){
 					if(debugging) printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
-					if(!was_macro) /*It is unnecessary to check for longer macros when only searching for builtins.*/
-					for(j = 0; j<(long)nmacros; j++){
+					if(!was_macro ||
+						 (i > (long)nbuiltin_macros)
+					)
+					for(j = i-1; j>(long)nbuiltin_macros; j--){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
 							long checkme;
