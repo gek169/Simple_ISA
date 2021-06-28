@@ -1,6 +1,6 @@
 #define k case
 /*Would require edit if you wanted a 32 bit PC*/
-#define PP ((UU)(program_counter_region<<16))
+#define PP (((UU)program_counter_region)<<16)
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_BYTE M[PP+((U)(program_counter++))]
 #define r(d) M[d]
