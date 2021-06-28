@@ -15,18 +15,14 @@ section 0xAE0000;
 bytes %/0%;
 
 section 0xAF0000;
-!Bench finished.
-bytes 0;
+..asciz:Bench finished.
 :seconds_strings:
 bytes 0xd, 0xa;
-!Seconds:
-bytes 0;
+..asciz: Seconds:
 :iterations_strings:
-! Iterations:
-bytes 0;
+..asciz: Iterations:
 :STP_STRING:
-! Stack Pointer:
-bytes 0;
+..asciz: Stack Pointer:
 
 //main routine.
 
