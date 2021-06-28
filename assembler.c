@@ -955,6 +955,11 @@ int main(int argc, char** argv){
 			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
 			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
+#if defined(FUZZTEST)
+			puts("This build of Sisa16 is safe for fuzz testing. You can run random binaries with impunity.");
+#else
+			puts("Fuzztesting safety is disabled. The driver may allow you to damage the host- be careful what you run!");
+#endif
 #if defined(NO_SEGMENT)
 			puts("The segment was disabled during compilation. Emulate is also disabled.");
 #else
