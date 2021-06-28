@@ -46,4 +46,4 @@ section 10;
 		la0x45;putchar;sc%printbytehex_jmptable_2_end%;jmp
 		la0x46;putchar;sc%printbytehex_jmptable_2_end%;jmp
 	:printbytehex_jmptable_2_end:
-	halt;
+halt;

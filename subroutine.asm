@@ -11,7 +11,7 @@ section 1000;
 	lb0xf;and;
 	lb 7;mul;
 	llb %printbytehex_jmptable_1%; add;ca;jmp;
-	VAR#printbytehex_jmptable_1#@
+	:printbytehex_jmptable_1:
 		la0x30;putchar;sc%printbytehex_jmptable_1_end%;jmp
 		la0x31;putchar;sc%printbytehex_jmptable_1_end%;jmp
 		la0x32;putchar;sc%printbytehex_jmptable_1_end%;jmp
@@ -28,10 +28,10 @@ section 1000;
 		la0x44;putchar;sc%printbytehex_jmptable_1_end%;jmp
 		la0x45;putchar;sc%printbytehex_jmptable_1_end%;jmp
 		la0x46;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	VAR#printbytehex_jmptable_1_end#@
+	:printbytehex_jmptable_1_end:
 	apop;lb 15;and;lb7;mul;
 	llb%printbytehex_jmptable_2%;add;ca;jmp;
-	VAR#printbytehex_jmptable_2#@
+	:printbytehex_jmptable_2:
 		la0x30;putchar;sc%printbytehex_jmptable_2_end%;jmp
 		la0x31;putchar;sc%printbytehex_jmptable_2_end%;jmp
 		la0x32;putchar;sc%printbytehex_jmptable_2_end%;jmp
@@ -48,8 +48,8 @@ section 1000;
 		la0x44;putchar;sc%printbytehex_jmptable_2_end%;jmp
 		la0x45;putchar;sc%printbytehex_jmptable_2_end%;jmp
 		la0x46;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	VAR#printbytehex_jmptable_2_end#@
-	ret;
+	:printbytehex_jmptable_2_end:
+ret;
 
 
 section 500;
