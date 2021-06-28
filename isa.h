@@ -827,3 +827,9 @@ SUU RX1I = RX1;
 }D
 G_HALT:dcl();return 0;
 }
+
+#undef D
+#undef k
+#undef PP
+#undef r
+
