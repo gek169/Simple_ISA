@@ -1504,7 +1504,10 @@ int main(int argc, char** argv){
 
 		if(strlen(line) < 1) goto end; /*the line is empty*/
 		if(strlen(line) == 1 && !isalpha(line[0])) goto end; /*Cannot possibly be a macro, it's the end of file thing.*/
-		if(!isalpha(line[0]) && line[0] != ' ' && line[0] != ';' && line[0] != '\t'
+		if(!isalpha(line[0]) && 
+			line[0] != ' ' && 
+			line[0] != '_' && 
+			line[0] != ';' && line[0] != '\t'
 			&& line[0] != '\\' && line[0] != '|'){
 			if(!clear_output)printf("<ASM WARNING> Ignoring line beginning with illegal character... Line:\n%s\n", line_copy);
 			goto end;
