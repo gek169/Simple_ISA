@@ -75,8 +75,8 @@ static char* insns[212] = {
 	"astp",
 	"bstp",
 	"compl",
-	/*Call structure*/
 	"cpc",
+	/*Call structure*/
 	"call",
 	"ret",
 	/*Far Memory Access*/
@@ -87,6 +87,7 @@ static char* insns[212] = {
 	"farpagel",
 	"farpagest",
 	"lfarpc",
+	/*Call structure*/
 	"farcall",
 	"farret",
 	"farilda",
