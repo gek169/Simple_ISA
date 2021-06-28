@@ -53,7 +53,7 @@ ret;
 
 
 section 500;
-	VAR#L_main#@
+	:L_main:
 		getchar;putchar;
 		lb 0x30;sub;
 		apush;
