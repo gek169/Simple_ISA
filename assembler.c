@@ -1538,7 +1538,7 @@ int main(int argc, char** argv){
 					if(!was_macro ||
 						 (i > (long)nbuiltin_macros)
 					)
-					for(j = i-1; j>(long)nbuiltin_macros; j--){
+					for(j = i-1; j>=(long)nbuiltin_macros; j--){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
 							long checkme;
