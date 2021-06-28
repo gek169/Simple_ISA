@@ -639,7 +639,8 @@ static char quit_after_macros = 0;
 static char debugging = 0;
 static unsigned long npasses = 0;
 static char printlines = 0;
-static unsigned long linesize = 0;char* line = NULL, *line_copy = NULL;
+static unsigned long linesize = 0;
+static char* line = NULL, *line_copy = NULL;
 static unsigned long region_restriction = 0;
 static char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 static void fputbyte(unsigned char b, FILE* f){
