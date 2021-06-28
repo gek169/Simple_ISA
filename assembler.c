@@ -438,8 +438,7 @@ static char* insn_repl[212] = {
 	"bytes57;",
 	/*compl of a*/
 	"bytes58;",
-	/*cpc*/
-	"bytes59;",
+	"bytes59;",/*cpc*/
 	"bytes60;",  /*call*/
 	"bytes61;",  /*ret*/
 	/*far memory.*/
@@ -601,6 +600,7 @@ static char* insn_repl[212] = {
 		"bytes208;","bytes209;",
 	/*emulate_seg*/
 		"bytes210;",
+	/*rxicmp*/
 		"bytes211;"
 };
 static const unsigned int n_insns = 212;
@@ -741,6 +741,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 			unsigned long required_spaces = 20;
 			unsigned long opcode_i = i-1;
 			U short_interpretation = 0;
+			u byte_interpretation = 0;
 			printf("%-13s",insns[opcode]);
 			for(arg_i = 0; arg_i < insns_numargs[opcode]; arg_i++){
 				unsigned char thechar;
@@ -758,6 +759,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				}
 				thechar = fgetc(f);
 				short_interpretation += thechar;
+				byte_interpretation = thechar;
 				if(arg_i == 0)short_interpretation *= 256;
 				printf("0x%02x",(unsigned int)thechar);i++;
 			}
@@ -781,6 +783,8 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				{
 					if( (short_interpretation & 0xFF00) == 0)
 						puts(" <TIP> replace with single-byte assignment, high byte is zero.");
+					else
+						puts("");
 				}else if(streq(insns[opcode], "ret")){
 					puts(" End of Local Procedure");
 				} else if(opcode == 0 && n_halts == 1){
@@ -791,36 +795,36 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 					puts(" Conditional Jump");
 				}else if(streq(insns[opcode], "cbrx0")
 						||streq(insns[opcode], "carx0")){
-					puts(" Likely: Far memory array access through RX0. Check array alignment!");
+					puts(" ?: Far memory array access through RX0. Check array alignment!");
 				}else if(streq(insns[opcode], "jmpifneq")){
 					puts(" Conditional Jump");
 				}else if(streq(insns[opcode], "clock")){
-					puts(" Interact with system time (see manpage) the A register is the time in milliseconds after this insn.");
+					puts(" Interact w/ sys time: A=ms, B=s, C=clock()");
 				}else if(streq(insns[opcode], "emulate_seg")){
-					puts(" Sandboxing Insn with Shared Segment. Jumps to 0x000000 and catches exceptions");
+					puts(" Sandboxing Insn w/ Shared Segment. Jumps to 0x000000 and catches exceptions");
 				}else if(streq(insns[opcode], "emulate")){
-					puts(" Sandboxing Insn. Jumps to 0x000000 and catches exceptions.");
+					puts(" Sandboxing Insn. Jump to 0x000000 and catches exceptions.");
 				}else if(streq(insns[opcode], "interrupt")){
-					puts(" <DEVICE> Device interaction using all registers returning value to A.");
+					puts(" <DEVICE> interrupt returning value to A.");
 				}else if(streq(insns[opcode], "putchar")){
 					puts(" <DEVICE> write A to device.");
 				}else if(streq(insns[opcode], "getchar")){
 					puts(" <DEVICE> read A from device.");
 				}else if(streq(insns[opcode], "sc")){
 					if(short_interpretation == (opcode_i & 0xffFF)){
-						puts(" Very Likely: Loop top. <TIP>: replace with cpc.");
+						puts(" \?!: Loop top. <TIP>: replace with cpc.");
 					}else{
-						puts(" Likely: arg is jump target");
+						puts(" ?: arg is jump target");
 					}
 				}else if(streq(insns[opcode], "crx0")
 						||streq(insns[opcode], "crx1")
 						||streq(insns[opcode], "crx2")
 						||streq(insns[opcode], "crx3")){
-					puts(" Likely: Computed Jump through RX register.");
+					puts(" ?: Computed Jump through RX register.");
 				}else if(streq(insns[opcode], "ca")){
-					puts(" Maybe: Computed Jump through register A");
+					puts(" ?\?: Computed Jump through register A");
 				}else if(streq(insns[opcode], "cb")){
-					puts(" Maybe: Computed Jump through register B");
+					puts(" ?\?: Computed Jump through register B");
 				}else if(streq(insns[opcode], "astp")){
 					puts(" Stack manip, maybe retrieving function arguments?");
 				}else if(streq(insns[opcode], "call")){
@@ -828,9 +832,9 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 				}else if(streq(insns[opcode], "farcall")){
 					puts(" Procedure Call");
 				}else if(streq(insns[opcode], "lfarpc")){
-					puts(" Region Jump");
+					printf(" Region Jump to %u\n", (unsigned)byte_interpretation);
 				}else if(streq(insns[opcode], "farjmprx0")){
-					puts(" Far Jump");
+					puts(" Far Jump Through RX0");
 				}else if( streq(insns[opcode], "farllda")
 						||streq(insns[opcode], "farlldb")
 						||streq(insns[opcode], "farldc")
@@ -844,7 +848,7 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 						||streq(insns[opcode], "llda")
 						||streq(insns[opcode], "lldb")
 				){
-					puts(" Likely: Loading from fixed position variable.");
+					puts(" ?: Loading from fixed position variable.");
 				}else if( streq(insns[opcode], "farstla")
 						||streq(insns[opcode], "farstlb")
 						||streq(insns[opcode], "farstc")
@@ -858,9 +862,9 @@ static int disassembler(char* fname, unsigned long location, unsigned long SISA1
 						||streq(insns[opcode], "stla")
 						||streq(insns[opcode], "stlb")
 				){
-					puts(" Likely: Storing to fixed position variable.");
+					puts(" ?: Storing to fixed position variable.");
 				}else if(streq(insns[opcode], "cpc")){
-					puts(" Very Likely: Loop top.");
+					puts(" ?: Loop top is next insn");
 				}else {printf("\n");}
 				if(unfinished_flag){
 					puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
@@ -900,7 +904,11 @@ int main(int argc, char** argv){
 	variable_expansions[6] = variable_expansions[0];
 	variable_names[7] = "\r";
 	variable_expansions[7] = variable_expansions[0];
-	nmacros = 8;
+	variable_names[8] = "  ";
+	variable_expansions[8] = variable_expansions[0];	
+	variable_names[9] = ";;";
+	variable_expansions[9] = ";";
+	nmacros = 10;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
