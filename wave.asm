@@ -10,8 +10,7 @@
 
 section 0x40000;
 :ascii_greyscale:
-! .:-=+*#%@%#*+=-:.
-bytes 0
+..asciz: .:-=+*#%@%#*+=-:.
 
 
 ASM_header libc.hasm
