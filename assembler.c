@@ -1476,7 +1476,11 @@ int main(int argc, char** argv){
 		}
 		/*Step 0: PRE-PRE PROCESSING. Yes, this is a thing.*/
 		pre_pre_processing:
-		while(strprefix(" ",line) || strprefix("\t",line)){ /*Remove preceding whitespace.*/
+		while(
+				strprefix(" ",line) 
+				|| strprefix("\t",line)
+				|| (isspace(line[0]) && line[0] != '\0')
+				){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");
 			free(line_old);

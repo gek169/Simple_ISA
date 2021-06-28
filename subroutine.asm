@@ -2,7 +2,7 @@
 
 section 0;sc %L_main%; jmp;
 section 1000;
-VAR#proc_printbytehex#sc %1000%;call;
+.proc_printbytehex:sc %1000%;call;
 	//retrieve our argument.
 	astp;lb3;sub;ca;ilda;
 	//push it
