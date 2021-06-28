@@ -7,7 +7,6 @@ static char* outfilename = "outsisa16.bin";
 static char run_sisa16 = 0;
 static char enable_dis_comments = 1;
 static char clear_output = 0;
-static char use_tempfile = 0;
 static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
 static char* variable_names[65535] = {0};
@@ -605,7 +604,7 @@ static char* insn_repl[212] = {
 };
 static const unsigned int n_insns = 212;
 static char int_checker(char* proc){
-	char int_mode = 0; /*starting with 0x means */
+	char int_mode = 0; /*starting with 0x means hexidecimal*/
 	char first_character = 1;
 	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
 	if(proc[0] == '0') {int_mode = 1;proc++;} /*octal*/
