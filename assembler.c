@@ -1917,7 +1917,8 @@ int main(int argc, char** argv){
 				if(debugging){
 					if(!clear_output)printf("\n~~Insn Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
 				}
-				{unsigned long i;for(i = 0; i<n_insns; i++){char* line_old; long loc, linesize; unsigned long j;
+				{unsigned long i;for(i = 0; i<n_insns; i++){
+					char* line_old; long loc, linesize; unsigned long j;
 					char found_longer_match; int num_commas_needed;
 					linesize = strlen(line);
 					loc = strfind(line, insns[i]);					
@@ -1928,7 +1929,7 @@ int main(int argc, char** argv){
 
 					/*Check to make sure that this isn't some other, longer insn.*/
 					found_longer_match = 0;
-					for(j = 0; j<n_insns; j++){
+					for(j = i+1; j<n_insns; j++){
 						if(j == i) continue;
 						if(strlen(insns[j]) > strlen(insns[i])){
 							long checkme = strfind(line, insns[j]);
@@ -2006,16 +2007,16 @@ int main(int argc, char** argv){
 					/**/
 					have_expanded = 1;
 					{char* before; char* after; long len_to_replace;
-					len_to_replace = strlen(insns[i]);
-					before = str_null_terminated_alloc(line_old, loc);
-					before = strcatallocf1(before, insn_repl[i]);
-					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
-									linesize-loc-len_to_replace);
-					line = strcatallocfb(before, after);
-					free(line_old);
+						len_to_replace = strlen(insns[i]);
+						before = str_null_terminated_alloc(line_old, loc);
+						before = strcatallocf1(before, insn_repl[i]);
+						after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
+										linesize-loc-len_to_replace);
+						line = strcatallocfb(before, after);
+						free(line_old);
 					}
 				}}
-			}while(have_expanded && (iteration++ < 32700)); /*Probably safe right?*/
+			}while(have_expanded && (iteration++ < 0xFFff)); /*Probably safe right?*/
 		}
 		/*
 			Put out bytes.
@@ -2069,7 +2070,8 @@ int main(int argc, char** argv){
 						incr > incrdont) break; /**/
 					proc += incr; proc += 1; /*Skip the comma itself.*/
 				}while(strlen(proc) > 0);
-			} else if(strprefix("section", metaproc)){ unsigned long dest;
+			} else if(strprefix("section", metaproc)){ 
+				unsigned long dest;
 				char* proc = metaproc + 7;
 				if(strlen(proc) == 0){
 					puts("<ASM SYNTAX ERROR> Cannot have empty SECTION tag.");
@@ -2084,7 +2086,6 @@ int main(int argc, char** argv){
 				/*Explicitly check to see if they actually typed zero.*/
 					if(proc[0]!='0'  && npasses == 1)
 					if(!clear_output)printf("<ASM WARNING> Section tag at zero. Might be a bad number. Line %s\n", line_copy);
-
 				}
 				if(debugging)
 					if(!clear_output)printf("Moving the output counter to %lu\n", dest);
@@ -2181,7 +2182,7 @@ int main(int argc, char** argv){
 				}
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)
-					if(!clear_output)printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
+					printf("\nRequest to halt assembly at this insn. STATUS:\nLine:\n%s\nCounter: %04lx\n", line_copy, outputcounter);
 				goto error;
 			}else if(strprefix("!", metaproc)){
 				printf("<ASM SYNTAX ERROR> Cannot put string literal here, Line:\n%s\nInternal:\n%s\n", line_copy, metaproc);
@@ -2208,17 +2209,16 @@ int main(int argc, char** argv){
 		} while(1);
 		/*if this is a line with vertical bars, start processing the stuff after the next vertical bar. */
 		if(strfind(line, "|")!=-1){
-			char* line_temp = strcatalloc(line+strfind(line, "|")+1, "");
-			free(line); line = line_temp;
+			char* line_temp = strcatalloc(line+strfind(line, "|")+1,"");
+			free(line);line = line_temp;
 			goto pre_pre_processing;
 		}
 		end:
 		free(line);
 		free(line_copy);
 		continue;
-		/*Yikes!*/
 		error:
-		puts("<ASM> Assembler Aborted.\n");
+		puts("<ASM> Assembler Aborted.");
 		return 1;
 	}
 	if(!clear_output)printf("<ASM> Successfully assembled %s\n", outfilename);
