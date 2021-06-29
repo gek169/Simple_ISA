@@ -29,6 +29,8 @@ it executes identically on every major platform and computer architecture.
 
 * Ready for deployment. the assembler can build, execute, and disassemble binaries for debugging.
 
+* Documented. Manpages and developer manual are provided in this repository along with examples.
+
 * Public domain. 
 
 	* (NOTE: The provided example textmode driver includes four lines under the Ncurses license. See d.h.)
@@ -81,6 +83,8 @@ Another binary disassembled:
 
 * Infinite 'segment' which allows for access to more than 16 megs of memory.
 
+* 'emulate_seg' functions the same but shares the infinite segment with the sandboxed process.
+
 * the registers a, b, c, and the program counter are 16 bit. the program conter region is 8 bit.
 
 * RX0-3 are 32 bit.
@@ -104,6 +108,7 @@ The emulator and assembler have been compiled and tested on the following archit
 	i536 (using: Debian linux, Alpine linux, on: native, jslinux)
 	x86_64 (using: Debian linux, Windows 10, on: native)
 	riscv64 (Buildroot linux, jslinux)
+	armhf 32 (using: Debian linux, raspberry pi)
 ```
 
 The included assembly programs are written for the architecture and can be executed just like scripts!
@@ -147,9 +152,9 @@ sudo make install
 sudo make uninstall
 ```
 
-you `sudo make install` and `sudo make uninstall` to install sisa16 and sisa16_asm (with those names) into INSTALL_DIR 
+you can run `sudo make -B install` and `sudo make -B uninstall` to install sisa16_emu and sisa16_asm (with those names) into INSTALL_DIR 
 
-you can set the INSTALL_DIR by using `make install INSTALL_DIR=/my/directory`
+you can set the INSTALL_DIR by using `sudo make -B install INSTALL_DIR=/my/directory`
 
 but make sure that while uninstalling you pass INSTALL_DIR again.
 
@@ -515,382 +520,9 @@ rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 
 The rest: nop duplicates, free for expansion (1 byte)
 ```
-There are plenty of free instruction spots for you to play around with in your experimentation.
 
-The primary usecase for this is probably embedding a portable bytecode instruction set into a game,
-or for educational purposes.
+Read the documentation for more information.
 
-The emulator will print out its memory layout at the end of execution if you pass an additional argument
-to it on the commandline (other than just the program name)
-```bash
-sisa16 program.bin literallyanything
-```
-## Device Interface
-
-You can make the emulator work with any device you want by implementing your own abstraction layer.
-Implement these functions in a d.h file:
-
-void di() is the device initializer.
-void dcl() is the devoice closing function.
-unsigned short gch() is the "get" function which puts something into register a.
-void pch(unsigned short) is the "put" function which gets something from register a.
-
-the memory (`unsigned char M[(1<<24)];`) is accessible from these functions.
-
-for more advanced usage which requires access to the registers...
-```c
-static unsigned short interrupt(unsigned short a,
-								unsigned short b,
-								unsigned short c,
-								unsigned short stack_pointer,
-								unsigned short program_counter,
-								unsigned char program_counter_region,
-								UU RX0,
-								UU RX1,
-								UU RX2,
-								UU RX3
-							);
-```
-
-The emulator requires a filename as the first parameter when running.
-
-A reasonably competent assembler is included with the ability to define sections, 
-include arbitrary data,
-and write your own multi-statement macros.
-It also does a limited amount of error checking.
-
-The assembler can now perform disassembly if you give it a file and a location to disassemble from.
-
-```sh
-sudo make -B install
-./asm_compile.sh
-#and then...
-sisa16_asm -dis clock.bin 0x20000
-```
-
-## What is this ISA called?
-
-SISA16, Simple Instruction Set Architecture 16-bit.
-
-## Specs?
-
-The ISA is capable of indexing 64k of memory "normally" but by using "far" indexing, it can
-access 16 megabytes in total.
-
-You can use the included assembler to define ROMs which are up to the full 16 megabytes in size.
-
-CPU speed:
-The machine isn't real but it executes as fast as possible on the host machine.
-
-Memory speed:
-Again, not really simulated. The architecture is designed with cache-efficiency in-mind, though- hence
-the existence of the home region and its special properties.
-
-Floating point unit:
-the only platform-dependent feature of the ISA.
-
-you can disable the floating point unit by compiling isa.c with -DNO_FP
-
-there will be no floating point code in the resulting binary.
-
-## Portability
-
-The Emulator and Assembler compile and run on dozens of architectures of varying endiannesses.
-
-Compiletime and runtime checks on the environment are done to ensure that any platform that the ISA won't run on
-are prevented from passing even the most basic testing.
-
-
-
-## Far memory system.
-
-Note that the program counter is 16 bit (not 32) and so the program counter cannot normally access
-more than the first 64 kilobytes.
-
-To get around this, I have implemented an "offset" system.
-
-THere is a special register called the "program counter offset" which is set implicitly in farcall and farret,
-or set explicitly with lfarpc.
-
-It is recommended you put your procedure definitions on page boundaries so that they can be easily copied and called.
-You might want to define a standard for how the number of pages a procedure occupies is specified-
-for instance, if a procedure occupies three pages,
-you might want to store a single byte before the beginning of the procedure specifying its length as three pages.
-
-If you use the farcall/farret system, be warned: you cannot use normal loads and stores to access memory
-outside the first 64k. This means for instance that if you write self-modifying code, you will not write
-to the actual location of instructions being executed.
-
-This can be useful- you can consider the first 64k "stack only" or "scratchpad memory"
-
-jumps and calls that happen after a farcall or lfarpc will always jump within the
-current 64k that the program counter is inside of.
-
-the first 64k is typically the fastest to access on the emulator since it is closest to the registers.
-
-Far memory loads and stores are now much easier with the farld and farst instructions and the indirect variants.
-
-## Programming conventions established by hardware
-
-Stack:
-
-The stack pointer (which always resides in the first 64k) points to a *free* location on the stack.
-The stack pointer *increments* rather than decrements to increase the stack size.
-
-The stack can be, at most, 64 kilobytes. Don't let it get there.
-
-## SISA-16 Assembler
-
-the SISA-16 assembler is very basic but very powerful. you can define variables, include arbitrary data in multiple ways,
-and of course, invoke every single one of SISA-16's many instructions.
-
-The assembler is a two-pass compiler. The first pass behaves like the second pass but doesn't actually write
-to the output file. On the second pass, the assembler writes to the output file.
-
-This is done so that macros for goto labels can be generated on the first pass and used on the second-
-if you have something like this:
-```
-sc %myLabel%;jmp;
-#later...
-
-VAR#myLabel#@
-```
-then on the first pass, the split `%myLabel%` will be evaluated as zero on the first pass, but on the second pass,
-the value will be used.
-
-The assembler allows you to define macros like this
-```
-VAR#myVariableName# my variable definition
-```
-If the variable definition contains `$` or `@` then 
-they will be expanded before macro definition. This allows you to define goto labels, for instance.
-
-Anywhere where "myVariableName" is encountered from then-on in the source code (including in the second pass) will be
-expanded.
-
-Note that you can create infinitely recursive macros.
-Is that a bug or a feature?
-my answer is YES to both, and i'm sure clever programmers will come up with ways to abuse macro recursion
-
-I'm also extremely confident that you could somehow cause the second pass to be out-of-sync with the first pass
-by abusing macro recursion. You can fix such bugs yourself by using asm_fix_outputcounter in a pinch.
-
-Really, you should figure out why it's happening.
-
-The assembler will generate warnings for most situations that would warrant it:
-* a split directive evaluates to zero on the second pass. (You could have just written "0,0" , it is most likely a misspelled variable)
-* an inline comment invalidates the rest of a line (Just a warning)
-* fill tag is set to zero when not explicitly declared as zero (the statement will do nothing)
-* section tag is set to zero when not explicitly declared as zero (the statement moves the outputcounter to the beginning of the output file)
-* Confirmed macro desync between passes
-* Unusual characters before an instruction's name (Usually leads to an unrecoverable error.)
-
-The assembler will generate unrecoverable errors for most situations that would warrant it:
-* An unknown name is parsed as a statement (Usually meaning you misspelled a macro name...)
-* An invalid number of arguments is provided for an instruction or directive
-* The bounds check for a region restriction or page/block restriction fails. This is useful when you want to
-make sure that a subroutine fits inside of a memory region or page (64k or 256 bytes, aligned, respectively) or that
-a piece of data which will be accessed as an array can be indexed "normally" using 16 bit math.
-* a macro definition uses a reserved name, like an instruction name or anything beginning with ASM_ or asm_
-* a macro definition would trample or redefine a built-in macro or reserved name. You cannot define "ll" for instance,
-	because it would make "llb" and "lla" and "illdaa" unusable, but you can define "myll" because it would not trample any of those.
-* a file is included that is larger than the entire SISA-16 address space.
-* a file is included that is empty
-* you attempt to define a string literal anywhere other than the start of a line.
-* asm_quit was invoked on the second pass.
-* an unreachable or unopenable file is included with ASM_data_include
-
-### list of SISA-16 assembler reserved words
-```
-	<all the instruction names are reserved. See above.>
-	asm_print- if on the second pass, print the output counter, the line, and the line post-processing.
-	asm_quit- if on the second pass, stop assembly.
-	asm_vars- print all variables on both passes.
-	asm_fix_outputcounter- if you have a desync issue between the two passes of the assembler and 
-		you don't know how to fix it, you can correct it with this. Moves the output counter on the second pass only.
-	section- move the output counter to a location.
-	fill- fill an area of memory with a constant byte value.
-	ASM_*- reserved namespace
-	asm_*- reserved namespace
-	VAR#- define a macro with syntax VAR#name#definition. VAR# must be at the beginning of a line.
-	asm_call- call a macro with arguments. asm_call#mymacro#firstarg#secondarg##;
-		may be inline, you can invoke asm_call multiple times.
-		If during macro expansion on a non-macro line, an asm_call appears which did not exist before, then it is processed.
-	asm_pleq- perform addition on macros. 
-		Syntax;
-		asm_pleq#\macroname1#\macroname2#; OR asm_pleq#\macroname1#integerliteral#;
-		if macroname1 is a string containing an integer literal, it will be replaced with the string
-		resulting from the parsing of the integer literal of strtol(macroname1) + strtol(macroname2)
-		or, for the integer literal caase,
-		strtol(macroname1) + strtol("integerliteral").
-
-		if you perform a pleq then all statements after it (even on the same line) will see the macro as being that value.
-
-		Note that because pleq is a *pre-pre processor instruction* all macro evaluations of a the variable on the line
-		will be the last value calculated. if you do
-		sc %myvar%; asm_pleq#myvar#3#;
-		where myvar is zero on the line before it is added to, 
-		then you will not get the expected result,
-		sc %0%; myvar+=3;
-		you will instead get...
-		myvar += 3; sc %3%;
-
-		You can use | to get the expected macro evaluation order.
-	asm_muleq- identical to asm_pleq but for multiplication.
-	\- Escape character. Prevent macro expansion for following macro. Needed to pass macro names to asm_pleq and asm_muleq,
-		otherwise they would be expanded.
-		if this is present at the end of a line, regardless of what kind of line it is,
-		the next line will be included with this one and treated as a single line, as if there were no gaps.
-
-		the backslash at the end of the line will be eliminated.
-	|- Macro evaluation sequence point operator. the line will be fully macro-expanded before this point, including
-		all pre-processing. The vertical bar will then be replaced with a semicolon.
-	!- string literal line. Must start at the beginning of a line.
-	$- expands to the current position of the output counter as an unsigned short, but split into two bytes.
-		if the output counter is at 0xe9f2 then $ will evaluate to '233,242'. Note that the output counter
-		position is determined at the beginning of the current line. Also note that if the output counter
-		is greater than 64k, the upper byte will be ignored- effectively trapping $ to the home region.
-		you can also specify an amount to be added to the $ value with $+value+, where value is an integer literal (Not a macro)
-	@- expands to the current position of the output counter as a 24 bit unsigned integer. 
-		Useful for section tags and fills and such. Has the same + syntax. Note that you *cannot* do %@%.
-	%- two of these defines a split directive. %0xff0A% will be split into 255,10.
-		Additionally, if you have a 32 bit value you wish to be split into four bytes (highest, high, low, lowest)
-		then you can do %/myvalue% (with a forward slash) to get a 32 bit integer, or %?myvalue% to get a float, or %&myvalue% to get a 24 bit integer.
-		All of these are unsigned.
-	ASM_data_include- include a file as raw bytes in the output. Macros are not expanded on the line.
-	bytes- include arbitrary bytes in the output file, 8 bit unsigned integers.
-	shorts- include arbitrary pairs of bytes in the output file, 16 bit unsigned integers. Do not split the integers.
-	" "- space macro, used to remove whitespace.
-	"\t"- tab macro, used to remove tabs.
-	asm_begin_region_restriction- record the current region of the output counter and emit an assemblytime error
-		if an attempt to write bytes outside that region is made before an end tag.
-	asm_begin_block_restriction- same as asm_begin_page_restriction
-	asm_begin_page_restriction- record the current page of the output counter and emit an assemblytime error
-		if an attempt to write bytes outside that page is made before an end tag.
-		Note that setting a page restriction causes the current region restriction to be forgotten.
-	asm_end_region_restriction- same as asm_end_page_restriction.
-	asm_end_block_restriction- same as asm_end_page_restriction.
-	asm_end_page_restriction- End the current restriction, do not emit errors.
-```
-### How to use the SISA-16 assembler
-
-The assembler is compiled as `sisa16_asm` by default on a *nix machine.
-you can invoke the assembler on a source file `source.asm` and create `source.bin` like this:
-
-`sisa16_asm -i source.asm -o source.bin`
-
-if you are editting or debugging the assembler itself, you may find it useful to
-view extended debug output, or use stdin as the input file. you can use -DBG as an argument to the assembler for this.
-
-Note that the two passes *won't work* in stdin mode. 
-
-stdin mode is used if an input file is not specified and is solely for quickly debugging the assembler itself.
-
-if you have bash on your system, or another compatible shell with typical core utils, then note that
-any and all `.asm` files will be compiled and output to `.bin` files of the same name if they are placed
-in the top level directory of this project when you invoke `make`, thanks to `asm_compile.sh`
-
-if you wish to verify that the assembler generated the output you expected, you can view the output with 
-`sisa16_asm -dis <file.bin> <location>`
-
-this will show you the full disassembly.
-
-### Static Linking
-
-There are two ways of doing static linking: Headers and Precompilation.
-
-Headers are the more intuitive and probably more extensible way.
-
-to use headers, simply make a line that looks like this
-```c
-ASM_header myfile.asm
-```
-Note that this line is whitespace sensitive- the line must begin with `ASM_header ` (with one space).
-
-the end of the line is at the newline character, and all spaces and characters after `ASM_header ` are considered
-part of the filename.
-
-If a relative path is used for the filename it will be searched for in the following locations, in order:
-* current working directory.
-* getenv("SISA16BIN")/
-* /usr/include/
-* ~/sisa16/
-* C:\SISA16\
-
-upon finding one successfully, it will open it.
-
-Through intelligent use of the assembler to compile libraries before programs that use them, one can achieve
-static linking by using `ASM_data_include ` (same semantics as ASM_header) 
-and then creating macros to call functions defined in the file included,
-or macros to refer to variables which are instantiated and used inside the library.
-
-```c
-#you have some library written as myLibrary.asm, which is used by myProgram.asm.
-sisa16_asm -i myLibrary.asm -o myLibrary.bin
-sisa16_asm -i myProgram.asm -o myProgram.bin
-
-#in myProgram.asm...
-section 0xee0000
-asm_begin_region_restriction;
-ASM_data_include myLibrary.bin
-asm_end_region_restriction;
-
-#Note that ASM_data_include does not change where the code you are including
-#decides to put its variables or subroutines- the assembler just sees bytes- you must be careful about that.
-
-#You have a subroutine called "LibPrint" defined in your library which is at 0xff90 in the library.
-VAR#procLibPrint#la0xee;sc%0xff90%;farcall;
-#Your library defines a short variable "LibVar" at 0xb102a4 which you need to interact with.
-VAR#accessLibVar#sc %0xb1%;llb %0x02a4%
-VAR#getshrtLibVar#accessLibVar;farillda;alpush;
-VAR#putshrtLibVar#accessLibVar;alpop;faristla;
-```
-
-### Integer literals
-Integer literals are default evaluated as decimal, like any other programming language,
-but by prefixing them with `0` (zero) you can make them be interpreted as octal, or `0x` (zero, lowercase x) to be interpreted as hexadecimal.
-
-### Macro evaluation order and macro evaluation bugs
-Macros are evaluated in the order of most recently defined to first defined.
-
-First defined macros include the builtin macros such as $, @, the space, and the percent directive.
-
-Builtin macros *except for %, space, and tab* are parsed on macro lines.
-### Use as a scripting language
-the assembler can immediately execute an image instead of writing it to an output file.
-
-This is actually much faster than normal assembly as it isn't constantly adjusting the file pointer with fseek.
-
-### Use as an embedded language for program extension
-
-You can embed SISA16 by implementing a host program that operates through the device driver. 
-di, dcl, interrupt, gch and pch.
-
-Simply take control of the program when di is invoked, eventually return to sisa16,
-and use an interrupt from the assembly language to hand
-control back to your C code from SISA16. This is known as "cooperative multitasking."
-
-Use dcl() to close your driver's resources.
-
-### Tips for doing stuff
-
-If you've written x86 or any other assembly language for a machine with lots of registers, you may find SISA-16 very limiting.
-
-You may also find it particularly annoying that complete pointer arithmetic is impossible.
-
-I'd argue this is part of the charm, it's like a supped-up 8 bit micro. Here's some tips:
-
-1) Establish an ABI convention. is the b register preserved through a function call, for instance? How are function arguments and return values passed?
-2) Write macros for your variables and functions. you can use asm_call to do very fancy tricks!
-3) Write macros which use other macros. Macros inside of a macro are not expanded until they are used (With the exception of built-ins like $ and %)
-4) create inline subroutines using macros so you don't have to dedicate brainpower to indexing into an array.
-5) Align all arrays to page or region boundaries- you can use `section` to move the output counter to a designated location.
-6) use asm_begin_region_restriction and asm_end_region_restriction or page equivalents for arrays.
-7) Do not try to be too clever with extremely recursive macros and the two passes- this is a very simple assembler and
-you will very easily find ways to break it.
-8) Know the limitations of the implementation. 
-9) If you have a prebuilt library which must be placed at a particular location in the binary, you should specify that in the name!
-	I would recommend region-aligning all libraries, unless they are extremely small.
 ```
 Written by
 ~~~DMHSW~~~
