@@ -101,16 +101,32 @@ nop;nop;
 	libc_ld_wait_ms;
 	add;
 	libc_st_wait_ms;
-	:libc_wait_looptop:
-		clock;
-		ba;
-		libc_ld_wait_ms;cmp;lb0;cmp
-		//if it's less than.
-		sc %libc_wait_loopend%;
-		jmpifeq;
-		//fallthrough:
-	sc %libc_wait_looptop%;jmp;
-:libc_wait_loopend:
+	rx3push;rx3b;
+	cmp;lb2;cmp;
+	sc %libc_wait_normal_looptop%;jmpifeq;
+	sc %libc_wait_special_looptop%;jmp;
+	:libc_wait_normal_looptop:
+			clock;
+			ba;
+			//is less than the time?
+			libc_ld_wait_ms;cmp;lb0;cmp
+			sc %libc_wait_loopend%;jmpifeq;
+			//is not equal to time?
+			//fallthrough:
+			sc %libc_wait_normal_looptop%;jmp;
+	:libc_wait_special_looptop:
+			clock;
+			ba;
+			//equal to time?
+			libc_ld_wait_ms;cmp;
+			sc %libc_wait_loopend%;jmpifeq;
+			//less than time + 1 second?
+			libc_ld_wait_ms;rx3b;
+			llb%1000%;add;cmp;lb0;cmp;brx3;
+			sc %libc_wait_loopend%;jmpifeq;
+			sc %libc_wait_special_looptop%;jmp;
+	:libc_wait_loopend:
+	rx3pop;
 farret;
 
 asm_end_region_restriction;
