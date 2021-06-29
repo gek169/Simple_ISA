@@ -618,6 +618,7 @@ void debugger_hook(unsigned short *a,
 								printf("\r\nHit Op %s\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
 							else
 								printf("\r\n[Op %s]\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+							goto repl_start;
 						}
 						*program_counter += 1 + insns_numargs[
 							M[
