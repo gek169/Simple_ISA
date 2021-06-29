@@ -221,7 +221,7 @@ void debugger_hook(unsigned short *a,
 	}
 	repl_start:
 
-		printf("<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
+		printf("<region: %lu, pc: 0x%04lx >\n\r", (unsigned long)*program_counter_region, 
 													  (unsigned long)*program_counter
 		);
 		if(line)free(line);
