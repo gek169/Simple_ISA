@@ -173,8 +173,7 @@ void debugger_hook(unsigned short *a,
 			line = read_until_terminator_alloced_modified(stdin);
 		if(!line){
 			puts("\r\n Failed Malloc.");
-			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
-			dcl();
+			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
 			exit(1);
 		}
 		if(line[0] > 126 || line[0] < 0) goto repl_start;
@@ -209,10 +208,7 @@ void debugger_hook(unsigned short *a,
 					goto repl_start;
 				}
 			}
-			case 'q':
-			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
-			dcl();
-			exit(1);
+			case 'q':for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);
 			case '\0':
 			case '\r':
 			case '\n':
@@ -395,7 +391,7 @@ void debugger_hook(unsigned short *a,
 				*RX3 = 0;
 				if(SEGMENT)free(SEGMENT);
 				SEGMENT = calloc(1, 256);
-				if(!SEGMENT) {puts("\r\n Failed Malloc.");exit(1);}
+				if(!SEGMENT) {puts("\r\n Failed Malloc.");for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);}
 				SEGMENT_PAGES = 1;
 				is_fresh_start = 1;
 			goto repl_start;
