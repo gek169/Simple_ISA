@@ -46,15 +46,16 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 		if(c == '\n' || c=='\r') {break;}
 		if(c > 127) continue; /*Pretend it did not happen.*/
 		if(c < 8) continue; /*Also didn't happen*/
-		putchar(c);
 		if(
 			c == 127
 			|| c==8
 		)
 		{
-			if(blen)blen--;
+			if(blen) printf("\r\n[CANCELLED]\r\n");
+			blen = 0;
 			continue;
 		}
+		putchar(c);
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				bcap<<=1;
@@ -549,6 +550,7 @@ void debugger_hook(unsigned short *a,
 				printf("\r\nRX[3]       = 0x%08lx", (unsigned long)*RX3);
 				printf("\r\nEMU DEPTH   =       0x%02lx", (unsigned long)EMULATE_DEPTH);
 				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
+				printf("\r\n");
 			goto repl_start;
 			case 'r':
 				memcpy(M, M2, sizeof(M));
