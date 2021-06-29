@@ -136,6 +136,8 @@ static void help(){
 			N "g for settin[g]         | change settings. format is \"g d <number>\" to modify setting \"d\" or just \"g\" to display the list of settings."
 			N "p for dum[p]            | dump the contents of memory into a file called dump.bin"
 			N "c for [c]lear           | Fill the terminal with a bunch of blank lines."
+			N "j for [j]ump            | Move the program counter to a location. j 0x100 will jump to 0x100 in the current region."
+			N "J for far[J]ump         | Move the program counter to a location, as well as the program counter region. J 0x11000 will jump to 100 in region 1."
 		N);
 }
 
@@ -226,13 +228,14 @@ void debugger_hook(unsigned short *a,
 		);
 		if(line)free(line);
 		line = NULL;
-			line = read_until_terminator_alloced_modified(stdin);
+		line = read_until_terminator_alloced_modified(stdin);
 		if(!line){
 			puts("\r\n Failed Malloc.");
 			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
 			exit(1);
 		}
-		if(line[0] > 126 || line[0] < 0) goto repl_start;
+		if(line[0] > 126 || line[0] <= 0) goto repl_start;
+		printf("\r\n");
 		switch(line[0]){
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
@@ -450,6 +453,39 @@ void debugger_hook(unsigned short *a,
 				debugger_run_insns--;
 				free(line);
 				goto repl_end;
+			}
+
+			case 'j':
+			{
+				unsigned long stepper = 1;
+				unsigned long targ = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					printf("\r\nNo jump target.\r\n");
+					goto repl_start;
+				}
+				targ = strtoul(line+stepper, 0,0);
+				targ &= 0xffFF;
+				printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+				*program_counter = targ;
+				goto repl_start;
+			}
+
+			case 'J':
+			{
+				unsigned long stepper = 1;
+				unsigned long targ = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					printf("\r\nNo farjump target.\r\n");
+					goto repl_start;
+				}
+				targ = strtoul(line+stepper, 0,0);
+				targ &= 0xffFFff;
+				printf("\r\nJumping to : 0x%06lx\r\n",targ);
+				*program_counter_region = targ / (256 * 256);
+				*program_counter = targ;
+				goto repl_start;
 			}
 
 			case 'b':
