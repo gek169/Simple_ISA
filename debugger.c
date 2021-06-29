@@ -18,6 +18,8 @@ static char is_fresh_start = 1;
 static char freedom = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
+UU debugger_setting_displaylines = 30;
+char debugger_display_dis = 1;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -108,6 +110,9 @@ static void help(){
 			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
 			N "q to [q]uit             | quit debugging."
 			N "r to [r]eload           | reload at the current emulation depth. "
+			N "g for settin[g]         | change settings. Available:"
+			N "    g d 30              | change the number of lines displayed by default when disassembling."
+			N "    g i 1               | set whether or not a disassembly should be shown every time the REPL is activated."
 		N);
 }
 
@@ -154,6 +159,12 @@ void debugger_hook(unsigned short *a,
 		printf("\n\r<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
 													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
 		);
+		disassembler(
+			filename, 
+			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
+			3,
+			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
+		);
 		if(line)free(line);
 		line = NULL;
 			line = read_until_terminator_alloced_modified(stdin);
@@ -188,7 +199,7 @@ void debugger_hook(unsigned short *a,
 			case 'u': freedom = 1; free(line); return;
 			case 'd':{
 				unsigned long stepper = 1;
-				unsigned long insns = 30;
+				unsigned long insns = debugger_setting_displaylines;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto disassemble_end;

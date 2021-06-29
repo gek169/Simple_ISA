@@ -20,7 +20,7 @@ static int disassembler(char* fname,
 #else
 	printf("\n\rsection 0x%lx;\n\r", location);
 #endif
-	for(i = location; i < end_location;){
+	for(i = location; i < end_location && i < 0x1000000;){
 		unsigned char opcode;
 		if(i >= 0x1000000){
 #ifdef SISA_DEBUGGER
