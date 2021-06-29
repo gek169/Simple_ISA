@@ -40,7 +40,7 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 			|| c==8
 		)
 		{
-			blen--;
+			if(blen)blen--;
 			continue;
 		}
 		if(blen == (bcap-1))	/*Grow the buffer.*/
