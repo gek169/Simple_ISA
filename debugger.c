@@ -95,8 +95,10 @@ void debugger_hook(unsigned short *a,
 		line = NULL;
 			line = read_until_terminator_alloced_modified(stdin);
 		if(!line){
-					puts("\r\n Failed Malloc.");
-					exit(1);
+			puts("\r\n Failed Malloc.");
+			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
+			dcl();
+			exit(1);
 		}
 		switch(line[0]){
 			default: 
@@ -215,6 +217,8 @@ void debugger_hook(unsigned short *a,
 				SEGMENT = calloc(1, 256);
 				if(!SEGMENT) {
 					puts("\r\n Failed Malloc.");
+					for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
+								dcl();
 					exit(1);
 				}
 				SEGMENT_PAGES = 1;
