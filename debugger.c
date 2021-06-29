@@ -100,6 +100,7 @@ static char delete_breakpoint(UU breakpoint){
 static void help(){
 		puts(
 			N "~~SISA16 Debugger~~"
+			N "Author: DMHSW"
 			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 			N "~~Let all that you do be done with love~~"
 			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -121,6 +122,7 @@ static void help(){
 			N "g for settin[g]         | change settings. Available:"
 			N "    g d 30              | change the number of lines displayed by default when disassembling."
 			N "    g i 1               | set whether or not a disassembly should be shown every time the REPL is activated."
+			N "p for dum[p]            | dump the contents of memory into a file called dump.bin"
 		N);
 }
 
@@ -189,6 +191,17 @@ void debugger_hook(unsigned short *a,
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
 			case 'h':help();goto repl_start;
+			case 'p':{
+				FILE* duck = fopen("dump.bin", "wb");
+				if(!duck){
+					printf("\r\nCannot open dump.bin\r\n");
+					goto repl_start;
+				}
+				fwrite(M, 1, 0x1000000, duck);
+				fclose(duck);
+				printf("\r\nSuccessfully dumped memory to dump.bin\r\n");
+				goto repl_start;
+			}
 			case 'g':{
 				unsigned long stepper = 1;
 				char setting;
