@@ -16,8 +16,8 @@ section 0x40000;
 ASM_header libc.hasm
 
 
-.line_length:			120
-.line_length_plus_1:	121
+.line_length:			79
+.line_length_plus_1:	80
 .wait_time:				20
 
 section 0x10000;

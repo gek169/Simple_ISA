@@ -81,8 +81,8 @@ farret;
 
 //WAIT~~~~~~~~~~~~
 //variable used for waiting thousandths of a second.
-.libc_ld_wait_ms:sc%0x2%;llb %@%;farillda;
-.libc_st_wait_ms:sc%0x2%;llb %@%;faristla;
+.libc_ld_wait_ms:farllda %&@%;
+.libc_st_wait_ms:farstla %&@%;
 //storage for that variable
 nop;nop;
 //prototype: wait(short milliseconds)
@@ -102,14 +102,19 @@ nop;nop;
 	blpop;
 	add;
 	libc_st_wait_ms;
-	:wait_looptop:
-	clock;
-	alpush;
+	:libc_wait_looptop:
+		clock;
+		ba;
 		libc_ld_wait_ms;
-	blpop;
-	cmp;
-	sc %wait_looptop%;
-	jmpifneq;
+		cmp;
+		//if it's equal to the exact thing.
+		sc %libc_wait_loopend%;
+		jmpifeq;
+		libc_ld_wait_ms;
+		
+		//fallthrough:
+		sc %libc_wait_looptop%;jmp;
+:libc_wait_loopend:
 farret;
 
 asm_end_region_restriction;
