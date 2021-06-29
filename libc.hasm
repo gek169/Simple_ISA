@@ -80,14 +80,14 @@ blpop;blpop;
 farret;
 
 //WAIT~~~~~~~~~~~~
+
 //variable used for waiting thousandths of a second.
 .libc_ld_wait_ms:farllda %&@%;
 .libc_st_wait_ms:farstla %&@%;
-//storage for that variable
 nop;nop;
+
 //prototype: wait(short milliseconds)
-//for very small values it may erroneously wait a long time.
-//.proc_wait:sc%@%;la2;farcall;
+
 ..decl_farproc:proc_wait
 	//retrieve our argument and store it in the desginated spot.
 	astp;
@@ -97,23 +97,24 @@ nop;nop;
 	libc_st_wait_ms;
 	//calculate the target time to stop at.
 	clock;
-	alpush;
-		libc_ld_wait_ms;
-	blpop;
+	ba;
+	libc_ld_wait_ms;
 	add;
 	libc_st_wait_ms;
 	:libc_wait_looptop:
 		clock;
 		ba;
-		libc_ld_wait_ms;
-		cmp;
+		libc_ld_wait_ms;cmp;
 		//if it's equal to the exact thing.
 		sc %libc_wait_loopend%;
 		jmpifeq;
-		libc_ld_wait_ms;
-		
+
+		//if it's equal to one greater.
+		libc_ld_wait_ms;aincr;cmp;
+		sc %libc_wait_loopend%;
+		jmpifeq;
 		//fallthrough:
-		sc %libc_wait_looptop%;jmp;
+	sc %libc_wait_looptop%;jmp;
 :libc_wait_loopend:
 farret;
 
