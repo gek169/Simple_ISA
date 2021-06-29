@@ -6,7 +6,8 @@
 */
 static FILE* F;
 static char* filename;
-static const unsigned char enable_dis_comments = 1;
+
+unsigned char enable_dis_comments = 1;
 #include "instructions.h"
 #include "stringutil.h"
 #include "disassembler.h"
@@ -18,7 +19,10 @@ static char freedom = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
 UU debugger_setting_displaylines = 30;
+UU debugger_setting_maxhalts = 3;
+
 char debugger_setting_do_dis = 1;
+char debugger_setting_do_hex = 0;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -181,9 +185,39 @@ void debugger_hook(unsigned short *a,
 		disassembler(
 			filename, 
 			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
-			3,
+			debugger_setting_maxhalts,
 			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
 		);
+	}
+	if(debugger_setting_do_hex){
+		unsigned long i = 0;
+		unsigned long n_halts = 0;
+		unsigned long n_illegals = 0;
+		unsigned long insns = debugger_setting_displaylines;
+		unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+		printf("\r\nHex:\r\n");
+		for(;i<insns;i++){
+			unsigned char opcode;
+			unsigned long j;
+			printf("\r\n");
+			opcode = M[location+i];
+			printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+			if(M[location+i] < n_insns){
+				for(j=0;j<insns_numargs[opcode];j++){
+					printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+				}
+				if(insns_numargs[opcode])
+					i += j;
+			} else{
+				n_illegals++;
+				n_halts = 0;
+			}
+			if(opcode == 0) {n_halts++;n_illegals = 0;}
+			if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)
+			break;
+		}
+		printf("\r\n");
+		goto repl_start;
 	}
 	repl_start:
 
@@ -221,8 +255,11 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == 0){
 					printf("~~Settings~~\r\n");
-					printf("d: 0x%08lx  | The default number of lines to bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
+					printf("d: 0x%06lx  | The default number of bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
 					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
+					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
+					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
+					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
 					goto repl_start;
 				}
 				setting = line[stepper++];
@@ -235,9 +272,15 @@ void debugger_hook(unsigned short *a,
 					default:
 						printf("Unknown setting.\r\n");
 					goto repl_start;
-					case 'd': debugger_setting_displaylines = mode;
+					case 'd': debugger_setting_displaylines = mode & 0xffFFff;
 					goto repl_start;
 					case 'i': debugger_setting_do_dis = mode;
+					goto repl_start;
+					case 'x': debugger_setting_do_hex = mode;
+					goto repl_start;
+					case 'c': enable_dis_comments = mode;
+					goto repl_start;
+					case 'h': debugger_setting_maxhalts = mode;
 					goto repl_start;
 				}
 			}
@@ -271,7 +314,7 @@ void debugger_hook(unsigned short *a,
 				disassembler(
 						filename, 
 						location, 
-						3,
+						debugger_setting_maxhalts,
 						location + insns
 				);
 				printf("\r\n");
