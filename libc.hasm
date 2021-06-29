@@ -120,9 +120,11 @@ nop;nop;
 			//equal to time?
 			libc_ld_wait_ms;cmp;
 			sc %libc_wait_loopend%;jmpifeq;
-			//less than time + 1 second?
-			libc_ld_wait_ms;rx3b;
-			llb%1000%;add;cmp;lb0;cmp;brx3;
+			//less than end time + 1 second?
+			libc_ld_wait_ms;
+			rx3b;
+			llb%1000%;add;cmp;lb0;cmp;
+			brx3;
 			sc %libc_wait_loopend%;jmpifeq;
 			sc %libc_wait_special_looptop%;jmp;
 	:libc_wait_loopend:
