@@ -16,6 +16,8 @@ static char is_waiting_until_pc_is_value = 0;
 static unsigned short pc_wait_value = 0;
 static char is_fresh_start = 1;
 static char freedom = 0;
+UU sisa_breakpoints[0x10000];
+UU n_breakpoints = 0;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -55,7 +57,36 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 	buf[blen] = '\0';
 	return buf;
 }
+static char make_breakpoint(UU new_breakpoint){
+	unsigned long i = 0;
+	new_breakpoint &= 0xffFFff;
+	for(; i < n_breakpoints; i++){
+		if(sisa_breakpoints[i] == new_breakpoint)
+			return 0;
+		else if(sisa_breakpoints[i] == (UU)0x1FFffFF){
+			sisa_breakpoints[i] = new_breakpoint;
+			return 1;
+		}
+	}
+	if(n_breakpoints >= 0xffFF){
+		printf("\r\n<Cannot make a breakpoint, there are too many already.\r\n");
+	}
+	sisa_breakpoints[n_breakpoints++] = new_breakpoint;
+	return 1;
+}
 
+static char delete_breakpoint(UU breakpoint){
+	unsigned long i = 0;
+	breakpoint &= 0xffFFff;
+	for(; i < n_breakpoints; i++){
+		if(sisa_breakpoints[i] == breakpoint){
+			sisa_breakpoints[i] = (UU)0x1FFffFF;
+			if(i == n_breakpoints-1) n_breakpoints--;
+			return 1;
+		}
+	}
+	return 0;
+}
 static void help(){
 		puts(
 			N "~~SISA16 Debugger~~"
@@ -63,16 +94,20 @@ static void help(){
 			N "~~Let all that you do be done with love~~"
 			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 			N "COMMANDS:"
-			N "h for [h]elp         | display help."
-			N "t for s[t]atus       | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
-			N "m to [m]odify        | modify a register. Syntax: m a 3 will set register a to the value 3. Every editable register has a single character representing it, viewable in the status."
-			N "s to [s]tep          | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
-			N "u to r[u]n           | Just run the damn program, no more debugging."
-			N "d to [d]isassemble   | disassemble. If no argument, disassembles the next 30 bytes."
-			N "  SYNTAX: d 50 will disassemble 50 bytes from the program counter."
-			N "  You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
-			N "q to [q]uit          | quit debugging."
-			N "r to [r]eload        | reload the current file and restart the debugger."
+			N "h for [h]elp            | display help."
+			N "t for s[t]atus          | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
+			N "m to [m]odify           | modify a register. Syntax: m a 3 will set register a to the value 3. Every editable register has a single character representing it, viewable in the status."
+			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "b to set [b]reakpoint   | Set a breakpoint. With no arguments, sets breakpoint at current location. b 0x100ff sets a breakpoint at that insn."
+			N "e to d[e]l breakpoint   | Delete a breakpoint. With no arguments, delete breakpoint at current location."
+			N "l to [l]ist breakpoint  | Print all breakpoints."
+			N "    e 0x100ff deletes a breakpoint at that insn."
+			N "u to r[u]n              | Run until breakpoint."
+			N "d to [d]isassemble      | disassemble. If no argument, disassembles the next 30 bytes."
+			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
+			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
+			N "q to [q]uit             | quit debugging."
+			N "r to [r]eload           | reload at the current emulation depth. "
 		N);
 }
 
@@ -88,14 +123,31 @@ void debugger_hook(unsigned short *a,
 									UU *RX3
 ){
 	char* line = NULL;
-	if(freedom) return;
+	if(freedom) 
+	{	unsigned long i=0;
+		if(n_breakpoints == 0) return;
+		for(; i < n_breakpoints; i++){
+			if(((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) == sisa_breakpoints[i])
+				{freedom = 0;
+				debugger_run_insns = 0;}
+		}
+	}
+	
 	if(is_fresh_start){
 		help();
 	}
 	
 	if(debugger_run_insns)
-	{debugger_run_insns--;return;}
-
+	{unsigned long i = 0;
+		debugger_run_insns--;
+		if(n_breakpoints)
+			for(; i < n_breakpoints; i++){
+				if(((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) == sisa_breakpoints[i])
+					{freedom = 0;
+					debugger_run_insns = 0;}
+			}
+		return;
+	}
 
 	repl_start:
 		printf("\n\r<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
@@ -164,6 +216,48 @@ void debugger_hook(unsigned short *a,
 				debugger_run_insns = strtoul(line+stepper, 0,0);
 				free(line);
 				goto repl_end;
+			}
+
+			case 'b':
+			{
+				unsigned long stepper = 1;
+				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					if(!make_breakpoint(location)){
+						printf("\r\nBreakpoint already exists.");
+					}
+					goto repl_start;
+				}
+				location = strtoul(line+stepper, 0,0);
+				if(!make_breakpoint(location)){
+					printf("\r\nBreakpoint already exists.");
+				}
+				goto repl_start;
+			}
+			case 'l':{
+				unsigned long i = 0;
+				for(i = 0; i < n_breakpoints; i++){
+					printf("\r\n @: 0x%06lx",sisa_breakpoints[i]);
+				}
+				goto repl_start;
+			}
+			case 'e':
+			{
+				unsigned long stepper = 1;
+				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					if(!delete_breakpoint(location)){
+						printf("\r\nBreakpoint already exists.");
+					}
+					goto repl_start;
+				}
+				location = strtoul(line+stepper, 0,0);
+				if(!delete_breakpoint(location)){
+					printf("\r\nBreakpoint already exists.");
+				}
+				goto repl_start;
 			}
 			case 'm':
 			{
@@ -245,7 +339,6 @@ void debugger_hook(unsigned short *a,
 				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 			goto repl_start;
 			case 'r':
-				for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}dcl();
 				memcpy(M, M2, sizeof(M));
 				*a = 0;
 				*b = 0;
@@ -259,12 +352,8 @@ void debugger_hook(unsigned short *a,
 				*RX3 = 0;
 				if(SEGMENT)free(SEGMENT);
 				SEGMENT = calloc(1, 256);
-				if(!SEGMENT) {
-					puts("\r\n Failed Malloc.");
-					exit(1);
-				}
+				if(!SEGMENT) {puts("\r\n Failed Malloc.");exit(1);}
 				SEGMENT_PAGES = 1;
-				EMULATE_DEPTH = 0;
 				is_fresh_start = 1;
 			goto repl_start;
 		}

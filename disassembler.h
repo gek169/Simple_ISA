@@ -326,7 +326,11 @@ static int disassembler(char* fname,
 						||streq(insns[opcode], "stla")
 						||streq(insns[opcode], "stlb")
 				){
+#ifndef SISA_DEBUGGER
 					puts(" ?: Storing to fixed position variable.");
+#else
+					printf(" ?: Storing to fixed position variable.\r\n");
+#endif
 				}else if(streq(insns[opcode], "cpc")){
 #ifndef SISA_DEBUGGER
 					puts(" ?: Loop top is next insn");
