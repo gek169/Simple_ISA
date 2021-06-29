@@ -100,9 +100,9 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_NOP;}
 #endif
 
 int e(){
-register u program_counter_region=0;
-register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
-register UU RX0=0,RX1=0,RX2=0,RX3=0;
+u program_counter_region=0;
+U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
+UU RX0=0,RX1=0,RX2=0,RX3=0;
 #ifdef USE_COMPUTED_GOTO
 const void* const goto_table[] = {&&G_HALT,&&G_LDA,&&G_LA,&&G_LDB,&&G_LB,&&G_SC,&&G_STA,&&G_STB,
 &&G_ADD,&&G_SUB,&&G_MUL,&&G_DIV,&&G_MOD,&&G_CMP,&&G_JMPIFEQ,&&G_JMPIFNEQ,
@@ -419,7 +419,12 @@ G_APOP:stack_pointer-=1;a=r(stack_pointer)D
 G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 /*Would require edit if you wanted a 32 bit PC*/
 G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3)D
-G_CLOCK:{register clock_t q=clock();a=((1000*q)/CLOCKS_PER_SEC);b=q/CLOCKS_PER_SEC;c=q;}D
+G_CLOCK:{
+	clock_t q=clock();
+	a=((1000*q)/CLOCKS_PER_SEC);
+	b=q/CLOCKS_PER_SEC;
+	c=q;
+}D
 /*load from RX0*/
 G_ARX0:a=RX0;D
 G_BRX0:b=RX0;D
