@@ -27,7 +27,7 @@ it executes identically on every major platform and computer architecture.
 * Trivially embeddable. Implement five small and easy-to-understand functions in a single header file
 	to add SISA16 scripting to any system.
 
-* Ready for deployment. the assembler can build, execute, and disassemble binaries for debugging.
+* Ready for deployment. Assembler, Debugger, Disassembler, manuals. Everything is here.
 
 * Documented. Manpages and developer manual are provided in this repository along with examples.
 
