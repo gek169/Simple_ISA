@@ -710,7 +710,10 @@ int main(int rc,char**rv){
 			settingsfilename = NULL;
 		} else 
 		fclose(settingsfile);
-	} else { /*From the current working directory.*/
+	} 
+
+	if(!settingsfilename)
+	{ /*From the current working directory.*/
 		FILE* settingsfile = NULL;
 		settingsfilename = strcatalloc("", ".sisa16_dbg");
 		if(!settingsfilename){
