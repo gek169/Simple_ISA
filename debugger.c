@@ -244,6 +244,7 @@ void debugger_hook(unsigned short *a,
 				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 			goto repl_start;
 			case 'r':
+				for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}dcl();
 				memcpy(M, M2, sizeof(M));
 				*a = 0;
 				*b = 0;
@@ -259,12 +260,11 @@ void debugger_hook(unsigned short *a,
 				SEGMENT = calloc(1, 256);
 				if(!SEGMENT) {
 					puts("\r\n Failed Malloc.");
-					for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
-								dcl();
 					exit(1);
 				}
 				SEGMENT_PAGES = 1;
 				EMULATE_DEPTH = 0;
+				is_fresh_start = 1;
 			goto repl_start;
 		}
 }
