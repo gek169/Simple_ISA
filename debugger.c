@@ -118,6 +118,7 @@ static void help(){
 			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
 			N "q to [q]uit             | quit debugging."
+			N "w to [w]rite byte       | write data to a location in memory. Syntax: w 0xAB00E0 12 will write the value 12 to the byte at 0xAB00E0"
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | change settings. Available:"
 			N "    g d 30              | change the number of lines displayed by default when disassembling."
@@ -262,6 +263,27 @@ void debugger_hook(unsigned short *a,
 						3,
 						location + insns
 				);
+				printf("\r\n");
+				goto repl_start;
+			}
+			case 'w':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				unsigned long value = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need address. \n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need value. \n\r");
+					goto repl_start;
+				}
+				value = strtoul(line + stepper, 0,0);
+				M[addr & 0xFFffFF] = value;
 				printf("\r\n");
 				goto repl_start;
 			}
