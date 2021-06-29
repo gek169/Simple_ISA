@@ -60,11 +60,6 @@ Advanced example with macros, demonstrating compiletime macro calling with asm_c
 
 ![assembler screenshot 2](Assembler_Language_Screenshot_2.png)
 
-Assembly-time computation of region offsets using macros to place a "libc" at 0x120000, as well as other macros.
-
-![assembler screenshot 2](Assembler_Language_Screenshot_3.png)
-
-
 A portion of a disassembled binary:
 
 ![disassembly_out](Disassembler_Output_1.png)
