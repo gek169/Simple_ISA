@@ -157,10 +157,11 @@ static void help(){
 			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
 			N "p for dum[p]            | dump memory -> dump.bin"
 			N "c for [c]lear           | print some blank lines."
-			N "j for [j]ump            | Change the PC to a value. You can use +"
+			N "j for [j]ump            | Change the PC to a value. You can use + or t"
 			N "    to jump forward by a number of instructions, rather than bytes."
 			N "    j 0x130 jumps to 0x130 in the current region."
 			N "    j +10 jumps forward 10 insns"
+			N "    j t f jumps forward until it finds an instruction starting with f"
 			N "J for far[J]ump         | Change the PC and PC region to a value."
 		N);
 }
@@ -537,20 +538,40 @@ void debugger_hook(unsigned short *a,
 			{
 				unsigned long stepper = 1;
 				unsigned long targ = 0;
+				char targchar = '\0';
 				char modus = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\n\r<no jump target?>");
+					if(!debugger_setting_minimal)
+						printf("\n\rMissing Jump target");
+					else
+						printf("\n\r<no jump target?>");
 					goto repl_start;
-				}
-				if(line[stepper] == '+'){
+				}else if(line[stepper] == '+'){
 					modus = 1;stepper++;
 					for(;isspace(line[stepper]);stepper++);
+					if(line[stepper] == '\0'){
+						if(!debugger_setting_minimal)
+							printf("\n\rMissing Jump target");
+						else
+							printf("\n\r<no jump target?>");
+					}
+				}else if(line[stepper] == 't'){
+					modus = 2;stepper++;
+					for(;isspace(line[stepper]);stepper++);
+					if(!isalpha(line[stepper])){
+						if(debugger_setting_minimal)
+							printf("\n\r<bad insn name>\r\n");
+						else
+							printf("\n\r<Bad Instruction Name>\r\n");
+						goto repl_start;
+					}
+					targchar = line[stepper];
+					targ = 0;
 				}
-				if(modus > 0 && line[stepper] == '\0'){
-					printf("\n\r<no jump target?>");
-				}
-				targ = strtoul(line+stepper, 0,0);
+				
+				if(modus == 0 || modus == 1)
+					targ = strtoul(line+stepper, 0,0);
 				
 				if(modus == 0){
 					targ &= 0xffFF;
@@ -558,17 +579,22 @@ void debugger_hook(unsigned short *a,
 						printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
 					else
 						printf("\r\n->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
-				} else {
+				} else if(modus == 1){
 					if(!debugger_setting_minimal)
 						printf("\r\nJumping forward %lu insns\r\n", targ);
 					else
 						printf("\r\n+%lu\r\n",targ);
+				} else if(modus == 2){
+					if(!debugger_setting_minimal)
+						printf("\r\nJumping until we see an instruction beginning with %c\r\n", targchar);
+					else
+						printf("\r\n[until %c]\r\n",targchar);
 				}
 
 				
 				if(modus == 0){
 					*program_counter = targ;
-				}else{
+				}else if (modus == 1){
 					unsigned long i = 0;
 					for(;i < targ;i++){
 							*program_counter += 1 + insns_numargs[
@@ -576,6 +602,28 @@ void debugger_hook(unsigned short *a,
 									*program_counter + (((UU)(*program_counter_region))<<16)
 								]
 							];
+					}
+				}else if(modus == 2){
+					unsigned long i = 0;
+					for(;i < 0xffFF;i++){
+						if(M[*program_counter + (((UU)(*program_counter_region))<<16)] >= n_insns)
+						{
+							if(!debugger_setting_minimal)
+								printf("\r\nHit Illegal Opcode.\r\n");
+							else
+								printf("\r\n[illop]\r\n");
+						}
+						if(  (insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]])[0] == targchar){
+							if(!debugger_setting_minimal)
+								printf("\r\nHit Op %s\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+							else
+								printf("\r\n[Op %s]\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+						}
+						*program_counter += 1 + insns_numargs[
+							M[
+								*program_counter + (((UU)(*program_counter_region))<<16)
+							]
+						];
 					}
 				}
 				goto repl_start;
