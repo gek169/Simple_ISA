@@ -20,7 +20,33 @@ static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
 
-void help(){
+static char* read_until_terminator_alloced_modified(FILE* f){
+	char c;
+	char* buf;
+	unsigned long bcap = 40;
+	char* bufold;
+	unsigned long blen = 0;
+	buf = STRUTIL_ALLOC(40);
+	if(!buf) return NULL;
+	while(1){
+		if(feof(f)){break;}
+		c = fgetc(f);
+		if(c == '\n' || c=='\r') {break;}
+		putchar(c);
+		if(blen == (bcap-1))	/*Grow the buffer.*/
+			{
+				bcap<<=1;
+				bufold = buf;
+				buf = STRUTIL_REALLOC(buf, bcap);
+				if(!buf){free(bufold); return NULL;}
+			}
+		buf[blen++] = c;
+	}
+	buf[blen] = '\0';
+	return buf;
+}
+
+static void help(){
 		puts(
 			N "~~SISA16 Debugger~~"
 			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -29,9 +55,9 @@ void help(){
 			N "COMMANDS:"
 			N "h for [h]elp         | display help."
 			N "t for s[t]atus       | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
-			N "m to [m]odify        | modify a register. Syntax: m a 3 will set register a to the value 3."
+			N "m to [m]odify        | modify a register. Syntax: m a 3 will set register a to the value 3. Every editable register has a single character representing it, viewable in the status."
 			N "s to [s]tep          | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
-			N "u to r[u]n           | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "u to r[u]n           | Just run the damn program, no more debugging."
 			N "d to [d]isassemble   | disassemble. If no argument, disassembles the next 30 bytes."
 			N "  SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "  You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
@@ -62,40 +88,123 @@ void debugger_hook(unsigned short *a,
 
 
 	repl_start:
-		printf("\n\r<region: %lu, pc: 0x%06lx > press h for help\n\r", (unsigned long)*program_counter_region, 
+		printf("\n\r<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
 													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
-		);		
+		);
 		if(line)free(line);
 		line = NULL;
-		{unsigned long lenout;
-			line = read_until_terminator_alloced(stdin, &lenout, '\n', 40);
+			line = read_until_terminator_alloced_modified(stdin);
+		if(!line){
+					puts("\r\n Failed Malloc.");
+					exit(1);
 		}
-		if(line)
 		switch(line[0]){
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
 			case 'h':help();goto repl_start;
+
+			case 'q':
+			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
+			dcl();
+			exit(1);
+			case '\0':goto repl_start;
+			case 'u': freedom = 1; free(line); return;
+			case 's':
+			{unsigned long stepper = 1;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					free(line);
+					debugger_run_insns = 1;
+					return;
+				}
+				debugger_run_insns = strtoul(line+stepper, 0,0);
+				return;
+			}
+			case 'm':
+			{
+				unsigned long stepper = 1;
+				char to_edit = 'A';
+				UU value = 0;
+			 	for(;isspace(line[stepper]);stepper++);
+			 	if(line[stepper] == '\0') 
+			 	{
+			 		puts("\r\n<Syntax Error, no register to modify.\r\n");
+			 		goto repl_start;
+			 	}
+			 	to_edit = line[stepper++];
+			 	for(;isspace(line[stepper]);stepper++);
+			 	if(line[stepper] == '\0') 
+			 	{
+			 		puts("\r\n<Clearing register to zero>\r\n");
+			 		value = 0;
+			 		goto repl_start;
+			 	} else
+			 		value = strtoul(line + stepper, 0,0);
+			 	switch(to_edit){
+			 		case 'a':
+			 		case 'A':
+			 			*a = value; 
+			 		break;
+			 		case 'b':
+			 		case 'B':
+			 			*b = value; 
+			 		break;
+			 		case 'c':
+			 		case 'C':
+			 			*c = value; 
+			 		break;
+			 		case 's':
+			 		case 'S':
+			 			*stack_pointer = value; 
+			 		break;
+			 		case 'p':
+			 		case 'P':
+			 			*program_counter = value; 
+			 		break;
+			 		case 'r':
+			 		case 'R':
+			 			*program_counter_region = value; 
+			 		break;
+			 		case '0':
+			 			*RX0 = value; 
+			 		break;
+			 		case '1':
+			 			*RX1 = value; 
+			 		break;
+					case '2':
+			 			*RX2 = value; 
+			 		break;
+					case '3':
+			 			*RX3 = value; 
+			 		break;
+			 		default:
+			 			puts("\r\n<Error, no such register conforming to this name. the names are A,B,C,S,P,R,0,1,2,3");
+			 		
+			 	}
+			 	goto repl_start;
+			}
 			case 't':
 				printf("\r\nFile: %s", filename);
-				printf("\r\n~~Registers~~");
-				printf("\r\nA         = 0x%04lx", (unsigned long)*a);
-				printf("\r\nB         = 0x%04lx", (unsigned long)*b);
-				printf("\r\nC         = 0x%04lx", (unsigned long)*c);
-				printf("\r\nSTP       = 0x%04lx", (unsigned long)*stack_pointer);
-				printf("\r\nPC        = 0x%04lx", (unsigned long)*program_counter);
-				printf("\r\nPC REGION = 0x%02lx", (unsigned long)*program_counter_region);
-				printf("\r\nRX0       = 0x%08lx", (unsigned long)*RX0);
-				printf("\r\nRX1       = 0x%08lx", (unsigned long)*RX1);
-				printf("\r\nRX2       = 0x%08lx", (unsigned long)*RX2);
-				printf("\r\nRX3       = 0x%08lx", (unsigned long)*RX3);
-				printf("\r\nEMU DEPTH = 0x%02lx", (unsigned long)EMULATE_DEPTH);
-				printf("\r\nSEG PAGES = 0x%08lx", (unsigned long)SEGMENT_PAGES);
+				printf("\r\n~~Registers~~ (Highlighted characters)");
+				printf("\r\n[A]         = 0x%04lx", (unsigned long)*a);
+				printf("\r\n[B]         = 0x%04lx", (unsigned long)*b);
+				printf("\r\n[C]         = 0x%04lx", (unsigned long)*c);
+				printf("\r\n[S]TP       = 0x%04lx", (unsigned long)*stack_pointer);
+				printf("\r\n[P]C        = 0x%04lx", (unsigned long)*program_counter);
+				printf("\r\nPC [R]EGION = 0x%02lx", (unsigned long)*program_counter_region);
+				printf("\r\nRX[0]       = 0x%08lx", (unsigned long)*RX0);
+				printf("\r\nRX[1]       = 0x%08lx", (unsigned long)*RX1);
+				printf("\r\nRX[2]       = 0x%08lx", (unsigned long)*RX2);
+				printf("\r\nRX[3]       = 0x%08lx", (unsigned long)*RX3);
+				printf("\r\nEMU DEPTH   = 0x%02lx", (unsigned long)EMULATE_DEPTH);
+				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 			goto repl_start;
 			case 'r':
 				memcpy(M, M2, sizeof(M));
 				*a = 0;
 				*b = 0;
 				*c = 0;
+				R=0;
 				*program_counter_region = 0;
 				*program_counter = 0;
 				*RX0 = 0;
@@ -104,10 +213,14 @@ void debugger_hook(unsigned short *a,
 				*RX3 = 0;
 				if(SEGMENT)free(SEGMENT);
 				SEGMENT = calloc(1, 256);
+				if(!SEGMENT) {
+					puts("\r\n Failed Malloc.");
+					exit(1);
+				}
 				SEGMENT_PAGES = 1;
 				EMULATE_DEPTH = 0;
 			goto repl_start;
-		}		
+		}
 }
 int main(int rc,char**rv){
 	UU i , j=~(UU)0;
@@ -338,6 +451,7 @@ int main(int rc,char**rv){
 			puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
 			return 0;
 	}
+	F=fopen(rv[1],"rb");
 	if(!F){
 		puts("SISA16 debugger cannot open this file.");
 		exit(1);
@@ -358,6 +472,8 @@ int main(int rc,char**rv){
 	/*
 	*/
 	e();
+	puts("\r\nExecution Finished normally.\r\n");
+	if(R==0)puts("\r\nNo Errors Encountered.\r\n");
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
 			printf("%02x%c",M[j],((j+1)%8)?' ':'|');
