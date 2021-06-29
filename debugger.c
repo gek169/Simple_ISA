@@ -135,6 +135,7 @@ void debugger_hook(unsigned short *a,
 	
 	if(is_fresh_start){
 		help();
+		is_fresh_start = 0;
 	}
 	
 	if(debugger_run_insns)
