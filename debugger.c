@@ -20,6 +20,7 @@ UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
 UU debugger_setting_displaylines = 30;
 UU debugger_setting_maxhalts = 3;
+UU debugger_setting_clearlines = 500;
 
 char debugger_setting_do_dis = 1;
 char debugger_setting_do_hex = 0;
@@ -134,6 +135,7 @@ static void help(){
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | change settings. format is \"g d <number>\" to modify setting \"d\" or just \"g\" to display the list of settings."
 			N "p for dum[p]            | dump the contents of memory into a file called dump.bin"
+			N "c for [c]lear           | Fill the terminal with a bunch of blank lines."
 		N);
 }
 
@@ -220,7 +222,7 @@ void debugger_hook(unsigned short *a,
 	repl_start:
 
 		printf("<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
-													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
+													  (unsigned long)*program_counter
 		);
 		if(line)free(line);
 		line = NULL;
@@ -235,6 +237,13 @@ void debugger_hook(unsigned short *a,
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
 			case 'h':help();goto repl_start;
+			case 'c':
+			{unsigned long i = 0;
+				for(;i < debugger_setting_clearlines;i++){
+					printf("\r\n");
+				}
+			}
+			goto repl_start;
 			case 'p':{
 				FILE* duck = fopen("dump.bin", "wb");
 				if(!duck){
@@ -257,6 +266,7 @@ void debugger_hook(unsigned short *a,
 					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
 					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
+					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)enable_dis_comments);
 					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
 					goto repl_start;
 				}
@@ -279,6 +289,8 @@ void debugger_hook(unsigned short *a,
 					case 'c': enable_dis_comments = mode;
 					goto repl_start;
 					case 'h': debugger_setting_maxhalts = mode;
+					goto repl_start;
+					case 'l': debugger_setting_clearlines = mode;
 					goto repl_start;
 				}
 			}
