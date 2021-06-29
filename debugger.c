@@ -487,6 +487,7 @@ void debugger_hook(unsigned short *a,
 				*program_counter = targ;
 				goto repl_start;
 			}
+			
 
 			case 'b':
 			{
