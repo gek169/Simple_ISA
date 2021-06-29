@@ -331,7 +331,7 @@ const void* const goto_table[] = {
 &&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,
 &&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP,&&G_NOP};
 #endif
-R=0;di();
+R=0;di();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
