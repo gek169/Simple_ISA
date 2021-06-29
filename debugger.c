@@ -23,6 +23,7 @@ static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
 
+;
 void respond(int bruh){
 	(void)bruh;
 	printf("\n\r<Received User Attention Signal!>\r\n");
@@ -370,7 +371,7 @@ void debugger_hook(unsigned short *a,
 			}
 			case 't':
 				printf("\r\nFile: %s", filename);
-				printf("\r\n~~Registers~~ (Highlighted characters)");
+				printf("\r\n~~Registers~~");
 				printf("\r\n[A]         = 0x%04lx", (unsigned long)*a);
 				printf("\r\n[B]         = 0x%04lx", (unsigned long)*b);
 				printf("\r\n[C]         = 0x%04lx", (unsigned long)*c);
