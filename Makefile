@@ -12,6 +12,14 @@ CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
+qdev: install
+	$(MAKE) clean
+	git add .
+	git commit -m "Developer time"
+	git push
+	
+	
+	
 
 sisa16_emu:
 	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16_emu -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
