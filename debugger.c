@@ -511,6 +511,7 @@ void debugger_hook(unsigned short *a,
 					if(sisa_breakpoints[i] != 0x1ffFFff)
 						printf("\r\nb @: 0x%06lx",sisa_breakpoints[i]);
 				}
+				printf("\r\n");
 				goto repl_start;
 			}
 			case 'e':
