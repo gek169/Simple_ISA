@@ -325,8 +325,7 @@ void debugger_hook(unsigned short *a,
 					case 'h': debugger_setting_maxhalts = mode;
 					break;
 					case 'm': debugger_setting_minimal = mode;
-					break;
-					
+					break;					
 				}
 				if(settingsfilename)
 				{
@@ -731,8 +730,10 @@ void debugger_hook(unsigned short *a,
 			 	goto repl_start;
 			}
 			case 't':
-				printf("\r\nFile: %s", filename);
-				printf("\r\n~~Registers~~");
+				if(!debugger_setting_minimal){
+					printf("\r\nFile: %s", filename);
+					printf("\r\n~~Registers~~");
+				}
 				printf("\r\n[A]         =     0x%04lx", (unsigned long)*a);
 				printf("\r\n[B]         =     0x%04lx", (unsigned long)*b);
 				printf("\r\n[C]         =     0x%04lx", (unsigned long)*c);
