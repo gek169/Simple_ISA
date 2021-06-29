@@ -21,7 +21,7 @@ static u M2[(((UU)1)<<24)];
 #define N "\r\n"
 
 static char* read_until_terminator_alloced_modified(FILE* f){
-	char c;
+	unsigned char c;
 	char* buf;
 	unsigned long bcap = 40;
 	char* bufold;
@@ -32,7 +32,17 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 		if(feof(f)){break;}
 		c = fgetc(f);
 		if(c == '\n' || c=='\r') {break;}
+		if(c > 127) continue; /*Pretend it did not happen.*/
+		if(c < 8) continue; /*Also didn't happen*/
 		putchar(c);
+		if(
+			c == 127
+			|| c==8
+		)
+		{
+			blen--;
+			continue;
+		}
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				bcap<<=1;
@@ -109,8 +119,40 @@ void debugger_hook(unsigned short *a,
 			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
 			dcl();
 			exit(1);
-			case '\0':goto repl_start;
+			case '\0':
+			case '\r':
+			case '\n':
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+			case 9:
+			goto repl_start;
 			case 'u': freedom = 1; free(line); return;
+			case 'd':{
+				unsigned long stepper = 1;
+				unsigned long insns = 30;
+				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') goto disassemble_end;
+				insns = strtoul(line + stepper, 0,0); /*grab number of insns*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0') goto disassemble_end;
+				location = strtoul(line + stepper, 0,0);
+				disassemble_end:
+				disassembler(
+						filename, 
+						location, 
+						3,
+						location + insns
+				);
+				goto repl_start;
+			}
 			case 's':
 			{unsigned long stepper = 1;
 				for(;isspace(line[stepper]);stepper++);
