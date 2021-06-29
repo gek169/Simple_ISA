@@ -273,6 +273,8 @@ void debugger_hook(unsigned short *a,
 			}
 			case 'x':{
 				unsigned long i = 0;
+				unsigned long n_halts = 0;
+				unsigned long n_illegals = 0;
 				unsigned long stepper = 1;
 				unsigned long insns = debugger_setting_displaylines;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
@@ -287,15 +289,24 @@ void debugger_hook(unsigned short *a,
 				hex_end:
 				printf("\r\nHeX view:\r\n");
 				for(;i<insns;i++){
+					unsigned char opcode;
 					unsigned long j;
 					printf("\r\n");
-					printf(" %02lx", (unsigned long)M[location+i]);
+					opcode = M[location+i];
+					printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 					if(M[location+i] < n_insns){
-						for(j=0;j<insns_numargs[M[location+i]];j++){
-							printf(" %02lx", (unsigned long)M[location+i+j]);
+						for(j=0;j<insns_numargs[opcode];j++){
+							printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 						}
-						i += j;
+						if(insns_numargs[opcode])
+							i += j;
+					} else{
+						n_illegals++;
+						n_halts = 0;
 					}
+					if(opcode == 0) {n_halts++;n_illegals = 0;}
+					if(n_halts > 3 || n_illegals > 3)
+					break;
 				}
 				printf("\r\n");
 				goto repl_start;
