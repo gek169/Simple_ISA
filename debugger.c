@@ -154,17 +154,17 @@ void debugger_hook(unsigned short *a,
 			}
 		return;
 	}
-
+	if(debugger_setting_do_dis){
+		disassembler(
+			filename, 
+			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
+			3,
+			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
+		);
+		printf("\r\n");
+	}
 	repl_start:
-		if(debugger_setting_do_dis){
-			disassembler(
-				filename, 
-				(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
-				3,
-				((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
-			);
-			printf("\r\n");
-		}
+
 		printf("<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
 													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
 		);
