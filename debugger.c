@@ -161,7 +161,6 @@ void debugger_hook(unsigned short *a,
 			3,
 			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
 		);
-		printf("\r\n");
 	}
 	repl_start:
 
