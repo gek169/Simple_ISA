@@ -508,7 +508,8 @@ void debugger_hook(unsigned short *a,
 			case 'l':{
 				unsigned long i = 0;
 				for(i = 0; i < n_breakpoints; i++){
-					printf("\r\n @: 0x%06lx",sisa_breakpoints[i]);
+					if(sisa_breakpoints[i] != 0x1ffFFff)
+						printf("\r\nb @: 0x%06lx",sisa_breakpoints[i]);
 				}
 				goto repl_start;
 			}
