@@ -551,8 +551,9 @@ void debugger_hook(unsigned short *a,
 					printf("\n\r<no jump target?>");
 				}
 				targ = strtoul(line+stepper, 0,0);
-				targ &= 0xffFF;
+				
 				if(modus == 0){
+					targ &= 0xffFF;
 					if(!debugger_setting_minimal)
 						printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
 					else
@@ -563,9 +564,11 @@ void debugger_hook(unsigned short *a,
 					else
 						printf("\r\n+%lu\r\n",targ);
 				}
-				if(modus == 0)
+
+				
+				if(modus == 0){
 					*program_counter = targ;
-				else if(modus > 0){
+				}else{
 					unsigned long i = 0;
 					for(;i < targ;i++){
 							*program_counter += 1 + insns_numargs[
@@ -574,7 +577,6 @@ void debugger_hook(unsigned short *a,
 								]
 							];
 					}
-					*program_counter = targ;
 				}
 				goto repl_start;
 			}
