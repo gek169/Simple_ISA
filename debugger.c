@@ -5,21 +5,61 @@
 	Textmode emulator for SISA16.
 */
 static FILE* F;
-
+static char* filename;
+static const unsigned char enable_dis_comments = 1;
 #include "instructions.h"
+#include "stringutil.h"
+#include "disassembler.h"
 
-void debugger_hook(unsigned short a,
-									unsigned short b,
-									unsigned short c,
-									unsigned short stack_pointer,
-									unsigned short program_counter,
-									unsigned char program_counter_region,
-									UU RX0,
-									UU RX1,
-									UU RX2,
-									UU RX3
+static unsigned long debugger_run_insns = 0; /*if this is less than one, the debugger is not */
+static char is_waiting_until_pc_is_value = 0;
+static unsigned short pc_wait_value = 0;
+static char is_fresh_start = 1;
+
+#define N "\r\n"
+
+void help(){
+
+		puts(
+			N "~~SISA16 Debugger~~"
+			N "COMMANDS:"
+			N "h for [h]elp         | display help."
+			N "t for s[t]atus       | display registers."
+			N "m to [m]odify        | modify a register. Syntax: m a 3 will set register a to the value 3."
+			N "s to [s]tep          | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "d to [d]isassemble   | disassemble. If no argument, disassembles the next 30 bytes."
+			N "  SYNTAX: d 50 will disassemble 50 bytes from the program counter."
+			N "  You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
+			N "q to [q]uit          | quit debugging."
+			N "r to [r]eload        | reload the current file and restart the debugger."
+		N);
+}
+
+void debugger_hook(unsigned short *a,
+									unsigned short *b,
+									unsigned short *c,
+									unsigned short *stack_pointer,
+									unsigned short *program_counter,
+									unsigned char *program_counter_region,
+									UU *RX0,
+									UU *RX1,
+									UU *RX2,
+									UU *RX3
 ){
-	puts("\n<hook called>\n");
+	char* line;
+	if(is_fresh_start){
+		help();
+	}
+	
+	if(debugger_run_insns)
+	{debugger_run_insns--;return;}
+
+
+	printf("\n\r<region: %lu, pc: 0x%06lx > press h for help\n\r", (unsigned long)*program_counter_region, 
+												  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
+	);
+
+	
 }
 int main(int rc,char**rv){
 	UU i , j=~(UU)0;
@@ -250,11 +290,11 @@ int main(int rc,char**rv){
 			puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
 			return 0;
 	}
-	F=fopen(rv[1],"rb");
 	if(!F){
 		puts("SISA16 debugger cannot open this file.");
 		exit(1);
 	}
+	filename = rv[1];
 		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
 	fclose(F);
 #if !defined(NO_SEGMENT)

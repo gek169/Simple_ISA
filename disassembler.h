@@ -4,14 +4,20 @@ static int disassembler(char* fname,
 		unsigned long end_location){
 	unsigned long n_halts = 0;
 	unsigned long n_illegals = 0;
-	FILE* f; unsigned long i = location & 0xffFFff;
+	unsigned long i = location & 0xffFFff;
+#ifndef SISA_DEBUGGER
+	FILE* f; 
 	f = fopen(fname, "rb");
 	if(!f){
 		puts("//ERROR: Could not open file to disassemble.");
 		exit(1);
 	}
+#endif
+	unsigned long stepper = i;
 	location &= 0xffFFff;
+#ifndef SISA_DEBUGGER
 	fseek(f, location, SEEK_SET);
+#endif
 	printf("\nsection 0x%lx;\n", location);
 	for(i = location; i < end_location;){
 		unsigned char opcode;
@@ -21,11 +27,18 @@ static int disassembler(char* fname,
 		}else if((i & 0xffFF) == 0){
 			printf("//<Region Boundary 0x%06lx >\n", i);
 		}
+#ifndef SISA_DEBUGGER
 		if((unsigned long)ftell(f) != i){
 			puts("//<Disassembly could not proceed, reason: end of file>");
 			goto end;
 		}
+#endif
+
+#ifndef SISA_DEBUGGER
 		opcode = fgetc(f);i++;
+#else
+		opcode = M[stepper++];i++;
+#endif
 		if(opcode == 0) 		n_halts++; 		else if(opcode < n_insns) 	n_halts = 0;
 		if(opcode >= n_insns) 	n_illegals++; 	else if(opcode != 0) 		n_illegals = 0;
 		if(
@@ -65,10 +78,16 @@ static int disassembler(char* fname,
 				}else{
 					required_spaces -= 4;
 				}
+
+
+#ifndef SISA_DEBUGGER
 				if(feof(f) || (unsigned long)ftell(f) != i){
 					unfinished_flag = arg_i + 1;
 				}
 				thechar = fgetc(f);
+#else
+				thechar = M[stepper++];
+#endif
 				short_interpretation += thechar;
 				byte_interpretation = thechar;
 				if(arg_i == 0)short_interpretation *= 256;
@@ -190,6 +209,8 @@ static int disassembler(char* fname,
 	}
 	puts("\n//Reached End.\n");
 	end:
+#ifndef SISA_DEBUGGER
 	fclose(f);
+#endif
 	return 0;
 }

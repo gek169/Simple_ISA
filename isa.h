@@ -49,25 +49,25 @@
 							M[((d)+3)&0xFFffFF]=	(v)&255;
 
 #ifdef SISA_DEBUGGER
-void debugger_hook(unsigned short a,
-									unsigned short b,
-									unsigned short c,
-									unsigned short stack_pointer,
-									unsigned short program_counter,
-									unsigned char program_counter_region,
-									UU RX0,
-									UU RX1,
-									UU RX2,
-									UU RX3
-								);
+void debugger_hook(	unsigned short *a,
+					unsigned short *b,
+					unsigned short *c,
+					unsigned short *stack_pointer,
+					unsigned short *program_counter,
+					unsigned char *program_counter_region,
+					UU *RX0,
+					UU *RX1,
+					UU *RX2,
+					UU *RX3
+);
 #else
 #define debugger_hook(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10) /*a comment*/
 #endif
 
 #ifdef USE_COMPUTED_GOTO
-#define D ;debugger_hook(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);goto *goto_table[CONSUME_BYTE];
+#define D ;debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);goto *goto_table[CONSUME_BYTE];
 #else
-#define D ;debugger_hook();switch(CONSUME_BYTE){\
+#define D ;debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);switch(CONSUME_BYTE){\
 k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
@@ -125,7 +125,8 @@ u program_counter_region=0;
 U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
 UU RX0=0,RX1=0,RX2=0,RX3=0;
 #ifdef USE_COMPUTED_GOTO
-const void* const goto_table[] = {&&G_HALT,&&G_LDA,&&G_LA,&&G_LDB,&&G_LB,&&G_SC,&&G_STA,&&G_STB,
+const void* const goto_table[] = {
+&&G_HALT,&&G_LDA,&&G_LA,&&G_LDB,&&G_LB,&&G_SC,&&G_STA,&&G_STB,
 &&G_ADD,&&G_SUB,&&G_MUL,&&G_DIV,&&G_MOD,&&G_CMP,&&G_JMPIFEQ,&&G_JMPIFNEQ,
 &&G_GETCHAR,
 &&G_PUTCHAR,
