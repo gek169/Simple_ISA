@@ -296,7 +296,7 @@ void debugger_hook(unsigned short *a,
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
 					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)debugger_setting_clearlines);
 					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
-					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_maxhalts);
+					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_minimal);
 					goto repl_start;
 				}
 				setting = line[stepper++];
