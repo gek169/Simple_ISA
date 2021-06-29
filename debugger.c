@@ -26,6 +26,7 @@ UU debugger_setting_clearlines = 500;
 
 char debugger_setting_do_dis = 1;
 char debugger_setting_do_hex = 0;
+char debugger_setting_minimal = 0;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -58,7 +59,10 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 			|| c==8
 		)
 		{
-			if(blen) printf("\r\n[CANCELLED]\r\n");
+			if(!debugger_setting_minimal)
+				{if(blen) printf("\r\n[CANCELLED]\r\n");}
+			else
+				{if(blen) printf("\r\n[C]\r\n");}
 			blen = 0;
 			continue;
 		}
@@ -87,7 +91,10 @@ static char make_breakpoint(UU new_breakpoint){
 		}
 	}
 	if(n_breakpoints >= 0xffFF){
-		printf("\r\n<Cannot make a breakpoint, there are too many already.\r\n");
+		if(!debugger_setting_minimal)
+			printf("\r\n<Cannot make a breakpoint, there are too many already>\r\n");
+		else
+			printf("\r\n<too many>\r\n");
 	}
 	sisa_breakpoints[n_breakpoints++] = new_breakpoint;
 	return 1;
@@ -106,40 +113,49 @@ static char delete_breakpoint(UU breakpoint){
 	return 0;
 }
 static void help(){
-		puts(
-			N "~~SISA16 Debugger~~"
-			N "Author: DMHSW"
-			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			N "~~Let all that you do be done with love~~"
-			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			N "COMMANDS:"
+	if(!debugger_setting_minimal)
+		printf(
+				N "~~SISA16 Debugger~~"
+				N "Author: DMHSW"
+				N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+				N "~~Let all that you do be done with love~~"
+				N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+				N "COMMANDS:"
+		);
+	else
+		printf(
+			N "[Let all that you do be done with love]"
+		);
+	printf(
 			N "h for [h]elp            | display help."
 			N "t for s[t]atus          | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
 			N "m to [m]odify           | modify a register. Syntax: m a = 3 will set register a to the value 3."
 			N "    Every editable register has a single character representing it, viewable in the status."
 			N "    Operations: =, +, -, *, /, &, |, ^"
 			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
-			N "b to set [b]reakpoint   | Set a breakpoint. With no arguments, sets breakpoint at current location. b 0x100ff sets a breakpoint at that insn."
+			N "b to set [b]reakpoint   | Set a breakpoint."
+			N "    b alone will set a breakpoint at the current pc."
+			N "    b 0x10030 will set a breakpoint at 0x10030"
 			N "e to d[e]l breakpoint   | Delete a breakpoint. With no arguments, delete breakpoint at current location."
 			N "l to [l]ist breakpoint  | Print all breakpoints."
 			N "    e 0x100ff deletes a breakpoint at that insn."
 			N "u to r[u]n              | Run until breakpoint."
-			N "x to view he[x]         | View raw bytes. Will show the same number of bytes as a disassembly by default, unless you give it a number of bytes."
-			N "d to [d]isassemble      | disassemble. If no argument, disassembles the next 30 bytes."
+			N "x to view he[x]         | View raw bytes of disassembly"
+			N "d to [d]isassemble      | disassemble."
 			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
 			N "q to [q]uit             | quit debugging."
-			N "a to [a]lter memory     | Modify a short in memory. "
-			N "    a 0xAF3344 0xBBCC will modify the short value starting at 0xAF3344 to be 0xBBCC."
-			N "A to [A]lter more memory| Modify a 32 bit unsigned integer in memory. "
-			N "    A 0xAF3344 0xAABBCCDD will modify the 32 bit value starting at 0xAF3344 to be 0xAABBCCDD."
+			N "a to [a]lter u16        | Modify a short in memory. "
+			N "    a 0xAF3344 0xBBCC will modify the u16 value starting at 0xAF3344 to be 0xBBCC."
+			N "A to [A]lter u32        | Modify a 32 bit uint in memory. "
+			N "    A 0xAF3344 0xAABBCCDD will modify the u32 at 0xAF3344 to 0xAABBCCDD."
 			N "w to [w]rite byte       | write data to a location in memory. Syntax: w 0xAB00E0 12 will write the value 12 to the byte at 0xAB00E0"
 			N "r to [r]eload           | reload at the current emulation depth. "
-			N "g for settin[g]         | change settings. format is \"g d <number>\" to modify setting \"d\" or just \"g\" to display the list of settings."
-			N "p for dum[p]            | dump the contents of memory into a file called dump.bin"
-			N "c for [c]lear           | Fill the terminal with a bunch of blank lines."
-			N "j for [j]ump            | Move the program counter to a location. j 0x100 will jump to 0x100 in the current region."
-			N "J for far[J]ump         | Move the program counter to a location, as well as the program counter region. J 0x11000 will jump to 100 in region 1."
+			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
+			N "p for dum[p]            | dump memory -> dump.bin"
+			N "c for [c]lear           | print some blank lines."
+			N "j for [j]ump            | Change the PC."
+			N "J for far[J]ump         | Change the PC and PC region."
 		N);
 }
 
@@ -155,7 +171,7 @@ void debugger_hook(unsigned short *a,
 									UU *RX3
 ){
 	char* line = NULL;
-	if(freedom) 
+	if(freedom)
 	{	unsigned long i=0;
 		if(n_breakpoints == 0) return;
 		for(; i < n_breakpoints; i++){
@@ -166,10 +182,11 @@ void debugger_hook(unsigned short *a,
 	}
 	
 	if(is_fresh_start){
-		help();
-		puts(
-			N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
-		N);
+		if(!debugger_setting_minimal)	help();
+		if(!debugger_setting_minimal)
+			puts(
+				N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
+			N);
 		is_fresh_start = 0;
 		signal(SIGINT, respond);
 	}
@@ -199,7 +216,7 @@ void debugger_hook(unsigned short *a,
 		unsigned long n_illegals = 0;
 		unsigned long insns = debugger_setting_displaylines;
 		unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
-		printf("\r\nHex:\r\n");
+		if(!debugger_setting_minimal) printf("\r\nHex:\r\n");
 		for(;i<insns;i++){
 			unsigned char opcode;
 			unsigned long j;
@@ -239,8 +256,11 @@ void debugger_hook(unsigned short *a,
 		if(line[0] > 126 || line[0] <= 0) goto repl_start;
 		printf("\r\n");
 		switch(line[0]){
-			default: 
-			puts("\r\n<unrecognized command>\r\n");
+			default:
+			if(!debugger_setting_minimal)
+				puts("\r\n<unrecognized command>\r\n");
+			else
+				puts("\r\n<bad>\r\n");
 			case 'h':help();goto repl_start;
 			case 'c':
 			{unsigned long i = 0;
@@ -257,7 +277,10 @@ void debugger_hook(unsigned short *a,
 				}
 				fwrite(M, 1, 0x1000000, duck);
 				fclose(duck);
-				printf("\r\nSuccessfully dumped memory to dump.bin\r\n");
+				if(!debugger_setting_minimal)
+					printf("\r\nSuccessfully dumped memory to dump.bin\r\n");
+				else
+					printf("\r\n[dumped]\r\n");
 				goto repl_start;
 			}
 			case 'g':{
@@ -273,6 +296,7 @@ void debugger_hook(unsigned short *a,
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
 					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)debugger_setting_clearlines);
 					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
+					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_maxhalts);
 					goto repl_start;
 				}
 				setting = line[stepper++];
@@ -283,7 +307,10 @@ void debugger_hook(unsigned short *a,
 				mode = strtoul(line + stepper, 0,0);
 				switch(setting){
 					default:
+					if(!debugger_setting_minimal)
 						printf("Unknown setting.\r\n");
+					else
+						printf("<bad>\r\n");
 					goto repl_start;
 					case 'd': debugger_setting_displaylines = mode & 0xffFFff;
 					break;
@@ -296,6 +323,8 @@ void debugger_hook(unsigned short *a,
 					case 'l': debugger_setting_clearlines = mode;
 					break;
 					case 'h': debugger_setting_maxhalts = mode;
+					break;
+					case 'm': debugger_setting_minimal = mode;
 					break;
 					
 				}
@@ -313,6 +342,7 @@ void debugger_hook(unsigned short *a,
 					fprintf(settingsfile, "c %lu\n", (unsigned long)enable_dis_comments);
 					fprintf(settingsfile, "l %lu\n", (unsigned long)debugger_setting_clearlines);
 					fprintf(settingsfile, "h %lu\n", (unsigned long)debugger_setting_maxhalts);
+					fprintf(settingsfile, "m %lu\n", (unsigned long)debugger_setting_minimal);
 					printf("\r\nSaved Settings.\r\n");
 					fclose(settingsfile);
 				}
@@ -370,13 +400,14 @@ void debugger_hook(unsigned short *a,
 				location = strtoul(line + stepper, 0,0);
 
 				hex_end:
-				printf("\r\nHeX view:\r\n");
+				if(!debugger_setting_minimal)
+					printf("\r\nHeX view:\r\n");
 				for(;i<insns;i++){
 					unsigned char opcode;
 					unsigned long j;
 					printf("\r\n");
 					opcode = M[location+i];
-					printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+					printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 					if(M[location+i] < n_insns){
 						for(j=0;j<insns_numargs[opcode];j++){
 							printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
@@ -400,14 +431,20 @@ void debugger_hook(unsigned short *a,
 				unsigned long value = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need address. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need address. \n\r");
+					else
+						printf("\n\r<no address?>\n\r");
 					goto repl_start;
 				}
 				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
 				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
 				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need value. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
@@ -421,14 +458,20 @@ void debugger_hook(unsigned short *a,
 				unsigned long value = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need address. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need address. \n\r");
+					else
+						printf("\n\r<no address?>\n\r");
 					goto repl_start;
 				}
 				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
 				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
 				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need value. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
@@ -443,14 +486,20 @@ void debugger_hook(unsigned short *a,
 				unsigned long value = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need address. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need address. \n\r");
+					else
+						printf("\n\r<no address?>\n\r");
 					goto repl_start;
 				}
 				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
 				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
 				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
 				if(line[stepper] == '\0') {
-					printf("\n\rSyntax Error: Need value. \n\r");
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
@@ -487,7 +536,10 @@ void debugger_hook(unsigned short *a,
 				}
 				targ = strtoul(line+stepper, 0,0);
 				targ &= 0xffFF;
-				printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+				if(!debugger_setting_minimal)
+					printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+				else
+					printf("\r\n->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
 				*program_counter = targ;
 				goto repl_start;
 			}
@@ -503,7 +555,10 @@ void debugger_hook(unsigned short *a,
 				}
 				targ = strtoul(line+stepper, 0,0);
 				targ &= 0xffFFff;
-				printf("\r\nJumping to : 0x%06lx\r\n",targ);
+				if(!debugger_setting_minimal)
+					printf("\r\nJumping to : 0x%06lx\r\n",targ);
+				else
+					printf("\r\n->0x%06lx\r\n",targ);
 				*program_counter_region = targ / (256 * 256);
 				*program_counter = targ;
 				goto repl_start;
@@ -517,13 +572,19 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
 					if(!make_breakpoint(location)){
-						printf("\r\nBreakpoint already exists.");
+						if(!debugger_setting_minimal)
+							printf("\r\nBreakpoint already exists.");
+						else
+							printf("\r\n[nothing to do]");
 					}
 					goto repl_start;
 				}
 				location = strtoul(line+stepper, 0,0);
 				if(!make_breakpoint(location)){
-					printf("\r\nBreakpoint already exists.");
+						if(!debugger_setting_minimal)
+							printf("\r\n");
+						else
+							printf("\r\n[nothing to do]");
 				}
 				goto repl_start;
 			}
@@ -543,13 +604,19 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
 					if(!delete_breakpoint(location)){
-						printf("\r\nBreakpoint already exists.");
+						if(!debugger_setting_minimal)
+							printf("\r\nBreakpoint already deleted.");
+						else
+							printf("\r\n[nothing to do]");
 					}
 					goto repl_start;
 				}
 				location = strtoul(line+stepper, 0,0);
 				if(!delete_breakpoint(location)){
-					printf("\r\nBreakpoint already exists.");
+					if(!debugger_setting_minimal)
+						printf("\r\nBreakpoint already deleted.");
+					else
+						printf("\r\n[nothing to do]");
 				}
 				goto repl_start;
 			}
@@ -562,23 +629,30 @@ void debugger_hook(unsigned short *a,
 			 	for(;isspace(line[stepper]);stepper++);
 			 	if(line[stepper] == '\0') 
 			 	{
-			 		puts("\r\n<Syntax Error, no register to modify.\r\n");
+			 		if(!debugger_setting_minimal)
+			 			printf("\r\n<Syntax Error, no register to modify.>\r\n");
+			 		else
+			 			printf("\r\n<no register?>\r\n");
 			 		goto repl_start;
 			 	}
 			 	to_edit = line[stepper++];
 			 	for(;isspace(line[stepper]);stepper++);
 			 	if(line[stepper] == '\0') 
 			 	{
-			 		puts("\r\n<Syntax error, no operation>\r\n");
-			 		value = 0;
+			 		if(!debugger_setting_minimal)
+			 			printf("\r\n<Syntax Error, no operation.>\r\n");
+			 		else
+			 			printf("\r\n<no operation?>\r\n");
 			 		goto repl_start;
 			 	}
 			 	operation = line[stepper++];
 			 	for(;isspace(line[stepper]);stepper++);
 			 	if(line[stepper] == '\0') 
 			 	{
-			 		puts("\r\n<Syntax error, no value>\r\n");
-			 		value = 0;
+			 		if(!debugger_setting_minimal)
+			 			printf("\r\n<Syntax Error, no value.>\r\n");
+			 		else
+			 			printf("\r\n<no value?>\r\n");
 			 		goto repl_start;
 			 	}
 		 		value = strtoul(line + stepper, 0,0);
@@ -590,19 +664,27 @@ void debugger_hook(unsigned short *a,
 						 			case '/': \
 										if(value)\
 						 					*REG /= value; \
+						 				else if(!debugger_setting_minimal)\
+						 					printf("\r\n Cannot divide by zero.\r\n");\
 						 				else\
-						 					printf("\r\n Cannot divide by zero..\r\n");\
+						 					printf("\r\n</0>\r\n");\
 						 			break;\
 						 			case '%': \
 										if(value)\
 						 					*REG %= value; \
+						 				else if(!debugger_setting_minimal)\
+						 					printf("\r\n Cannot modulo by zero.\r\n");\
 						 				else\
-						 					printf("\r\n Cannot modulo by zero..\r\n");\
+						 					printf("\r\n<%%0>\r\n");\
 						 			break;\
 						 			case '&':  *REG &= value;  break;\
 						 			case '|':  *REG |= value;  break;\
 						 			case '^':  *REG ^= value;  break;\
-						 			default: printf("\r\n Unknown operation.\r\n");\
+									default:\
+						 				if(!debugger_setting_minimal)\
+						 					printf("\r\nNo such operation.\r\n");\
+						 				else\
+						 					printf("\r\n<bad op>\r\n");\
 						 		}
 			 	switch(to_edit){
 			 		case 'a':
@@ -767,6 +849,9 @@ int main(int rc,char**rv){
 					break;
 					case 'h':
 					debugger_setting_maxhalts = strtoul(line+1,0,0);
+					break;
+					case 'm':
+					debugger_setting_minimal = strtoul(line+1,0,0);
 					break;
 					default:
 					/*printf("\r\nIn Settings File: unknown setting %c\r\n", line[0]);*/
