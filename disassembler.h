@@ -355,7 +355,11 @@ static int disassembler(char* fname,
 			}
 		}
 		if((n_halts + n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
+#ifndef SISA_DEBUGGER
 			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
+#else
+			printf("\n\r//Reached Halt/Invalid Opcode Limit. Disassembly finished.\r\n");
+#endif
 			goto end;
 		}
 	}
