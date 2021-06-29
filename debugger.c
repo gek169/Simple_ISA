@@ -106,7 +106,10 @@ static char delete_breakpoint(UU breakpoint){
 	for(; i < n_breakpoints; i++){
 		if(sisa_breakpoints[i] == breakpoint){
 			sisa_breakpoints[i] = (UU)0x1FFffFF;
-			if(i == n_breakpoints-1) n_breakpoints--;
+			if(i == n_breakpoints-1) {
+				n_breakpoints--;
+				while(n_breakpoints && sisa_breakpoints[n_breakpoints-1] == 0x1ffFFff)n_breakpoints--;
+			}
 			return 1;
 		}
 	}
@@ -649,8 +652,6 @@ void debugger_hook(unsigned short *a,
 				*program_counter = targ;
 				goto repl_start;
 			}
-			
-
 			case 'b':
 			{
 				unsigned long stepper = 1;
