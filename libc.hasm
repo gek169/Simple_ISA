@@ -104,13 +104,8 @@ nop;nop;
 	:libc_wait_looptop:
 		clock;
 		ba;
-		libc_ld_wait_ms;cmp;
-		//if it's equal to the exact thing.
-		sc %libc_wait_loopend%;
-		jmpifeq;
-
-		//if it's equal to one greater.
-		libc_ld_wait_ms;aincr;cmp;
+		libc_ld_wait_ms;cmp;lb0;cmp
+		//if it's less than.
 		sc %libc_wait_loopend%;
 		jmpifeq;
 		//fallthrough:
