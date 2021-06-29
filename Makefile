@@ -57,7 +57,7 @@ uninstall:
 	rm -f $(INSTALL_DIR)/sisa16_dbg
 	rm -f $(INSTALL_DIR)/sisa16_asm
 	rm -f $(MAN_INSTALL_DIR)/sisa16_emu.1
-	rm -f $(MAN_INSTALL_DIR)/sisa16.1
+	rm -f $(MAN_INSTALL_DIR)/sisa16_dbg.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_asm.1
 	@echo "Uninstalled from INSTALL_DIR."
 
