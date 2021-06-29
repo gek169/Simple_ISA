@@ -118,6 +118,10 @@ static void help(){
 			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
 			N "q to [q]uit             | quit debugging."
+			N "a to [a]lter memory     | Modify a short in memory. "
+			N "    a 0xAF3344 0xBBCC will modify the short value starting at 0xAF3344 to be 0xBBCC."
+			N "A to [A]lter more memory| Modify a 32 bit unsigned integer in memory. "
+			N "    A 0xAF3344 0xAABBCCDD will modify the 32 bit value starting at 0xAF3344 to be 0xAABBCCDD."
 			N "w to [w]rite byte       | write data to a location in memory. Syntax: w 0xAB00E0 12 will write the value 12 to the byte at 0xAB00E0"
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | change settings. Available:"
@@ -284,6 +288,52 @@ void debugger_hook(unsigned short *a,
 				}
 				value = strtoul(line + stepper, 0,0);
 				M[addr & 0xFFffFF] = value;
+				printf("\r\n");
+				goto repl_start;
+			}
+			case 'a':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				unsigned long value = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need address. \n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need value. \n\r");
+					goto repl_start;
+				}
+				value = strtoul(line + stepper, 0,0);
+				M[addr & 0xFFffFF] = value/256;
+				M[(addr+1) & 0xFFffFF] = value;
+				printf("\r\n");
+				goto repl_start;
+			}
+			case 'A':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				unsigned long value = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need address. \n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line + stepper, 0,0); /*grab number of insns*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0') {
+					printf("\n\rSyntax Error: Need value. \n\r");
+					goto repl_start;
+				}
+				value = strtoul(line + stepper, 0,0);
+				M[addr & 0xFFffFF] = value/(256*256*256);
+				M[(addr+1) & 0xFFffFF] = value/(256*256);
+				M[(addr+2) & 0xFFffFF] = value/(256);
+				M[(addr+3) & 0xFFffFF] = value;
 				printf("\r\n");
 				goto repl_start;
 			}
