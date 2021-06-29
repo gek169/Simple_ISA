@@ -52,25 +52,14 @@ the macro assembler/disassembler which doubles as an emulator,
 
 # What does the Assembly language look like?
 
-a simple function which prints a byte's value as two hex-digits:
+See the included programs. they are named ".asm"
 
-![assembler screenshot](Assembler_Language_Screenshot.png)
+libraries are postfixed with ".hasm"
 
-Advanced example with macros, demonstrating compiletime macro calling with asm_call:
+The disassembly looks like this:
 
-![assembler screenshot 2](Assembler_Language_Screenshot_2.png)
+![disassembly output](disassembly.png)
 
-A portion of a disassembled binary:
-
-![disassembly_out](Disassembler_Output_1.png)
-
-Another binary disassembled:
-
-![disassembly_out](Disassembler_Output_3.png)
-
-'/dev/urandom' disassembly:
-
-![disassembly_out](Disassembler_Output_2.png)
 
 # Notable Features and Limitations
 
