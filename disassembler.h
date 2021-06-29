@@ -14,10 +14,10 @@ static int disassembler(char* fname,
 	}
 #endif
 	unsigned long stepper = i;
-	location &= 0xffFFff;
 #ifndef SISA_DEBUGGER
 	fseek(f, location, SEEK_SET);
 #endif
+	location &= 0xffFFff;
 	printf("\nsection 0x%lx;\n", location);
 	for(i = location; i < end_location;){
 		unsigned char opcode;

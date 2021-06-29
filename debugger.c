@@ -15,18 +15,23 @@ static unsigned long debugger_run_insns = 0; /*if this is less than one, the deb
 static char is_waiting_until_pc_is_value = 0;
 static unsigned short pc_wait_value = 0;
 static char is_fresh_start = 1;
+static char freedom = 0;
+static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
 
 void help(){
-
 		puts(
 			N "~~SISA16 Debugger~~"
+			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+			N "~~Let all that you do be done with love~~"
+			N "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 			N "COMMANDS:"
 			N "h for [h]elp         | display help."
-			N "t for s[t]atus       | display registers."
+			N "t for s[t]atus       | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
 			N "m to [m]odify        | modify a register. Syntax: m a 3 will set register a to the value 3."
 			N "s to [s]tep          | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "u to r[u]n           | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
 			N "d to [d]isassemble   | disassemble. If no argument, disassembles the next 30 bytes."
 			N "  SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "  You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
@@ -46,7 +51,8 @@ void debugger_hook(unsigned short *a,
 									UU *RX2,
 									UU *RX3
 ){
-	char* line;
+	char* line = NULL;
+	if(freedom) return;
 	if(is_fresh_start){
 		help();
 	}
@@ -55,11 +61,53 @@ void debugger_hook(unsigned short *a,
 	{debugger_run_insns--;return;}
 
 
-	printf("\n\r<region: %lu, pc: 0x%06lx > press h for help\n\r", (unsigned long)*program_counter_region, 
-												  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
-	);
-
-	
+	repl_start:
+		printf("\n\r<region: %lu, pc: 0x%06lx > press h for help\n\r", (unsigned long)*program_counter_region, 
+													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
+		);		
+		if(line)free(line);
+		line = NULL;
+		{unsigned long lenout;
+			line = read_until_terminator_alloced(stdin, &lenout, '\n', 40);
+		}
+		if(line)
+		switch(line[0]){
+			default: 
+			puts("\r\n<unrecognized command>\r\n");
+			case 'h':help();goto repl_start;
+			case 't':
+				printf("\r\nFile: %s", filename);
+				printf("\r\n~~Registers~~");
+				printf("\r\nA         = 0x%04lx", (unsigned long)*a);
+				printf("\r\nB         = 0x%04lx", (unsigned long)*b);
+				printf("\r\nC         = 0x%04lx", (unsigned long)*c);
+				printf("\r\nSTP       = 0x%04lx", (unsigned long)*stack_pointer);
+				printf("\r\nPC        = 0x%04lx", (unsigned long)*program_counter);
+				printf("\r\nPC REGION = 0x%02lx", (unsigned long)*program_counter_region);
+				printf("\r\nRX0       = 0x%08lx", (unsigned long)*RX0);
+				printf("\r\nRX1       = 0x%08lx", (unsigned long)*RX1);
+				printf("\r\nRX2       = 0x%08lx", (unsigned long)*RX2);
+				printf("\r\nRX3       = 0x%08lx", (unsigned long)*RX3);
+				printf("\r\nEMU DEPTH = 0x%02lx", (unsigned long)EMULATE_DEPTH);
+				printf("\r\nSEG PAGES = 0x%08lx", (unsigned long)SEGMENT_PAGES);
+			goto repl_start;
+			case 'r':
+				memcpy(M, M2, sizeof(M));
+				*a = 0;
+				*b = 0;
+				*c = 0;
+				*program_counter_region = 0;
+				*program_counter = 0;
+				*RX0 = 0;
+				*RX1 = 0;
+				*RX2 = 0;
+				*RX3 = 0;
+				if(SEGMENT)free(SEGMENT);
+				SEGMENT = calloc(1, 256);
+				SEGMENT_PAGES = 1;
+				EMULATE_DEPTH = 0;
+			goto repl_start;
+		}		
 }
 int main(int rc,char**rv){
 	UU i , j=~(UU)0;
@@ -296,6 +344,7 @@ int main(int rc,char**rv){
 	}
 	filename = rv[1];
 		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
+		memcpy(M2, M, sizeof(M));
 	fclose(F);
 #if !defined(NO_SEGMENT)
 	{
