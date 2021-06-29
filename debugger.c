@@ -248,7 +248,7 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
 					free(line);
-					debugger_run_insns = 1;
+					debugger_run_insns = 0;
 					goto repl_end;
 				}
 				debugger_run_insns = strtoul(line+stepper, 0,0);
