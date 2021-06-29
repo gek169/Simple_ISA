@@ -110,11 +110,11 @@ void debugger_hook(unsigned short *a,
 			dcl();
 			exit(1);
 		}
+		if(line[0] > 126 || line[0] < 0) goto repl_start;
 		switch(line[0]){
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
 			case 'h':help();goto repl_start;
-
 			case 'q':
 			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
 			dcl();
@@ -159,10 +159,11 @@ void debugger_hook(unsigned short *a,
 				if(line[stepper] == '\0') {
 					free(line);
 					debugger_run_insns = 1;
-					return;
+					goto repl_end;
 				}
 				debugger_run_insns = strtoul(line+stepper, 0,0);
-				return;
+				free(line);
+				goto repl_end;
 			}
 			case 'm':
 			{
@@ -267,6 +268,7 @@ void debugger_hook(unsigned short *a,
 				is_fresh_start = 1;
 			goto repl_start;
 		}
+		repl_end: return;
 }
 int main(int rc,char**rv){
 	UU i , j=~(UU)0;
