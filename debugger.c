@@ -114,6 +114,7 @@ static void help(){
 			N "l to [l]ist breakpoint  | Print all breakpoints."
 			N "    e 0x100ff deletes a breakpoint at that insn."
 			N "u to r[u]n              | Run until breakpoint."
+			N "x to view he[x]         | View raw bytes. Will show the same number of bytes as a disassembly by default, unless you give it a number of bytes."
 			N "d to [d]isassemble      | disassemble. If no argument, disassembles the next 30 bytes."
 			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
 			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
@@ -267,6 +268,35 @@ void debugger_hook(unsigned short *a,
 						3,
 						location + insns
 				);
+				printf("\r\n");
+				goto repl_start;
+			}
+			case 'x':{
+				unsigned long i = 0;
+				unsigned long stepper = 1;
+				unsigned long insns = debugger_setting_displaylines;
+				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') goto hex_end;
+				insns = strtoul(line + stepper, 0,0); /*grab number of insns*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0') goto hex_end;
+				location = strtoul(line + stepper, 0,0);
+
+				hex_end:
+				printf("\r\nHeX view:\r\n");
+				for(;i<insns;i++){
+					unsigned long j;
+					printf("\r\n");
+					printf(" %02lx", (unsigned long)M[location+i]);
+					if(M[location+i] < n_insns){
+						for(j=0;j<insns_numargs[M[location+i]];j++){
+							printf(" %02lx", (unsigned long)M[location+i+j]);
+						}
+						i += j;
+					}
+				}
 				printf("\r\n");
 				goto repl_start;
 			}
