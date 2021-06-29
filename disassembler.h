@@ -363,7 +363,11 @@ static int disassembler(char* fname,
 			goto end;
 		}
 	}
+#ifndef SISA_DEBUGGER
 	puts("\n//Reached End.\n");
+#else
+	printf("\n\r//Reached End.\n\r");
+#endif
 	end:
 #ifndef SISA_DEBUGGER
 	fclose(f);
