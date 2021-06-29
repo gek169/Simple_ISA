@@ -380,7 +380,7 @@ int main(int argc, char** argv){
 			puts("Optional argument: -C: display compiletime environment information (What C compiler you used) as well as Author.");
 			puts("Optional argument: -run: Build and Execute assembly file, like -i. Compatible with shebangs on *nix machines.\nTry adding `#!/usr/bin/sisa16_asm -run` to the start of your programs!");
 			puts("Optional argument: -v, -h, --help, --version: This printout.");
-			puts("\n\nSISA-16 Macro Assembler, Disassembler, and Emulator in Pure Glorious ANSI/ISO C90, Version 1.6");
+			puts("\n\nSISA-16 Macro Assembler, Disassembler, Debugger, and Emulator in Pure Glorious ANSI/ISO C90, Version " SISA_VERSION);
 			puts("\"Let all that you do be done with love\"");
 			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			puts("Language information:");

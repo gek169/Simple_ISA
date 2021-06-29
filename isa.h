@@ -1,3 +1,7 @@
+#ifndef SISA_VERSION
+#define SISA_VERSION "1.7_official"
+#endif
+
 #define k case
 /*Would require edit if you wanted a 32 bit PC*/
 #define PP (((UU)program_counter_region)<<16)

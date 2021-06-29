@@ -68,7 +68,7 @@ int main(int rc,char**rv){
 	if(rc<2){
 			puts("SISA-16 Standalone Debugger written by D[MHS]W for the Public Domain");
 			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
-			puts("\n\nSISA-16 Macro Assembler, Disassembler, and Emulator in Pure Glorious ANSI/ISO C90, Version 1.6");
+			puts("\n\nSISA-16 Macro Assembler, Disassembler, Debugger, and Emulator in Pure Glorious ANSI/ISO C90, Version " SISA_VERSION);
 			puts("\"Let all that you do be done with love\"");
 			puts("Authored by DMHSW for the Public Domain. Enjoy.\n\n");
 			puts("Developer's original repository: https://github.com/gek169/Simple_ISA.git");
