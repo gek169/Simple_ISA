@@ -443,7 +443,7 @@ G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 G_INTERRUPT:a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3)D
 G_CLOCK:{
 	clock_t q=clock();
-	a=((1000*q)/CLOCKS_PER_SEC);
+	a=((q)/(CLOCKS_PER_SEC/1000));
 	b=q/CLOCKS_PER_SEC;
 	c=q;
 }D
