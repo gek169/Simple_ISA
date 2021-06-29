@@ -43,7 +43,7 @@ nop;
 		ld_iteration_count; 
 			aincr;
 		st_iteration_count;
-		lla %wait_time%;
+		la %~wait_time%;
 		alpush;
 			proc_wait;
 		alpop;
