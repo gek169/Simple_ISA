@@ -65,4 +65,7 @@ nop;
 :asciifun_loopout:
 asm_end_restriction;
 
-section 0;la 0xa;putchar;la 0xd;putchar;la 1;lfarpc;
+section 0;
+	la 0xa;putchar;
+	la 0xd;putchar;
+	la 1;lfarpc;
