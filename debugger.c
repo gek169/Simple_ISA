@@ -19,7 +19,7 @@ static char freedom = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
 UU debugger_setting_displaylines = 30;
-char debugger_display_dis = 1;
+char debugger_setting_do_dis = 1;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -156,14 +156,17 @@ void debugger_hook(unsigned short *a,
 	}
 
 	repl_start:
-		printf("\n\r<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
+		if(debugger_setting_do_dis){
+			disassembler(
+				filename, 
+				(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
+				3,
+				((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
+			);
+			printf("\r\n");
+		}
+		printf("<region: %lu, pc: 0x%06lx >\n\r", (unsigned long)*program_counter_region, 
 													  (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)
-		);
-		disassembler(
-			filename, 
-			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
-			3,
-			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
 		);
 		if(line)free(line);
 		line = NULL;
@@ -179,6 +182,33 @@ void debugger_hook(unsigned short *a,
 			default: 
 			puts("\r\n<unrecognized command>\r\n");
 			case 'h':help();goto repl_start;
+			case 'g':{
+				unsigned long stepper = 1;
+				char setting;
+				unsigned long mode;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == 0){
+					printf("~~Settings~~\r\n");
+					printf("d: 0x%08lx  | The default number of lines to bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
+					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
+					goto repl_start;
+				}
+				setting = line[stepper++];
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == 0){
+					printf("Missing Mode.\r\n"); goto repl_start;
+				}
+				mode = strtoul(line + stepper, 0,0);
+				switch(setting){
+					default:
+						printf("Unknown setting.\r\n");
+					goto repl_start;
+					case 'd': debugger_setting_displaylines = mode;
+					goto repl_start;
+					case 'i': debugger_setting_do_dis = mode;
+					goto repl_start;
+				}
+			}
 			case 'q':
 			for(;EMULATE_DEPTH >0;){EMULATE_DEPTH--;dcl();}
 			dcl();

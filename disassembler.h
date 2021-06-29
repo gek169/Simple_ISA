@@ -46,7 +46,7 @@ static int disassembler(char* fname,
 #ifndef SISA_DEBUGGER
 		opcode = fgetc(f);i++;
 #else
-		opcode = M[stepper++];i++;
+		opcode = M[stepper++ & 0xffFFff];i++;
 #endif
 		if(opcode == 0) 		n_halts++; 		else if(opcode < n_insns) 	n_halts = 0;
 		if(opcode >= n_insns) 	n_illegals++; 	else if(opcode != 0) 		n_illegals = 0;
@@ -111,7 +111,7 @@ static int disassembler(char* fname,
 				}
 				thechar = fgetc(f);
 #else
-				thechar = M[stepper++];
+				thechar = M[stepper++ & 0xffFFff];
 #endif
 				short_interpretation += thechar;
 				byte_interpretation = thechar;
