@@ -179,6 +179,7 @@ void debugger_hook(unsigned short *a,
 				{freedom = 0;
 				debugger_run_insns = 0;}
 		}
+		if(freedom) return; /*still in freedom mode.*/
 	}
 	
 	if(is_fresh_start){
@@ -197,10 +198,12 @@ void debugger_hook(unsigned short *a,
 		if(n_breakpoints)
 			for(; i < n_breakpoints; i++){
 				if(((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) == sisa_breakpoints[i])
-					{freedom = 0;
-					debugger_run_insns = 0;}
+				{
+						freedom = 0;
+						debugger_run_insns = 0;
+				}
 			}
-		return;
+		if(debugger_run_insns) return;
 	}
 	if(debugger_setting_do_dis){
 		disassembler(
