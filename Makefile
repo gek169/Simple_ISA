@@ -18,7 +18,7 @@ qdev:
 	git add .
 	git commit -m "Developer time"
 	git push
-	sh ./asmbuild.sh
+	./asmbuild.sh
 	
 	
 	
