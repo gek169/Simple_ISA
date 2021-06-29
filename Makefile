@@ -21,7 +21,11 @@ sisa16_asm:
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
-main: sisa16_asm sisa16_emu
+sisa16_dbg:
+	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	@echo "~~Built debugger."
+
+main: sisa16_asm sisa16_emu sisa16_dbg
 
 check: asm_programs
 
@@ -40,17 +44,17 @@ asm_programs: sisa16_asm
 	./sisa16_asm -fdis switchcase.bin 0
 	./sisa16_asm -fdis controlflow_1.bin 0
 	
-install: sisa16_asm sisa16_emu
+install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
+	@cp ./sisa16_dbg $(INSTALL_DIR)/ || cp ./sisa16_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_dbg"
 	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
 	@echo "Attempting manpage install."
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
-	rm -f $(INSTALL_DIR)/sisa16
 	rm -f $(INSTALL_DIR)/sisa16_emu
-	rm -f $(INSTALL_DIR)/sisa16_stdin
+	rm -f $(INSTALL_DIR)/sisa16_dbg
 	rm -f $(INSTALL_DIR)/sisa16_asm
 	rm -f $(MAN_INSTALL_DIR)/sisa16_emu.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16.1
@@ -58,5 +62,5 @@ uninstall:
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_stdin isa_constexpr rbytes
+	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_stdin isa_constexpr rbytes
 	clear

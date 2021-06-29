@@ -57,11 +57,11 @@ void debugger_hook(unsigned short a,
 									UU RX3
 								);
 #else
-#define debugger_hook() /*a comment*/
+#define debugger_hook(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10) /*a comment*/
 #endif
 
 #ifdef USE_COMPUTED_GOTO
-#define D ;debugger_hook();goto *goto_table[CONSUME_BYTE];
+#define D ;debugger_hook(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);goto *goto_table[CONSUME_BYTE];
 #else
 #define D ;debugger_hook();switch(CONSUME_BYTE){\
 k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
