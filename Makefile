@@ -12,11 +12,13 @@ CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
-qdev: install
-	$(MAKE) clean
+qdev:
+	sudo $(MAKE) -B install
+	sudo $(MAKE) clean
 	git add .
 	git commit -m "Developer time"
 	git push
+	sh ./asmbuild.sh
 	
 	
 	
