@@ -245,6 +245,7 @@ void debugger_hook(unsigned short *a,
 						3,
 						location + insns
 				);
+				printf("\r\n");
 				goto repl_start;
 			}
 			case 's':
