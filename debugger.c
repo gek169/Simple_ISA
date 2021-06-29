@@ -157,7 +157,10 @@ static void help(){
 			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
 			N "p for dum[p]            | dump memory -> dump.bin"
 			N "c for [c]lear           | print some blank lines."
-			N "j for [j]ump            | Change the PC to a value."
+			N "j for [j]ump            | Change the PC to a value. You can use +"
+			N "    to jump forward by a number of instructions, rather than bytes."
+			N "    j 0x130 jumps to 0x130 in the current region."
+			N "    j +10 jumps forward 10 insns"
 			N "J for far[J]ump         | Change the PC and PC region to a value."
 		N);
 }
@@ -534,18 +537,45 @@ void debugger_hook(unsigned short *a,
 			{
 				unsigned long stepper = 1;
 				unsigned long targ = 0;
+				char modus = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\r\nNo jump target.\r\n");
+					printf("\n\r<no jump target?>");
 					goto repl_start;
+				}
+				if(line[stepper] == '+'){
+					modus = 1;stepper++;
+					for(;isspace(line[stepper]);stepper++);
+				}
+				if(modus > 0 && line[stepper] == '\0'){
+					printf("\n\r<no jump target?>");
 				}
 				targ = strtoul(line+stepper, 0,0);
 				targ &= 0xffFF;
-				if(!debugger_setting_minimal)
-					printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
-				else
-					printf("\r\n->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
-				*program_counter = targ;
+				if(modus == 0){
+					if(!debugger_setting_minimal)
+						printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+					else
+						printf("\r\n->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+				} else {
+					if(!debugger_setting_minimal)
+						printf("\r\nJumping forward %lu insns\r\n", targ);
+					else
+						printf("\r\n+%lu\r\n",targ);
+				}
+				if(modus == 0)
+					*program_counter = targ;
+				else if(modus > 0){
+					unsigned long i = 0;
+					for(;i < targ;i++){
+							*program_counter += 1 + insns_numargs[
+								M[
+									*program_counter + (((UU)(*program_counter_region))<<16)
+								]
+							];
+					}
+					*program_counter = targ;
+				}
 				goto repl_start;
 			}
 
