@@ -302,7 +302,7 @@ void debugger_hook(unsigned short *a,
 				if(settingsfilename)
 				{
 					FILE* settingsfile = NULL;
-					settingsfile = fopen(settingsfilename, "r");
+					settingsfile = fopen(settingsfilename, "w");
 					if(!settingsfile) {
 						printf("\r\nError working with settings file.\r\n");
 						goto repl_start;
