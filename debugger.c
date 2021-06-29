@@ -132,9 +132,7 @@ static void help(){
 			N "    A 0xAF3344 0xAABBCCDD will modify the 32 bit value starting at 0xAF3344 to be 0xAABBCCDD."
 			N "w to [w]rite byte       | write data to a location in memory. Syntax: w 0xAB00E0 12 will write the value 12 to the byte at 0xAB00E0"
 			N "r to [r]eload           | reload at the current emulation depth. "
-			N "g for settin[g]         | change settings. Available:"
-			N "    g d 30              | change the number of lines displayed by default when disassembling."
-			N "    g i 1               | set whether or not a disassembly should be shown every time the REPL is activated."
+			N "g for settin[g]         | change settings. format is \"g d <number>\" to modify setting \"d\" or just \"g\" to display the list of settings."
 			N "p for dum[p]            | dump the contents of memory into a file called dump.bin"
 		N);
 }
