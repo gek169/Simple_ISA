@@ -5,7 +5,9 @@
 	Textmode emulator for SISA16.
 */
 static FILE* F;
-static char* filename;
+static char* filename = NULL;
+static char* env_home = NULL;
+static char* settingsfilename = NULL;
 
 unsigned char enable_dis_comments = 1;
 #include "instructions.h"
@@ -28,7 +30,7 @@ static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
 
-;
+
 void respond(int bruh){
 	(void)bruh;
 	printf("\n\r<Received User Attention Signal!>\r\n");
@@ -269,7 +271,7 @@ void debugger_hook(unsigned short *a,
 					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
 					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
-					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)enable_dis_comments);
+					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)debugger_setting_clearlines);
 					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
 					goto repl_start;
 				}
@@ -284,18 +286,37 @@ void debugger_hook(unsigned short *a,
 						printf("Unknown setting.\r\n");
 					goto repl_start;
 					case 'd': debugger_setting_displaylines = mode & 0xffFFff;
-					goto repl_start;
+					break;
 					case 'i': debugger_setting_do_dis = mode;
-					goto repl_start;
+					break;
 					case 'x': debugger_setting_do_hex = mode;
-					goto repl_start;
+					break;
 					case 'c': enable_dis_comments = mode;
-					goto repl_start;
-					case 'h': debugger_setting_maxhalts = mode;
-					goto repl_start;
+					break;
 					case 'l': debugger_setting_clearlines = mode;
-					goto repl_start;
+					break;
+					case 'h': debugger_setting_maxhalts = mode;
+					break;
+					
 				}
+				if(settingsfilename)
+				{
+					FILE* settingsfile = NULL;
+					settingsfile = fopen(settingsfilename, "r");
+					if(!settingsfile) {
+						printf("\r\nError working with settings file.\r\n");
+						goto repl_start;
+					}
+					fprintf(settingsfile, "d %lu\n", (unsigned long)debugger_setting_displaylines);
+					fprintf(settingsfile, "i %lu\n", (unsigned long)debugger_setting_do_dis);
+					fprintf(settingsfile, "x %lu\n", (unsigned long)debugger_setting_do_hex);
+					fprintf(settingsfile, "c %lu\n", (unsigned long)enable_dis_comments);
+					fprintf(settingsfile, "l %lu\n", (unsigned long)debugger_setting_clearlines);
+					fprintf(settingsfile, "h %lu\n", (unsigned long)debugger_setting_maxhalts);
+					printf("\r\nSaved Settings.\r\n");
+					fclose(settingsfile);
+				}
+				goto repl_start;
 			}
 			case 'q':for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);
 			case '\0':
@@ -664,11 +685,98 @@ void debugger_hook(unsigned short *a,
 		}
 		repl_end: return;
 }
+#define debugger_stringify(x) #x
 int main(int rc,char**rv){
 	UU i , j=~(UU)0;
 	SUU q_test = (SUU)-1;
 	/*M = malloc((((UU)1)<<24));*/
 	
+	/*
+		attempt to load settings.
+		First, from the home directory.
+		Then, from the current directory.
+	*/
+	env_home = getenv("HOME");
+	if(env_home)
+	{FILE* settingsfile = NULL;
+		settingsfilename = strcatalloc(env_home, "/.sisa16_dbg");
+		if(!settingsfilename){
+			printf("\r\nFailed Malloc.\r\n");
+			exit(1);
+		}
+		settingsfile = fopen(settingsfilename, "r");
+		if(!settingsfile){
+			free(settingsfilename);
+			settingsfilename = NULL;
+		} else 
+		fclose(settingsfile);
+	} else { /*From the current working directory.*/
+		FILE* settingsfile = NULL;
+		settingsfilename = strcatalloc("", ".sisa16_dbg");
+		if(!settingsfilename){
+			printf("\r\nFailed Malloc.\r\n");
+			exit(1);
+		}
+		settingsfile = fopen(settingsfilename, "r");
+		if(!settingsfile){
+			free(settingsfilename);
+			settingsfilename = NULL;
+		} else 
+		fclose(settingsfile);
+	}
+
+	if(settingsfilename){
+		FILE* settingsfile = NULL;
+		settingsfile = fopen(settingsfilename, "r");
+		if(settingsfile){
+			char* line;
+			/*Attempt to read settings from the settings file.*/
+			while(!feof(settingsfile)){
+				line = read_until_terminator_alloced_modified(settingsfile);
+				if(!line){
+					printf("\r\nFailed Malloc.\r\n");
+					exit(1);
+				}
+				while(isspace(line[0])){
+					char* line_old = line;
+					line = strcatalloc(line+1, "");
+					if(!line){
+						printf("\r\nFailed Malloc.\r\n");
+						exit(1);
+					}
+					free(line_old);
+				}
+				switch(line[0]){
+					case 'd':
+					debugger_setting_displaylines = strtoul(line+1,0,0);
+					break;
+					case 'i':
+					debugger_setting_do_dis = strtoul(line+1,0,0);
+					break;
+					case 'x':
+					debugger_setting_do_hex = strtoul(line+1,0,0);
+					break;
+					case 'c':
+					enable_dis_comments = strtoul(line+1,0,0);
+					break;
+					case 'l':
+					debugger_setting_clearlines = strtoul(line+1,0,0);
+					break;
+					case 'h':
+					debugger_setting_maxhalts = strtoul(line+1,0,0);
+					break;
+					default:
+					/*printf("\r\nIn Settings File: unknown setting %c\r\n", line[0]);*/
+					break;
+				}
+			}
+			fclose(settingsfile);
+		} else {
+			printf("\r\n <internal error working with settings file on line " debugger_stringify(__LINE__) " of debugger.c.>\r\n");
+		}
+	} else {
+		printf("\r\n !!!! No settings file found. Create a file in your home folder or the current working directory called .sisa16_dbg to save settings!!!!");
+	}
 	if(
 		(sizeof(U) != 2) ||
 		(sizeof(u) != 1) ||
