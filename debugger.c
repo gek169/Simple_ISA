@@ -107,7 +107,9 @@ static void help(){
 			N "COMMANDS:"
 			N "h for [h]elp            | display help."
 			N "t for s[t]atus          | display registers and EMULATE_DEPTH from emulate and emulate_seg insns."
-			N "m to [m]odify           | modify a register. Syntax: m a 3 will set register a to the value 3. Every editable register has a single character representing it, viewable in the status."
+			N "m to [m]odify           | modify a register. Syntax: m a = 3 will set register a to the value 3."
+			N "    Every editable register has a single character representing it, viewable in the status."
+			N "    Operations: =, +, -, *, /, &, |, ^"
 			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
 			N "b to set [b]reakpoint   | Set a breakpoint. With no arguments, sets breakpoint at current location. b 0x100ff sets a breakpoint at that insn."
 			N "e to d[e]l breakpoint   | Delete a breakpoint. With no arguments, delete breakpoint at current location."
@@ -156,6 +158,9 @@ void debugger_hook(unsigned short *a,
 	
 	if(is_fresh_start){
 		help();
+		puts(
+			N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
+		N);
 		is_fresh_start = 0;
 		signal(SIGINT, respond);
 	}
@@ -387,6 +392,8 @@ void debugger_hook(unsigned short *a,
 					goto repl_end;
 				}
 				debugger_run_insns = strtoul(line+stepper, 0,0);
+				if(debugger_run_insns == 0) goto repl_start; /*Simulate reputable behavior.*/
+				debugger_run_insns--;
 				free(line);
 				goto repl_end;
 			}
@@ -436,6 +443,7 @@ void debugger_hook(unsigned short *a,
 			{
 				unsigned long stepper = 1;
 				char to_edit = 'A';
+				char operation = '=';
 				UU value = 0;
 			 	for(;isspace(line[stepper]);stepper++);
 			 	if(line[stepper] == '\0') 
@@ -447,47 +455,78 @@ void debugger_hook(unsigned short *a,
 			 	for(;isspace(line[stepper]);stepper++);
 			 	if(line[stepper] == '\0') 
 			 	{
-			 		puts("\r\n<Clearing register to zero>\r\n");
+			 		puts("\r\n<Syntax error, no operation>\r\n");
 			 		value = 0;
 			 		goto repl_start;
-			 	} else
-			 		value = strtoul(line + stepper, 0,0);
+			 	}
+			 	operation = line[stepper++];
+			 	for(;isspace(line[stepper]);stepper++);
+			 	if(line[stepper] == '\0') 
+			 	{
+			 		puts("\r\n<Syntax error, no value>\r\n");
+			 		value = 0;
+			 		goto repl_start;
+			 	}
+		 		value = strtoul(line + stepper, 0,0);
+#define perform_surgery(REG) 	switch(operation){\
+						 			case '=': *REG = value; break;\
+						 			case '+': *REG += value; break;\
+						 			case '-': *REG -= value; break;\
+						 			case '*': *REG *= value; break;\
+						 			case '/': \
+										if(value)\
+						 					*REG /= value; \
+						 				else\
+						 					printf("\r\n Cannot divide by zero..\r\n");\
+						 			break;\
+						 			case '%': \
+										if(value)\
+						 					*REG %= value; \
+						 				else\
+						 					printf("\r\n Cannot modulo by zero..\r\n");\
+						 			break;\
+						 			case '&':  *REG &= value;  break;\
+						 			case '|':  *REG |= value;  break;\
+						 			case '^':  *REG ^= value;  break;\
+						 			default: printf("\r\n Unknown operation.\r\n");\
+						 		}
 			 	switch(to_edit){
 			 		case 'a':
 			 		case 'A':
-			 			*a = value; 
+				 		perform_surgery(a);
+			 			
 			 		break;
 			 		case 'b':
 			 		case 'B':
-			 			*b = value; 
+				 		perform_surgery(b);
 			 		break;
 			 		case 'c':
 			 		case 'C':
-			 			*c = value; 
+				 		perform_surgery(c);
 			 		break;
 			 		case 's':
 			 		case 'S':
-			 			*stack_pointer = value; 
+				 		perform_surgery(stack_pointer);
 			 		break;
 			 		case 'p':
 			 		case 'P':
-			 			*program_counter = value; 
+				 		perform_surgery(program_counter);
 			 		break;
 			 		case 'r':
 			 		case 'R':
-			 			*program_counter_region = value; 
+				 		perform_surgery(program_counter_region);
 			 		break;
 			 		case '0':
-			 			*RX0 = value; 
+				 		perform_surgery(RX0);
 			 		break;
 			 		case '1':
-			 			*RX1 = value; 
+				 		perform_surgery(RX1);
 			 		break;
 					case '2':
-			 			*RX2 = value; 
+				 		perform_surgery(RX2);
 			 		break;
 					case '3':
-			 			*RX3 = value; 
+				 		perform_surgery(RX3);
 			 		break;
 			 		default:
 			 			puts("\r\n<Error, no such register conforming to this name. the names are A,B,C,S,P,R,0,1,2,3");
@@ -498,17 +537,17 @@ void debugger_hook(unsigned short *a,
 			case 't':
 				printf("\r\nFile: %s", filename);
 				printf("\r\n~~Registers~~");
-				printf("\r\n[A]         = 0x%04lx", (unsigned long)*a);
-				printf("\r\n[B]         = 0x%04lx", (unsigned long)*b);
-				printf("\r\n[C]         = 0x%04lx", (unsigned long)*c);
-				printf("\r\n[S]TP       = 0x%04lx", (unsigned long)*stack_pointer);
-				printf("\r\n[P]C        = 0x%04lx", (unsigned long)*program_counter);
-				printf("\r\nPC [R]EGION = 0x%02lx", (unsigned long)*program_counter_region);
+				printf("\r\n[A]         =     0x%04lx", (unsigned long)*a);
+				printf("\r\n[B]         =     0x%04lx", (unsigned long)*b);
+				printf("\r\n[C]         =     0x%04lx", (unsigned long)*c);
+				printf("\r\n[S]TP       =     0x%04lx", (unsigned long)*stack_pointer);
+				printf("\r\n[P]C        =     0x%04lx", (unsigned long)*program_counter);
+				printf("\r\nPC [R]EGION =       0x%02lx", (unsigned long)*program_counter_region);
 				printf("\r\nRX[0]       = 0x%08lx", (unsigned long)*RX0);
 				printf("\r\nRX[1]       = 0x%08lx", (unsigned long)*RX1);
 				printf("\r\nRX[2]       = 0x%08lx", (unsigned long)*RX2);
 				printf("\r\nRX[3]       = 0x%08lx", (unsigned long)*RX3);
-				printf("\r\nEMU DEPTH   = 0x%02lx", (unsigned long)EMULATE_DEPTH);
+				printf("\r\nEMU DEPTH   =       0x%02lx", (unsigned long)EMULATE_DEPTH);
 				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 			goto repl_start;
 			case 'r':
@@ -527,7 +566,6 @@ void debugger_hook(unsigned short *a,
 				SEGMENT = calloc(1, 256);
 				if(!SEGMENT) {puts("\r\n Failed Malloc.");for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);}
 				SEGMENT_PAGES = 1;
-				is_fresh_start = 1;
 			goto repl_start;
 		}
 		repl_end: return;
