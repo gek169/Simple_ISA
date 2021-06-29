@@ -10,10 +10,9 @@ static const unsigned char enable_dis_comments = 1;
 #include "instructions.h"
 #include "stringutil.h"
 #include "disassembler.h"
+#include <signal.h>
 
 static unsigned long debugger_run_insns = 0; /*if this is less than one, the debugger is not */
-static char is_waiting_until_pc_is_value = 0;
-static unsigned short pc_wait_value = 0;
 static char is_fresh_start = 1;
 static char freedom = 0;
 UU sisa_breakpoints[0x10000];
@@ -23,6 +22,14 @@ char debugger_setting_do_dis = 1;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
+
+void respond(int bruh){
+	(void)bruh;
+	printf("\n\r<Received User Attention Signal!>\r\n");
+	freedom=0;
+	debugger_run_insns=0;
+	return;
+}
 
 static char* read_until_terminator_alloced_modified(FILE* f){
 	unsigned char c;
@@ -141,6 +148,7 @@ void debugger_hook(unsigned short *a,
 	if(is_fresh_start){
 		help();
 		is_fresh_start = 0;
+		signal(SIGINT, respond);
 	}
 	
 	if(debugger_run_insns)
