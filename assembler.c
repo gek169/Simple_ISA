@@ -706,6 +706,15 @@ int main(int argc, char** argv){
 			line = strcatalloc(line+1,"");
 			free(line_old);
 		}
+		/*Find line comments... but only on non-VAR lines!*/
+		if(!strprefix("VAR#",line)){
+			if(strfind(line, "//") != -1){
+				line[strfind(line, "//")] = 0;
+			}
+			if(strfind(line, "#") != -1){
+				line[strfind(line, "#")] = 0;
+			}
+		}
 		if(	
 			strprefix("ASM_COPYRIGHT", line)
 			|| strprefix("asm_copyright", line)
@@ -733,7 +742,10 @@ int main(int argc, char** argv){
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
 		/*MACRO_EXPANSION*/
-		if(strfind(line,"VAR#")!= -1) was_macro=1; else was_macro = 0;
+		if(strprefix("VAR#",line))
+			was_macro=1; 
+		else 
+			was_macro = 0;
 		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
 			do{
 				have_expanded = 0;
