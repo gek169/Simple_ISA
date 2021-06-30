@@ -93,10 +93,7 @@ static void fputbyte(unsigned char b, FILE* f){
 	}
 	outputcounter++; outputcounter&=0xffffff;
 }
-static void putshort(unsigned short sh, FILE* f){
-	fputbyte(sh/256, f);
-	fputbyte(sh, f);
-}
+static void putshort(unsigned short sh, FILE* f){fputbyte(sh/256, f);fputbyte(sh, f);}
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 
