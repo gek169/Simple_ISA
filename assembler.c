@@ -394,10 +394,12 @@ int main(int argc, char** argv){
 			strprefix("--manual",argv[i]) ||
 			strprefix("--docs",argv[i]) ||
 			strprefix("--documentation",argv[i])
-		)
+		){
 			puts (
 #include "manpage.h"
 			);
+			exit(0);
+		}
 	}}
 	if(debugging) infile=stdin;
 
