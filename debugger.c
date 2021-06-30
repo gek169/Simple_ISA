@@ -398,13 +398,13 @@ void debugger_hook(unsigned short *a,
 				location = strtoul(line + stepper, 0,0);
 				disassemble_end:
 				tempsetting = max_lines_disassembler;
-				max_lines_disassembler = insns;
-				disassembler(
-						filename, 
-						location, 
-						debugger_setting_maxhalts,
-						0x1000000
-				);
+					max_lines_disassembler = insns;
+					disassembler(
+							filename, 
+							location, 
+							debugger_setting_maxhalts,
+							0x1000000
+					);
 				max_lines_disassembler = tempsetting;
 				goto repl_start;
 			}
@@ -444,7 +444,7 @@ void debugger_hook(unsigned short *a,
 					}
 					
 					if(opcode == 0) {n_halts++;n_illegals = 0;}
-					if(n_halts > 3 || n_illegals > 3)
+					if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)
 					break;
 					printf("\r\n");lines++;
 				}
