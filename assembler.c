@@ -445,7 +445,7 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
+		line = read_until_terminator_alloced(infile, &linesize, '\n', 180);
 		if(!line) {
 			printf(compil_fail_pref);
 			puts("failed malloc for line.");
