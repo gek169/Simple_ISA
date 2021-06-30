@@ -19,6 +19,8 @@ static unsigned long max_lines_disassembler = 30;
 static unsigned long debugger_run_insns = 0; /*if this is less than one, the debugger is not */
 static char is_fresh_start = 1;
 static char freedom = 0;
+static char watched_register = '\0';
+static UU watched_register_value = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
 UU debugger_setting_maxhalts = 3;
@@ -40,6 +42,7 @@ void respond(int bruh){
 		printf("[!]\r\n");
 	freedom=0;
 	debugger_run_insns=0;
+	watched_register = '\0';
 	return;
 }
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
@@ -152,6 +155,7 @@ static void help(){
 			N "    m p = 3 will set the program counter to 3."
 			N "    m 0 = 0xAABBCCDD will set RX0 to that value."
 			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "R to watch [R]egister   | Save a register's value and step until it changes."
 			N "b to set [b]reakpoint   | Set a breakpoint."
 			N "    b sets a breakpoint here."
 			N "    b 0x10030 will set a breakpoint at 0x10030"
@@ -206,20 +210,7 @@ void debugger_hook(unsigned short *a,
 		if(freedom) return; /*still in freedom mode.*/
 	}
 	
-	if(is_fresh_start){
-		if(!debugger_setting_minimal)	help();
-		if(!debugger_setting_minimal)
-			printf(
-				N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
-			N);
-		else
-			printf(N "[START]" N);
-		is_fresh_start = 0;
-		signal(SIGINT, respond);
-#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
-		signal(SIGSEGV, segmentation_violation);
-#endif
-	}
+
 	
 	if(debugger_run_insns)
 	{unsigned long i = 0;
@@ -234,6 +225,83 @@ void debugger_hook(unsigned short *a,
 			}
 		if(debugger_run_insns) return;
 	}
+
+	if(watched_register != '\0'){unsigned long i = 0;
+		if(n_breakpoints)
+			for(; i < n_breakpoints; i++){
+				if(((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) == sisa_breakpoints[i])
+				{
+						freedom = 0;
+						debugger_run_insns = 0;
+						watched_register = 0;
+				}
+			}
+		switch(watched_register){
+			case 'a':
+			case 'A':
+				if (*a == watched_register_value) return;
+			break;
+			case 'b':
+			case 'B':
+				if (*b == watched_register_value) return;
+			break;
+			case 'c':
+			case 'C':
+				if (*c == watched_register_value) return;
+			break;
+			case 'p':
+			case 'P':
+				if (*program_counter == watched_register_value) return;
+			break;
+			case 'r':
+			case 'R':
+				if (*program_counter_region == watched_register_value) return;
+			break;
+			case 's':
+			case 'S':
+				if (*stack_pointer == watched_register_value) return;
+			break;
+			case '0':
+				if (*RX0 == watched_register_value) return;
+			break;
+			case '1':
+				if (*RX1 == watched_register_value) return;
+			break;
+			case '2':
+				if (*RX2 == watched_register_value) return;
+			break;
+			case '3':
+				if (*RX3 == watched_register_value) return;
+			break;
+			case 'E':
+			case 'e':
+				if (EMULATE_DEPTH == watched_register_value) return;
+			break;
+			case 'G':
+			case 'g':
+				if (SEGMENT_PAGES == watched_register_value) return;
+			break;
+			default:
+				printf("\r\nWhat register are you talking about?\r\n");
+			goto repl_pre;
+		}
+	}
+
+	if(is_fresh_start){
+		if(!debugger_setting_minimal)	help();
+		if(!debugger_setting_minimal)
+			printf(
+				N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
+			N);
+		else
+			printf(N "[START]" N);
+		is_fresh_start = 0;
+		signal(SIGINT, respond);
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
+		signal(SIGSEGV, segmentation_violation);
+#endif
+	}
+	repl_pre:
 	if(debugger_setting_do_hex){
 		unsigned long i = 0;
 		unsigned long lines = 0;
@@ -764,13 +832,13 @@ void debugger_hook(unsigned short *a,
 			 	}
 		 		value = strtoul(line + stepper, 0,0);
 #define perform_surgery(REG) 	switch(operation){\
-						 			case '=': *REG = value; break;\
-						 			case '+': *REG += value; break;\
-						 			case '-': *REG -= value; break;\
-						 			case '*': *REG *= value; break;\
+						 			case '=': REG = value; break;\
+						 			case '+': REG += value; break;\
+						 			case '-': REG -= value; break;\
+						 			case '*': REG *= value; break;\
 						 			case '/': \
 										if(value)\
-						 					*REG /= value; \
+						 					REG /= value; \
 						 				else if(!debugger_setting_minimal)\
 						 					printf("\r\n Cannot divide by zero.\r\n");\
 						 				else\
@@ -778,15 +846,15 @@ void debugger_hook(unsigned short *a,
 						 			break;\
 						 			case '%': \
 										if(value)\
-						 					*REG %= value; \
+						 					REG %= value; \
 						 				else if(!debugger_setting_minimal)\
 						 					printf("\r\n Cannot modulo by zero.\r\n");\
 						 				else\
 						 					printf("\r\n<%%0>\r\n");\
 						 			break;\
-						 			case '&':  *REG &= value;  break;\
-						 			case '|':  *REG |= value;  break;\
-						 			case '^':  *REG ^= value;  break;\
+						 			case '&':  REG &= value;  break;\
+						 			case '|':  REG |= value;  break;\
+						 			case '^':  REG ^= value;  break;\
 									default:\
 						 				if(!debugger_setting_minimal)\
 						 					printf("\r\nNo such operation.\r\n");\
@@ -794,42 +862,53 @@ void debugger_hook(unsigned short *a,
 						 					printf("\r\n<bad op>\r\n");\
 						 		}
 			 	switch(to_edit){
+			 		const char* error_fmt = "\r\n<WARNING> this is extremely dangerous. This will probably cause a segmentation violation in the emulator.\r\n";
 			 		case 'a':
 			 		case 'A':
-				 		perform_surgery(a);
+				 		perform_surgery(*a);
 			 			
 			 		break;
 			 		case 'b':
 			 		case 'B':
-				 		perform_surgery(b);
+				 		perform_surgery(*b);
 			 		break;
 			 		case 'c':
 			 		case 'C':
-				 		perform_surgery(c);
+				 		perform_surgery(*c);
 			 		break;
 			 		case 's':
 			 		case 'S':
-				 		perform_surgery(stack_pointer);
+				 		perform_surgery(*stack_pointer);
 			 		break;
 			 		case 'p':
 			 		case 'P':
-				 		perform_surgery(program_counter);
+				 		perform_surgery(*program_counter);
 			 		break;
 			 		case 'r':
 			 		case 'R':
-				 		perform_surgery(program_counter_region);
+				 		perform_surgery(*program_counter_region);
 			 		break;
 			 		case '0':
-				 		perform_surgery(RX0);
+				 		perform_surgery(*RX0);
 			 		break;
 			 		case '1':
-				 		perform_surgery(RX1);
+				 		perform_surgery(*RX1);
 			 		break;
 					case '2':
-				 		perform_surgery(RX2);
+				 		perform_surgery(*RX2);
 			 		break;
 					case '3':
-				 		perform_surgery(RX3);
+				 		perform_surgery(*RX3);
+			 		break;
+			 		case 'e':
+			 		case 'E':
+			 			perform_surgery(EMULATE_DEPTH);
+			 			printf(error_fmt);
+			 		break;
+			 		case 'g':
+			 		case 'G':
+			 			perform_surgery(SEGMENT_PAGES);
+			 			printf(error_fmt);
 			 		break;
 			 		default:
 			 			puts("\r\n<Error, no such register conforming to this name. the names are A,B,C,S,P,R,0,1,2,3");
@@ -852,8 +931,8 @@ void debugger_hook(unsigned short *a,
 				printf("\r\nRX[1]       = 0x%08lx", (unsigned long)*RX1);
 				printf("\r\nRX[2]       = 0x%08lx", (unsigned long)*RX2);
 				printf("\r\nRX[3]       = 0x%08lx", (unsigned long)*RX3);
-				printf("\r\nEMU DEPTH   =       0x%02lx", (unsigned long)EMULATE_DEPTH);
-				printf("\r\nSEG PAGES   = 0x%08lx", (unsigned long)SEGMENT_PAGES);
+				printf("\r\n[E]MU DEPTH =       0x%02lx", (unsigned long)EMULATE_DEPTH);
+				printf("\r\nSEG PA[G]ES = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 				printf("\r\n");
 			goto repl_start;
 			case 'r':
