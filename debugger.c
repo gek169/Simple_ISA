@@ -225,14 +225,6 @@ void debugger_hook(unsigned short *a,
 			}
 		if(debugger_run_insns) return;
 	}
-	if(debugger_setting_do_dis){
-		disassembler(
-			filename, 
-			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
-			debugger_setting_maxhalts,
-			0x1000000
-		);
-	}
 	if(debugger_setting_do_hex){
 		unsigned long i = 0;
 		unsigned long lines = 0;
@@ -263,6 +255,15 @@ void debugger_hook(unsigned short *a,
 		
 		goto repl_start;
 	}
+	if(debugger_setting_do_dis){
+		disassembler(
+			filename, 
+			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
+			debugger_setting_maxhalts,
+			0x1000000
+		);
+	}
+
 	repl_start:
 
 		printf("<region: %lu, pc: 0x%04lx >\n\r", (unsigned long)*program_counter_region, 
