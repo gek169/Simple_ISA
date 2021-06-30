@@ -86,49 +86,31 @@ farret;
 .libc_st_wait_ms:farstla %&@%;
 nop;nop;
 
+.libc_ld_start_ms_b:farlldb %&@%;
+.libc_ld_start_ms_a:farllda %&@%;
+.libc_st_start_ms_b:farstlb %&@%;
+.libc_st_start_ms_a:farstla %&@%;
+nop;nop;
 //prototype: wait(short milliseconds)
-
 ..decl_farproc:proc_wait
-	//retrieve our argument and store it in the desginated spot.
-	astp;
-	lb5;
-	sub;
-	illdaa;
-	libc_st_wait_ms;
-	//calculate the target time to stop at.
-	clock;
-	ba;
-	libc_ld_wait_ms;
-	add;
-	libc_st_wait_ms;
-	rx3push;rx3b;
-	cmp;lb2;cmp;
-	sc %libc_wait_normal_looptop%;jmpifeq;
-	sc %libc_wait_special_looptop%;jmp;
-	:libc_wait_normal_looptop:
-			clock;
-			ba;
-			//is less than the time?
-			libc_ld_wait_ms;cmp;lb0;cmp
-			sc %libc_wait_loopend%;jmpifeq;
-			//is not equal to time?
-			//fallthrough:
-			sc %libc_wait_normal_looptop%;jmp;
-	:libc_wait_special_looptop:
-			clock;
-			ba;
-			//equal to time?
-			libc_ld_wait_ms;cmp;
-			sc %libc_wait_loopend%;jmpifeq;
-			//less than end time + 1 second?
-			libc_ld_wait_ms;
-			rx3b;
-			llb%1000%;add;cmp;lb0;cmp;
-			brx3;
-			sc %libc_wait_loopend%;jmpifeq;
-			sc %libc_wait_special_looptop%;jmp;
-	:libc_wait_loopend:
-	rx3pop;
+	//	retrieve our argument and store it in the desginated spot.
+	astp;lb5;sub;illdaa;libc_st_wait_ms;
+	//	store the start time.
+	clock;libc_st_start_ms_a;
+	//loop.
+	:libc_wait_looptop:
+		//grab the time.
+		clock;
+		libc_ld_start_ms_b;
+		sub;
+		ba;
+		libc_ld_wait_ms;
+		cmp;
+		lb 2;
+		cmp;
+		sc %libc_wait_loopout%; jmpifneq;
+		sc %libc_wait_looptop%; jmp;
+	:libc_wait_loopout:
 farret;
 
 asm_end_region_restriction;
