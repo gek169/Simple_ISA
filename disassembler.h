@@ -337,7 +337,8 @@ static int disassembler(char* fname,
 				}
 			}
 		}
-		if((n_halts + n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
+		if((n_halts) > SISA16_DISASSEMBLER_MAX_HALTS
+			|| (n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
 			goto end;
 		}
 	}
