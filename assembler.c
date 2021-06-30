@@ -1206,7 +1206,10 @@ int main(int argc, char** argv){
 						(strfind(macro_name, variable_names[i])>-1)
 					)
 				){
-					printf(warn_pref);if(!clear_output)printf("This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
+					if(!clear_output){
+					printf(warn_pref);
+					printf("This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
+					}
 				}
 				
 				if(streq(macro_name, variable_names[i])){
