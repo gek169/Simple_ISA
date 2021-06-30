@@ -388,9 +388,9 @@ G_JMPIFNEQ:if(a!=1)program_counter=c;D/*Would require edit if you wanted a 32 bi
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
-G_DIV:if(b!=0)a/=b;else{R=1;goto G_HALT;}D
-G_MOD:if(b!=0)a%=b;else{R=2;goto G_HALT;}D
-G_CMP:if(a<b)a=0;else if(a>b)a=2;else a=1;D
+G_DIV:{if(b!=0)a/=b;else{R=1;goto G_HALT;}}D
+G_MOD:{if(b!=0)a%=b;else{R=2;goto G_HALT;}}D
+G_CMP:{if(a<b)a=0;else if(a>b)a=2;else a=1;}D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
 G_FARISTLA:write_2bytes(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
@@ -406,7 +406,8 @@ G_FARCALL:
 write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
 write_byte(program_counter_region,stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
 program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
-program_counter=c;/*Would require edit if you wanted a 32 bit PC*/D
+program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
+D
 G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
 G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)+((UU)b)))D
@@ -554,25 +555,25 @@ ZC:
 ZD:
 #if !defined(NO_SEGMENT)
 {
-		u* SEGMENT_OLD = SEGMENT;
-		register UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
-		if(RX0 == 0)	{R=6;goto G_HALT;}
-		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
-			SEGMENT_PAGES = RX0;
-			SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
-		}
-		if(!SEGMENT){
-			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
-			SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
-		}
-		if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
-			/*Must initialize memory to zero.*/
-			register size_t end, i;
-			i = ((size_t)SEGMENT_PAGES_OLD) * 256;
-			end = ((size_t)SEGMENT_PAGES) * 256;
-			for(;i<end;i++)SEGMENT[i] = 0;
-		}
-	}D
+	u* SEGMENT_OLD = SEGMENT;
+	register UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
+	if(RX0 == 0)	{R=6;goto G_HALT;}
+	if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
+		SEGMENT_PAGES = RX0;
+		SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
+	}
+	if(!SEGMENT){
+		SEGMENT_PAGES = SEGMENT_PAGES_OLD;
+		SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
+	}
+	if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
+		/*Must initialize memory to zero.*/
+		register size_t end, i;
+		i = ((size_t)SEGMENT_PAGES_OLD) * 256;
+		end = ((size_t)SEGMENT_PAGES) * 256;
+		for(;i<end;i++)SEGMENT[i] = 0;
+	}
+}D
 #else
 	R=14; goto G_HALT;
 #endif
@@ -730,7 +731,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA21:{UU flight;
 			flight = CONSUME_THREE_BYTES;
 			write_4bytes(RX1, flight);
-		}D
+	}D
 	G_AA22:{UU flight;
 		flight = CONSUME_THREE_BYTES;
 		write_4bytes(RX2, flight);
@@ -795,10 +796,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA31: R=14; goto G_HALT;
 #endif
 #if defined(NO_FP) || defined(NO_SIGNED_DIV)
-	G_AA32:
-	G_AA33:
-	R=8;
-	goto G_HALT;
+	G_AA32:G_AA33:R=8;goto G_HALT;
 #else
 	G_AA32:{
 		float fRX0;
