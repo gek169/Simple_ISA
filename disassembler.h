@@ -23,7 +23,7 @@ static int disassembler(char* fname,
 #endif
 	for(i = location; i < end_location && i < 0x1000000 && linenum < max_lines_disassembler;){
 		unsigned char opcode;
-		unsigned char bad_binary_flag;
+		unsigned char bad_binary_flag = 0;
 		if(i >= 0x1000000){
 #ifdef SISA_DEBUGGER
 			printf("//Disassembly reached end of usable memory.\r\n");
