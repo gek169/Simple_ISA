@@ -12,6 +12,8 @@ section 0x40000;
 :ascii_greyscale:
 ..asciz: .:-=+*#%@%#*+=-:.
 
+..(3):
+bytes 0,0,0,5;
 
 ASM_header libc.hasm
 
@@ -22,7 +24,7 @@ ASM_header libc.hasm
 
 section 0x10000;
 asm_begin_region_restriction;
-la 0;
+la line_length;
 alpush;
 st_iteration_count;
 nop;
@@ -52,11 +54,10 @@ nop;
 	:iter_is_not_endval:
 		ld_iteration_count;
 		blpop;blpush;
-		add;
-		lb 18;mod;
+		add;lb 18;mod;
 		//we now have the offset calculated in register a.
 		sc %0x4%; 
-		llb %ascii_greyscale%;
+		lb %~ascii_greyscale%;
 		add;
 		ba;
 		farilda;
@@ -66,6 +67,4 @@ nop;
 asm_end_restriction;
 
 section 0;
-	la 0xa;putchar;
-	la 0xd;putchar;
 	la 1;lfarpc;
