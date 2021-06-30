@@ -811,7 +811,7 @@ void debugger_hook(unsigned short *a,
 					case 'g':
 					case 'G':watched_register_value = SEGMENT_PAGES;break;
 				}
-				printf("\r\nWatching Register %c", watched_register);
+				printf("Watching Register %c\r\n", watched_register);
 				return;
 			}
 			case 'e':
