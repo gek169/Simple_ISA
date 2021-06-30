@@ -416,6 +416,7 @@ void debugger_hook(unsigned short *a,
 				unsigned long stepper = 1;
 				unsigned long insns = 0x1000000;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				/*Parse input.*/
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto hex_end;
 				insns = strtoul(line + stepper, 0,0); /*grab number of insns*/
@@ -425,9 +426,8 @@ void debugger_hook(unsigned short *a,
 				location = strtoul(line + stepper, 0,0);
 
 				hex_end:
-				if(!debugger_setting_minimal)
-					printf("\r\nHeX view:\r\n");
-				for(;i<insns && lines < max_lines_disassembler && (location+i < 0x1000000);i++){
+				if(!debugger_setting_minimal) printf("\r\nHeX view:\r\n");
+				for(;i<0x1000000 && lines < insns && (location+i < 0x1000000);i++){
 					unsigned char opcode;
 					unsigned long j;
 					opcode = M[location+i];
@@ -442,10 +442,8 @@ void debugger_hook(unsigned short *a,
 						n_illegals++;
 						n_halts = 0;
 					}
-					
 					if(opcode == 0) {n_halts++;n_illegals = 0;}
-					if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)
-					break;
+					if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)break;
 					printf("\r\n");lines++;
 				}
 				goto repl_start;
