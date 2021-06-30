@@ -231,7 +231,7 @@ void debugger_hook(unsigned short *a,
 			filename, 
 			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
 			debugger_setting_maxhalts,
-			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaybytes
+			0x1000000
 		);
 	}
 	if(debugger_setting_do_hex){
@@ -239,10 +239,10 @@ void debugger_hook(unsigned short *a,
 		unsigned long lines = 0;
 		unsigned long n_halts = 0;
 		unsigned long n_illegals = 0;
-		unsigned long insns = debugger_setting_displaybytes;
+		unsigned long insns = 0x1000000;
 		unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 		if(!debugger_setting_minimal) printf("\r\nHex:\r\n");
-		for(;i<insns && lines < max_lines_disassembler;i++){
+		for(;i<insns && lines < max_lines_disassembler && (location+i < 0x1000000);i++){
 			unsigned char opcode;
 			unsigned long j;
 			printf("\r\n");
@@ -418,7 +418,7 @@ void debugger_hook(unsigned short *a,
 				unsigned long n_halts = 0;
 				unsigned long n_illegals = 0;
 				unsigned long stepper = 1;
-				unsigned long insns = debugger_setting_displaybytes;
+				unsigned long insns = 0x1000000;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto hex_end;
@@ -431,7 +431,7 @@ void debugger_hook(unsigned short *a,
 				hex_end:
 				if(!debugger_setting_minimal)
 					printf("\r\nHeX view:\r\n");
-				for(;i<insns && lines<max_lines_disassembler;i++){
+				for(;i<insns && lines < max_lines_disassembler && (location+i < 0x1000000);i++){
 					unsigned char opcode;
 					unsigned long j;
 					opcode = M[location+i];
