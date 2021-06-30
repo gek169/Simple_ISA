@@ -207,8 +207,11 @@ void debugger_hook(unsigned short *a,
 		if(n_breakpoints == 0) return;
 		for(; i < n_breakpoints; i++){
 			if(((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) == sisa_breakpoints[i])
-				{freedom = 0;
-				debugger_run_insns = 0;}
+				{
+					freedom = 0;
+					debugger_run_insns = 0;
+					watched_register = '\0';
+				}
 		}
 		if(freedom) return; /*still in freedom mode.*/
 	}
@@ -224,6 +227,7 @@ void debugger_hook(unsigned short *a,
 				{
 						freedom = 0;
 						debugger_run_insns = 0;
+						watched_register = '\0';
 				}
 			}
 		if(debugger_run_insns) return;
@@ -236,7 +240,7 @@ void debugger_hook(unsigned short *a,
 				{
 						freedom = 0;
 						debugger_run_insns = 0;
-						watched_register = 0;
+						watched_register = '\0';
 				}
 			}
 		switch(watched_register){
@@ -286,8 +290,10 @@ void debugger_hook(unsigned short *a,
 			break;
 			default:
 				printf("\r\nWhat register are you talking about?\r\n");
+				watched_register = '\0';
 			goto repl_pre;
 		}
+		watched_register = '\0';
 	}
 
 	if(is_fresh_start){
