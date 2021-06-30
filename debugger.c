@@ -391,7 +391,7 @@ void debugger_hook(unsigned short *a,
 			case 'd':{
 				unsigned long stepper = 1;
 				unsigned long tempsetting = 0;
-				unsigned long insns = debugger_setting_displaybytes;
+				unsigned long insns = max_lines_disassembler;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto disassemble_end;
@@ -446,10 +446,11 @@ void debugger_hook(unsigned short *a,
 						n_illegals++;
 						n_halts = 0;
 					}
+					
 					if(opcode == 0) {n_halts++;n_illegals = 0;}
 					if(n_halts > 3 || n_illegals > 3)
 					break;
-					printf("\r\n");
+					printf("\r\n");lines++;
 				}
 				goto repl_start;
 			}
