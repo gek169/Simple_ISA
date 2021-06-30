@@ -969,8 +969,9 @@ void debugger_hook(unsigned short *a,
 						 				else\
 						 					printf("\r\n<bad op>\r\n");\
 						 		}
+				{const char* error_fmt = "\r\n<WARNING> this is extremely dangerous. This will probably cause a segmentation violation in the emulator.\r\n";
 			 	switch(to_edit){
-			 		const char* error_fmt = "\r\n<WARNING> this is extremely dangerous. This will probably cause a segmentation violation in the emulator.\r\n";
+			 		
 			 		case 'a':
 			 		case 'A':
 				 		perform_surgery(*a);
@@ -1021,6 +1022,7 @@ void debugger_hook(unsigned short *a,
 			 		default:
 			 			puts("\r\n<Error, no such register conforming to this name. the names are A,B,C,S,P,R,0,1,2,3");
 			 		
+			 	}
 			 	}
 			 	goto repl_start;
 			}
