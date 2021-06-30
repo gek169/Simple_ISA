@@ -6,12 +6,13 @@ static int disassembler(char* fname,
 	unsigned long n_illegals = 0;
 	unsigned long i = location & 0xffFFff;
 	unsigned long linenum = 0;
+	unsigned long stepper = i;
 #ifndef SISA_DEBUGGER
 	FILE* f; 
 	f = fopen(fname, "rb");
 	if(!f){puts("//ERROR: Could not open file to disassemble.");	exit(1);}
 #endif
-	unsigned long stepper = i;
+	
 #ifndef SISA_DEBUGGER
 	fseek(f, location, SEEK_SET);
 #endif
