@@ -772,6 +772,48 @@ void debugger_hook(unsigned short *a,
 				printf("\r\n");
 				goto repl_start;
 			}
+			case 'R':
+			{
+				unsigned long stepper = 1;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0'){
+					if(!debugger_setting_minimal)
+						printf("\r\nWhat register should we watch?\r\n");
+					else
+						printf("\r\n<register?>\r\n");
+				}
+				watched_register = line[stepper];
+				switch(watched_register){
+					default:
+						if(!debugger_setting_minimal)
+							printf("\r\nThat is not a real register!\r\n");
+						else
+							printf("\r\n<bad register>\r\n");
+						goto repl_start;
+					case 'a':
+					case 'A':watched_register_value = *a;break;
+					case 'b':
+					case 'B':watched_register_value = *b;break;
+					case 'c':
+					case 'C':watched_register_value = *c;break;
+					case 's':
+					case 'S':watched_register_value = *stack_pointer;break;
+					case 'p':
+					case 'P':watched_register_value = *program_counter;break;
+					case 'r':
+					case 'R':watched_register_value = *program_counter_region;break;
+					case '0':watched_register_value = *RX0;break;
+					case '1':watched_register_value = *RX1;break;
+					case '2':watched_register_value = *RX2;break;
+					case '3':watched_register_value = *RX3;break;
+					case 'E':
+					case 'e':watched_register_value = EMULATE_DEPTH;break;
+					case 'g':
+					case 'G':watched_register_value = SEGMENT_PAGES;break;
+				}
+				printf("\r\nWatching Register %c", watched_register);
+				return;
+			}
 			case 'e':
 			{
 				unsigned long stepper = 1;
