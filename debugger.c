@@ -601,6 +601,9 @@ void debugger_hook(unsigned short *a,
 					}
 					if(M[addr+i] == 0) break;
 					if(isgraph(M[addr+i]) || M[addr+i] == ' '){
+						if(M[addr+i] == '<')
+							putchar('\\');
+						else if(M[addr+i] == '\\') {putchar('\\');putchar('\\');}
 						putchar(M[addr+i]);
 						continue;
 					}else{
