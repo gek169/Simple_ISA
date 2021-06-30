@@ -245,10 +245,8 @@ void debugger_hook(unsigned short *a,
 		for(;i<insns && lines < max_lines_disassembler && (location+i < 0x1000000);i++){
 			unsigned char opcode;
 			unsigned long j;
-			printf("\r\n");
 			opcode = M[location+i];
 			printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
-			lines++;
 			if(M[location+i] < n_insns){
 				for(j=0;j<insns_numargs[opcode];j++){
 					printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
@@ -260,10 +258,10 @@ void debugger_hook(unsigned short *a,
 				n_halts = 0;
 			}
 			if(opcode == 0) {n_halts++;n_illegals = 0;}
-			if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)
-			break;
+			if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)break;
+			printf("\r\n");lines++;
 		}
-		printf("\r\n");
+		
 		goto repl_start;
 	}
 	repl_start:
