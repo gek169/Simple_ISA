@@ -16,8 +16,8 @@ qdev:
 	sudo $(MAKE) -B install
 	sudo $(MAKE) clean
 	git add .
-	git commit -m "Developer time"
-	git push
+	git commit -m "Developer time" || echo "nothing to commit"
+	git push || echo "nothing to push"
 	./asmbuild.sh
 	
 	
