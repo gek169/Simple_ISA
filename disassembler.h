@@ -5,6 +5,7 @@ static int disassembler(char* fname,
 	unsigned long n_halts = 0;
 	unsigned long n_illegals = 0;
 	unsigned long i = location & 0xffFFff;
+	unsigned long linenum = 0;
 #ifndef SISA_DEBUGGER
 	FILE* f; 
 	f = fopen(fname, "rb");
@@ -20,28 +21,24 @@ static int disassembler(char* fname,
 #else
 	printf("\n\rsection 0x%lx;\n\r", location);
 #endif
-	for(i = location; i < end_location && i < 0x1000000;){
+	for(i = location; i < end_location && i < 0x1000000 && linenum < max_lines_disassembler;){
 		unsigned char opcode;
+		unsigned char bad_binary_flag;
 		if(i >= 0x1000000){
 #ifdef SISA_DEBUGGER
 			printf("//Disassembly reached end of usable memory.\r\n");
 #else
 			puts("//Disassembly reached end of usable memory.");
 #endif
-			goto end;
+			goto end_for_realsies;
 		}else if((i & 0xffFF) == 0){
 #ifdef SISA_DEBUGGER
-		printf("//<Region Boundary 0x%06lx >\n\r", i);
+			printf("//<Region Boundary 0x%06lx >\n\r", i);
 #else
-		printf("//<Region Boundary 0x%06lx >\n", i);
+			printf("//<Region Boundary 0x%06lx >\n", i);
 #endif
+			linenum++; if(linenum > max_lines_disassembler) goto end;
 		}
-#ifndef SISA_DEBUGGER
-		if((unsigned long)ftell(f) != i){
-			puts("//<Disassembly could not proceed, reason: end of file>");
-			goto end;
-		}
-#endif
 
 #ifndef SISA_DEBUGGER
 		opcode = fgetc(f);i++;
@@ -54,27 +51,14 @@ static int disassembler(char* fname,
 			opcode < n_insns &&  /*Valid opcode*/
 			(insns_numargs[opcode] > 0) && /*With arguments*/
 			(((i-1)+insns_numargs[opcode])>>16) != ((i-1)>>16)
-		){
-#ifndef SISA_DEBUGGER
-			printf("\n//(E_BAD_BINARY)\n//op is '%s' which has %u args but crosses the region boundary.\n//This is most likely the result of interpreting embedded data as code.\n",insns[opcode],insns_numargs[opcode]);
-#else
-			printf("\n\r//(E_BAD_BINARY)\n\r//op is '%s' which has %u args but crosses the region boundary.\n\r//This is most likely the result of interpreting embedded data as code.\n\r",insns[opcode],insns_numargs[opcode]);
-#endif
-			if( ((((i-1)+insns_numargs[opcode])>>16)&0xff) == 0){
-#ifndef SISA_DEBUGGER
-				puts("//This opcode crosses over the memory image boundary. Some of its data is junk:");
-#else
-				printf("//This opcode crosses over the memory image boundary. Some of its data is junk:\r\n");
-#endif
-			}
-		}
+		){bad_binary_flag = 1;}
 		
 		if(opcode >= n_insns){
 			if(enable_dis_comments)
 #ifndef SISA_DEBUGGER
-				printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE) Probably Data.\n","bytes", (unsigned int)opcode, i-1);
+				printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE)\n","bytes", (unsigned int)opcode, i-1);
 #else
-				printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE) Probably Data.\n\r","bytes", (unsigned int)opcode, i-1);
+				printf("%-12s 0x%x                ;//0x%06lx  : Illegal Opcode (E_ILLEGAL_OPCODE)\n\r","bytes", (unsigned int)opcode, i-1);
 #endif
 			else
 #ifndef SISA_DEBUGGER
@@ -123,16 +107,19 @@ static int disassembler(char* fname,
 			{unsigned long li; for(li=0;li<required_spaces;li++){
 				printf(" ");
 			}}
-			if(!enable_dis_comments) 
+			if(!enable_dis_comments) {
 #ifndef SISA_DEBUGGER
 				printf(";\n");
 #else
 				printf(";\n\r");
 #endif
+			}
+			linenum++; if(linenum > max_lines_disassembler) goto end;
 			if(enable_dis_comments)
 			{
 				printf(";//0x%06lx  :", opcode_i);
 				if(bad_flag) printf("(E_WONT_RUN)");
+				if(bad_binary_flag) printf("(E_INSN_ARGS_CROSS_REGION_BOUNDARY)");
 				if(unfinished_flag) printf("(E_UNFINISHED_EOF AT ARGUMENT %u)", unfinished_flag-1);
 				if(streq(insns[opcode], "farret")){
 #ifndef SISA_DEBUGGER
@@ -145,18 +132,19 @@ static int disassembler(char* fname,
 					|| streq(insns[opcode], "llb")
 				)
 				{
-					if( (short_interpretation & 0xFF00) == 0)
+					if( (short_interpretation & 0xFF00) == 0){
 #ifndef SISA_DEBUGGER
 						puts(" <TIP> replace with single-byte assignment, high byte is zero.");
 #else
 						printf(" <TIP> replace with single-byte assignment, high byte is zero.\r\n");
 #endif
-					else
+					}else{
 #ifndef SISA_DEBUGGER
 						printf("\n");
 #else
 						printf("\n\r");
 #endif
+					}
 				}else if(streq(insns[opcode], "ret")){
 #ifndef SISA_DEBUGGER
 					puts(" End of Local Procedure");
@@ -177,9 +165,9 @@ static int disassembler(char* fname,
 #endif
 				}else if(streq(insns[opcode], "jmpifeq")){
 #ifndef SISA_DEBUGGER
-					puts(" Conditional Jump");
+					puts(" Cond. Jump");
 #else
-					printf(" Conditional Jump\r\n");
+					printf(" Cond. Jump\r\n");
 #endif
 				}else if(streq(insns[opcode], "cbrx0")
 						||streq(insns[opcode], "carx0")){
@@ -190,52 +178,53 @@ static int disassembler(char* fname,
 #endif
 				}else if(streq(insns[opcode], "jmpifneq")){
 #ifndef SISA_DEBUGGER
-					puts(" Conditional Jump");
+					puts(" Cond. Jump");
 #else
-					printf(" Conditional Jump\r\n");
+					printf(" Cond. Jump\r\n");
 #endif
 				}else if(streq(insns[opcode], "clock")){
 #ifndef SISA_DEBUGGER
-					puts(" Interact w/ sys time: A=ms, B=s, C=clock()");
+					puts(" get sys time: A=ms, B=s, C=clock()");
 #else
-					printf(" Interact w/ sys time: A=ms, B=s, C=clock()\r\n");
+					printf(" get sys time: A=ms, B=s, C=clock()\r\n");
 #endif
 				}else if(streq(insns[opcode], "emulate_seg")){
 #ifndef SISA_DEBUGGER
-					puts(" Sandboxing Insn w/ Shared Segment. Jumps to 0x000000 and catches exceptions");
+					puts(" Sandbox w/ Shared Segment. Jumps to 0x000000 and catches exceptions");
 #else
-					printf(" Sandboxing Insn w/ Shared Segment. Jumps to 0x000000 and catches exceptions\r\n");
+					printf(" Sandbox w/ Shared Segment. Jumps to 0x000000 and catches exceptions\r\n");
 #endif
 				}else if(streq(insns[opcode], "emulate")){
 #ifndef SISA_DEBUGGER
-					puts(" Sandboxing Insn. Jump to 0x000000 and catches exceptions.");
+					puts(" Sandbox. Jump to 0x000000 and catches exceptions.");
 #else
-					printf(" Sandboxing Insn. Jump to 0x000000 and catches exceptions.\r\n");
+					printf(" Sandbox. Jump to 0x000000 and catches exceptions.\r\n");
 #endif
 				}else if(streq(insns[opcode], "interrupt")){
 #ifndef SISA_DEBUGGER
-					puts(" <DEVICE> interrupt returning value to A.");
+					puts(" <DEVICE> interrupt.");
 #else
-					printf(" <DEVICE> interrupt returning value to A.\r\n");
+					printf(" <DEVICE> interrupt.\r\n");
 #endif
 				}else if(streq(insns[opcode], "putchar")){
 #ifndef SISA_DEBUGGER
-					puts(" <DEVICE> write A to device.");
+					puts(" <DEVICE> A->device");
 #else
-					printf(" <DEVICE> write A to device.\r\n");
+					printf(" <DEVICE> A->device\r\n");
 #endif
 				}else if(streq(insns[opcode], "getchar")){
 #ifndef SISA_DEBUGGER
-					puts(" <DEVICE> read A from device.");
+					puts(" <DEVICE> device->A");
 #else
-					printf(" <DEVICE> read A from device.\r\n");
+					printf(" <DEVICE> device->A\r\n");
 #endif
 				}else if(streq(insns[opcode], "sc")){
-					if(short_interpretation == (opcode_i & 0xffFF)){
+					if(short_interpretation == (opcode_i & 0xffFF) ||
+						short_interpretation == ((opcode_i+3) & 0xffFF)){
 #ifndef SISA_DEBUGGER
-						puts(" \?!: Loop top. <TIP>: replace with cpc.");
+						puts(" !: Loop top. <TIP>: replace with cpc.");
 #else
-						printf(" \?!: Loop top. <TIP>: replace with cpc.\r\n");
+						printf(" !: Loop top. <TIP>: replace with cpc.\r\n");
 #endif
 					}else{
 #ifndef SISA_DEBUGGER
@@ -309,9 +298,9 @@ static int disassembler(char* fname,
 						||streq(insns[opcode], "lldb")
 				){
 #ifndef SISA_DEBUGGER
-					puts(" ?: Loading from fixed position variable.");
+					puts(" ?: Loading from fixed variable.");
 #else
-					printf(" ?: Loading from fixed position variable.\r\n");
+					printf(" ?: Loading from fixed variable.\r\n");
 #endif
 				}else if( streq(insns[opcode], "farstla")
 						||streq(insns[opcode], "farstlb")
@@ -327,9 +316,9 @@ static int disassembler(char* fname,
 						||streq(insns[opcode], "stlb")
 				){
 #ifndef SISA_DEBUGGER
-					puts(" ?: Storing to fixed position variable.");
+					puts(" ?: Storing to fixed variable.");
 #else
-					printf(" ?: Storing to fixed position variable.\r\n");
+					printf(" ?: Storing to fixed variable.\r\n");
 #endif
 				}else if(streq(insns[opcode], "cpc")){
 #ifndef SISA_DEBUGGER
@@ -343,34 +332,30 @@ static int disassembler(char* fname,
 #else
 					printf("\r\n");
 #endif
-					}
+				}
 				if(unfinished_flag){
 #ifndef SISA_DEBUGGER
 					puts("\n//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)");
 #else
 					printf("\n\r//End of File, Last Opcode is inaccurately disassembled (E_UNFINISHED_EOF)\r\n");
 #endif
-					goto end;
+					goto end_for_realsies;
 				}
 			}
 		}
 		if((n_halts + n_illegals) > SISA16_DISASSEMBLER_MAX_HALTS){
-#ifndef SISA_DEBUGGER
-			puts("\n//Reached Halt/Invalid Opcode Limit. Disassembly finished.");
-#else
-			printf("\n\r//Reached Halt/Invalid Opcode Limit. Disassembly finished.\r\n");
-#endif
 			goto end;
 		}
 	}
-#ifndef SISA_DEBUGGER
-	puts("\n//Reached End.\n");
-#else
-	printf("\n\r//Reached End.\n\r");
-#endif
+
 	end:
 #ifndef SISA_DEBUGGER
+	puts("\n//Reached End.\n");
+	end_for_realsies:
 	fclose(f);
+#else
+	printf("\n\r//Reached End.\n\r");
+	end_for_realsies:
 #endif
 	return 0;
 }

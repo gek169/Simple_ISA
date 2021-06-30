@@ -10,6 +10,7 @@ static char* env_home = NULL;
 static char* settingsfilename = NULL;
 
 unsigned char enable_dis_comments = 1;
+static unsigned long max_lines_disassembler = 30;
 #include "instructions.h"
 #include "stringutil.h"
 #include "disassembler.h"
@@ -20,7 +21,7 @@ static char is_fresh_start = 1;
 static char freedom = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
-UU debugger_setting_displaylines = 30;
+UU debugger_setting_displaybytes = 0x1000000;
 UU debugger_setting_maxhalts = 3;
 UU debugger_setting_clearlines = 500;
 
@@ -69,7 +70,8 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 			blen = 0;
 			continue;
 		}
-		putchar(c);
+		if(!is_fresh_start)
+			putchar(c);
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				bcap<<=1;
@@ -155,8 +157,8 @@ static void help(){
 			N "u to r[u]n              | Run until breakpoint."
 			N "x to view he[x]         | View raw bytes of disassembly"
 			N "d to [d]isassemble      | disassemble."
-			N "    SYNTAX: d 50 will disassemble 50 bytes from the program counter."
-			N "    You may also include a location, d 50 0x100 will disassemble 50 bytes from 0x100."
+			N "    SYNTAX: d 50 will disassemble 50 lines from the program counter."
+			N "    You may also include a location, d 50 0x100 will disassemble 50 lines from 0x100."
 			N "q to [q]uit             | quit debugging."
 			N "w to [w]rite byte       | write byte to memory. Syntax: w 0xAB00E0 12 will write the value 12 to 0xAB00E0"
 			N "a to [a]lter u16        | Modify a short in memory. "
@@ -229,22 +231,24 @@ void debugger_hook(unsigned short *a,
 			filename, 
 			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
 			debugger_setting_maxhalts,
-			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaylines
+			((unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16)) + debugger_setting_displaybytes
 		);
 	}
 	if(debugger_setting_do_hex){
 		unsigned long i = 0;
+		unsigned long lines = 0;
 		unsigned long n_halts = 0;
 		unsigned long n_illegals = 0;
-		unsigned long insns = debugger_setting_displaylines;
+		unsigned long insns = debugger_setting_displaybytes;
 		unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 		if(!debugger_setting_minimal) printf("\r\nHex:\r\n");
-		for(;i<insns;i++){
+		for(;i<insns && lines < max_lines_disassembler;i++){
 			unsigned char opcode;
 			unsigned long j;
 			printf("\r\n");
 			opcode = M[location+i];
 			printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+			lines++;
 			if(M[location+i] < n_insns){
 				for(j=0;j<insns_numargs[opcode];j++){
 					printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
@@ -312,7 +316,7 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == 0){
 					printf("~~Settings~~\r\n");
-					printf("d: 0x%06lx    | The default number of bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
+					printf("d: 0x%06lx    | The default number of lines to diassemble ahead.\r\n", (unsigned long)max_lines_disassembler);
 					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
 					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
@@ -334,7 +338,7 @@ void debugger_hook(unsigned short *a,
 					else
 						printf("<bad>\r\n");
 					goto repl_start;
-					case 'd': debugger_setting_displaylines = mode & 0xffFFff;
+					case 'd': max_lines_disassembler = mode & 0xffFFff;
 					break;
 					case 'i': debugger_setting_do_dis = mode;
 					break;
@@ -357,7 +361,7 @@ void debugger_hook(unsigned short *a,
 						printf("\r\nError working with settings file.\r\n");
 						goto repl_start;
 					}
-					fprintf(settingsfile, "d %lu\n", (unsigned long)debugger_setting_displaylines);
+					fprintf(settingsfile, "d %lu\n", (unsigned long)max_lines_disassembler);
 					fprintf(settingsfile, "i %lu\n", (unsigned long)debugger_setting_do_dis);
 					fprintf(settingsfile, "x %lu\n", (unsigned long)debugger_setting_do_hex);
 					fprintf(settingsfile, "c %lu\n", (unsigned long)enable_dis_comments);
@@ -386,7 +390,8 @@ void debugger_hook(unsigned short *a,
 			case 'u': freedom = 1; free(line); return;
 			case 'd':{
 				unsigned long stepper = 1;
-				unsigned long insns = debugger_setting_displaylines;
+				unsigned long tempsetting = 0;
+				unsigned long insns = debugger_setting_displaybytes;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto disassemble_end;
@@ -396,21 +401,24 @@ void debugger_hook(unsigned short *a,
 				if(line[stepper] == '\0') goto disassemble_end;
 				location = strtoul(line + stepper, 0,0);
 				disassemble_end:
+				tempsetting = max_lines_disassembler;
+				max_lines_disassembler = insns;
 				disassembler(
 						filename, 
 						location, 
 						debugger_setting_maxhalts,
-						location + insns
+						0x1000000
 				);
-				printf("\r\n");
+				max_lines_disassembler = tempsetting;
 				goto repl_start;
 			}
 			case 'x':{
 				unsigned long i = 0;
+				unsigned long lines = 0;
 				unsigned long n_halts = 0;
 				unsigned long n_illegals = 0;
 				unsigned long stepper = 1;
-				unsigned long insns = debugger_setting_displaylines;
+				unsigned long insns = debugger_setting_displaybytes;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') goto hex_end;
@@ -423,10 +431,9 @@ void debugger_hook(unsigned short *a,
 				hex_end:
 				if(!debugger_setting_minimal)
 					printf("\r\nHeX view:\r\n");
-				for(;i<insns;i++){
+				for(;i<insns && lines<max_lines_disassembler;i++){
 					unsigned char opcode;
 					unsigned long j;
-					printf("\r\n");
 					opcode = M[location+i];
 					printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 					if(M[location+i] < n_insns){
@@ -442,8 +449,8 @@ void debugger_hook(unsigned short *a,
 					if(opcode == 0) {n_halts++;n_illegals = 0;}
 					if(n_halts > 3 || n_illegals > 3)
 					break;
+					printf("\r\n");
 				}
-				printf("\r\n");
 				goto repl_start;
 			}
 			case 'w':{
@@ -931,7 +938,7 @@ int main(int rc,char**rv){
 				}
 				switch(line[0]){
 					case 'd':
-					debugger_setting_displaylines = strtoul(line+1,0,0) & 0xffFFff;
+					max_lines_disassembler = strtoul(line+1,0,0) & 0xffFFff;
 					break;
 					case 'i':
 					debugger_setting_do_dis = strtoul(line+1,0,0);

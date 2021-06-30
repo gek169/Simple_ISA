@@ -3,7 +3,7 @@
 #include <string.h>
 #include "d.h"
 #include "isa.h"
-static char* outfilename = "outsisa16.bin";
+static char* outfilename = "outs16.bin";
 static char run_sisa16 = 0;
 static char enable_dis_comments = 1;
 static char clear_output = 0;
@@ -12,6 +12,7 @@ static char* infilename = NULL;
 static char* variable_names[65535] = {0};
 static char* variable_expansions[65535] = {0};
 static char variable_is_redefining_flag[65535] = {0};
+static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
 static char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
