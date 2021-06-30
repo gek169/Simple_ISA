@@ -1167,7 +1167,7 @@ int main(int rc,char**rv){
 			printf("\r\n <internal error working with settings file on line " debugger_stringify(__LINE__) " of debugger.c.>\r\n");
 		}
 	} else {
-		printf("\r\n !!!! No settings file found. Create a file in your home folder or the current working directory called .sisa16_dbg to save settings!!!!");
+		printf("\r\n !!!! No settings file found. Create a file in your home folder or the current working directory called .sisa16_dbg to save settings!!!!\r\n");
 	}
 	if(
 		(sizeof(U) != 2) ||
