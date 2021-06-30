@@ -42,7 +42,13 @@ void respond(int bruh){
 	debugger_run_insns=0;
 	return;
 }
-
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
+void segmentation_violation(int bruh){
+	(void)bruh;
+	printf("\r\nIt appears there was a segmentation violation by the program! Uh Oh!\r\n");
+	exit(1);
+}
+#endif
 static char* read_until_terminator_alloced_modified(FILE* f){
 	unsigned char c;
 	char* buf;
@@ -210,6 +216,9 @@ void debugger_hook(unsigned short *a,
 			printf(N "[START]" N);
 		is_fresh_start = 0;
 		signal(SIGINT, respond);
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
+		signal(SIGSEGV, segmentation_violation);
+#endif
 	}
 	
 	if(debugger_run_insns)
