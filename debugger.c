@@ -310,7 +310,7 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == 0){
 					printf("~~Settings~~\r\n");
-					printf("d: 0x%06lx  | The default number of bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
+					printf("d: 0x%06lx    | The default number of bytes to diassemble ahead.\r\n", (unsigned long)debugger_setting_displaylines);
 					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
 					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
 					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
