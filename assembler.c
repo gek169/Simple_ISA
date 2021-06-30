@@ -42,6 +42,7 @@ static char int_checker(char* proc){
 		!( (*proc <= '8' && *proc >= '0') )){
 			return 1;
 		}
+		chars_read++;
 	}
 	if(chars_read == 0) return 1; /*There were no characters in the number.*/
 	return 0;
