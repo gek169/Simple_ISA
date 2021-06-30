@@ -781,6 +781,7 @@ void debugger_hook(unsigned short *a,
 						printf("\r\nWhat register should we watch?\r\n");
 					else
 						printf("\r\n<register?>\r\n");
+					goto repl_start;
 				}
 				watched_register = line[stepper];
 				switch(watched_register){
