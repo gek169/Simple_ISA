@@ -588,7 +588,7 @@ void debugger_hook(unsigned short *a,
 						else if(M[addr+i] == '\n')
 							printf("\r\n<nl>\r\n");
 						else
-							printf("\r\n<spacechar %c>\r\n", M[addr+i]);
+							printf("\r\n<spacechar %u>\r\n", M[addr+i]);
 						continue;
 					}
 					if(M[addr+i] == 127) {
@@ -596,15 +596,17 @@ void debugger_hook(unsigned short *a,
 						continue;
 					}
 					if(M[addr+i] > 127){
-						printf("\r\n<unprintable %c>\r\n", M[addr+i]);
+						printf("\r\n<unprintable %u>\r\n", M[addr+i]);
 						continue;
 					}
+					if(M[addr+i] == 0) break;
 					if(isgraph(M[addr+i])){
 						putchar(M[addr+i]);
 						continue;
 					}else{
-						printf("\r\n<unprintable %c>\r\n", M[addr+i]);
+						printf("\r\n<unprintable %u>\r\n", M[addr+i]);
 					}
+					
 				}
 				printf("\r\n");
 			}
