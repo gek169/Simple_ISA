@@ -21,7 +21,6 @@ static char is_fresh_start = 1;
 static char freedom = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
-UU debugger_setting_displaybytes = 0x1000000;
 UU debugger_setting_maxhalts = 3;
 UU debugger_setting_clearlines = 500;
 
