@@ -245,7 +245,7 @@ void debugger_hook(unsigned short *a,
 			printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 			if(M[location+i] < n_insns){
 				for(j=0;j<insns_numargs[opcode];j++){
-					printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+					printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
 				}
 				if(insns_numargs[opcode])
 					i += j;
@@ -429,7 +429,7 @@ void debugger_hook(unsigned short *a,
 					printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
 					if(M[location+i] < n_insns){
 						for(j=0;j<insns_numargs[opcode];j++){
-							printf(" %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
+							printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
 						}
 						if(insns_numargs[opcode])
 							i += j;
@@ -929,7 +929,7 @@ int main(int rc,char**rv){
 				}
 				switch(line[0]){
 					case 'd':
-					debugger_setting_displaylines = strtoul(line+1,0,0);
+					debugger_setting_displaylines = strtoul(line+1,0,0) & 0xffFFff;
 					break;
 					case 'i':
 					debugger_setting_do_dis = strtoul(line+1,0,0);
