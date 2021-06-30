@@ -11,9 +11,26 @@ loads an address space image into memory and executes it in the SISA16 virtual m
 but allows you to debug the program as it executes.
 .SH OPTIONS
 if you add extra arguments, you get a memory dump at the end of execution.
+
+.SH SETTINGS
+
+A settings file can be kept in your home folder (/home/fred/) or the current working directory
+for sisa16's debugger. This allows you to configure things like the defaults of how disassemblies
+are displayed, and how many blank lines are required to clear the screen.
+
 .SH DEBUGGER COMMANDS
 
-press 'h' and hit enter while the REPL is open to view the commands.
+press 'h' and hit enter while the REPL is open to view the commands available to you.
+
+commands are specified by a single letter at the REPL interface (read eval print loop)
+
+Note that CTRL+C (SIGINT) is captured by the debugger, you must hit CTRL+C to enter the debugger,
+then type q and hit enter to quit the debugger if the program is running and you wish to quit.
+
+Most shells will also allow you to send SIGSTOP, which is not captured (CTRL+Z) so you can use this
+if you need to.
+
+'q' quits the debugger.
 
 .SH AUTHOR
 David MHS Webster, 2021

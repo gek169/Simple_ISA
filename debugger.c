@@ -34,7 +34,10 @@ static u M2[(((UU)1)<<24)];
 
 void respond(int bruh){
 	(void)bruh;
-	printf("\n\r<Received User Attention Signal!>\r\n");
+	if(!debugger_setting_minimal)
+		printf("\n\r<Received User Attention Signal! if you want to quit, type q and hit enter at the REPL.>\r\n");
+	else
+		printf("\n\r[_/\\_]\r\n");
 	freedom=0;
 	debugger_run_insns=0;
 	return;
@@ -72,7 +75,11 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 				bcap<<=1;
 				bufold = buf;
 				buf = STRUTIL_REALLOC(buf, bcap);
-				if(!buf){free(bufold); return NULL;}
+				if(!buf){
+					free(bufold); 
+					printf("\r\n<UH OH!>\r\n");
+					return NULL;
+				}
 			}
 		buf[blen++] = c;
 	}
