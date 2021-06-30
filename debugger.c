@@ -252,8 +252,6 @@ void debugger_hook(unsigned short *a,
 			if(n_halts > debugger_setting_maxhalts || n_illegals > debugger_setting_maxhalts)break;
 			printf("\r\n");lines++;
 		}
-		
-		goto repl_start;
 	}
 	if(debugger_setting_do_dis){
 		disassembler(
