@@ -35,7 +35,7 @@ static u M2[(((UU)1)<<24)];
 void respond(int bruh){
 	(void)bruh;
 	if(!debugger_setting_minimal)
-		printf("\n\r<Received User Attention Signal! if you want to quit, type q and hit enter at the REPL.>\r\n");
+		printf("\n\r<Heard SIGINT! if you want to quit, type q and hit enter at the REPL.>\r\n");
 	else
 		printf("[!]\r\n");
 	freedom=0;
