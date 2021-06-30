@@ -37,7 +37,7 @@ void respond(int bruh){
 	if(!debugger_setting_minimal)
 		printf("\n\r<Received User Attention Signal! if you want to quit, type q and hit enter at the REPL.>\r\n");
 	else
-		printf("\n\r[_/\\_]\r\n");
+		printf("[!]\r\n");
 	freedom=0;
 	debugger_run_insns=0;
 	return;
@@ -202,9 +202,11 @@ void debugger_hook(unsigned short *a,
 	if(is_fresh_start){
 		if(!debugger_setting_minimal)	help();
 		if(!debugger_setting_minimal)
-			puts(
+			printf(
 				N "<Stopped at initialization, please note the first step will not actually execute an instruction, it is a dead cycle>"
 			N);
+		else
+			printf(N "[START]" N);
 		is_fresh_start = 0;
 		signal(SIGINT, respond);
 	}
