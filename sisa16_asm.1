@@ -26,6 +26,23 @@ builds and optionally executes SISA16 virtual machine images. for the
 .B sisa16
 virtual portable computer architecture.
 
+.SH YOUR MANPAGE SUCKS
+
+Assembling a file:
+
+sisa16_asm -i my_program.asm -o my_program.bin
+
+Assembling and running a file, without creating a bin:
+
+sisa16_asm -run my_program.asm
+
+Displaying compiletime environment information:
+
+sisa16_asm -C
+
+Viewing version information:
+
+sisa16_asm -v
 
 .SH OPTIONS
 .BR -i
@@ -64,6 +81,9 @@ Disable comments from disassembly output.
 .BR --no-comments
 same as -nc
 
+.BR -m
+print this manual, in case some jerk forgets to give it to you, so you can echo it out to a file.
+
 .BR -C
 prints the compiletime environment information.
 
@@ -80,7 +100,7 @@ Terminology:
 Location where data is stored in main memory
 
 .B Register: 
-a very fast form of memory which is not part of main memory
+a very fast form of memory which is not part of main memory, like a kind of variable.
 
 .B Page: 
 256 bytes starting at an address whose low byte is zero.

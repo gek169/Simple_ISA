@@ -374,7 +374,8 @@ int main(int argc, char** argv){
 			puts("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
 			puts("Optional argument: -fdis, --full-disassemble: disassemble a file, without ending on halts/illegal opcodes. Same semantics as -dis");
 			puts("Optional argument: -o: specify output file. If not specified it is: outsisa16.bin");
-			puts("Optional argument: -DBG: debug the assembler. do not specify an infile if you want to use stdin.");
+			puts("Optional argument: -DBG: debug the assembler.");
+			puts("Optional argument: -m: print manual page to standard out. This is in case some jerk decided not to give you the manpage.");
 			puts("Optional argument: -E: Print macro expansion only do not write to file");
 			puts("Optional argument: -pl: Print lines");
 			puts("Optional argument: -C: display compiletime environment information (What C compiler you used) as well as Author.");
@@ -388,6 +389,15 @@ int main(int argc, char** argv){
 			printf("The last instruction added to the instruction set is %s\n", insns[n_insns-1]);
 			return 0;
 		}
+		if(
+			strprefix("-m",argv[i]) ||
+			strprefix("--manual",argv[i]) ||
+			strprefix("--docs",argv[i]) ||
+			strprefix("--documentation",argv[i])
+		)
+			puts (
+#include "manpage.h"
+			);
 	}}
 	if(debugging) infile=stdin;
 
