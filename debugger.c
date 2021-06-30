@@ -609,6 +609,7 @@ void debugger_hook(unsigned short *a,
 					
 				}
 				printf("\r\n");
+				goto repl_start;
 			}
 			case 'a':{
 				unsigned long stepper = 1;
