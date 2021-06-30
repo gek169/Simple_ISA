@@ -72,9 +72,9 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 		)
 		{
 			if(!debugger_setting_minimal)
-				{if(blen) printf("\r\n[CANCELLED]\r\n");}
+				{if(blen) printf("[CANCELLED]\r\n");}
 			else
-				{if(blen) printf("\r\n[C]\r\n");}
+				{if(blen) printf("[C]\r\n");}
 			blen = 0;
 			continue;
 		}
@@ -87,7 +87,7 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 				buf = STRUTIL_REALLOC(buf, bcap);
 				if(!buf){
 					free(bufold); 
-					printf("\r\n<UH OH!>\r\n");
+					printf("<!UH OH! realloc failure.>\r\n");
 					return NULL;
 				}
 			}
@@ -155,6 +155,9 @@ static void help(){
 			N "    m p = 3 will set the program counter to 3."
 			N "    m 0 = 0xAABBCCDD will set RX0 to that value."
 			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "S to print [S]tring     | display a string."
+			N "    S 0xAF00B9 will print a null-terminated string starting at that address."
+			N "    S 0xAF00B9 20 will print 20 characters of that string."
 			N "R to watch [R]egister   | Save a register's value and step until it changes."
 			N "b to set [b]reakpoint   | Set a breakpoint."
 			N "    b sets a breakpoint here."
@@ -552,6 +555,59 @@ void debugger_hook(unsigned short *a,
 				printf("\r\n");
 				goto repl_start;
 			}
+			case 'S':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				unsigned long chars = 0xffFF;
+				unsigned long i = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need address. \n\r");
+					else
+						printf("\n\r<no address?>\n\r");
+					goto repl_start;
+				}
+				addr = 0xFFffFF & strtoul(line + stepper, 0,0); /*addr*/
+				for(;!isspace(line[stepper]) && line[stepper];stepper++); /*skip the number*/
+				for(;isspace(line[stepper]);stepper++); /*skip spaces.*/
+				if(line[stepper] == '\0'){
+					goto string_printer;
+				}
+				chars = 0xFFffFF & strtoul(line + stepper, 0,0);
+				string_printer:
+				for(;i<chars;i++){
+					if(addr + i >= 0x1000000) break;
+					if(isspace(M[addr+i]) && M[addr+i] != ' '){
+						if(M[addr+i] == '\t')
+							printf("\r\n<tab character>\r\n");
+						else if(M[addr+i] == '\v')
+							printf("\r\n<vertical tab character>\r\n");
+						else if(M[addr+i] == '\r')
+							printf("\r\n<cr>\r\n");
+						else if(M[addr+i] == '\n')
+							printf("\r\n<nl>\r\n");
+						else
+							printf("\r\n<spacechar %c>\r\n", M[addr+i]);
+						continue;
+					}
+					if(M[addr+i] == 127) {
+						printf("\r\n<del>\r\n");
+						continue;
+					}
+					if(M[addr+i] > 127){
+						printf("\r\n<unprintable %c>\r\n", M[addr+i]);
+						continue;
+					}
+					if(isgraph(M[addr+i])){
+						putchar(M[addr+i]);
+						continue;
+					}else{
+						printf("\r\n<unprintable %c>\r\n", M[addr+i]);
+					}
+				}
+				printf("\r\n");
+			}
 			case 'a':{
 				unsigned long stepper = 1;
 				unsigned long addr = 0;
@@ -667,19 +723,19 @@ void debugger_hook(unsigned short *a,
 				if(modus == 0){
 					targ &= 0xffFF;
 					if(!debugger_setting_minimal)
-						printf("\r\nJumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+						printf("Jumping to : 0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
 					else
-						printf("\r\n->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
+						printf("->0x%06lx\r\n",targ + (((UU)(*program_counter_region))<<16));
 				} else if(modus == 1){
 					if(!debugger_setting_minimal)
-						printf("\r\nJumping forward %lu insns\r\n", targ);
+						printf("Jumping forward %lu insns\r\n", targ);
 					else
-						printf("\r\n+%lu\r\n",targ);
+						printf("+%lu\r\n",targ);
 				} else if(modus == 2){
 					if(!debugger_setting_minimal)
-						printf("\r\nJumping until we see an instruction beginning with %c\r\n", targchar);
+						printf("Jumping until we see an instruction beginning with %c\r\n", targchar);
 					else
-						printf("\r\n[until %c]\r\n",targchar);
+						printf("[until %c]\r\n",targchar);
 				}
 
 				
@@ -700,15 +756,15 @@ void debugger_hook(unsigned short *a,
 						if(M[*program_counter + (((UU)(*program_counter_region))<<16)] >= n_insns)
 						{
 							if(!debugger_setting_minimal)
-								printf("\r\nHit Illegal Opcode.\r\n");
+								printf("Hit Illegal Opcode.\r\n");
 							else
-								printf("\r\n[illop]\r\n");
+								printf("[illop]\r\n");
 						}
 						if(  (insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]])[0] == targchar){
 							if(!debugger_setting_minimal)
-								printf("\r\nHit Op %s\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+								printf("Hit Op %s\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
 							else
-								printf("\r\n[Op %s]\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+								printf("[Op %s]\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
 							goto repl_start;
 						}
 						*program_counter += 1 + insns_numargs[
@@ -727,15 +783,18 @@ void debugger_hook(unsigned short *a,
 				unsigned long targ = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
-					printf("\r\nNo farjump target.\r\n");
+					if(!debugger_setting_minimal)
+						printf("No farjump target.\r\n");
+					else
+						printf("<target?>\r\n");
 					goto repl_start;
 				}
 				targ = strtoul(line+stepper, 0,0);
 				targ &= 0xffFFff;
 				if(!debugger_setting_minimal)
-					printf("\r\nJumping to : 0x%06lx\r\n",targ);
+					printf("Jumping to : 0x%06lx\r\n",targ);
 				else
-					printf("\r\n->0x%06lx\r\n",targ);
+					printf("->0x%06lx\r\n",targ);
 				*program_counter_region = targ / (256 * 256);
 				*program_counter = targ;
 				goto repl_start;
