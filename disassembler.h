@@ -31,13 +31,6 @@ static int disassembler(char* fname,
 			puts("//Disassembly reached end of usable memory.");
 #endif
 			goto end_for_realsies;
-		}else if((i & 0xffFF) == 0){
-#ifdef SISA_DEBUGGER
-			printf("//<Region Boundary 0x%06lx >\n\r", i);
-#else
-			printf("//<Region Boundary 0x%06lx >\n", i);
-#endif
-			linenum++; if(linenum > max_lines_disassembler) goto end;
 		}
 
 #ifndef SISA_DEBUGGER
