@@ -4,6 +4,7 @@
 #include "d.h"
 #include "isa.h"
 static char* outfilename = "outs16.bin";
+static const char* fail_msg = "\r\n<ASM> Assembler Aborted.\r\n";
 static char run_sisa16 = 0;
 static char enable_dis_comments = 1;
 static char clear_output = 0;
@@ -63,8 +64,6 @@ static void fputbyte(unsigned char b, FILE* f){
 	if(!run_sisa16 && !quit_after_macros)
 		if((unsigned long)ftell(f) != outputcounter){
 			/*seek to the end*/
-			if(debugging)
-				ASM_PUTS("Having to move the file counter.\n");
 			fseek(f,0,SEEK_END);
 			if((unsigned long)ftell(f) > outputcounter) /*The file is already larger than needed.*/
 				fseek(f,outputcounter,SEEK_SET); 
@@ -72,22 +71,21 @@ static void fputbyte(unsigned char b, FILE* f){
 				while((unsigned long)ftell(f)!=outputcounter)fputc(0, f);
 		}
 	switch(region_restriction_mode){
-		case 0: break;
+		default: break;
 		case 1:{
 			if (((outputcounter>>8) & 0xFFFF)  != region_restriction){
-				printf("<ASM COMPILATION ERROR> block restriction failed. Outputcounter exited 256 byte bounds. Line:\n%s", line_copy); 
+				printf("<ASM COMPILATION ERROR> page restriction failed. Line:\n%s", line_copy); 
 				exit(1);
 			}
 		}
 		break;
 		case 2:{
 			if (((outputcounter>>16) & 0xFF)  != region_restriction){
-				printf("<ASM COMPILATION ERROR> region restriction failed. Outputcounter exited 64k bounds. Line:\n%s", line_copy);
+				printf("<ASM COMPILATION ERROR> region restriction failed. Line:\n%s", line_copy);
 				exit(1);
 			}
 		}
 		break;
-		default: puts("<ASM INTERNAL ERROR> invalid region_restriction_mode set somehow."); exit(1);
 	}
 	if(!quit_after_macros){
 		if(!run_sisa16){
@@ -200,12 +198,12 @@ int main(int argc, char** argv){
 			puts("32 bit signed integer division instructions were enabled during compilation. Don't divide by zero!");
 #endif
 
-			printf("Size of u is %u, it should be 1, any other result is UB.\n", (unsigned int)sizeof(u));
-			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
-			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
-			printf("Size of SUU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(SUU));
+			printf("Size of u is %u, it should be 1\n", (unsigned int)sizeof(u));
+			printf("Size of U is %u, it should be 2\n", (unsigned int)sizeof(U));
+			printf("Size of UU is %u, it should be 4\n", (unsigned int)sizeof(UU));
+			printf("Size of SUU is %u, it should be 4\n", (unsigned int)sizeof(SUU));
 #if !defined(NO_FP)
-			printf("Size of float is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(float));
+			printf("Size of float is %u, it should be 4\n", (unsigned int)sizeof(float));
 #endif
 
 
@@ -404,7 +402,7 @@ int main(int argc, char** argv){
 		}
 	} else {
 		puts("\n<ASM ERROR> No input files.\n");
-		puts("\n<ASM> Assembler Aborted.");
+		puts(fail_msg);
 		return 1;
 	}
 	ofile = NULL;
@@ -422,9 +420,11 @@ int main(int argc, char** argv){
 	while(1){
 		char was_macro = 0;	
 		char using_asciz = 0;
+/*
 		if(!infile) {
 			puts("<ASM INTERNAL ERROR> infile is null? This should never happen.");
 		}
+*/
 		if(feof(infile)){
 			/*try popping from the fstack*/
 			if(include_level > 0){
@@ -439,7 +439,7 @@ int main(int argc, char** argv){
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 1);
 		if(!line) {
-			puts("<ASM COMPILATION ERROR> line returned from read_until_terminator_alloced was null.");
+			puts("<ASM COMPILATION ERROR> failed malloc for line.");
 			goto error;
 		}
 		while(
@@ -492,7 +492,7 @@ int main(int argc, char** argv){
 			long loc_eparen = strfind(line, /*(*/"):");
 			secnum = strtoul(line + 3, 0,0);
 			if(loc_eparen == -1){
-				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for region selection is missing ending \"):\"");
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for region selection is missing ending \"):\"");
 				puts("Line:");
 				puts(line_copy);
 				goto error;
@@ -1569,7 +1569,7 @@ int main(int argc, char** argv){
 		free(line_copy);
 		continue;
 		error:
-		puts("<ASM> Assembler Aborted.");
+		puts(fail_msg);
 		return 1;
 	}
 	if(!clear_output)printf("<ASM> Successfully assembled %s\n", outfilename);

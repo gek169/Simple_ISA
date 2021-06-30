@@ -77,12 +77,12 @@ int main(int rc,char**rv){
 #else
 			puts("32 bit signed integer division instructions were enabled during compilation. Don't divide by zero!");
 #endif
-			printf("Size of u is %u, it should be 1, any other result is UB.\n", (unsigned int)sizeof(u));
-			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
-			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
-			printf("Size of SUU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(SUU));
+			printf("Size of u is %u, it should be 1\n", (unsigned int)sizeof(u));
+			printf("Size of U is %u, it should be 2\n", (unsigned int)sizeof(U));
+			printf("Size of UU is %u, it should be 4\n", (unsigned int)sizeof(UU));
+			printf("Size of SUU is %u, it should be 4\n", (unsigned int)sizeof(SUU));
 #if !defined(NO_FP)
-			printf("Size of float is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(float));
+			printf("Size of float is %u, it should be 4\n", (unsigned int)sizeof(float));
 #endif
 
 #ifdef __STDC_IEC_559__
@@ -161,7 +161,7 @@ int main(int rc,char**rv){
 #if defined(__hppa__) || defined(__HPPA__)
 		puts("Compiled for hppa.");
 #endif
-
+/*
 		{
 			volatile UU a = 0;
 			a = 1;
@@ -176,6 +176,7 @@ int main(int rc,char**rv){
 					puts("Executing on a Big-Endian Architecture.");
 			}
 		}
+*/
 #if defined(WIN32) || defined(_WIN32)
 			puts("Compiled for Macrohard Doors.");
 #endif
@@ -213,7 +214,6 @@ int main(int rc,char**rv){
 			puts("Gah! You didn't really compile my beautiful software with that disgusting compiler?");
 			puts("MSVC is the worst C compiler on earth. No, not just because Microsoft wrote it. They make *some* good products.");
 			puts("The bytecode is horrible and the compiler is uncooperative and buggy.");
-			puts("Herb Sutter can go suck an egg! He's trying to kill C++.");
 			return 0;
 #endif
 

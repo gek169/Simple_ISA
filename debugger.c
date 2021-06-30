@@ -1035,12 +1035,12 @@ int main(int rc,char**rv){
 #else
 			puts("32 bit signed integer division instructions were enabled during compilation. Don't divide by zero!");
 #endif
-			printf("Size of u is %u, it should be 1, any other result is UB.\n", (unsigned int)sizeof(u));
-			printf("Size of U is %u, it should be 2, any other result is UB.\n", (unsigned int)sizeof(U));
-			printf("Size of UU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(UU));
-			printf("Size of SUU is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(SUU));
+			printf("Size of u is %u, it should be 1\n", (unsigned int)sizeof(u));
+			printf("Size of U is %u, it should be 2\n", (unsigned int)sizeof(U));
+			printf("Size of UU is %u, it should be 4\n", (unsigned int)sizeof(UU));
+			printf("Size of SUU is %u, it should be 4\n", (unsigned int)sizeof(SUU));
 #if !defined(NO_FP)
-			printf("Size of float is %u, it should be 4, any other result is UB.\n", (unsigned int)sizeof(float));
+			printf("Size of float is %u, it should be 4\n", (unsigned int)sizeof(float));
 #endif
 
 #ifdef __STDC_IEC_559__
