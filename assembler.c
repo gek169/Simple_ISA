@@ -16,10 +16,16 @@ static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
 static char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
-	char first_character = 1;
+	unsigned long chars_read = 0;
 	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
-	if(proc[0] == '0') {int_mode = 1;proc++;} /*octal*/
-	if(*proc && int_mode == 1) {if(proc[0] == 'x') {int_mode = 2;proc++;} else return 0;} /*hex*/
+	if(proc[0] == '0') {
+		int_mode = 1;proc++;
+		chars_read++;
+	} /*octal*/
+	if(*proc && int_mode == 1) {if(proc[0] == 'x') {
+		int_mode = 2;proc++;} else return 0;
+		chars_read = 0;
+	} /*hex*/
 	if(int_mode == 1 && (proc[0] == ',' || proc[0] == ';' || proc[0] == '\0')) return 0; /*zero.*/
 	for(;!(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0');proc++){
 		/*Check hex*/
@@ -36,9 +42,8 @@ static char int_checker(char* proc){
 		!( (*proc <= '8' && *proc >= '0') )){
 			return 1;
 		}
-		first_character = 0;
 	}
-	if(first_character && int_mode != 1) return 1; /*There were no characters in the number.*/
+	if(chars_read == 0) return 1; /*There were no characters in the number.*/
 	return 0;
 }
 
