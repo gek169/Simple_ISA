@@ -21,6 +21,10 @@ static char is_fresh_start = 1;
 static char freedom = 0;
 static char watched_register = '\0';
 static UU watched_register_value = 0;
+static char* names[0x10000];
+static UU name_vals[0x10000];
+static char name_buf_temp[80]; /*for sprintf*/
+static unsigned long n_names = 0;
 UU sisa_breakpoints[0x10000];
 UU n_breakpoints = 0;
 UU debugger_setting_maxhalts = 3;
@@ -94,6 +98,58 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 	buf[blen] = '\0';
 	return buf;
 }
+static char create_name(UU address, char* name){
+	unsigned long i;
+	for(i = 0; i < n_names; i++){
+		if(names[i] == NULL) continue;
+		if(streq(names[i], name)) {
+			name_vals[i] = address;
+			return 0;
+		}
+	}
+	/*search for a null.*/
+	for(i = 0; i < n_names; i++){
+		if(names[i] == NULL){
+			names[i] = strcatalloc(name,"");
+			if(!names[i]){
+				printf("\r\n!!Failed Malloc!! aborting...\r\n");
+				exit(1);
+			}
+			name_vals[i] = address;
+			return 0;
+		}
+	}
+	if(n_names > 0xffFF){
+		return 1;
+	}
+	names[n_names] = strcatalloc(name,"");
+	name_vals[i] = address;
+	return 0;
+	
+}
+static void delete_name(UU addr){
+	unsigned long i;
+	for(i = 0; i < n_names; i++){
+		if(names[i] == NULL) continue;
+		if(name_vals[i] == addr){
+			free(names[i]);names[i] =0;
+			name_vals[i] = 0;
+		}
+	}
+	return;
+}
+static char* get_name_eval(UU i){
+	{
+		if(names[i] != NULL)
+		{
+			name_buf_temp[79] = '\0';
+			sprintf(name_buf_temp, "%lu", (unsigned long)name_vals[i] & 0xFFffFFff);
+			return name_buf_temp;
+		}
+	}
+	name_buf_temp[0] = '\0';
+	return name_buf_temp; /*Always return a valid pointer!*/
+}
 static char make_breakpoint(UU new_breakpoint){
 	unsigned long i = 0;
 	new_breakpoint &= 0xffFFff;
@@ -166,7 +222,7 @@ static void help(){
 			N "e to d[e]l breakpoint   | Delete a breakpoint."
 			N "    e 0x100ff deletes a breakpoint at that insn."
 			N "    e deletes a breakpoint at this insn."
-			N "l to [l]ist breakpoint  | Print all breakpoints."
+			N "l to [l]ist             | Print all breakpoints and names."
 			N "u to r[u]n              | Run until breakpoint."
 			N "x to view he[x]         | View raw bytes of disassembly"
 			N "d to [d]isassemble      | disassemble."
@@ -180,9 +236,9 @@ static void help(){
 			N "A to [A]lter u32        | Modify a 32 bit uint in memory. "
 			N "    A 0xAF3344 0xAABBCCDD will modify the u32 at 0xAF3344 to 0xAABBCCDD."
 			N "v to [v]iew             | view the 8, 16, and 32 bit representations of a memory address."
-			N "    v 0xAF00B9 will display the 8, 16, and 32 bit representations"
-			N "    of the value at that address, as well as the floating point representation,"
-			N "    if the floating point unit was enabled during compilation."
+			N "    v 0xAF00B9 will display the 8, 16, and 32 bit interpretations"
+			N "    of the value at that address, as well as float"
+			N "    if the floating point unit is enabled."
 			N "n to [n]ame address     | name an address for quick reference."
 			N "    A named address can be referenced in any command with &name&."
 			N "    the syntax of this command is important,"
@@ -192,6 +248,9 @@ static void help(){
 			N "        n myLabel         30"
 			N "        nmyLabel 30"
 			N "        nmyLabel     30"
+			N "N to u[N]-name address  | delete an address name."
+			N "    N 0x1ffee will delete all names associated with that address."
+			N "    N &mylabel& will delete mylabel if it exists."
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
 			N "p for dum[p]            | dump memory -> dump.bin"
@@ -380,6 +439,17 @@ void debugger_hook(unsigned short *a,
 		}
 		if(line[0] > 126 || line[0] <= 0) goto repl_start;
 		printf("\r\n");
+		{unsigned long i;
+			/*I cannot imagine a single situation in which someone would */
+			for(i = 0; i < n_names; i++){
+				if(names[i] == NULL) continue;
+				line = str_repl_allocf(line, names[i], get_name_eval(i));
+			}
+			for(i = 0; i < n_names; i++){
+				if(names[i] == NULL) continue;
+				line = str_repl_allocf(line, names[i], get_name_eval(i));
+			}
+		}
 		switch(line[0]){
 			default:
 			if(!debugger_setting_minimal)
@@ -575,6 +645,66 @@ void debugger_hook(unsigned short *a,
 				value = strtoul(line + stepper, 0,0);
 				M[addr & 0xFFffFF] = value;
 				printf("\r\n");
+				goto repl_start;
+			}
+			case 'N':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line+stepper,0,0);
+				delete_name(addr);
+				goto repl_start;
+			}
+			case 'n':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				char* startname;
+				char* endname;
+				for(;isspace(line[stepper]);stepper++); /*skip initial space*/
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need Name to assign. \n\r");
+					else
+						printf("\n\r<no name?>\n\r");
+					goto repl_start;
+				}
+				startname = line + stepper; /*The actual first character of the name.*/
+				for(;line[stepper] && !isspace(line[stepper]);stepper++); /*Skip the name itself.*/
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
+					goto repl_start;
+				}
+				endname = line + stepper;
+				stepper++; /*We landed on a space. Logically we must move on.*/
+				for(;isspace(line[stepper]);stepper++); /*Skip additional space.*/
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need value. \n\r");
+					else
+						printf("\n\r<no value?>\n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line + stepper,0,0);
+				startname--; *startname = '&';
+				*endname = '&';
+				endname++;*endname = '\0';
+				printf("\r\nCreating name '%s' with value %lu", startname, (unsigned long)addr);
+				if(create_name(addr,startname)){
+					if(!debugger_setting_minimal)
+						printf("\r\nToo Many Names!\r\n");
+					else
+						printf("\r\n[too many]\r\n");
+				}
 				goto repl_start;
 			}
 			case 'v':{
@@ -901,6 +1031,10 @@ void debugger_hook(unsigned short *a,
 				for(i = 0; i < n_breakpoints; i++){
 					if(sisa_breakpoints[i] != 0x1ffFFff)
 						printf("\r\nb @: 0x%06lx",sisa_breakpoints[i]);
+				}
+				for(i = 0; i < n_names; i++){
+					if(names[i])
+						printf("\r\n'%s': 0x%08lx",names[i], name_vals[i]);
 				}
 				printf("\r\n");
 				goto repl_start;
