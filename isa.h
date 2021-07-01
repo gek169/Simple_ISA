@@ -756,7 +756,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA28:a--;D
 	G_AA29:RX0++;D
 	G_AA30:RX0--;D
-#if !defined(NO_SEGMENT)
+#if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_AA31:{
 		u* M_SAVED = NULL;
 		
@@ -814,7 +814,7 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = lRX0;
 	}D
 #endif
-#if !defined(NO_SEGMENT)
+#if !defined(NO_EMULATE)
 	G_AA34:{
 		u* M_SAVED = NULL;
 		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
