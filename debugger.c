@@ -202,6 +202,8 @@ static void help(){
 			N "    j +10 jumps forward 10 insns"
 			N "    j t f jumps forward until it finds an instruction starting with f"
 			N "J for far[J]ump         | Change the PC and PC region to a value."
+			N "    J 0x10000  will jump to 0x10000 setting [R] to 1, and [P] to 0."
+			N "    J 0xAFBBCC will jump to  0xBBCC in [R] 0xAF."
 		N);
 }
 
