@@ -228,7 +228,7 @@ static void help(){
 			N "d to [d]isassemble      | disassemble."
 			N "    SYNTAX: d 50 will disassemble 50 lines from the program counter."
 			N "    You may use a location,"
-			N "    d 50 0x100 will dis. 50 lines @ 0x100."
+			N "    d 50 0x100 will dis. 50 lines at 0x100."
 			N "q to [q]uit             | quit debugging."
 			N "w to [w]rite byte       | write byte to memory. Syntax: w 0xAB00E0 12"
 			N "a to [a]lter u16        | Modify a short in memory. "
@@ -248,6 +248,7 @@ static void help(){
 			N "        n myLabel         30"
 			N "        nmyLabel 30"
 			N "        nmyLabel     30"
+			N "    Note that @ as a character is used as a special name equal to R<<16 + P"
 			N "N to u[N]-name address  | delete an address name."
 			N "    N 0x1ffee will delete all names associated with that address."
 			N "    N &mylabel& will delete mylabel if it exists."
@@ -440,15 +441,14 @@ void debugger_hook(unsigned short *a,
 		if(line[0] > 126 || line[0] <= 0) goto repl_start;
 		printf("\r\n");
 		{unsigned long i;
-			/*I cannot imagine a single situation in which someone would */
+			unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 			for(i = 0; i < n_names; i++){
 				if(names[i] == NULL) continue;
-				line = str_repl_allocf(line, names[i], get_name_eval(i));
+				while(strfind(line, names[i]) != -1)
+					line = str_repl_allocf(line, names[i], get_name_eval(i));
 			}
-			for(i = 0; i < n_names; i++){
-				if(names[i] == NULL) continue;
-				line = str_repl_allocf(line, names[i], get_name_eval(i));
-			}
+			sprintf(name_buf_temp, "%lu", location);
+				while(strfind(line, "@") != -1) line = str_repl_allocf(line, "@", name_buf_temp);
 		}
 		switch(line[0]){
 			default:
