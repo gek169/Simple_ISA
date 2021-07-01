@@ -730,7 +730,7 @@ void debugger_hook(unsigned short *a,
 				endname++;*endname = '\0';
 				/*Try to prevent the creation of names that would make the shit unusable.*/
 				if(
-					streq(startname, "///") 
+					streq(startname, "///")
 					|| strprefix("//", startname)
 					|| streq("/", startname)
 				){
@@ -738,6 +738,7 @@ void debugger_hook(unsigned short *a,
 						printf("\r\nI won't let you do that to yourself.\r\n");
 					else
 						printf("\r\n<bad name>\r\n");
+					goto repl_start;
 				}
 				printf("\r\nCreating name '%s' with value %lu", startname, (unsigned long)addr);
 				if(create_name(addr,startname)){
