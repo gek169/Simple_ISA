@@ -1024,15 +1024,17 @@ void debugger_hook(unsigned short *a,
 					}
 					goto repl_start;
 				}
-				location = strtoul(line+stepper, 0,0);stepper++;
+				location = strtoul(line+stepper, 0,0);
 				if(line[stepper] == '\0') goto make_breakpoint_end;
-				else for(;line[stepper] && line[stepper] != '+' && line[stepper] != '-' && !isspace(line[stepper]);stepper++); /*skip over the damn number*/
+				else for(;line[stepper] && line[stepper] != '+' && !isspace(line[stepper]);stepper++); /*skip over the damn number*/
 				for(;isspace(line[stepper]);stepper++); /*skip over space.*/
 				if(line[stepper] == '\0') goto make_breakpoint_end;
-				mode = line[stepper++]; /*read the operation.*/
-				if(line[stepper] == '\0') goto make_breakpoint_end;
+				mode = line[stepper];stepper++; /*read the operation.*/
 				for(;isspace(line[stepper]);stepper++); /*skip over space.*/
-				if(line[stepper] == '\0') modval = 1; else modval = strtoul(line, 0,0); /*read mod value.*/
+				if(line[stepper] == '\0') 
+					modval = 1; 
+				else 
+					modval = strtoul(line, 0,0); /*read mod value.*/
 				{
 					if(!debugger_setting_minimal)
 						printf("\r\nSetting breakpoint %lu insns ahead.\r\n", modval);
