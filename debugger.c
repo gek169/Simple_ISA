@@ -219,6 +219,7 @@ static void help(){
 			N "b to set [b]reakpoint   | Set a breakpoint."
 			N "    b sets a breakpoint here."
 			N "    b 0x10030 will set a breakpoint at 0x10030"
+			N "    b@+ will set a breakpoint one byte ahead."
 			N "e to d[e]l breakpoint   | Delete a breakpoint."
 			N "    e 0x100ff deletes a breakpoint at that insn."
 			N "    e deletes a breakpoint at this insn."
@@ -957,7 +958,9 @@ void debugger_hook(unsigned short *a,
 								]
 							];
 					}
-				}else if(modus == 2){
+				}
+				else if(modus == 2)
+				{
 					unsigned long i = 0;
 					for(;i < 0xffFF;i++){
 						if(M[*program_counter + (((UU)(*program_counter_region))<<16)] >= n_insns)
@@ -983,7 +986,6 @@ void debugger_hook(unsigned short *a,
 				}
 				goto repl_start;
 			}
-
 			case 'J':
 			{
 				unsigned long stepper = 1;
@@ -1010,6 +1012,8 @@ void debugger_hook(unsigned short *a,
 			{
 				unsigned long stepper = 1;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
+				char mode = '\0';
+				unsigned long modval = 0;
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == '\0') {
 					if(!make_breakpoint(location)){
@@ -1020,7 +1024,35 @@ void debugger_hook(unsigned short *a,
 					}
 					goto repl_start;
 				}
-				location = strtoul(line+stepper, 0,0);
+				location = strtoul(line+stepper, 0,0);stepper++;
+				if(line[stepper] == '\0') goto make_breakpoint_end;
+				else for(;line[stepper] && line[stepper] != '+' && line[stepper] != '-' && !isspace(line[stepper]);stepper++); /*skip over the damn number*/
+				for(;isspace(line[stepper]);stepper++); /*skip over space.*/
+				if(line[stepper] == '\0') goto make_breakpoint_end;
+				mode = line[stepper++]; /*read the operation.*/
+				if(line[stepper] == '\0') goto make_breakpoint_end;
+				for(;isspace(line[stepper]);stepper++); /*skip over space.*/
+				if(line[stepper] == '\0') modval = 1; else modval = strtoul(line, 0,0); /*read mod value.*/
+				{
+					if(!debugger_setting_minimal)
+						printf("\r\nSetting breakpoint %lu insns ahead.\r\n", modval);
+					if(mode == '+'){
+						unsigned long i = 0;
+						for(;i < modval;i++){
+							if(M[location & 0xffFFff] >= n_insns)
+							{
+								if(!debugger_setting_minimal)
+									printf("Hit Illegal Opcode.\r\n");
+								else
+									printf("[illop]\r\n");
+							}
+							location += 1 + insns_numargs[
+								M[location & 0xffFFff]
+							];
+						}
+					}
+				}
+				make_breakpoint_end:
 				if(!make_breakpoint(location)){
 						if(!debugger_setting_minimal)
 							printf("\r\n");
