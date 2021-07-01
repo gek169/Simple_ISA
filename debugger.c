@@ -1033,8 +1033,10 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++); /*skip over space.*/
 				if(line[stepper] == '\0') 
 					modval = 1; 
-				else 
+				else {
+					printf("\r\nline is :%s\r\n", line);
 					modval = strtoul(line, 0,0); /*read mod value.*/
+				}
 				{
 					if(!debugger_setting_minimal)
 						printf("\r\nSetting breakpoint %lu insns ahead.\r\n", modval);
