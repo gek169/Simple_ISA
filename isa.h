@@ -61,7 +61,7 @@ void debugger_hook(	unsigned short *a,
 					UU *RX3
 );
 #else
-#define debugger_hook(F1,F2,F3,F4,F5,F6,F7,F8,F9,F10) /*a comment*/
+#define debugger_hook(FBRUH1,FBRUH2,FBRUH3,FBRUH4,FBRUH5,FBRUH6,FBRUH7,FBRUH8,FBRUH9,FBRUH10) /*a comment*/
 #endif
 
 #ifdef USE_COMPUTED_GOTO
