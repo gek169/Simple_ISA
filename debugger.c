@@ -453,6 +453,8 @@ void debugger_hook(unsigned short *a,
 				for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
 				exit(1);
 			}
+			if(!debugger_setting_minimal)
+				printf("\r\nRepeating command '%s'\r\n", line);
 		}
 		if(line[0] > 126 || line[0] <= 0) goto repl_start;
 		printf("\r\n");
@@ -460,11 +462,24 @@ void debugger_hook(unsigned short *a,
 			unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 			for(i = 0; i < n_names; i++){
 				if(names[i] == NULL) continue;
-				while(strfind(line, names[i]) != -1)
+				while(strfind(line, names[i]) != -1){
 					line = str_repl_allocf(line, names[i], get_name_eval(i));
+							if(!line){
+								puts("\r\n Failed Malloc.");
+								for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+								exit(1);
+							}
+				}
 			}
 			sprintf(name_buf_temp, "%lu", location);
-				while(strfind(line, "@") != -1) line = str_repl_allocf(line, "@", name_buf_temp);
+				while(strfind(line, "@") != -1) {
+					line = str_repl_allocf(line, "@", name_buf_temp);
+					if(!line){
+						puts("\r\n Failed Malloc.");
+						for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+						exit(1);
+					}
+				}
 		}
 		if(debugger_saved_last) free(debugger_saved_last);
 		debugger_saved_last = NULL;
@@ -710,9 +725,20 @@ void debugger_hook(unsigned short *a,
 					goto repl_start;
 				}
 				addr = strtoul(line + stepper,0,0);
-				startname--; *startname = '&';
-				*endname = '&';
+				startname--; *startname = '/';
+				*endname = '/';
 				endname++;*endname = '\0';
+				/*Try to prevent the creation of names that would make the shit unusable.*/
+				if(
+					streq(startname, "///") 
+					|| strprefix("//", startname)
+					|| streq("/", startname)
+				){
+					if(!debugger_setting_minimal)
+						printf("\r\nI won't let you do that to yourself.\r\n");
+					else
+						printf("\r\n<bad name>\r\n");
+				}
 				printf("\r\nCreating name '%s' with value %lu", startname, (unsigned long)addr);
 				if(create_name(addr,startname)){
 					if(!debugger_setting_minimal)
