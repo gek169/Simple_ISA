@@ -72,7 +72,7 @@ bytes 0xd, 0xa;
 		st_iter;
 	//exit the loop if we have have passed the limit.
 		sc %main_loopout%;
-		arx2;lb 100;cmp;lb2;cmp;jmpifeq;
+		arx2;lb 100;cmp;lb0;cmp;jmpifneq;
 		
 	//print the stack pointer.
 		la 0xAF;apush;lla %STP_STRING%;alpush;
