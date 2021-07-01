@@ -1218,9 +1218,21 @@ int main(int rc,char**rv){
 			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
 #if defined(NO_SEGMENT)
-			puts("The segment was disabled during compilation. Emulate is also disabled.");
+			puts("The segment was disabled during compilation. emulate is also disabled.");
 #else
 			puts("The segment is enabled, so is Emulate.");
+#endif
+
+#if defined(NO_EMULATE)
+			puts("emulate and emulate_seg are disabled.");
+#else
+
+#if defined(NO_SEGMENT)
+			puts("... but you CAN use emulate_seg! Just not emulate.");
+#else
+			puts("You may use emulate and emulate_seg");
+#endif
+
 #endif
 
 #if defined(NO_FP)

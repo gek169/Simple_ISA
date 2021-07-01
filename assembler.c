@@ -188,9 +188,21 @@ int main(int argc, char** argv){
 			puts("Fuzztesting safety is disabled. The driver may allow you to damage the host- be careful what you run!");
 #endif
 #if defined(NO_SEGMENT)
-			puts("The segment was disabled during compilation. Emulate is also disabled.");
+			puts("The segment was disabled during compilation. emulate is also disabled.");
 #else
 			puts("The segment is enabled, so is Emulate.");
+#endif
+
+#if defined(NO_EMULATE)
+			puts("emulate and emulate_seg are disabled.");
+#else
+
+#if defined(NO_SEGMENT)
+			puts("... but you CAN use emulate_seg! Just not emulate.");
+#else
+			puts("You may use emulate and emulate_seg");
+#endif
+
 #endif
 #if defined(NO_FP)
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
