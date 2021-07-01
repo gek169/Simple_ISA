@@ -72,5 +72,5 @@ uninstall:
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_stdin isa_constexpr rbytes
+	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_stdin isa_constexpr rbytes *.dbg
 	clear

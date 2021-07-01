@@ -147,16 +147,19 @@ static void help(){
 	printf(
 			N "h for [h]elp            | display this."
 			N "t for s[t]atus          | display CPU state."
-			N "m to [m]odify           | modify a register. Syntax: m a = 3 will set register a to the value 3."
+			N "m to [m]odify           | modify a register."
 			N "    Every register has a name, check s[t]atus."
 			N "    Operations: =, +, -, *, /, &, |, ^"
 			N "    m p = 3 will set the program counter to 3."
 			N "    m 0 = 0xAABBCCDD will set RX0 to that value."
-			N "s to [s]tep             | step a single instruction. May provide a number of steps: s 10 will step for 10 insns."
+			N "s to [s]tep             | step some number of insns."
+			N "    s steps a single insn."
+			N "    s 10 steps 10 insns."
 			N "S to print [S]tring     | display a string."
 			N "    S 0xAF00B9 will print a null-terminated string starting at that address."
 			N "    S 0xAF00B9 20 will print 20 characters of that string."
-			N "R to watch [R]egister   | Save a register's value and step until it changes."
+			N "R to watch [R]egister   | step until register changes"
+			N "    RA waits until register A changes."
 			N "b to set [b]reakpoint   | Set a breakpoint."
 			N "    b sets a breakpoint here."
 			N "    b 0x10030 will set a breakpoint at 0x10030"
@@ -168,7 +171,8 @@ static void help(){
 			N "x to view he[x]         | View raw bytes of disassembly"
 			N "d to [d]isassemble      | disassemble."
 			N "    SYNTAX: d 50 will disassemble 50 lines from the program counter."
-			N "    You may also include a location, d 50 0x100 will disassemble 50 lines from 0x100."
+			N "    You may use a location,"
+			N "    d 50 0x100 will dis. 50 lines @ 0x100."
 			N "q to [q]uit             | quit debugging."
 			N "w to [w]rite byte       | write byte to memory. Syntax: w 0xAB00E0 12"
 			N "a to [a]lter u16        | Modify a short in memory. "
@@ -179,6 +183,15 @@ static void help(){
 			N "    v 0xAF00B9 will display the 8, 16, and 32 bit representations"
 			N "    of the value at that address, as well as the floating point representation,"
 			N "    if the floating point unit was enabled during compilation."
+			N "n to [n]ame address     | name an address for quick reference."
+			N "    A named address can be referenced in any command with &name&."
+			N "    the syntax of this command is important,"
+			N "    the name must be delimited by whitespace characters and the initial n."
+			N "    Valid:"
+			N "        n myLabel 30"
+			N "        n myLabel         30"
+			N "        nmyLabel 30"
+			N "        nmyLabel     30"
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
 			N "p for dum[p]            | dump memory -> dump.bin"
@@ -400,12 +413,12 @@ void debugger_hook(unsigned short *a,
 				for(;isspace(line[stepper]);stepper++);
 				if(line[stepper] == 0){
 					printf("~~Settings~~\r\n");
-					printf("d: 0x%06lx    | The default number of lines to diassemble ahead.\r\n", (unsigned long)max_lines_disassembler);
-					printf("i: 0x%08lx  | Should we disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
-					printf("x: 0x%08lx  | Should we show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
-					printf("c: 0x%08lx  | Show disassembly comments?\r\n", (unsigned long)enable_dis_comments);
-					printf("l: 0x%08lx  | Number of lines to display when a clear command is issued.\r\n", (unsigned long)debugger_setting_clearlines);
-					printf("h: 0x%08lx  | Maximum halts or illegals to display?\r\n", (unsigned long)debugger_setting_maxhalts);
+					printf("d: 0x%06lx    | default number of lines to dis. ahead.\r\n", (unsigned long)max_lines_disassembler);
+					printf("i: 0x%08lx  | disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
+					printf("x: 0x%08lx  | show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
+					printf("c: 0x%08lx  | Show dis. comments?\r\n", (unsigned long)enable_dis_comments);
+					printf("l: 0x%08lx  | blank lines in a clear command.\r\n", (unsigned long)debugger_setting_clearlines);
+					printf("h: 0x%08lx  | Maximum halts or illegals in a dis.?\r\n", (unsigned long)debugger_setting_maxhalts);
 					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_minimal);
 					goto repl_start;
 				}
