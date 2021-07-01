@@ -500,7 +500,7 @@ void debugger_hook(unsigned short *a,
 				unsigned long n_halts = 0;
 				unsigned long n_illegals = 0;
 				unsigned long stepper = 1;
-				unsigned long insns = 0x1000000;
+				unsigned long insns = max_lines_disassembler;
 				unsigned long location = (unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16);
 				/*Parse input.*/
 				for(;isspace(line[stepper]);stepper++);
@@ -522,8 +522,7 @@ void debugger_hook(unsigned short *a,
 						for(j=0;j<insns_numargs[opcode];j++){
 							printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
 						}
-						if(insns_numargs[opcode])
-							i += j;
+						if(insns_numargs[opcode])i += j;
 					} else{
 						n_illegals++;
 						n_halts = 0;
