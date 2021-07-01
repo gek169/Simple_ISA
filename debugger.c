@@ -48,7 +48,7 @@ void respond(int bruh){
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
 void segmentation_violation(int bruh){
 	(void)bruh;
-	printf("\r\nIt appears there was a segmentation violation by the program! Uh Oh!\r\n");
+	printf("\r\n<<SEGV>>\r\n");
 	exit(1);
 }
 #endif
