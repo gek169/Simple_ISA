@@ -290,26 +290,11 @@ int main(int argc, char** argv){
 #if defined(__hppa__) || defined(__HPPA__)
 		puts("Compiled for hppa.");
 #endif
-
-		{
-			volatile UU a = 0;
-			a = 1;
-			if(*((volatile unsigned char*) &a)){
-				puts("Executing on a Little-Endian Architecture.");
-			} else {
-				if(*(((volatile unsigned char*)(&a))+2))
-					puts("Executing on a PDP-Endian Architecture... That's pretty strange.");
-				else if(*(((volatile unsigned char*)(&a))+1))
-					puts("Executing on an unknown Middle-Endian Architecture... How Unusual.");
-				else
-					puts("Executing on a Big-Endian Architecture.");
-			}
-		}
 #if defined(WIN32) || defined(_WIN32)
 			puts("Compiled for Macrohard Doors.");
 #endif
 #if defined(__unix__)
-			puts("Targetting some Nix-like OS.");	
+			puts("Targetting *nix");
 #endif
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
 			puts("Targetting Linux. Free Software Is Freedom.");

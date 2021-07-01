@@ -181,7 +181,7 @@ int main(int rc,char**rv){
 			puts("Compiled for Macrohard Doors.");
 #endif
 #if defined(__unix__)
-			puts("Targetting some Nix-like OS.");	
+			puts("Targetting *nix");
 #endif
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
 			puts("Targetting Linux. Free Software Is Freedom.");
