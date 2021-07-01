@@ -1036,6 +1036,8 @@ void debugger_hook(unsigned short *a,
 				{
 					if(!debugger_setting_minimal)
 						printf("\r\nSetting breakpoint %lu insns ahead.\r\n", modval);
+					else
+						printf("\r\n[+%lu insns]\r\n", modval);
 					if(mode == '+'){
 						unsigned long i = 0;
 						for(;i < modval;i++){
