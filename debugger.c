@@ -32,8 +32,6 @@ char debugger_setting_minimal = 0;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
-
-
 void respond(int bruh){
 	(void)bruh;
 	if(!debugger_setting_minimal)
@@ -172,11 +170,15 @@ static void help(){
 			N "    SYNTAX: d 50 will disassemble 50 lines from the program counter."
 			N "    You may also include a location, d 50 0x100 will disassemble 50 lines from 0x100."
 			N "q to [q]uit             | quit debugging."
-			N "w to [w]rite byte       | write byte to memory. Syntax: w 0xAB00E0 12 will write the value 12 to 0xAB00E0"
+			N "w to [w]rite byte       | write byte to memory. Syntax: w 0xAB00E0 12"
 			N "a to [a]lter u16        | Modify a short in memory. "
-			N "    a 0xAF3344 0xBBCC will modify the u16 value starting at 0xAF3344 to be 0xBBCC."
+			N "    a 0xAF3344 0xBBCC will write 0xBBCC to 0xAF3344"
 			N "A to [A]lter u32        | Modify a 32 bit uint in memory. "
 			N "    A 0xAF3344 0xAABBCCDD will modify the u32 at 0xAF3344 to 0xAABBCCDD."
+			N "v to [v]iew             | view the 8, 16, and 32 bit representations of a memory address."
+			N "    v 0xAF00B9 will display the 8, 16, and 32 bit representations"
+			N "    of the value at that address, as well as the floating point representation,"
+			N "    if the floating point unit was enabled during compilation."
 			N "r to [r]eload           | reload at the current emulation depth. "
 			N "g for settin[g]         | view/change settings. g d 50 sets setting d to 50"
 			N "p for dum[p]            | dump memory -> dump.bin"
@@ -558,6 +560,52 @@ void debugger_hook(unsigned short *a,
 				value = strtoul(line + stepper, 0,0);
 				M[addr & 0xFFffFF] = value;
 				printf("\r\n");
+				goto repl_start;
+			}
+			case 'v':{
+				unsigned long stepper = 1;
+				unsigned long addr = 0;
+				UU val32;
+				SUU sval32;
+				U val16;
+				u val8;
+#ifndef NO_FP
+				float valf;
+#endif
+				for(;isspace(line[stepper]);stepper++);
+				if(line[stepper] == '\0') {
+					if(!debugger_setting_minimal)
+						printf("\n\rSyntax Error: Need address. \n\r");
+					else
+						printf("\n\r<no address?>\n\r");
+					goto repl_start;
+				}
+				addr = strtoul(line + stepper, 0,0) & 0xffFFff;
+				{
+					val8  = 	  M[addr];
+					val16 = 	  M[addr               ] * 256 
+								+ M[(addr+1) & 0xffFFff];
+					val32 = 	  M[addr				] * 256*256*256
+								+ M[(addr+1) & 0xffFFff	] * 256*256
+								+ M[(addr+2) & 0xffFFff	] * 256
+								+ M[(addr+3) & 0xffFFff	];
+					memcpy(&sval32, &val32, 4);
+#ifndef NO_FP
+					memcpy(&valf, &val32, 4);
+#endif
+					printf("\r\nU8 :   0x%02lx | %lu", (unsigned long)val8, (unsigned long)val8);
+					printf("\r\nU16: 0x%04lx | %lu", (unsigned long)val16, (unsigned long)val16);
+					printf("\r\nU32: 0x%04lx | %lu", (unsigned long)val32, (unsigned long)val32);
+#ifdef USE_UNSIGNED_INT
+					printf("\r\nS32: %d", sval32);
+#else
+					printf("\r\nS32: %ld", sval32);
+#endif
+#ifndef NO_FP
+					printf("\r\nFLT: %f", valf);
+#endif
+					printf("\r\n");
+				}
 				goto repl_start;
 			}
 			case 'S':{
