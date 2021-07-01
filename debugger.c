@@ -33,6 +33,8 @@ UU debugger_setting_clearlines = 500;
 char debugger_setting_do_dis = 1;
 char debugger_setting_do_hex = 0;
 char debugger_setting_minimal = 0;
+char debugger_setting_repeat = 0; /*r*/
+char* debugger_saved_last = NULL;
 static u M2[(((UU)1)<<24)];
 
 #define N "\r\n"
@@ -442,6 +444,16 @@ void debugger_hook(unsigned short *a,
 			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
 			exit(1);
 		}
+		if(line[0] == '\0' && debugger_setting_repeat && debugger_saved_last)
+		{
+			line = strcatalloc(debugger_saved_last, "");
+			if(!line)
+			{
+				puts("\r\n Failed Malloc.");
+				for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+				exit(1);
+			}
+		}
 		if(line[0] > 126 || line[0] <= 0) goto repl_start;
 		printf("\r\n");
 		{unsigned long i;
@@ -454,6 +466,9 @@ void debugger_hook(unsigned short *a,
 			sprintf(name_buf_temp, "%lu", location);
 				while(strfind(line, "@") != -1) line = str_repl_allocf(line, "@", name_buf_temp);
 		}
+		if(debugger_saved_last) free(debugger_saved_last);
+		debugger_saved_last = NULL;
+		debugger_saved_last = strcatalloc(line, "");
 		switch(line[0]){
 			default:
 			if(!debugger_setting_minimal)
@@ -496,6 +511,7 @@ void debugger_hook(unsigned short *a,
 					printf("l: 0x%08lx  | blank lines in a clear command.\r\n", (unsigned long)debugger_setting_clearlines);
 					printf("h: 0x%08lx  | Maximum halts or illegals in a dis.?\r\n", (unsigned long)debugger_setting_maxhalts);
 					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_minimal);
+					printf("r: 0x%08lx  | enter will repeat the previous command?\r\n", (unsigned long)debugger_setting_repeat);
 					goto repl_start;
 				}
 				setting = line[stepper++];
@@ -511,20 +527,14 @@ void debugger_hook(unsigned short *a,
 					else
 						printf("<bad>\r\n");
 					goto repl_start;
-					case 'd': max_lines_disassembler = mode & 0xffFFff;
-					break;
-					case 'i': debugger_setting_do_dis = mode;
-					break;
-					case 'x': debugger_setting_do_hex = mode;
-					break;
-					case 'c': enable_dis_comments = mode;
-					break;
-					case 'l': debugger_setting_clearlines = mode;
-					break;
-					case 'h': debugger_setting_maxhalts = mode;
-					break;
-					case 'm': debugger_setting_minimal = mode;
-					break;					
+					case 'd': max_lines_disassembler = mode & 0xffFFff;break;
+					case 'i': debugger_setting_do_dis = mode;break;
+					case 'x': debugger_setting_do_hex = mode;break;
+					case 'c': enable_dis_comments = mode;break;
+					case 'l': debugger_setting_clearlines = mode;break;
+					case 'h': debugger_setting_maxhalts = mode;break;
+					case 'm': debugger_setting_minimal = mode;break;					
+					case 'r': debugger_setting_repeat = mode; debugger_saved_last = strcatalloc(line, ""); break;
 				}
 				if(settingsfilename)
 				{
@@ -541,6 +551,7 @@ void debugger_hook(unsigned short *a,
 					fprintf(settingsfile, "l %lu\n", (unsigned long)debugger_setting_clearlines);
 					fprintf(settingsfile, "h %lu\n", (unsigned long)debugger_setting_maxhalts);
 					fprintf(settingsfile, "m %lu\n", (unsigned long)debugger_setting_minimal);
+					fprintf(settingsfile, "r %lu\n", (unsigned long)debugger_setting_repeat);
 					printf("\r\nSaved Settings.\r\n");
 					fclose(settingsfile);
 				}
@@ -1391,6 +1402,9 @@ int main(int rc,char**rv){
 					break;
 					case 'm':
 					debugger_setting_minimal = strtoul(line+1,0,0);
+					break;
+					case 'r':
+					debugger_setting_repeat = strtoul(line+1,0,0);
 					break;
 					default:
 					/*printf("\r\nIn Settings File: unknown setting %c\r\n", line[0]);*/
