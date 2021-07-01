@@ -1336,10 +1336,14 @@ void debugger_hook(unsigned short *a,
 				*RX1 = 0;
 				*RX2 = 0;
 				*RX3 = 0;
+#if !defined(NO_SEGMENT)
 				if(SEGMENT)free(SEGMENT);
 				SEGMENT = calloc(1, 256);
-				if(!SEGMENT) {puts("\r\n Failed Malloc.");for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);}
+				if(!SEGMENT) {printf("\r\n Failed Malloc.\r\n");for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);}
 				SEGMENT_PAGES = 1;
+#else
+				SEGMENT_PAGES = 0;
+#endif
 			goto repl_start;
 		}
 		repl_end: return;
