@@ -123,7 +123,7 @@ static char create_name(UU address, char* name){
 		return 1;
 	}
 	names[n_names] = strcatalloc(name,"");
-	name_vals[i] = address;
+	name_vals[n_names++] = address;
 	return 0;
 	
 }
