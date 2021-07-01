@@ -35,6 +35,7 @@ static int disassembler(char* fname,
 		}
 
 #ifndef SISA_DEBUGGER
+		if(feof(f)) goto end;
 		opcode = fgetc(f);i++;
 #else
 		opcode = M[stepper++ & 0xffFFff];i++;
