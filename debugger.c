@@ -111,16 +111,18 @@ char loadnames(const char* filename){
 		do{
 			i = n_names;
 			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
-			if(!entry) {fclose(fin);return 0;}
+			if(!entry) {
+				printf("\r\nFAILED MALLOC\r\n");
+				fclose(fin);return 0;
+			}
 			if(streq(entry, "///") || strlen(entry) == 0){
-				printf("\r\nMoving on...\r\n");
 				free(entry); 
 				entry = NULL; break;
 			}
 			names[i] = entry;
 			entry = read_until_terminator_alloced(fin, &lenout, '|',40);
 			if(!entry) {
-				printf("\r\n<should not happen>\r\n");
+				printf("\r\nFAILED MALLOC\r\n");
 				free(names[i]); names[i] = NULL; fclose(fin); return 0;
 			}
 			name_vals[i] = strtoul(entry, 0,0);
@@ -133,11 +135,12 @@ char loadnames(const char* filename){
 	do{
 		i = n_breakpoints;
 		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
-		if(!entry) {fclose(fin);return 0;}
+		if(!entry) {printf("\r\nFAILED MALLOC\r\n");fclose(fin);return 0;}
 		if(strlen(entry) == 0 || entry[0] > 126 || entry[0] < 0) { /*Probably never happens.*/
 			free(entry); entry = NULL;break;
 		}
 		sisa_breakpoints[i] = strtoul(entry, 0,0);
+		printf("\r\nParsed Breakpoint %s\r\n", entry);
 		free(entry);
 		entry = NULL;
 		n_breakpoints++;
