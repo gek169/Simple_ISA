@@ -1232,10 +1232,11 @@ void debugger_hook(unsigned short *a,
 						printf("\r\nFailed Malloc!\r\n");
 						exit(1);
 					}
+					printf("\r\n");
 					savenames(fff);
 					free(fff);
 				}
-				printf("\r\n");
+				
 				
 				goto repl_start;
 			}
