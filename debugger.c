@@ -60,6 +60,7 @@ void segmentation_violation(int bruh){
 char savenames(const char* filename){
 	unsigned long i = 0;
 	FILE* fout = fopen(filename, "w");
+	unsigned long have_written = 0;
 	if(!fout)
 	{
 		if(!debugger_setting_minimal)
@@ -70,9 +71,14 @@ char savenames(const char* filename){
 	}
 	for(i=0; i < n_names; i++)
 	{
-		if(names[i]) fprintf(fout, "%s|%lu|", names[i], name_vals[i]);
+		if(names[i]) {
+			if(!have_written) fprintf(fout, "!"); /*signal to use */
+			fprintf(fout, "%s|%lu|", names[i], name_vals[i]);
+			have_written = 1;
+		}
 	}
-	fprintf(fout, "|");
+	if(have_written)
+		fprintf(fout, "|");
 	/*
 		write breakpoints to file.
 	*/
@@ -99,18 +105,19 @@ char loadnames(const char* filename){
 	for(i=0;i<n_names;i++) if(names[i]) free(names[i]);
 	n_names = 0;
 	n_breakpoints = 0;
-	do{
-		i = n_names;
-		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
-		if(!entry) return 0;
-		if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
-		names[i] = entry;
-		entry = read_until_terminator_alloced(fin, &lenout, '|',40);
-		if(!entry) {free(names[i]); names[i] = NULL; return 0;}
-		name_vals[i] = strtoul(entry, 0,0);
-		free(entry); entry = NULL;
-		n_names++;
-	}while(entry);
+	if(fgetc(fin) == '!')
+		do{
+			i = n_names;
+			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
+			if(!entry) return 0;
+			if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
+			names[i] = entry;
+			entry = read_until_terminator_alloced(fin, &lenout, '|',40);
+			if(!entry) {free(names[i]); names[i] = NULL; return 0;}
+			name_vals[i] = strtoul(entry, 0,0);
+			free(entry); entry = NULL;
+			n_names++;
+		}while(entry);
 	/*We are now parsing breakpoints*/
 	if(feof(fin)){
 		fclose(fin);
