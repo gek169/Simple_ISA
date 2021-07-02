@@ -97,7 +97,7 @@ char loadnames(const char* filename){
 		names[i] = entry;
 		entry = read_until_terminator_alloced(fin, &lenout, '|',40);
 		if(!entry) {free(names[i]); names[i] = NULL; return 0;}
-		name_vals[i] = strtoul(names[i], 0,0);
+		name_vals[i] = strtoul(entry, 0,0);
 		free(entry); entry = NULL;
 		n_names++;
 	}while(entry);
