@@ -60,7 +60,7 @@ void segmentation_violation(int bruh){
 char savenames(const char* filename){
 	unsigned long i = 0;
 	FILE* fout = fopen(filename, "w");
-	unsigned long have_written = 0;
+	unsigned char have_written = 0;
 	if(!fout)
 	{
 		if(!debugger_setting_minimal)
@@ -111,11 +111,11 @@ char loadnames(const char* filename){
 		do{
 			i = n_names;
 			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
-			if(!entry) return 0;
-			if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
+			if(!entry) {fclose(fin);return 0;}
+			if(strlen(entry) == 0 || entry[0] > 126 || entry[0] < 0) {free(entry); entry = NULL; break;}
 			names[i] = entry;
 			entry = read_until_terminator_alloced(fin, &lenout, '|',40);
-			if(!entry) {free(names[i]); names[i] = NULL; return 0;}
+			if(!entry) {free(names[i]); names[i] = NULL; fclose(fin); return 0;}
 			name_vals[i] = strtoul(entry, 0,0);
 			free(entry); entry = NULL;
 			n_names++;
@@ -126,10 +126,13 @@ char loadnames(const char* filename){
 	do{
 		i = n_breakpoints;
 		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
-		if(!entry) return 0;
-		if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
+		if(!entry) {fclose(fin);return 0;}
+		if(strlen(entry) == 0 || entry[0] > 126 || entry[0] < 0) { /*Probably never happens.*/
+			free(entry); entry = NULL;break;
+		}
 		sisa_breakpoints[i] = strtoul(entry, 0,0);
-		free(entry); entry = NULL;
+		free(entry);
+		entry = NULL;
 		n_breakpoints++;
 	}while(entry);
 	fclose(fin);
