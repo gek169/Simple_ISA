@@ -53,8 +53,6 @@
 		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);
 #define UNSTASH_REGS UNSTASH_REG(a);UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
 		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);
-#define UNSTASH_REGS_NOA UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
-		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);
 
 
 #ifdef SISA_DEBUGGER
@@ -359,8 +357,8 @@ G_XOR:a^=b;D
 G_GETCHAR:
 {
 	STASH_REGS;
-	a=gch();
-	UNSTASH_REGS_NOA;
+	a_stash=gch();
+	UNSTASH_REGS;
 }
 D
 G_PUTCHAR:{
@@ -484,8 +482,8 @@ G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 G_INTERRUPT:
 {
 	STASH_REGS;
-	a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);
-	UNSTASH_REGS_NOA;
+	a_stash=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);
+	UNSTASH_REGS;
 }
 D
 G_CLOCK:{
@@ -843,7 +841,7 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M_SAVED, M, (((UU)1)<<24));
 		EMULATE_DEPTH++;
 			e();
-			a=R;
+			a_stash=R;
 			R=0;
 		EMULATE_DEPTH--;
 		if(SEGMENT)free(SEGMENT);
@@ -853,7 +851,7 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M, M_SAVED, (((UU)1)<<24));
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
-		UNSTASH_REGS_NOA;
+		UNSTASH_REGS;
 	}D
 #else
 	G_AA31: R=14; goto G_HALT;
@@ -892,14 +890,14 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M_SAVED, M, (((UU)1)<<24));
 		EMULATE_DEPTH++;
 			e();
-			a=R;
+			a_stash=R;
 			R=0;
 		EMULATE_DEPTH--;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, (((UU)1)<<24));
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
-		UNSTASH_REGS_NOA;
+		UNSTASH_REGS;
 	}D
 #else
 	G_AA34: R=14; goto G_HALT;
