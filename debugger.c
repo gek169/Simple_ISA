@@ -83,9 +83,9 @@ char loadnames(const char* filename){
 	if(!fin)
 	{
 		if(!debugger_setting_minimal)
-			printf("\r\nCould not open output debugger file %s\r\n", filename);
+			printf("\r\nCould not find debugger file %s\r\n", filename);
 		else
-			printf("\r\n<badfile: %s>\r\n", filename);
+			printf("\r\n<nofile: %s>\r\n", filename);
 		return 1;
 	}
 	for(i=0;i<n_names;i++) if(names[i]) free(names[i]);
@@ -1169,7 +1169,17 @@ void debugger_hook(unsigned short *a,
 					if(names[i])
 						printf("\r\n'%s': 0x%08lx",names[i], name_vals[i]);
 				}
+				{
+					char* fff = strcatalloc(filename, ".dbg");
+					if(!fff){
+						printf("\r\nFailed Malloc!\r\n");
+						exit(1);
+					}
+					savenames(fff);
+					free(fff);
+				}
 				printf("\r\n");
+				
 				goto repl_start;
 			}
 			case 'R':
