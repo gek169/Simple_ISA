@@ -32,12 +32,6 @@ section 0x1F0
 	IS_A_NEWLINE;	jmpifeq;GET_A_BACK;
 	sc %Lbl_BONUSDUCKS%;	IS_A_Q;jmpifeq;GET_A_BACK;
 	sc %Lbl_Emulator%;		IS_A_R;jmpifeq;GET_A_BACK;
-	sc 1,0xF0;
-
-#Simple loop
-
-
-	
 //prepare the loop by preparing our looping variable at 59,
 //and the address register C to repeatedly jump to the top.
 	lb 0;
