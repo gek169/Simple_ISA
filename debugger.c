@@ -114,11 +114,15 @@ char loadnames(const char* filename){
 			if(!entry) {fclose(fin);return 0;}
 			if(streq(entry, "///") || strlen(entry) == 0){
 				printf("\r\nMoving on...\r\n");
-				free(entry); entry = NULL; break;
+				free(entry); 
+				entry = NULL; break;
 			}
 			names[i] = entry;
 			entry = read_until_terminator_alloced(fin, &lenout, '|',40);
-			if(!entry) {free(names[i]); names[i] = NULL; fclose(fin); return 0;}
+			if(!entry) {
+				printf("\r\n<should not happen>\r\n");
+				free(names[i]); names[i] = NULL; fclose(fin); return 0;
+			}
 			name_vals[i] = strtoul(entry, 0,0);
 			free(entry); entry = NULL;
 			n_names++;
