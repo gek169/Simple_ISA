@@ -4,7 +4,7 @@ CC= cc
 INSTALL_DIR=/usr/local/bin
 MAN_INSTALL_DIR=/usr/local/share/man/man1
 CCC= g++
-OPTLEVEL= -O3
+OPTLEVEL= -Ofast
 #make the emulator safe for fuzz testing.
 MORECFLAGS=-DUSE_COMPUTED_GOTO -Wall
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s 
