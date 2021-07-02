@@ -129,7 +129,7 @@ char loadnames(const char* filename){
 			name_vals[i] = strtoul(entry, 0,0);
 			free(entry); entry = NULL;
 			n_names++;
-		}while(entry);
+		}while(1);
 	} else printf("\r\nNo names found\r\n");
 	/*We are now parsing breakpoints*/
 	if(feof(fin)){fclose(fin);return 0;}
