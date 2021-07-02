@@ -591,9 +591,9 @@ ZB:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
-	STASH_REGS;
+		STASH_REGS;
 		memcpy(M + 0x100 * ((size_t)(RX0&0xffFF)), SEGMENT + 0x100 * ((size_t)RX1), 0x100);
-	UNSTASH_REGS;
+		UNSTASH_REGS;
 	}
 	D
 #else
@@ -602,10 +602,11 @@ ZB:
 ZC:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
+	else
 	{
-	STASH_REGS;
-	memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
-	UNSTASH_REGS;
+		STASH_REGS;
+		memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
+		UNSTASH_REGS;
 	}
 	D
 #else
@@ -613,9 +614,9 @@ ZC:
 #endif
 ZD:
 #if !defined(NO_SEGMENT)
-{
-	u* SEGMENT_OLD = SEGMENT;
+{	
 	STASH_REGS;
+	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 	if(RX0 == 0)	{R=6;goto G_HALT;}
 	if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
@@ -729,12 +730,12 @@ G_AA11:{SUU SRX0, SRX1;
 		SRX0 = RX0;
 		SRX1 = RX1;
 	if(SRX1!=0)RX0=(SRX0/SRX1)&0xffFFffFF;else{R=3;goto G_HALT;}
-	}D
+}D
 G_AA12:{SUU SRX0, SRX1;
 		SRX0 = RX0;
 		SRX1 = RX1;
 	if(SRX1!=0)RX0=(SRX0%SRX1)&0xffFFffFF;else{R=4;goto G_HALT;}
-	}D
+}D
 #else
 	/*
 		TODO: Emulate signed integer division for two's complement guaranteed behavior.
@@ -819,8 +820,8 @@ G_AA12:{SUU SRX0, SRX1;
 	G_AA30:RX0--;D
 #if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_AA31:{
-		u* M_SAVED = NULL;
 		STASH_REGS;
+		u* M_SAVED = NULL;
 		u* SEG_SAVED = NULL;
 		UU SEG_PAGES_SAVED;
 		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
@@ -878,8 +879,8 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_AA34:{
-		u* M_SAVED = NULL;
 		STASH_REGS;
+		u* M_SAVED = NULL;
 		UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
