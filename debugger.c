@@ -676,7 +676,14 @@ void debugger_hook(unsigned short *a,
 				}
 				goto repl_start;
 			}
-			case 'q':for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);
+			case 'q':
+			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+			{
+				char* tmp =strcatalloc(filename, ".dbg");
+				savenames(tmp);
+				free(tmp);
+			}
+			exit(0);
 			case '\0':
 			case '\r':
 			case '\n':
