@@ -4,7 +4,7 @@
 /*
 	Textmode emulator for SISA16.
 */
-static FILE* F;
+
 static char* filename = NULL;
 static char* env_home = NULL;
 static char* settingsfilename = NULL;
@@ -56,6 +56,55 @@ void segmentation_violation(int bruh){
 	exit(1);
 }
 #endif
+
+char savenames(const char* filename){
+	unsigned long i = 0;
+	FILE* fout = fopen(filename, "w");
+	if(!fout)
+	{
+		if(!debugger_setting_minimal)
+			printf("\r\nCould not open output debugger file %s\r\n", filename);
+		else
+			printf("\r\n<badfile: %s>\r\n", filename);
+		return 1;
+	}
+	for(i=0; i < n_names; i++)
+	{
+		if(names[i]) fprintf(fout, "%s|%lu|", names[i], name_vals[i]);
+	}
+	fclose(fout);
+	return 0;
+}
+char loadnames(const char* filename){
+	unsigned long i      = 0;
+	unsigned long lenout = 0;
+	char* entry = NULL;
+	FILE* fin = fopen(filename, "r");
+	if(!fin)
+	{
+		if(!debugger_setting_minimal)
+			printf("\r\nCould not open output debugger file %s\r\n", filename);
+		else
+			printf("\r\n<badfile: %s>\r\n", filename);
+		return 1;
+	}
+	for(i=0;i<n_names;i++) if(names[i]) free(names[i]);
+	n_names = 0;
+	do{
+		i = n_names;
+		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
+		if(!entry) return 0;
+		names[i] = entry;
+		entry = read_until_terminator_alloced(fin, &lenout, '|',40);
+		if(!entry) {free(names[i]); names[i] = NULL; return 0;}
+		name_vals[i] = strtoul(names[i], 0,0);
+		free(entry); entry = NULL;
+		n_names++;
+	}while(entry);
+	fclose(fin);
+	return 0;
+}
+
 static char* read_until_terminator_alloced_modified(FILE* f){
 	unsigned char c;
 	char* buf;
@@ -738,9 +787,11 @@ void debugger_hook(unsigned short *a,
 					streq(startname, "///")
 					|| strprefix("//", startname)
 					|| streq("/", startname)
+					|| (strfind(startname, "|") != -1)
+					|| (strfind(startname, ";") != -1)
 				){
 					if(!debugger_setting_minimal)
-						printf("\r\nI won't let you do that to yourself.\r\n");
+						printf("\r\nForbidden name.\r\n");
 					else
 						printf("\r\n<bad name>\r\n");
 					goto repl_start;
@@ -1355,6 +1406,7 @@ void debugger_hook(unsigned short *a,
 }
 #define debugger_stringify(x) #x
 int main(int rc,char**rv){
+	static FILE* F;
 	UU i , j=~(UU)0;
 	SUU q_test = (SUU)-1;
 	/*M = malloc((((UU)1)<<24));*/
@@ -1479,20 +1531,18 @@ int main(int rc,char**rv){
 #endif
 		return 1;
 	}
-#if !defined(NO_SIGNED_DIV)
 	memcpy(&i,&q_test, sizeof(UU));
 	if(i != j){
-		puts("<COMPILETIME ENVIRONMENT ERROR> This is not a two's complement architecture. You must define NO_SIGNED_DIV");
+		puts("<COMPILETIME ENVIRONMENT ERROR>This is not a two's complement architecture. You must define NO_SIGNED_DIV");
 		exit(1);
 	}
 	j = (UU)0x80000000;
 	q_test = -2147483648;
 	memcpy(&i,&q_test, sizeof(UU));
 	if(i != j){
-		puts("<COMPILETIME ENVIRONMENT ERROR> This is not a -conformant- two's complement architecture. It appears the sign bit is not the highest bit.\nYou must define NO_SIGNED_DIV");
+		puts("<COMPILETIME ENVIRONMENT ERROR>This is not a two's complement architecture. It appears the sign bit is not the highest bit.\nYou must define NO_SIGNED_DIV");
 		exit(1);
 	}
-#endif
 	if(rc<2){
 			puts("SISA-16 Standalone Debugger written by D[MHS]W for the Public Domain");
 			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
@@ -1674,6 +1724,14 @@ int main(int rc,char**rv){
 #endif
 			puts("The C compiler does not expose itself to be one of the ones recognized by this program. Please tell me on Github what you used.");
 			return 0;
+	}
+	{
+		char* fn = NULL;
+		fn = strcatalloc(rv[1], ".dbg");
+		if(fn){
+			loadnames(fn);
+			free(fn);
+		}
 	}
 	F=fopen(rv[1],"rb");
 	if(!F){
