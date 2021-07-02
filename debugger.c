@@ -146,7 +146,7 @@ char loadnames(const char* filename){
 		free(entry);
 		entry = NULL;
 		n_breakpoints++;
-	}while(entry);
+	}while(1);
 	fclose(fin);
 	return 0;
 }
