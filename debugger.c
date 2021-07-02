@@ -79,6 +79,8 @@ char savenames(const char* filename){
 	}
 	if(have_written)
 		fprintf(fout, "|");
+	else
+		fprintf(fout, "_");
 	/*
 		write breakpoints to file.
 	*/
@@ -119,10 +121,7 @@ char loadnames(const char* filename){
 			n_names++;
 		}while(entry);
 	/*We are now parsing breakpoints*/
-	if(feof(fin)){
-		fclose(fin);
-		return 0;	
-	}
+	if(feof(fin)){fclose(fin);return 0;}
 	/*We are now parsing breakpoints*/
 	do{
 		i = n_breakpoints;
