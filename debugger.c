@@ -78,7 +78,7 @@ char savenames(const char* filename){
 		}
 	}
 	if(have_written)
-		fprintf(fout, "|");
+		fprintf(fout, "///|");
 	else
 		fprintf(fout, "_");
 	/*
@@ -112,7 +112,7 @@ char loadnames(const char* filename){
 			i = n_names;
 			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
 			if(!entry) {fclose(fin);return 0;}
-			if(strlen(entry) == 0 || entry[0] > 126 || entry[0] <= 0) {
+			if(streq(entry, "///") || strlen(entry) == 0){
 				printf("\r\nMoving on...\r\n");
 				free(entry); entry = NULL; break;
 			}
