@@ -89,6 +89,10 @@ char savenames(const char* filename){
 			fprintf(fout, "%lu|", sisa_breakpoints[i]);
 	}
 	fclose(fout);
+	if(!debugger_setting_minimal)
+		printf("Saved Debugging file.\r\n");
+	else
+		printf("[saved]\r\n");
 	return 0;
 }
 char loadnames(const char* filename){
@@ -129,8 +133,8 @@ char loadnames(const char* filename){
 			name_vals[i] = strtoul(entry, 0,0);
 			free(entry); entry = NULL;
 			n_names++;
-		}while(1);
-	} else printf("\r\nNo names found\r\n");
+		}while(n_names < 0x10000);
+	} 
 	/*We are now parsing breakpoints*/
 	if(feof(fin)){fclose(fin);return 0;}
 	/*We are now parsing breakpoints*/
@@ -142,11 +146,10 @@ char loadnames(const char* filename){
 			free(entry); entry = NULL;break;
 		}
 		sisa_breakpoints[i] = strtoul(entry, 0,0);
-		printf("\r\nParsed Breakpoint %s\r\n", entry);
 		free(entry);
 		entry = NULL;
 		n_breakpoints++;
-	}while(1);
+	} while(n_breakpoints < 0x10000);
 	fclose(fin);
 	return 0;
 }
