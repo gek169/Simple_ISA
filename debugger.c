@@ -597,9 +597,17 @@ void debugger_hook(unsigned short *a,
 			case 'h':help();goto repl_start;
 			case 'c':
 			{unsigned long i = 0;
+#if defined(WIN32) || defined(_WIN32)
+				system("CLS");
+#else
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
+				system("clear");
+#else
 				for(;i < debugger_setting_clearlines;i++){
 					printf("\r\n");
 				}
+#endif
+#endif
 			}
 			goto repl_start;
 			case 'p':{
@@ -627,7 +635,7 @@ void debugger_hook(unsigned short *a,
 					printf("i: 0x%08lx  | disassemble at every step?\r\n", (unsigned long)debugger_setting_do_dis);
 					printf("x: 0x%08lx  | show hex at every step?\r\n", (unsigned long)debugger_setting_do_hex);
 					printf("c: 0x%08lx  | Show dis. comments?\r\n", (unsigned long)enable_dis_comments);
-					printf("l: 0x%08lx  | blank lines in a clear command.\r\n", (unsigned long)debugger_setting_clearlines);
+					printf("l: 0x%08lx  | blank lines in a clear command (*nix will use system clear)\r\n", (unsigned long)debugger_setting_clearlines);
 					printf("h: 0x%08lx  | Maximum halts or illegals in a dis.?\r\n", (unsigned long)debugger_setting_maxhalts);
 					printf("m: 0x%08lx  | Minimal display?\r\n", (unsigned long)debugger_setting_minimal);
 					printf("r: 0x%08lx  | enter will repeat the previous command?\r\n", (unsigned long)debugger_setting_repeat);
