@@ -125,6 +125,10 @@ static char create_name(UU address, char* name){
 		return 1;
 	}
 	names[n_names] = strcatalloc(name,"");
+	if(!names[n_names]){
+		printf("\r\n!!Failed Malloc!! aborting...\r\n");
+		exit(1);
+	}
 	name_vals[n_names++] = address;
 	return 0;
 	
@@ -134,7 +138,8 @@ static void delete_name(UU addr){
 	for(i = 0; i < n_names; i++){
 		if(names[i] == NULL) continue;
 		if(name_vals[i] == addr){
-			free(names[i]);names[i] =0;
+			free(names[i]);
+			names[i] = NULL;
 			name_vals[i] = 0;
 		}
 	}
