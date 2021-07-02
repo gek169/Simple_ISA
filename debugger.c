@@ -72,6 +72,14 @@ char savenames(const char* filename){
 	{
 		if(names[i]) fprintf(fout, "%s|%lu|", names[i], name_vals[i]);
 	}
+	fprintf(fout, "|");
+	/*
+		write breakpoints to file.
+	*/
+	for(i=0; i < n_breakpoints; i++){
+		if(sisa_breakpoints[i] != 0x1FFffFF)
+			fprintf(fout, "%lu|", sisa_breakpoints[i]);
+	}
 	fclose(fout);
 	return 0;
 }
@@ -90,16 +98,33 @@ char loadnames(const char* filename){
 	}
 	for(i=0;i<n_names;i++) if(names[i]) free(names[i]);
 	n_names = 0;
+	n_breakpoints = 0;
 	do{
 		i = n_names;
 		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
 		if(!entry) return 0;
+		if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
 		names[i] = entry;
 		entry = read_until_terminator_alloced(fin, &lenout, '|',40);
 		if(!entry) {free(names[i]); names[i] = NULL; return 0;}
 		name_vals[i] = strtoul(entry, 0,0);
 		free(entry); entry = NULL;
 		n_names++;
+	}while(entry);
+	/*We are now parsing breakpoints*/
+	if(feof(fin)){
+		fclose(fin);
+		return 0;	
+	}
+	/*We are now parsing breakpoints*/
+	do{
+		i = n_breakpoints;
+		entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
+		if(!entry) return 0;
+		if(strlen(entry) == 0) {free(entry); entry = NULL;break;}
+		sisa_breakpoints[i] = strtoul(entry, 0,0);
+		free(entry); entry = NULL;
+		n_breakpoints++;
 	}while(entry);
 	fclose(fin);
 	return 0;
@@ -280,6 +305,7 @@ static void help(){
 			N "    e 0x100ff deletes a breakpoint at that insn."
 			N "    e deletes a breakpoint at this insn."
 			N "l to [l]ist             | Print all breakpoints and names."
+			N "    this command also saves your breakpoints and names."
 			N "u to r[u]n              | Run until breakpoint."
 			N "x to view he[x]         | View raw bytes of disassembly"
 			N "d to [d]isassemble      | disassemble."
