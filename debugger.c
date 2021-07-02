@@ -108,6 +108,7 @@ char loadnames(const char* filename){
 	n_names = 0;
 	n_breakpoints = 0;
 	if(fgetc(fin) == '!')
+	{
 		do{
 			i = n_names;
 			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
@@ -129,6 +130,7 @@ char loadnames(const char* filename){
 			free(entry); entry = NULL;
 			n_names++;
 		}while(entry);
+	} else printf("\r\nNo names found\r\n");
 	/*We are now parsing breakpoints*/
 	if(feof(fin)){fclose(fin);return 0;}
 	/*We are now parsing breakpoints*/
