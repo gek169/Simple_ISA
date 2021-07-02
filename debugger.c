@@ -112,7 +112,10 @@ char loadnames(const char* filename){
 			i = n_names;
 			entry = read_until_terminator_alloced(fin, &lenout, '|', 40);
 			if(!entry) {fclose(fin);return 0;}
-			if(strlen(entry) == 0 || entry[0] > 126 || entry[0] < 0) {free(entry); entry = NULL; break;}
+			if(strlen(entry) == 0 || entry[0] > 126 || entry[0] <= 0) {
+				printf("\r\nMoving on...\r\n");
+				free(entry); entry = NULL; break;
+			}
 			names[i] = entry;
 			entry = read_until_terminator_alloced(fin, &lenout, '|',40);
 			if(!entry) {free(names[i]); names[i] = NULL; fclose(fin); return 0;}
