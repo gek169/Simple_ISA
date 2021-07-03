@@ -116,7 +116,7 @@ static void dcl(){return;}
 #endif
 
 static unsigned short gch(){return (unsigned short)getchar();}
-static void pch(unsigned short a){putchar(a);fflush(stdout);}
+static void pch(unsigned short a){putchar(a);if(a==0xa||a == 0xd)fflush(stdout);}
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,

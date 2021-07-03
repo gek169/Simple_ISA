@@ -118,6 +118,15 @@ The additional region of memory outside the normal SISA16 address space, which i
 allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
 but can also be used to hold code.
 
+.B Screen Memory:
+153600 bytes starting at 0xB00000 which are used for the screen in the AV driver.
+
+.B Audio Region:
+65536 bytes starting from 0xB50000 which are used for the active audio buffer.
+
+If you call an interrupt with a==3, you will start playing back audio in the AV driver.
+
+
 .SH INSTRUCTIONS
 
 .TP
