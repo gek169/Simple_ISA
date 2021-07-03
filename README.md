@@ -502,7 +502,7 @@ emulate_seg: Same as Emulate, but the segment is passed down to the child. (1 by
 
 rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 
-The rest: nop duplicates, free for expansion (1 byte)
+The rest: halt duplicates, free for expansion (1 byte)
 ```
 
 Read the documentation for more information.
