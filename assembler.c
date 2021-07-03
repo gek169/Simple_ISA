@@ -616,8 +616,8 @@ int main(int argc, char** argv){
 		}
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
-			const char* env_sisa16bin = getenv("SISA16BIN");
-			const char* env_home = getenv("HOME");
+			char* env_sisa16bin = getenv("SISA16BIN");
+			char* env_home = getenv("HOME");
 			metaproc = line + strlen("ASM_header ");
 			if(include_level >= ASM_MAX_INCLUDE_LEVEL){
 				printf(compil_fail_pref);
@@ -625,6 +625,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			tmp = fopen(metaproc, "r");
+			env_sisa16bin = getenv("SISA16BIN");
 			if(!tmp && env_sisa16bin) 
 			{
 				char* bruh = strcatallocf1(strcatalloc(env_sisa16bin,"/"), metaproc);
@@ -636,6 +637,7 @@ int main(int argc, char** argv){
 				tmp = fopen(bruh, "r");
 				free(bruh);
 			}
+			env_home = getenv("HOME");
 			if(!tmp && env_home) {
 				char* bruh = NULL;
 				bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
@@ -664,7 +666,7 @@ int main(int argc, char** argv){
 			const char *env_sisa16bin, *env_home;
 			metaproc = line + strlen("ASM_data_include ");
 			env_sisa16bin = getenv("SISA16BIN");
-			env_home = getenv("HOME");
+			
 			tmp = fopen(metaproc, "rb");
 			if(!tmp && env_sisa16bin) 
 			{
@@ -677,7 +679,8 @@ int main(int argc, char** argv){
 				tmp = fopen(bruh, "rb");
 				free(bruh);
 			}
-			if(!tmp) {
+			env_home = getenv("HOME");
+			if(!tmp && env_home) {
 				char* bruh = NULL;
 				bruh = strcatallocf1(strcatalloc(env_home,"/sisa16/"), metaproc);
 				tmp = fopen(bruh, "r");
