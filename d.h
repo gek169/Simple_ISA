@@ -1,46 +1,93 @@
 /*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
-#if defined(USE_NCURSES)
+
+
+#ifdef USE_SDL2
 /*
-	the Ncurses binding cannot be put in the public domain,
-	but the di/dcl interface is.
-	The following four lines are under this license:
-	Copyright 2018-2019,2020 Thomas E. Dickey
-	Copyright 1998-2017,2018 Free Software Foundation, Inc.
-	Copyright 2021-2021 David M. Webster
-	
-	Permission is hereby granted, free of charge, to any person obtaining a
-	copy of this software and associated documentation files (the
-	"Software"), to deal in the Software without restriction, including
-	without limitation the rights to use, copy, modify, merge, publish,
-	distribute, distribute with modifications, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included
-	in all copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-	OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-	MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-	IN NO EVENT SHALL THE ABOVE COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
-	OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
-	THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-	
-	Except as contained in this notice, the name(s) of the above copyright
-	holders shall not be used in advertising or otherwise to promote the
-	sale, use or other dealings in this Software without prior written
-	authorization.
+	SDL2 driver.
 */
-#include <ncurses.h>
 #include "isa_pre.h"
-static void di(){if(EMULATE_DEPTH==0)initscr();}
-static void dcl(){if(EMULATE_DEPTH==0)endwin();}
+#define SDL_MAIN_HANDLED
+#ifdef __TINYC__
+#define SDL_DISABLE_IMMINTRIN_H 1
+#endif
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+static SDL_Window *sdl_win = NULL;
+static SDL_Renderer *sdl_rend = NULL;
+static SDL_Texture *sdl_tex = NULL;
+static UU SDL_targ[640*480];
+static const UU arne_palette[16] = {
+		0x000000,
+		0x493c2b,
+		0xbe2633,
+		0xe06f8b,
+		0x9d9d9d,
+		0xa46422,
+		0xeb8931,
+		0xf7e26b,
+		0xffffff,
+		0x1b2632,
+		0x2f484e,
+		0x44891a,
+		0xa3ce27,
+		0x005784,
+		0x31a2f2,
+		0xb2dcef
+};
+static void di(){
+	if(EMULATE_DEPTH==0){
+	    // Initialize SDL
+	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
+	    {
+	        printf("SDL2 could not be initialized!\n"
+	               "SDL_Error: %s\n", SDL_GetError());
+	        exit(1);
+	    }
+	    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
+	    {
+	        printf("SDL2_mixer could not be initialized!\n"
+	               "SDL_Error: %s\n", SDL_GetError());
+	        exit(1);
+	    }
+		sdl_win = SDL_CreateWindow("[Sisa16 Emulation]",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
+			640, 480,
+			SDL_WINDOW_SHOWN
+		);
+		if(!sdl_win)
+		{
+			printf("SDL2 window creation failed.\n"
+				"SDL_Error: %s\n", SDL_GetError());
+			exit(1);
+		}
+		sdl_rend = SDL_CreateRenderer(sdl_win, -1, SDL_RENDERER_ACCELERATED);
+		if(!sdl_rend){
+			printf("SDL2 renderer creation failed.\n"
+				"SDL_Error: %s\n", SDL_GetError());
+			exit(1);
+		}
+		sdl_tex = SDL_CreateTexture(sdl_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
+		if(!sdl_tex){
+			printf("SDL2 texture creation failed.\n"
+				"SDL_Error: %s\n", SDL_GetError());
+			exit(1);
+		}
+	}
+}
+static void dcl(){
+	if(EMULATE_DEPTH==0){
+		SDL_DestroyTexture(sdl_tex);
+		SDL_DestroyRenderer(sdl_rend);
+    	SDL_DestroyWindow(sdl_win);
+	    SDL_Quit();
+	}
+}
 #else
 /*
-	Fully Public domain textmode driver.
+	textmode driver.
 */
 #include "isa_pre.h"
 static void di(){return;}
@@ -65,21 +112,80 @@ static unsigned short interrupt(unsigned short a,
 									UU RX3
 								)
 {
+
+#ifdef USE_SDL2
+	if(a == 0){ /*magic value to display the screen.*/
+		UU i = 0;
+		static SDL_Rect screenrect;
+		screenrect.x = 0;
+		screenrect.y = 0;
+		screenrect.w = 640;
+		screenrect.h = 640;
+		for(;i<640*480;i++){
+			unsigned char val = M[0xB00000 + (i/2)];
+			if(i%2){
+				val &= 0xf0;
+				val >>= 4;
+			} else {
+				val &= 0xf;
+			}
+			SDL_targ[i] = arne_palette[val];
+		}
+		SDL_UpdateTexture(
+			sdl_tex,
+			NULL,
+			SDL_targ, 
+			640 * 4
+		);
+		SDL_RenderCopy(
+			sdl_rend, 
+			sdl_tex,
+			NULL,
+			NULL
+		);
+		SDL_RenderPresent(sdl_rend);
+		return 1;
+	}
+	if(a == 1){ /*check for quit event.*/
+		SDL_Event ev;
+		while(SDL_PollEvent(&ev)){
+			if(ev.type == SDL_QUIT) return 0xFFff; /*Magic value for quit.*/
+		}
+		return 0;
+	}
+	if(a == 2){ /*Read the buttons*/
+		unsigned short retval = 0;
+		const unsigned char *state;
+		SDL_PumpEvents();
+		state = SDL_GetKeyboardState(NULL);
+		retval |= 0x1 * (state[SDL_SCANCODE_UP]!=0);
+		retval |= 0x2 * (state[SDL_SCANCODE_DOWN]!=0);
+		retval |= 0x4 * (state[SDL_SCANCODE_LEFT]!=0);
+		retval |= 0x8 * (state[SDL_SCANCODE_RIGHT]!=0);
+
+		retval |= 0x10 * (state[SDL_SCANCODE_RETURN]!=0);
+		retval |= 0x20 * (state[SDL_SCANCODE_RSHIFT]!=0);
+		retval |= 0x40 * (state[SDL_SCANCODE_Z]!=0);
+		retval |= 0x80 * (state[SDL_SCANCODE_X]!=0);
+
+		retval |= 0x100 * (state[SDL_SCANCODE_C]!=0);
+		retval |= 0x200 * (state[SDL_SCANCODE_A]!=0);
+		retval |= 0x400 * (state[SDL_SCANCODE_S]!=0);
+		retval |= 0x800 * (state[SDL_SCANCODE_D]!=0);
+		return retval;
+	}
+	/*TODO: play samples from a buffer.*/
+#endif
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
 		for(i=0;i<(1<<24)-31;i+=32)
 			for(j=i,printf("%s\r\n%04lx|",(i&255)?"":"\r\n~",i);j<i+32;j++)
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
+		return a;
 	}
 
-
-	if(
 #if !defined(NO_SEGMENT)
-	a == 0xffFE
-#else
-	0
-#endif
-	){ /*Disk Read.*/
+	if(a == 0xffFE){ /*Disk Read.*/
 		UU i; char buf[0x10000];
 		for(i = 0; i<0x10000; i++){
 			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
@@ -118,14 +224,9 @@ static unsigned short interrupt(unsigned short a,
 		}
 		return 1;
 	}
-#if !defined(FUZZTEST)
-	if(
-#if !defined(NO_SEGMENT)
-	a == 0xffFD
-#else
-	0
 #endif
-	){ /*Disk Write*/
+#if !defined(FUZZTEST) && !defined(NO_SEGMENT)
+	if(a == 0xffFD){ /*Disk Write*/
 		UU i; char buf[0x10000];
 		for(i = 0; i<0x10000; i++){
 			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
@@ -145,6 +246,5 @@ static unsigned short interrupt(unsigned short a,
 		return 1;
 	}
 #endif
-	/*TODO: add a disassembler.*/
 	return a;
 }

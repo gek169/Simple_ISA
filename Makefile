@@ -1,4 +1,4 @@
-#USE-NCURSES
+
 CC= cc
 #CC= tcc
 INSTALL_DIR=/usr/local/bin
@@ -24,15 +24,18 @@ qdev:
 	
 
 sisa16_emu:
-	$(CC) $(CFLAGS) -DUSE_NCURSES isa.c -o sisa16_emu -lncurses -DUSE_UNSIGNED_INT || $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) isa.c -o sisa16_sdl2_emu -lSDL2 -lSDL2_mixer -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
 	@echo "~~Built emulator."
 
 sisa16_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_sdl2_asm -lSDL2 -lSDL2_mixer -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
 sisa16_dbg:
-	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) debugger.c -o sisa16_sdl2_dbg -DUSE_UNSIGNED_INT -DUSE_SDL2 -lSDL2 -lSDL2_mixer || echo "Cannot build the sdl2 version of the debugger."
 	@echo "~~Built debugger."
 
 main: sisa16_asm sisa16_emu sisa16_dbg
@@ -56,8 +59,11 @@ asm_programs: sisa16_asm
 	
 install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
+	@cp ./sisa16_sdl2_emu $(INSTALL_DIR)/ || cp ./sisa16_sdl2_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_emu"
 	@cp ./sisa16_dbg $(INSTALL_DIR)/ || cp ./sisa16_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_dbg"
+	@cp ./sisa16_sdl2_dbg $(INSTALL_DIR)/ || cp ./sisa16_sdl2_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_dbg"
 	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
+	@cp ./sisa16_sdl2_asm $(INSTALL_DIR)/ || cp ./sisa16_sdl2_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_asm"
 	@echo "Attempting manpage install."
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 

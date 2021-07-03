@@ -22,6 +22,9 @@ ASM_header libc.hasm
 .line_length_plus_1:	80
 .wait_time:				20
 
+section 0xB00000;
+fill 153600,0x2E
+
 section 0x10000;
 asm_begin_region_restriction;
 la line_length;
@@ -45,6 +48,20 @@ nop;
 		ld_iteration_count; 
 			aincr;
 		st_iteration_count;
+		//If we are using the SDL driver, display the screen.
+		la 0; interrupt;
+		//the return value tells us if we are currently using 
+		rx0a;
+		//poll for the quit event.
+		la 1; interrupt;
+		llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
+		la 2;interrupt;
+		lb0x10;cmp;
+		sc %asciifun_loopout%; jmpifeq;
+		
+		//are we using SDL?
+		:asciifun_back:
+		lb1;rx1b;rxcmp;sc %asciifun_looptop%;jmpifeq;
 		la %~wait_time%;
 		alpush;
 			proc_wait;
@@ -64,6 +81,7 @@ nop;
 		putchar;
 	sc %asciifun_looptop%;jmp;
 :asciifun_loopout:
+halt;
 asm_end_restriction;
 
 section 0;
