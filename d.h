@@ -38,7 +38,6 @@ static const UU arne_palette[16] = {
 		0x31a2f2,
 		0xb2dcef
 };
-
 void sdl_audio_callback(void *udata, Uint8 *stream, int len){
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
@@ -64,7 +63,6 @@ static void di(){
 		sdl_spec.samples = 2048;
 		sdl_spec.callback = sdl_audio_callback;
 		sdl_spec.userdata = NULL;
-
 		sdl_win = SDL_CreateWindow("[Sisa16 Emulation]",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
