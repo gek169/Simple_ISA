@@ -742,7 +742,7 @@ G_AA12:{SUU SRX0, SRX1;
 #else
 	G_AA31: R=14; goto G_HALT;
 #endif
-#if defined(NO_FP) || defined(NO_SIGNED_DIV)
+#if defined(NO_FP)
 	G_AA32:G_AA33:R=8;goto G_HALT;
 #else
 	G_AA32:{
