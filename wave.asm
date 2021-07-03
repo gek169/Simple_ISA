@@ -43,7 +43,6 @@ nop;
 		sc %iter_is_not_endval%;jmp;
 
 	:iter_is_endval:
-//		la 0xa; putchar;
 		la 0xd; putchar;
 		ld_iteration_count; 
 			aincr;
