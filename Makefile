@@ -24,17 +24,17 @@ qdev:
 	
 
 sisa16_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses|| $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 	$(CC) $(CFLAGS) isa.c -o sisa16_sdl2_emu -lSDL2 -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
 	@echo "~~Built emulator."
 
 sisa16_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
 	$(CC) $(CASMFLAGS) assembler.c -o sisa16_sdl2_asm -lSDL2 -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
 sisa16_dbg:
-	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_NCURSES -DUSE_UNSIGNED_INT -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
 	$(CC) $(CASMFLAGS) debugger.c -o sisa16_sdl2_dbg -DUSE_UNSIGNED_INT -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
 	@echo "~~Built debugger."
 

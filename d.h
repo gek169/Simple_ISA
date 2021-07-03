@@ -5,7 +5,7 @@
 
 #ifdef USE_SDL2
 /*
-	SDL2 driver.
+	SDL2 driver, plus simple text mode.
 */
 #include "isa_pre.h"
 #define SDL_MAIN_HANDLED
@@ -107,12 +107,21 @@ static void dcl(){
 	}
 }
 #else
+
 /*
 	textmode driver.
 */
 #include "isa_pre.h"
+
+#ifdef USE_NCURSES
+#include <ncurses.h>
+static void di(){if(EMULATE_DEPTH==0)initscr(); return;}
+static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
+#else
 static void di(){return;}
 static void dcl(){return;}
+#endif
+
 #endif
 
 static unsigned short gch(){return (unsigned short)getchar();}
