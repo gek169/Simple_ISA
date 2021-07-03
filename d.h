@@ -94,12 +94,8 @@ static void di(){return;}
 static void dcl(){return;}
 #endif
 
-static unsigned short gch(){
-	return (unsigned short)getchar();
-}
-static void pch(unsigned short a){
-	putchar(a);
-}
+static unsigned short gch(){return (unsigned short)getchar();}
+static void pch(unsigned short a){putchar(a);fflush(stdout);}
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,
