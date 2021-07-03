@@ -91,20 +91,23 @@ section 0;
 	:L_make_tri_top:
 		//what sample are we on?
 		arx0;
-		
-		lb 8;
-		and;
-		lb3;
-		rsh;
-		llb %0x200%;
+		//do some computation.
+
+
+		//triangle wave.
+		lb1;rsh;
+		llb %0x4%;
+		mod;
+		lb 0xF0;
 		mul;
-		sc %0xB5%; 
-		brx0; 
-		faristla;
-		rxincr;
-		rxincr;
-		lrx1 %/0x10000%; 
-		rxcmp;
-		sc %L_make_tri_top%; jmpifneq;
+		//square wave.
+		//lb 8;
+		//and;
+		//lb3;
+		//rsh;
+		//llb %0x200%;
+		//mul;
+		sc %0xB5%;brx0;faristla;
+		rxincr;rxincr;lrx1 %/0x10000%; rxcmp;sc %L_make_tri_top%; jmpifneq;
 	la 3; interrupt;
 	la 1;lfarpc;
