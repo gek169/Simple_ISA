@@ -70,13 +70,14 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
 	rm -f $(INSTALL_DIR)/sisa16_emu
-	rm -f $(INSTALL_DIR)/sisa16_dbg
-	rm -f $(INSTALL_DIR)/sisa16_asm
+	rm -f $(INSTALL_DIR)/sisa16_sdl2_emu
+	rm -f $(INSTALL_DIR)/sisa16_sdl2_dbg
+	rm -f $(INSTALL_DIR)/sisa16_sdl2_asm
 	rm -f $(MAN_INSTALL_DIR)/sisa16_emu.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_dbg.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_asm.1
 	@echo "Uninstalled from INSTALL_DIR."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_stdin isa_constexpr rbytes
+	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes
 	clear
