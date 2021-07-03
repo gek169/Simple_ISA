@@ -793,11 +793,9 @@ G_AA12:{SUU SRX0, SRX1;
 	{
 		register SUU RX0I = RX0;
 		register SUU RX1I = RX1;
-		if(
-			RX0I<RX1I
-		)a=0;else if(
-			RX0I>RX1I
-		)a=2;else a=1;
+		if(RX0I<RX1I)		a=0;
+		else if(RX0I>RX1I)	a=2;
+		else 				a=1;
 	}D
 	/*add more insns here.*/
 	G_HALT:dcl();return 0;

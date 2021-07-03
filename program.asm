@@ -69,8 +69,6 @@ section 0
 	#we should see this when we return.
 	la 0x41
 	putchar;putchar;putchar;
-	//enable these two lines to dump the memory of the emulator after execution.
-	lla %0xFFff%;
 	//transfer code from the segment.
 	lrx0 %/2000%;seg_realloc;
 	lrx0 %/0x0%;
@@ -79,7 +77,7 @@ section 0
 	//transfer back from the segment.
 	lrx0 %/0xffff%;
 	seg_ld;
-	interrupt;
+	lla %0xFFff%;interrupt;
 	lrx0 %-20%;
 	lrx1 %/5%;
 	rxicmp
