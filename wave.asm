@@ -25,6 +25,9 @@ ASM_header libc.hasm
 section 0xB00000;
 fill 153600,0x2E
 
+//section 0xB50000;
+
+
 section 0x10000;
 asm_begin_region_restriction;
 la line_length;
@@ -45,7 +48,7 @@ nop;
 	:iter_is_endval:
 		la 0xd; putchar;
 		ld_iteration_count; 
-			aincr;
+			adecr;
 		st_iteration_count;
 		//If we are using the SDL driver, display the screen.
 		la 0; interrupt;
@@ -54,10 +57,10 @@ nop;
 		//poll for the quit event.
 		la 1; interrupt;
 		llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
+		la 3; interrupt;
 		la 2;interrupt;
 		lb0x10;cmp;
 		sc %asciifun_loopout%; jmpifeq;
-		
 		//are we using SDL?
 		:asciifun_back:
 		lb1;rx1b;rxcmp;sc %asciifun_looptop%;jmpifeq;
@@ -84,4 +87,24 @@ halt;
 asm_end_restriction;
 
 section 0;
+//fill a section of memory with something
+	:L_make_tri_top:
+		//what sample are we on?
+		arx0;
+		
+		lb 8;
+		and;
+		lb3;
+		rsh;
+		llb %0x200%;
+		mul;
+		sc %0xB5%; 
+		brx0; 
+		faristla;
+		rxincr;
+		rxincr;
+		lrx1 %/0x10000%; 
+		rxcmp;
+		sc %L_make_tri_top%; jmpifneq;
+	la 3; interrupt;
 	la 1;lfarpc;

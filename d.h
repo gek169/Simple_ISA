@@ -13,10 +13,12 @@
 #define SDL_DISABLE_IMMINTRIN_H 1
 #endif
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
 static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
+static SDL_AudioSpec sdl_spec;
+static unsigned short audio_pos = 0;
+static unsigned short audio_left = 0;
 static UU SDL_targ[640*480];
 static const UU arne_palette[16] = {
 		0x000000,
@@ -36,6 +38,16 @@ static const UU arne_palette[16] = {
 		0x31a2f2,
 		0xb2dcef
 };
+
+void sdl_audio_callback(void *udata, Uint8 *stream, int len){
+	SDL_memset(stream, 0, len);
+	if(audio_left == 0){return;}
+	len = (len < audio_left) ? len : audio_left;
+	SDL_MixAudio(stream, M + 0xB50000 + audio_pos, len, SDL_MIX_MAXVOLUME);
+	audio_pos += len;
+	audio_left -= len;
+}
+
 static void di(){
 	if(EMULATE_DEPTH==0){
 	    // Initialize SDL
@@ -45,12 +57,14 @@ static void di(){
 	               "SDL_Error: %s\n", SDL_GetError());
 	        exit(1);
 	    }
-	    if(Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 4096) == -1)
-	    {
-	        printf("SDL2_mixer could not be initialized!\n"
-	               "SDL_Error: %s\n", SDL_GetError());
-	        exit(1);
-	    }
+		sdl_spec.freq = 16000;//Sampling rate
+		sdl_spec.format = AUDIO_U16MSB; //Number of data bits
+		sdl_spec.channels = 1;//Number of channels
+		sdl_spec.silence = 0;
+		sdl_spec.samples = 2048;
+		sdl_spec.callback = sdl_audio_callback;
+		sdl_spec.userdata = NULL;
+
 		sdl_win = SDL_CreateWindow("[Sisa16 Emulation]",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
@@ -75,12 +89,19 @@ static void di(){
 				"SDL_Error: %s\n", SDL_GetError());
 			exit(1);
 		}
+		if ( SDL_OpenAudio(&sdl_spec, NULL) < 0 ){
+		  printf("\r\nSDL2 audio opening failed!\r\n"
+		  "SDL_Error: %s\r\n", SDL_GetError());
+		  exit(-1);
+		}
+		SDL_PauseAudio(0);
 	}
 }
 static void dcl(){
 	if(EMULATE_DEPTH==0){
 		SDL_DestroyTexture(sdl_tex);
 		SDL_DestroyRenderer(sdl_rend);
+		SDL_CloseAudio();
     	SDL_DestroyWindow(sdl_win);
 	    SDL_Quit();
 	}
@@ -171,6 +192,11 @@ static unsigned short interrupt(unsigned short a,
 		return retval;
 	}
 	/*TODO: play samples from a buffer.*/
+	if(a == 3){
+		audio_left = 0xffFF;
+		audio_pos = 0;
+		return 0;
+	}
 #endif
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
