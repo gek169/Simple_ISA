@@ -175,7 +175,6 @@ farret;
 		rx0pop;		rxincr;		rx0push;
 	sc %libc_gets_noecho_looptop%;jmp;
 	//We can actually share the same endings as gets, so we don't have anything here...
-halt;
 
 //WAIT~~~~~~~~~~~~
 
