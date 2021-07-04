@@ -9,9 +9,6 @@
 	proc_puts;
 	la 0xa; putchar; la 0xd; putchar;
 	proc_puts;
-	la 0xa; putchar; la 0xd; putchar;
-	proc_puts;
-	la 0xa; putchar; la 0xd; putchar;
 	halt;
 
 ..(0):
