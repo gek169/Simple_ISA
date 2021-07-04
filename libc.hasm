@@ -132,10 +132,7 @@ farret;
 	lrx2 %/0%;
 	:libc_gets_looptop:
 		getchar; //Hey, user, give me some data!
-		//First, is it zero?
 		apush;
-		lb 0;cmp;bpop;sc%libc_gets_onlypop_end%;jmpifeq;
-		ab;bpush;
 		lb 32;cmp;lb0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
@@ -146,16 +143,12 @@ farret;
 		putchar;
 		rx0pop;		rxincr;		rx0push;
 		sc %libc_gets_looptop%;jmp;
-	//ending 1: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
+	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
 		rx0pop; 
 		cbrx0; 
 		la 0; 
 		farista; 
-		farret;
-	//ending 2: the last character was null
-	:libc_gets_onlypop_end:
-		rx0pop;
 		farret;
 
 
@@ -175,10 +168,7 @@ farret;
 		rx0pop;		push %4%;	cbrx0;
 		getchar; //Hey, user, give me some data!
 		farista;
-		//begin the process of checking values. 0, <30, and >126.
 		apush;
-		lb 0;cmp;bpop;sc%libc_gets_onlypop_end%;jmpifeq;
-		ab;bpush;
 		lb 32;cmp;lb0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
