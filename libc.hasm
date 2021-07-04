@@ -121,11 +121,14 @@ farret;
 
 //GETS
 //Clobbers: A, B, C, RX0
+//Designed for interactive mode
 ..decl_farproc:proc_gets
 	//fetch far pointer.
 	astp;lb6;sub;ca;
 	ilda;ca;
 	astp;lb5;sub;illdaa;//get the short!
+	rx2push
+	lrx2 %/0%;
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
@@ -139,17 +142,68 @@ farret;
 		ab;bpush;
 		lb 0xa;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
+
+
+		//ascii del chars.
+		lb 0x7f;cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
+		ab;bpush;
+		lb 8;cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
+		
+
+
+		//greater than 126?
+		ab;bpush;
 		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+
+		//If This is what we do if its not a delete character.
 		ab;
-		//write it out!
 		rx0pop;		push %4%;	cbrx0;		farista;
-		//echo the character out so the user can see it.
-		putchar;
+		rx0_2;		rxincr;		rx2_0;
 		rx0pop;		rxincr;		rx0push;
+
+		//store a space and a zero at the end of the string.
+		cbrx0;		la 0;	farista;
+		rx1_2;		rxsub;	
+		la 0xd; putchar;
+		cbrx0;
+		ac;
+		apush;blpush;
+			proc_puts;
+		pop %3%;
+		la 0xd; putchar;
+		sc %libc_gets_looptop%;jmp;
+
+
+		
+	//Delete character received but there were zero characters in the string.
+	:libc_gets_zero_chars:
+		sc %libc_gets_looptop%;jmp;
+	//Handle ascii DEL and Backspace.
+	:libc_gets_handle_del:
+		rx0_2; 		lrx1 %/0%; 	rxcmp; sc %libc_gets_zero_chars%; jmpifeq;
+		rx0_2;		rxdecr;		rx2_0;
+		rx0pop;		rxdecr;		rx0push;
+		la 0xd; putchar;
+		//store a space and a zero at the end of the string.
+		cbrx0;		la 32;	farista;
+		rxincr;		cbrx0;		la 0;	farista;
+		rxdecr;
+		rx1_2;		rxsub;	
+		la 0xd; putchar;
+		cbrx0;
+		ac;
+		apush;blpush;
+			proc_puts;
+		pop %3%;
+		la 32; putchar;
+		la 32; putchar;
+		la 32; putchar;
+		la 0xd; putchar;
 		sc %libc_gets_looptop%;jmp;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
 		rx0pop; 
+		rx2pop;
 		cbrx0; 
 		la 0; 
 		farista; 
@@ -164,10 +218,11 @@ farret;
 	astp;lb6;sub;ca;
 	ilda;ca;
 	astp;lb5;sub;illdaa;//get the short!
+	//compatibility with gets.
+	rx2push
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
-	lrx2 %/0%;
 	:libc_gets_noecho_looptop:
 		rx0pop;		push %4%;	cbrx0;
 		getchar; //Hey, user, give me some data!
