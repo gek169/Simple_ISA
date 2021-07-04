@@ -106,17 +106,17 @@ farret;
 		lb0;cmp;	sc%libc_strlen_loopend%;jmpifeq;
 		rx0pop;		rxincr;		rx0push;
 		rx0_2;		rxincr;		rx2_0;
-	sc %libc_strlen_looptop%;jmp;
+		sc %libc_strlen_looptop%;jmp;
 	:libc_strlen_loopend:
-	blpop;blpop;
-	rx0_2;		//move RX2 to RX0 so we can keep it.
-	rx2pop;		//restore RX2.
-	astp;lb5;sub;ca;
-	//get the low 16 bits.
-	arx0; istla;
-	rx1push; lrx1 %/16%; rxrsh;rx1pop;
-	astp;lb6;sub;ca;
-	arx0; ista;
+		pop %4%;
+		rx0_2;		//move RX2 to RX0 so we can keep it.
+		rx2pop;		//restore RX2.
+		astp;lb5;sub;ca;
+		//get the low 16 bits.
+		arx0; istla;
+		rx1push; lrx1 %/16%; rxrsh;rx1pop;
+		astp;lb6;sub;ca;
+		arx0; ista;
 farret;
 
 //GETS
@@ -133,7 +133,11 @@ farret;
 	:libc_gets_looptop:
 		getchar; //Hey, user, give me some data!
 		apush;
-		lb 32;cmp;lb0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb 0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		ab;bpush;
+		lb 0xd;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		ab;bpush;
+		lb 0xa;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;
@@ -169,9 +173,13 @@ farret;
 		getchar; //Hey, user, give me some data!
 		farista;
 		apush;
-		lb 32;cmp;lb0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb 0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
-		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb 0xd;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		ab;bpush;
+		lb 0xa;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		ab;
+		lb 126;cmp;lb2;cmp;sc%libc_gets_loopend%;jmpifeq;
 		rx0pop;		rxincr;		rx0push;
 	sc %libc_gets_noecho_looptop%;jmp;
 	//We can actually share the same endings as gets, so we don't have anything here...
