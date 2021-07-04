@@ -122,6 +122,9 @@ farret;
 //GETS
 //Clobbers: A, B, C, RX0
 //Designed for interactive mode
+//Limit of 0xffFE characters.
+.libc_gets_max_chars:0xffFE
+
 ..decl_farproc:proc_gets
 	//fetch far pointer.
 	astp;lb6;sub;ca;
@@ -134,6 +137,16 @@ farret;
 	lb0;bpush;bc;bpush;alpush;
 	lrx2 %/0%;
 	:libc_gets_looptop:
+		rx0_2
+		rx1push
+		lrx1 %/libc_gets_max_chars%
+		rxcmp
+		rx1pop
+		lb 0;
+		cmp;
+		sc %libc_gets_loopend%
+		jmpifneq
+		
 		getchar; //Hey, user, give me some data!
 		apush;
 		lb 0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
@@ -219,6 +232,16 @@ farret;
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
 	:libc_gets_noecho_looptop:
+		rx0_2
+		rx1push
+		lrx1 %/libc_gets_max_chars%
+		rxcmp
+		rx1pop
+		lb 0;
+		cmp;
+		sc %libc_gets_loopend%
+		jmpifneq
+		
 		rx0pop;		push %4%;	cbrx0;
 		getchar; //Hey, user, give me some data!
 		farista;
@@ -231,6 +254,7 @@ farret;
 		ab;
 		lb 126;cmp;lb2;cmp;sc%libc_gets_loopend%;jmpifeq;
 		rx0pop;		rxincr;		rx0push;
+		rx0_2;		rxincr;		rx2_0;
 	sc %libc_gets_noecho_looptop%;jmp;
 	//We can actually share the same endings as gets, so we don't have anything here...
 
