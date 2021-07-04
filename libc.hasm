@@ -77,7 +77,7 @@ farret;
 		//else, print and increment
 		ab
 		putchar
-		rx0pop;rxincr;rx0push;
+		rx0pop;		rxincr;		rx0push;
 	sc %puts_looptop%;jmp;
 	:puts_loopend:
 	blpop;blpop;
