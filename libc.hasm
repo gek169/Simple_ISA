@@ -10,46 +10,48 @@ section 0x20000;asm_begin_region_restriction;
 	apush;
 	lb 4;rsh;
 	lb0xf;and;
-	lb 7;mul;
+	lb 6;mul;
 llb %printbytehex_jmptable_1%; add;ca;jmp;
 :printbytehex_jmptable_1:
-	la0x30;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x31;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x32;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x33;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x34;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x35;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x36;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x37;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x38;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x39;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x41;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x42;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x43;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x44;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x45;putchar;sc%printbytehex_jmptable_1_end%;jmp
-	la0x46;putchar;sc%printbytehex_jmptable_1_end%;jmp
+	la0x30;sc%printbytehex_jmptable_1_end%;jmp
+	la0x31;sc%printbytehex_jmptable_1_end%;jmp
+	la0x32;sc%printbytehex_jmptable_1_end%;jmp
+	la0x33;sc%printbytehex_jmptable_1_end%;jmp
+	la0x34;sc%printbytehex_jmptable_1_end%;jmp
+	la0x35;sc%printbytehex_jmptable_1_end%;jmp
+	la0x36;sc%printbytehex_jmptable_1_end%;jmp
+	la0x37;sc%printbytehex_jmptable_1_end%;jmp
+	la0x38;sc%printbytehex_jmptable_1_end%;jmp
+	la0x39;sc%printbytehex_jmptable_1_end%;jmp
+	la0x41;sc%printbytehex_jmptable_1_end%;jmp
+	la0x42;sc%printbytehex_jmptable_1_end%;jmp
+	la0x43;sc%printbytehex_jmptable_1_end%;jmp
+	la0x44;sc%printbytehex_jmptable_1_end%;jmp
+	la0x45;sc%printbytehex_jmptable_1_end%;jmp
+	la0x46;sc%printbytehex_jmptable_1_end%;jmp
 :printbytehex_jmptable_1_end:
-apop;lb 15;and;lb7;mul;
+putchar
+apop;lb 15;and;lb6;mul;
 llb%printbytehex_jmptable_2%;add;ca;jmp;
 :printbytehex_jmptable_2:
-	la0x30;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x31;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x32;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x33;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x34;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x35;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x36;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x37;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x38;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x39;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x41;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x42;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x43;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x44;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x45;putchar;sc%printbytehex_jmptable_2_end%;jmp
-	la0x46;putchar;sc%printbytehex_jmptable_2_end%;jmp
+	la0x30;sc%printbytehex_jmptable_2_end%;jmp
+	la0x31;sc%printbytehex_jmptable_2_end%;jmp
+	la0x32;sc%printbytehex_jmptable_2_end%;jmp
+	la0x33;sc%printbytehex_jmptable_2_end%;jmp
+	la0x34;sc%printbytehex_jmptable_2_end%;jmp
+	la0x35;sc%printbytehex_jmptable_2_end%;jmp
+	la0x36;sc%printbytehex_jmptable_2_end%;jmp
+	la0x37;sc%printbytehex_jmptable_2_end%;jmp
+	la0x38;sc%printbytehex_jmptable_2_end%;jmp
+	la0x39;sc%printbytehex_jmptable_2_end%;jmp
+	la0x41;sc%printbytehex_jmptable_2_end%;jmp
+	la0x42;sc%printbytehex_jmptable_2_end%;jmp
+	la0x43;sc%printbytehex_jmptable_2_end%;jmp
+	la0x44;sc%printbytehex_jmptable_2_end%;jmp
+	la0x45;sc%printbytehex_jmptable_2_end%;jmp
+	la0x46;sc%printbytehex_jmptable_2_end%;jmp
 :printbytehex_jmptable_2_end:
+putchar;
 farret;
 
 
