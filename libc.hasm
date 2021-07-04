@@ -1,9 +1,12 @@
-
+//	SISA16 "LIBC" STANDARD LIBRARY
+// Intended to fit in a single region.
+// (C) David M.H.S. Webster 2021
+// Written for the Public Domain.
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~Let all that you do be done with love~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 section 0x20000;asm_begin_region_restriction;
-
-//.proc_printbytehex:sc 0,0;la 2;farcall; 
-
 ..decl_farproc:proc_printbytehex
 //retrieve our argument.
 	astp;lb4;sub;ca;ilda;
@@ -119,7 +122,55 @@ farret;
 		arx0; ista;
 farret;
 
-//GETS
+//MEMCPY~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: A,B,C, RX0, RX1, RX2
+//RETURNS: Nothing.
+//ARGS:
+//src: RX1
+//dest: RX0
+//bytes: RX2
+
+.libc_ld_mcpy_src:farldrx0 %&@%;
+.libc_st_mcpy_src:farstrx0 %&@%;
+.libc_st_mcpy_src_rx1:farstrx1 %&@%;
+halt;
+halt;
+halt;
+halt;
+
+.libc_ld_mcpy_dst:farldrx0 %&@%;
+.libc_st_mcpy_dst:farstrx0 %&@%;
+halt;
+halt;
+halt;
+halt;
+
+..decl_farproc:proc_memcpy
+	libc_st_mcpy_dst;
+	libc_st_mcpy_src_rx1;
+	:libc_mcpy_looptop:
+		//Quit? if not, decrement.
+		rx0_2; lrx1 %/0%; rxcmp; sc %libc_mcpy_loopend%; jmpifeq;
+		rxdecr; rx2_0;
+		
+		//load a single byte.
+		libc_ld_mcpy_src;
+		cbrx0;
+		farilda;
+		rxincr;
+		libc_st_mcpy_src;
+
+		libc_ld_mcpy_dst;
+		cbrx0;
+		farista;
+		rxincr;
+		libc_st_mcpy_dst;
+
+		sc %libc_mcpy_looptop%; jmp;
+	:libc_mcpy_loopend:
+	farret;
+
+//GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0
 //Designed for interactive mode
 //Limit of 0xffFE characters.

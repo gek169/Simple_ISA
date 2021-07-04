@@ -260,8 +260,8 @@ G_PUTCHAR:{
 	pch(a);
 	UNSTASH_REGS;
 }D
-G_LSHIFT:a<<=b&15;D
-G_RSHIFT:a>>=b&15;D
+G_LSHIFT:a<<=b;D
+G_RSHIFT:a>>=b;D
 G_ILDA:a=r(c)D
 G_ILDB:b=r(c)D
 G_CAB:c=((a&255)<<8)+(b&255)D
@@ -461,8 +461,8 @@ Y8:RX0=(RX0-RX1)&0xffFFffFF;D
 Y9:RX0=(RX0*RX1)&0xffFFffFF;D
 YA:if(RX1!=0)RX0=(RX0/RX1)&0xffFFffFF;else{R=3;goto G_HALT;}D
 YB:if(RX1!=0)RX0=(RX0%RX1)&0xffFFffFF;else{R=4;goto G_HALT;}D
-YC:RX0=(RX0>>(RX1&31))&0xffFFffFF;D
-YD:RX0=(RX0<<(RX1&31))&0xffFFffFF;D
+YC:RX0=(RX0>>(RX1))&0xffFFffFF;D
+YD:RX0=(RX0<<(RX1))&0xffFFffFF;D
 /*pushes*/
 YE:write_4bytes(RX0, stack_pointer);stack_pointer+=4;D
 YF:write_4bytes(RX1, stack_pointer);stack_pointer+=4;D
