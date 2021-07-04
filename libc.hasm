@@ -1,7 +1,9 @@
 
 
 section 0x20000;asm_begin_region_restriction;
+
 //.proc_printbytehex:sc 0,0;la 2;farcall; 
+
 ..decl_farproc:proc_printbytehex
 //retrieve our argument.
 	astp;lb4;sub;ca;ilda;
@@ -10,46 +12,46 @@ section 0x20000;asm_begin_region_restriction;
 	lb 4;rsh;
 	lb0xf;and;
 	lb 6;mul;
-llb %printbytehex_jmptable_1%; add;ca;jmp;
-:printbytehex_jmptable_1:
-	la0x30;sc%printbytehex_jmptable_1_end%;jmp
-	la0x31;sc%printbytehex_jmptable_1_end%;jmp
-	la0x32;sc%printbytehex_jmptable_1_end%;jmp
-	la0x33;sc%printbytehex_jmptable_1_end%;jmp
-	la0x34;sc%printbytehex_jmptable_1_end%;jmp
-	la0x35;sc%printbytehex_jmptable_1_end%;jmp
-	la0x36;sc%printbytehex_jmptable_1_end%;jmp
-	la0x37;sc%printbytehex_jmptable_1_end%;jmp
-	la0x38;sc%printbytehex_jmptable_1_end%;jmp
-	la0x39;sc%printbytehex_jmptable_1_end%;jmp
-	la0x41;sc%printbytehex_jmptable_1_end%;jmp
-	la0x42;sc%printbytehex_jmptable_1_end%;jmp
-	la0x43;sc%printbytehex_jmptable_1_end%;jmp
-	la0x44;sc%printbytehex_jmptable_1_end%;jmp
-	la0x45;sc%printbytehex_jmptable_1_end%;jmp
-	la0x46;sc%printbytehex_jmptable_1_end%;jmp
-:printbytehex_jmptable_1_end:
+llb %libc_printbytehex_jmptable_1%; add;ca;jmp;
+:libc_printbytehex_jmptable_1:
+	la0x30;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x31;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x32;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x33;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x34;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x35;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x36;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x37;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x38;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x39;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x41;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x42;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x43;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x44;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x45;sc%libc_printbytehex_jmptable_1_end%;jmp
+	la0x46;sc%libc_printbytehex_jmptable_1_end%;jmp
+:libc_printbytehex_jmptable_1_end:
 putchar
 apop;lb 15;and;lb6;mul;
-llb%printbytehex_jmptable_2%;add;ca;jmp;
-:printbytehex_jmptable_2:
-	la0x30;sc%printbytehex_jmptable_2_end%;jmp
-	la0x31;sc%printbytehex_jmptable_2_end%;jmp
-	la0x32;sc%printbytehex_jmptable_2_end%;jmp
-	la0x33;sc%printbytehex_jmptable_2_end%;jmp
-	la0x34;sc%printbytehex_jmptable_2_end%;jmp
-	la0x35;sc%printbytehex_jmptable_2_end%;jmp
-	la0x36;sc%printbytehex_jmptable_2_end%;jmp
-	la0x37;sc%printbytehex_jmptable_2_end%;jmp
-	la0x38;sc%printbytehex_jmptable_2_end%;jmp
-	la0x39;sc%printbytehex_jmptable_2_end%;jmp
-	la0x41;sc%printbytehex_jmptable_2_end%;jmp
-	la0x42;sc%printbytehex_jmptable_2_end%;jmp
-	la0x43;sc%printbytehex_jmptable_2_end%;jmp
-	la0x44;sc%printbytehex_jmptable_2_end%;jmp
-	la0x45;sc%printbytehex_jmptable_2_end%;jmp
-	la0x46;sc%printbytehex_jmptable_2_end%;jmp
-:printbytehex_jmptable_2_end:
+llb%libc_printbytehex_jmptable_2%;add;ca;jmp;
+:libc_printbytehex_jmptable_2:
+	la0x30;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x31;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x32;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x33;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x34;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x35;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x36;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x37;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x38;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x39;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x41;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x42;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x43;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x44;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x45;sc%libc_printbytehex_jmptable_2_end%;jmp
+	la0x46;sc%libc_printbytehex_jmptable_2_end%;jmp
+:libc_printbytehex_jmptable_2_end:
 putchar;
 farret;
 
@@ -65,7 +67,7 @@ farret;
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
-	:puts_looptop:
+	:libc_puts_looptop:
 		//setup far pointer.
 		rx0pop;		push %4%;	cbrx0;
 		//load through far pointer and print
@@ -73,15 +75,16 @@ farret;
 		apush;
 		//if the character was zero, jump to the end of the loop
 		//also make sure to pop the character from the stack, so we can print it later.
-		lb0;cmp;bpop;sc%puts_loopend%;jmpifeq;
+		lb0;cmp;bpop;sc%libc_puts_loopend%;jmpifeq;
 		//else, print and increment
 		ab
 		putchar
 		rx0pop;		rxincr;		rx0push;
-	sc %puts_looptop%;jmp;
-	:puts_loopend:
+	sc %libc_puts_looptop%;jmp;
+	:libc_puts_loopend:
 	blpop;blpop;
 farret;
+
 
 //STRLEN~~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0
@@ -96,14 +99,14 @@ farret;
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
 	lrx2 %/0%;
-	:strlen_looptop:
+	:libc_strlen_looptop:
 		rx0pop;		push %4%;	cbrx0;
 		farilda;
-		lb0;cmp;	sc%strlen_loopend%;jmpifeq;
+		lb0;cmp;	sc%libc_strlen_loopend%;jmpifeq;
 		rx0pop;		rxincr;		rx0push;
 		rx0_2;		rxincr;		rx2_0;
-	sc %strlen_looptop%;jmp;
-	:strlen_loopend:
+	sc %libc_strlen_looptop%;jmp;
+	:libc_strlen_loopend:
 	blpop;blpop;
 	rx0_2;		//move RX2 to RX0 so we can keep it.
 	rx2pop;		//restore RX2.
