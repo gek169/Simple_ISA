@@ -23,6 +23,8 @@ bytes 0xd, 0xa;
 ..asciz: Iterations:
 :STP_STRING:
 ..asciz: Stack Pointer:
+:LENGTH_OF_STRING_STRING:
+..asciz: length of this string:
 
 //main routine.
 
@@ -76,8 +78,16 @@ bytes 0xd, 0xa;
 		
 	//print the stack pointer.
 		la 0xAF;apush;lla %STP_STRING%;alpush;
-		proc_puts;pop %3%;
+		proc_puts;
+		pop %3%;
 		astp;apush;proc_printbytehex;apop;
+	//print the length of string string.
+	//print the length of that very same string.
+		la 0xAF;apush;lla %LENGTH_OF_STRING_STRING%;alpush;
+		proc_puts;
+		proc_strlen;
+		proc_printbytehex;
+		pop %3%;
 		sc %main_looptop%;jmp;
 :main_loopout:
 la 0xd;putchar;

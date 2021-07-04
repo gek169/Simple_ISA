@@ -84,6 +84,7 @@ farret;
 farret;
 
 //STRLEN~~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: A, B, C, RX0
 ..decl_farproc:proc_strlen
 	//fetch far pointer.
 	astp;lb6;sub;ca;
@@ -104,8 +105,8 @@ farret;
 	sc %strlen_looptop%;jmp;
 	:strlen_loopend:
 	blpop;blpop;
+	rx0_2;		//move RX2 to RX0 so we can keep it.
 	rx2pop;		//restore RX2.
-	rx0_2
 	astp;lb5;sub;ca;
 	//get the low 16 bits.
 	arx0; istla;
