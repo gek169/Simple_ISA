@@ -18,9 +18,9 @@ bytes 0,0,0,5;
 ASM_header libc.hasm
 
 
-.line_length:			79
-.line_length_plus_1:	80
-.wait_time:				20
+.line_length:			90
+.line_length_plus_1:	91
+.wait_time:				16
 
 section 0xB00000;
 fill 153600,0x2E
