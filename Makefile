@@ -64,7 +64,8 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./sisa16_sdl2_emu $(INSTALL_DIR)/ || cp ./sisa16_sdl2_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_emu"
 	@cp ./sisa16_sdl2_asm $(INSTALL_DIR)/ || cp ./sisa16_sdl2_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_asm"
 	@cp ./sisa16_sdl2_dbg $(INSTALL_DIR)/ || cp ./sisa16_sdl2_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_dbg"
-	@echo "Attempting manpage install."
+	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
+	@cp ./libc.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 uninstall:
@@ -76,7 +77,8 @@ uninstall:
 	rm -f $(MAN_INSTALL_DIR)/sisa16_emu.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_dbg.1
 	rm -f $(MAN_INSTALL_DIR)/sisa16_asm.1
-	@echo "Uninstalled from INSTALL_DIR."
+	@echo "Uninstalled."
+	@echo "Note that if you have libraries under /usr/include/sisa16/, they were *not* removed."
 
 clean:
 	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes

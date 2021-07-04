@@ -616,8 +616,8 @@ int main(int argc, char** argv){
 		}
 		if(strprefix("ASM_header ", line)){
 			FILE* tmp; char* metaproc;
-			char* env_sisa16bin = getenv("SISA16BIN");
-			char* env_home = getenv("HOME");
+			char* env_sisa16bin = NULL;
+			char* env_home = NULL;
 			metaproc = line + strlen("ASM_header ");
 			if(include_level >= ASM_MAX_INCLUDE_LEVEL){
 				printf(compil_fail_pref);
