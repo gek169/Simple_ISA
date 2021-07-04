@@ -133,6 +133,7 @@ int e()
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
 	UU RX0=0,RX1=0,RX2=0,RX3=0;
+	EMULATE_DEPTH=0;
 #else
 	register u program_counter_region=0;
 	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
@@ -719,7 +720,7 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		M_SAVED = malloc((((UU)1)<<24));
+		M_SAVED = malloc(0x1000000);
 		SEG_SAVED = SEGMENT;
 		SEG_PAGES_SAVED = SEGMENT_PAGES;
 		SEGMENT = malloc(0x100);
@@ -731,7 +732,7 @@ G_AA12:{SUU SRX0, SRX1;
 			SEGMENT_PAGES = SEG_PAGES_SAVED;
 			R=12; goto G_HALT;
 		}
-		memcpy(M_SAVED, M, (((UU)1)<<24));
+		memcpy(M_SAVED, M, 0x1000000);
 		EMULATE_DEPTH++;
 			e();
 			a_stash=R;
@@ -741,7 +742,7 @@ G_AA12:{SUU SRX0, SRX1;
 		SEGMENT = SEG_SAVED;
 		SEGMENT_PAGES = SEG_PAGES_SAVED;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-		memcpy(M, M_SAVED, (((UU)1)<<24));
+		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 		UNSTASH_REGS;
@@ -776,18 +777,18 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		M_SAVED = malloc((((UU)1)<<24));
+		M_SAVED = malloc(0x1000000);
 		if(!M_SAVED){
 			R=12; goto G_HALT;
 		}
-		memcpy(M_SAVED, M, (((UU)1)<<24));
+		memcpy(M_SAVED, M, 0x1000000);
 		EMULATE_DEPTH++;
 			e();
 			a_stash=R;
 			R=0;
 		EMULATE_DEPTH--;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-		memcpy(M, M_SAVED, (((UU)1)<<24));
+		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
 		free(M_SAVED);
 		UNSTASH_REGS;
