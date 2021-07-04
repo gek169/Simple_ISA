@@ -56,7 +56,8 @@ putchar;
 farret;
 
 
-
+//PUTS~~~~~~~~~~~~~~~
+//CLOBBERS: A, B, C, RX0
 ..decl_farproc:proc_puts
 	//fetch the high byte of a three byte pointer.
 	astp;lb6;sub;ca;
@@ -120,7 +121,6 @@ farret;
 
 //GETS
 //Clobbers: A, B, C, RX0
-//Does not write the 
 ..decl_farproc:proc_gets
 	//fetch far pointer.
 	astp;lb6;sub;ca;
@@ -147,25 +147,23 @@ farret;
 		//echo the character out so the user can see it.
 		putchar;
 		rx0pop;		rxincr;		rx0push;
-	sc %libc_gets_looptop%;jmp;
+		sc %libc_gets_looptop%;jmp;
 	//ending 1: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
-	
 		rx0pop; 
 		cbrx0; 
 		la 0; 
 		farista; 
 		farret;
-	//ending 2: the last character was a zero.
+	//ending 2: the last character was null
 	:libc_gets_onlypop_end:
 		rx0pop;
-farret;
+		farret;
 
 
 
 //GETS_NOECHO
 //Clobbers: A, B, C, RX0
-//Does not write the 
 ..decl_farproc:proc_gets_noecho
 	//fetch far pointer.
 	astp;lb6;sub;ca;
@@ -179,24 +177,23 @@ farret;
 		rx0pop;		push %4%;	cbrx0;
 		getchar; //Hey, user, give me some data!
 		farista;
-		//begin the process of checking 
+		//begin the process of checking values. 0, <30, and >126.
 		apush;
 		lb 0;cmp;bpop;sc%libc_gets_noecho_onlypop_end%;jmpifeq;
 		ab;bpush;
-		//less than 32? (the first ascii printable)
 		lb 32;cmp;lb0;cmp;bpop;sc%libc_gets_noecho_loopend%;jmpifeq;
 		ab;bpush;
-		//greater than 126? (the last ascii printable)
 		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_noecho_loopend%;jmpifeq;
-		//don't echo the character out so the user can see it.
-		//putchar;
 		rx0pop;		rxincr;		rx0push;
 	sc %libc_gets_noecho_looptop%;jmp;
 	//ending 1: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_noecho_loopend:
-	
-		rx0pop; cbrx0; la 0; farista; farret;
-	//ending 2: the last character was a zero.
+		rx0pop; 
+		cbrx0; 
+		la 0; 
+		farista; 
+		farret;
+	//ending 2: the last character was null.
 	:libc_gets_noecho_onlypop_end:
 		rx0pop;
 farret;
