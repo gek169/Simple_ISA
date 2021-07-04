@@ -171,11 +171,6 @@ farret;
 			proc_puts;
 		pop %3%;
 		la 0xd; putchar;
-		sc %libc_gets_looptop%;jmp;
-
-
-		
-	//Delete character received but there were zero characters in the string.
 	:libc_gets_zero_chars:
 		sc %libc_gets_looptop%;jmp;
 	//Handle ascii DEL and Backspace.
