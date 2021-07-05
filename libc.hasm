@@ -140,7 +140,7 @@ farret;
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
 	rx1_0;
-	lrx2 %/0%;
+	lb0;rx2b;
 	:libc_strlen_looptop:
 		rx0_1;	cbrx0;
 		farilda;
@@ -213,7 +213,7 @@ farret;
 	lrx2 %/0%;
 	:libc_gets_looptop:
 		rx0_2
-		lrx1 %/libc_gets_max_chars%
+		llb %libc_gets_max_chars%; rx1b
 		rxcmp
 		lb 0;
 		cmp;
@@ -261,7 +261,7 @@ farret;
 		sc %libc_gets_looptop%;jmp;
 	//Handle ascii DEL and Backspace.
 	:libc_gets_handle_del:
-		rx0_2; 		lrx1 %/0%; 	rxcmp; sc %libc_gets_zero_chars%; jmpifeq;
+		rx0_2; 		lb0;rx1b;	rxcmp;	sc %libc_gets_zero_chars%; jmpifeq;
 		rx0_2;		rxdecr;		rx2_0;
 		rx0_3;		rxdecr;		rx3_0;
 		la 0xd; putchar;
@@ -302,10 +302,10 @@ farret;
 	rx1b; rxadd;
 	//It's in RX0.
 	rx3_0;
-	lrx2 %/0%;
+	lb0;rx2b;
 	:libc_gets_noecho_looptop:
 		rx0_2
-		lrx1 %/libc_gets_max_chars%
+		llb %libc_gets_max_chars%; rx1b;
 		rxcmp
 		lb 0;
 		cmp;
