@@ -211,7 +211,7 @@ farret;
 	rx1b; rxadd;
 	//It's in RX0.
 	rx3_0;
-	lrx2 %/0%;
+	lb0;rx2b;
 	:libc_gets_looptop:
 		rx0_2
 		llb %libc_gets_max_chars%; rx1b
