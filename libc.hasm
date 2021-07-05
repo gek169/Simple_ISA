@@ -60,119 +60,98 @@ farret;
 
 
 //PUTS~~~~~~~~~~~~~~~
-//CLOBBERS: A, B, C, RX0
+//CLOBBERS: A, B, C, RX0, RX1
 ..decl_farproc:proc_puts
-	//fetch the high byte of a three byte pointer.
-	astp;lb6;sub;ca;
-	ilda;ca;
-	//load the thing thats there. But we also loaded the high byte of the
-	//next short, so we need to get rid of that. Goes in C
-	astp;lb5;sub;illdaa;//we need to grab that short.
-	//we now have our far pointer! put it on the top of the stack for easy access.
-	//we actually push 4 bytes, so we can rx0pop.
-	lb0;bpush;bc;bpush;alpush;
+	//Grab the far pointer.
+	astp; lb 6; sub; ca; ildb;
+	rx0b; lrx1 %/16%; rxlsh;
+	aincr; ca; illdb; 
+	rx1b; rxadd;
 	:libc_puts_looptop:
-		//setup far pointer.
-		rx0pop;		push %4%;	cbrx0;
-		//load through far pointer and print
+		cbrx0;
 		farilda;
 		apush;
-		//if the character was zero, jump to the end of the loop
-		//also make sure to pop the character from the stack, so we can print it later.
 		lb0;cmp;bpop;sc%libc_puts_loopend%;jmpifeq;
-		//else, print and increment
 		ab
 		putchar
-		rx0pop;		rxincr;		rx0push;
+		rxincr;
 	sc %libc_puts_looptop%;jmp;
 	:libc_puts_loopend:
-	blpop;blpop;
 farret;
 
 
 //STRLEN~~~~~~~~~~~~~~~~~~~~~~
-//Clobbers: A, B, C, RX0
+//Clobbers: A, B, C, RX0, RX1, RX2
 ..decl_farproc:proc_strlen
-	//fetch far pointer.
-	astp;lb6;sub;ca;
-	ilda;ca;
-	astp;lb5;sub;illdaa;//get the short!
-	//stash away RX2
-	rx2push;
+	//Grab the far pointer.
+	astp; lb 6; sub; ca; ildb;
+	rx0b; lrx1 %/16%; rxlsh;
+	aincr; ca; illdb; 
+	rx1b; rxadd;
+	//It's in RX0.
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
-	lb0;bpush;bc;bpush;alpush;
+	rx1_0;
 	lrx2 %/0%;
 	:libc_strlen_looptop:
-		rx0pop;		push %4%;	cbrx0;
+		rx0_1;	cbrx0;
 		farilda;
-		lb0;cmp;	sc%libc_strlen_loopend%;jmpifeq;
-		rx0pop;		rxincr;		rx0push;
+		lb0;		cmp;	sc%libc_strlen_loopend%;	jmpifeq;
+		rxincr;		rx1_0;
 		rx0_2;		rxincr;		rx2_0;
 		sc %libc_strlen_looptop%;jmp;
 	:libc_strlen_loopend:
-		pop %4%;
-		rx0_2;		//move RX2 to RX0 so we can keep it.
-		rx2pop;		//restore RX2.
+		rx0_2;								//move RX2 to RX0 so we can keep it.
 		astp;lb5;sub;ca;
-		//get the low 16 bits.
-		arx0; istla;
-		rx1push; lrx1 %/16%; rxrsh;rx1pop;
+		arx0; istla							//get the low 16 bits.
+		lrx1 %/16%
+		rxrsh
 		astp;lb6;sub;ca;
 		arx0; ista;
 farret;
 
 //MEMCPY~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Clobbers: A,B,C, RX0, RX1, RX2
+//Clobbers: A,B,C, RX0, RX1, RX2, RX3.
 //RETURNS: Nothing.
 //ARGS:
 //src: RX1
 //dest: RX0
 //bytes: RX2
-
-.libc_ld_mcpy_src:farldrx0 %&@%;
-.libc_st_mcpy_src:farstrx0 %&@%;
-.libc_st_mcpy_src_rx1:farstrx1 %&@%;
-halt;
-halt;
-halt;
-halt;
-
-.libc_ld_mcpy_dst:farldrx0 %&@%;
-.libc_st_mcpy_dst:farstrx0 %&@%;
-halt;
-halt;
-halt;
-halt;
+.libc_mcpy_src:@
+halt;halt;
+halt;halt;
 
 ..decl_farproc:proc_memcpy
-	libc_st_mcpy_dst;
-	libc_st_mcpy_src_rx1;
+	rx3_0;
+	farstrx1 %&libc_mcpy_src%;
+	lrx1 %/0%;
 	:libc_mcpy_looptop:
 		//Quit? if not, decrement.
-		rx0_2; lrx1 %/0%; rxcmp; sc %libc_mcpy_loopend%; jmpifeq;
-		rxdecr; rx2_0;
+		rx0_2 
+		rxcmp
+		sc %libc_mcpy_loopend%; jmpifeq;
+		rxdecr
+		rx2_0
 		
 		//load a single byte.
-		libc_ld_mcpy_src;
-		cbrx0;
-		farilda;
-		rxincr;
-		libc_st_mcpy_src;
-
-		libc_ld_mcpy_dst;
-		cbrx0;
-		farista;
-		rxincr;
-		libc_st_mcpy_dst;
-
+		farldrx0 %&   libc_mcpy_src%
+		cbrx0
+		farilda
+		rxincr
+		farstrx0 %&   libc_mcpy_src%
+		//store that single byte.
+		rx0_3
+			cbrx0
+			farista
+			rxincr
+		rx3_0
 		sc %libc_mcpy_looptop%; jmp;
 	:libc_mcpy_loopend:
 	farret;
 
 //GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Clobbers: A, B, C, RX0
-//Designed for interactive mode
+//Clobbers: A, B, C, RX0, RX2.
+//Designed for interactive mode.
 //Limit of 0xffFE characters.
 .libc_gets_max_chars:0xffFE
 
@@ -181,7 +160,6 @@ halt;
 	astp;lb6;sub;ca;
 	ilda;ca;
 	astp;lb5;sub;illdaa;//get the short!
-	rx2push
 	lrx2 %/0%;
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
@@ -262,7 +240,6 @@ halt;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
 		rx0pop; 
-		rx2pop;
 		cbrx0; 
 		la 0; 
 		farista; 
@@ -277,8 +254,6 @@ halt;
 	astp;lb6;sub;ca;
 	ilda;ca;
 	astp;lb5;sub;illdaa;//get the short!
-	//compatibility with gets.
-	rx2push
 	//we now have our far pointer! put it on the top of the stack for easy access.
 	//we actually push 4 bytes, so we can rx0pop.
 	lb0;bpush;bc;bpush;alpush;
