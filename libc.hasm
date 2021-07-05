@@ -8,56 +8,104 @@
 
 section 0x20000;asm_begin_region_restriction;
 ..decl_farproc:proc_printbytehex
-//retrieve our argument.
-	astp;lb4;sub;ca;ilda;
-//push it
-	apush;
-	lb 4;rsh;
-	lb0xf;and;
-	lb 6;mul;
-llb %libc_printbytehex_jmptable_1%; add;ca;jmp;
-:libc_printbytehex_jmptable_1:
-	la0x30;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x31;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x32;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x33;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x34;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x35;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x36;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x37;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x38;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x39;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x41;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x42;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x43;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x44;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x45;sc%libc_printbytehex_jmptable_1_end%;jmp
-	la0x46;sc%libc_printbytehex_jmptable_1_end%;jmp
-:libc_printbytehex_jmptable_1_end:
-putchar
-apop;lb 15;and;lb6;mul;
-llb%libc_printbytehex_jmptable_2%;add;ca;jmp;
-:libc_printbytehex_jmptable_2:
-	la0x30;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x31;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x32;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x33;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x34;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x35;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x36;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x37;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x38;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x39;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x41;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x42;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x43;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x44;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x45;sc%libc_printbytehex_jmptable_2_end%;jmp
-	la0x46;sc%libc_printbytehex_jmptable_2_end%;jmp
-:libc_printbytehex_jmptable_2_end:
-putchar;
-farret;
+	//retrieve our argument.
+		astp;lb4;sub;ca;ilda;
+	//push it
+		apush
+		lb 4;rsh;
+		lb0xf;and;
+		lb 6;mul;
+	llb %libc_printbytehex_jmptable_1%; add;ca;jmp;
+	:libc_printbytehex_jmptable_1:
+		la0x30;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x31;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x32;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x33;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x34;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x35;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x36;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x37;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x38;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x39;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x41;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x42;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x43;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x44;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x45;sc%libc_printbytehex_jmptable_1_end%;jmp
+		la0x46;sc%libc_printbytehex_jmptable_1_end%;jmp
+	:libc_printbytehex_jmptable_1_end:
+	putchar
+	apop;lb 15;and;lb6;mul;
+	llb%libc_printbytehex_jmptable_2%;add;ca;jmp;
+	:libc_printbytehex_jmptable_2:
+		la0x30;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x31;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x32;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x33;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x34;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x35;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x36;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x37;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x38;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x39;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x41;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x42;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x43;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x44;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x45;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x46;sc%libc_printbytehex_jmptable_2_end%;jmp
+	:libc_printbytehex_jmptable_2_end:
+	putchar
+	farret
 
+..decl_farproc:proc_printbytelchex
+	//retrieve our argument.
+		astp;lb4;sub;ca;ilda;
+	//push it
+		apush
+		lb 4;rsh;
+		lb0xf;and;
+		lb 6;mul;
+	llb %libc_printbytelchex_jmptable_1%; add;ca;jmp;
+	:libc_printbytelchex_jmptable_1:
+		la0x30;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x31;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x32;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x33;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x34;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x35;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x36;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x37;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x38;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x39;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x61;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x62;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x63;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x64;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x65;sc%libc_printbytelchex_jmptable_1_end%;jmp
+		la0x66;sc%libc_printbytelchex_jmptable_1_end%;jmp
+	:libc_printbytelchex_jmptable_1_end:
+	putchar
+	apop;lb 15;and;lb6;mul;
+	llb%libc_printbytelchex_jmptable_2%;add;ca;jmp;
+	:libc_printbytelchex_jmptable_2:
+		la0x30;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x31;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x32;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x33;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x34;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x35;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x36;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x37;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x38;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x39;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x61;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x62;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x63;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x64;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x65;sc%libc_printbytehex_jmptable_2_end%;jmp
+		la0x66;sc%libc_printbytehex_jmptable_2_end%;jmp
+	//We can re-use the same ending from printbytehex.
 
 //PUTS~~~~~~~~~~~~~~~
 //CLOBBERS: A, B, C, RX0, RX1
@@ -118,8 +166,7 @@ farret;
 //dest: RX0
 //bytes: RX2
 .libc_mcpy_src:@
-halt;halt;
-halt;halt;
+bytes %/0%;
 
 ..decl_farproc:proc_memcpy
 	rx3_0;
