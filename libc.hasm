@@ -194,7 +194,7 @@ bytes %/0%;
 		rx3_0
 		sc %libc_mcpy_looptop%; jmp;
 	:libc_mcpy_loopend:
-	farret;
+farret;
 
 //GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0, RX1, RX2, RX3
@@ -288,7 +288,7 @@ bytes %/0%;
 		cbrx0; 
 		la 0; 
 		farista; 
-		farret;
+farret;
 
 
 
