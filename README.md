@@ -99,23 +99,30 @@ The included assembly programs are written for the architecture and can be execu
 
 (the cpp file in this repository is a proof-of-concept unmaintained alpha version of this project.)
 
-Here is how you use the emulator on a unix system:
+Here is how you use the emulator on a unix system. Note that Ncurses is optional, but highly recommended.
+
+You should read the pdf or odt manual in this repository for more compilation flags to improve emulation performance and access more features.
 ```bash
 #compile the emulator
 #most systems have UNSIGNED_INT as four byte unsigned types, that's what the define is for.
-cc isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+cc isa.c -o sisa16_emu -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses
 #compile the assembler
-cc assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
+cc assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT  -DUSE_NCURSES -lncurses
+#compile the debugger
+cc debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT  -DUSE_NCURSES -lncurses
 #assemble your program
 ./sisa16_asm -i program.asm -o program.bin
 #run your program
 ./sisa16_emu program.bin
+#debug your program
+./sisa16_dbg program.bin
 #install sisa16
 sudo cp sisa16_asm /usr/bin/
 sudo cp sisa16_emu /usr/bin/
+sudo cp sisa16_dbg /usr/bin/
 
 #run asm program starting with shebang as script
-#the shebang looks like this for the default INSTALL_DIR:
+#the shebang looks like this if you use /usr/bin/ (usr/local/bin/ is the default for sisa16)
 #!/usr/bin/sisa16_asm -run
 #you put that at the top of your file and chmod+x the .asm file, and it will run.
 ./program.asm
