@@ -112,7 +112,7 @@ farret
 ..decl_farproc:proc_puts
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
-	rx0b; lrx1 %/16%; rxlsh;
+	rx0b; lb16; rx1b; rxlsh;
 	aincr; ca; illdb; 
 	rx1b; rxadd;
 	:libc_puts_looptop:
@@ -133,7 +133,7 @@ farret;
 ..decl_farproc:proc_strlen
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
-	rx0b; lrx1 %/16%; rxlsh;
+	rx0b; lb16; rx1b; rxlsh;
 	aincr; ca; illdb; 
 	rx1b; rxadd;
 	//It's in RX0.
@@ -206,7 +206,7 @@ farret;
 ..decl_farproc:proc_gets
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
-	rx0b; lrx1 %/16%; rxlsh;
+	rx0b; lb16; rx1b; rxlsh;
 	aincr; ca; illdb; 
 	rx1b; rxadd;
 	//It's in RX0.
@@ -298,7 +298,7 @@ farret;
 ..decl_farproc:proc_gets_noecho
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
-	rx0b; lrx1 %/16%; rxlsh;
+	rx0b; lb16; rx1b; rxlsh;
 	aincr; ca; illdb; 
 	rx1b; rxadd;
 	//It's in RX0.
