@@ -166,7 +166,8 @@ farret;
 //dest: RX0
 //bytes: RX2
 .libc_mcpy_src:@
-bytes %/0%;
+nop;nop;
+nop;nop;
 
 ..decl_farproc:proc_memcpy
 	rx3_0;
