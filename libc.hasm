@@ -150,7 +150,7 @@ halt;halt;
 	farret;
 
 //GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Clobbers: A, B, C, RX0, RX2.
+//Clobbers: A, B, C, RX0, RX1, RX2.
 //Designed for interactive mode.
 //Limit of 0xffFE characters.
 .libc_gets_max_chars:0xffFE
@@ -167,10 +167,8 @@ halt;halt;
 	lrx2 %/0%;
 	:libc_gets_looptop:
 		rx0_2
-		rx1push
 		lrx1 %/libc_gets_max_chars%
 		rxcmp
-		rx1pop
 		lb 0;
 		cmp;
 		sc %libc_gets_loopend%
@@ -259,10 +257,8 @@ halt;halt;
 	lb0;bpush;bc;bpush;alpush;
 	:libc_gets_noecho_looptop:
 		rx0_2
-		rx1push
 		lrx1 %/libc_gets_max_chars%
 		rxcmp
-		rx1pop
 		lb 0;
 		cmp;
 		sc %libc_gets_loopend%
