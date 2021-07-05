@@ -83,6 +83,7 @@ nop;
 		putchar;
 	sc %asciifun_looptop%;jmp;
 :asciifun_loopout:
+la 7; putchar;
 halt;
 asm_end_restriction;
 
