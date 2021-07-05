@@ -68,6 +68,10 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./libc.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
+libc:
+	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
+	@cp ./libc.hasm /usr/include/sisa16/ && echo "Installed libc.hasm" || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
+
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
 	rm -f $(INSTALL_DIR)/sisa16_emu
