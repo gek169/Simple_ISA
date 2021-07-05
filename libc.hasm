@@ -134,11 +134,11 @@ halt;halt;
 		rx2_0
 		
 		//load a single byte.
-		farldrx0 %&   libc_mcpy_src%
+		farldrx0 %&libc_mcpy_src%
 		cbrx0
 		farilda
 		rxincr
-		farstrx0 %&   libc_mcpy_src%
+		farstrx0 %&libc_mcpy_src%
 		//store that single byte.
 		rx0_3
 			cbrx0
