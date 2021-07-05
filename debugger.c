@@ -71,7 +71,13 @@ char savenames(const char* filename){
 		if(names[i])
 			have_written = 1;
 	}
-	if(have_written == 0) return 0;
+	if(have_written == 0) {
+		fout = fopen(filename, "r");
+		if(!fout) return 0;
+		fclose(fout);
+		remove(filename);
+		return 0;
+	}
 	have_written = 0;
 	fout = fopen(filename, "w");
 	
