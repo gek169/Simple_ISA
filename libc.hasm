@@ -7,6 +7,59 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 section 0x20000;asm_begin_region_restriction;
+
+//EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//This must be placed at a region boundary, so it must be first.
+//Both of the following functions take a jump point in RX0.
+//They take a page to share with the client in the second parameter, so memory can be shared.
+//Register A (upon return) is the return value from the containerized machine, so you can use the error code if there was one.
+
+//Copy shit.
+farldrx0 %&libc_emulate_stack_data_store%
+farstrx0 %&0%
+.libc_emulate_jumploc:@+1+
+lrx0 %/0%; 
+farjmprx0;
+:libc_emulate_stack_data_store:
+nop;nop;nop;nop;
+
+//Both of these functions use register B to store the page that 
+
+..decl_farproc:proc_emulate
+	//We are passed a place to jump to in RX0.
+	farstrx0 %&libc_emulate_jumploc%;
+	//We must memcpy three bytes, so we memcpy 4.
+	farldrx0 %&0%
+	farstrx0 %&libc_emulate_stack_data_store%
+	sc %0%; la 2; ista; //la
+	adecr;ca;			//put 1 into c.
+	lla %0x244%; istla;	//2- the region we want to jump to. lfarpc is 0x44.
+	ab;
+	emulate;
+	//restore stack integrity.
+		farldrx0 %&libc_emulate_stack_data_store%
+		farstrx0 %&0%
+	//a holds the value
+farret;
+
+..decl_farproc:proc_emulate_seg
+	//We are passed a place to jump to in RX0.
+	farstrx0 %&libc_emulate_jumploc%;
+	//copy four bytes from the bottom of the stack for the bootloader.
+	farldrx0 %&0%
+	farstrx0 %&libc_emulate_stack_data_store%
+	sc %0%; la 2; ista; 	//la
+	adecr;ca;				//put 1 into c.
+	lla %0x244%; istla;		//2- the region we want to jump to. lfarpc is 0x44.
+	ab;
+	emulate_seg;
+	//restore stack integrity.
+		farldrx0 %&libc_emulate_stack_data_store%
+		farstrx0 %&0%
+	//a holds the return value.
+farret;
+
+
 ..decl_farproc:proc_printbytehex
 	//retrieve our argument.
 		astp;lb4;sub;ca;ilda;

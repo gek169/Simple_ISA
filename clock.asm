@@ -20,7 +20,7 @@ bytes %/0%;
 bytes %0%;
 
 section 0xAF0000;
-..asciz:Bench finished.
+..asciz:~~~~~Bench finished.~~~~~~~~
 :seconds_strings:
 bytes 0xd, 0xa;
 ..asciz: Seconds:
@@ -34,7 +34,19 @@ bytes 0xd, 0xa;
 //main routine.
 
 //rx2 holds our time in seconds.
-..(1):	
+..(1):
+	//containerize execution of the clock.
+	lrx0 %/Lbl_clock_start%;
+	lb 0xEEEE;
+	proc_emulate_seg;
+	la 0xd;putchar;la 0xa;putchar;
+	la 0xAF;apush;la 0;alpush;
+		proc_puts;
+	pop %3%;
+	halt;
+
+	
+	:Lbl_clock_start:
 	clock;
 	st_secs_b;
 	rx3b;
@@ -105,11 +117,6 @@ bytes 0xd, 0xa;
 	ld_secs;rx3a;llb %BENCH_SECONDS%;cmp;lb0;cmp;jmpifneq;
 	sc %main_looptop%;jmp;
 :main_loopout:
-la 0xd;putchar;
-la 0xa;putchar;
-la 0xAF;apush;la 0;alpush;
-	proc_puts;
-pop %3%;
 halt;
 
 
