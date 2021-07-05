@@ -284,8 +284,6 @@ halt;halt;
 //WAIT~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0, RX1.
 //RX registers go unused.
-
-
 //wait_ms is in RX0.
 //start_ms is in RX1.
 
