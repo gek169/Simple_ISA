@@ -56,7 +56,7 @@ section 0x20000;asm_begin_region_restriction;
 		la0x46;sc%libc_printbytehex_jmptable_2_end%;jmp
 	:libc_printbytehex_jmptable_2_end:
 	putchar
-	farret
+farret
 
 ..decl_farproc:proc_printbytelchex
 	//retrieve our argument.
