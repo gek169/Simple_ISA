@@ -246,7 +246,7 @@ halt;halt;
 
 
 //GETS_NOECHO
-//Clobbers: A, B, C, RX0
+//Clobbers: A, B, C, RX0, RX1, RX2, RX3
 ..decl_farproc:proc_gets_noecho
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
@@ -255,6 +255,7 @@ halt;halt;
 	rx1b; rxadd;
 	//It's in RX0.
 	rx3_0;
+	lrx2 %/0%;
 	:libc_gets_noecho_looptop:
 		rx0_2
 		lrx1 %/libc_gets_max_chars%
