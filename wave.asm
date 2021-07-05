@@ -52,7 +52,7 @@ nop;
 		st_iteration_count;
 		//If we are using the SDL driver, display the screen.
 		la 0; interrupt;
-		//the return value tells us if we are currently using 
+		//the return value tells us if we are currently using SDL.
 		rx0a;
 		//poll for the quit event.
 		la 1; interrupt;
@@ -63,7 +63,11 @@ nop;
 		sc %asciifun_loopout%; jmpifeq;
 		//are we using SDL?
 		:asciifun_back:
-		lb1;rx1b;rxcmp;sc %asciifun_looptop%;jmpifeq;
+		lb1;
+		rx1b;
+		rxcmp;
+		sc %asciifun_looptop%;
+		jmpifeq;
 		la %~wait_time%;
 		alpush;
 			proc_wait;

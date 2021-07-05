@@ -150,20 +150,19 @@ halt;halt;
 	farret;
 
 //GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Clobbers: A, B, C, RX0, RX1, RX2.
+//Clobbers: A, B, C, RX0, RX1, RX2, RX3
 //Designed for interactive mode.
 //Limit of 0xffFE characters.
 .libc_gets_max_chars:0xffFE
 
 ..decl_farproc:proc_gets
-	//fetch far pointer.
-	astp;lb6;sub;ca;
-	ilda;ca;
-	astp;lb5;sub;illdaa;//get the short!
-	lrx2 %/0%;
-	//we now have our far pointer! put it on the top of the stack for easy access.
-	//we actually push 4 bytes, so we can rx0pop.
-	lb0;bpush;bc;bpush;alpush;
+	//Grab the far pointer.
+	astp; lb 6; sub; ca; ildb;
+	rx0b; lrx1 %/16%; rxlsh;
+	aincr; ca; illdb; 
+	rx1b; rxadd;
+	//It's in RX0.
+	rx3_0;
 	lrx2 %/0%;
 	:libc_gets_looptop:
 		rx0_2
@@ -197,9 +196,9 @@ halt;halt;
 
 		//If This is what we do if its not a delete character.
 		ab;
-		rx0pop;		push %4%;	cbrx0;		farista;
+		rx0_3;		cbrx0;		farista;
 		rx0_2;		rxincr;		rx2_0;
-		rx0pop;		rxincr;		rx0push;
+		rx0_3;		rxincr;		rx3_0;
 
 		//store a space and a zero at the end of the string.
 		cbrx0;		la 0;	farista;
@@ -217,13 +216,14 @@ halt;halt;
 	:libc_gets_handle_del:
 		rx0_2; 		lrx1 %/0%; 	rxcmp; sc %libc_gets_zero_chars%; jmpifeq;
 		rx0_2;		rxdecr;		rx2_0;
-		rx0pop;		rxdecr;		rx0push;
+		rx0_3;		rxdecr;		rx3_0;
 		la 0xd; putchar;
 		//store a space and a zero at the end of the string.
 		cbrx0;		la 32;	farista;
 		rxincr;		cbrx0;		la 0;	farista;
 		rxdecr;
-		rx1_2;		rxsub;	
+		rx1_2;		
+		rxsub;	
 		la 0xd; putchar;
 		cbrx0;
 		ac;
@@ -237,7 +237,7 @@ halt;halt;
 		sc %libc_gets_looptop%;jmp;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
-		rx0pop; 
+		rx0_3;
 		cbrx0; 
 		la 0; 
 		farista; 
@@ -248,13 +248,13 @@ halt;halt;
 //GETS_NOECHO
 //Clobbers: A, B, C, RX0
 ..decl_farproc:proc_gets_noecho
-	//fetch far pointer.
-	astp;lb6;sub;ca;
-	ilda;ca;
-	astp;lb5;sub;illdaa;//get the short!
-	//we now have our far pointer! put it on the top of the stack for easy access.
-	//we actually push 4 bytes, so we can rx0pop.
-	lb0;bpush;bc;bpush;alpush;
+	//Grab the far pointer.
+	astp; lb 6; sub; ca; ildb;
+	rx0b; lrx1 %/16%; rxlsh;
+	aincr; ca; illdb; 
+	rx1b; rxadd;
+	//It's in RX0.
+	rx3_0;
 	:libc_gets_noecho_looptop:
 		rx0_2
 		lrx1 %/libc_gets_max_chars%
@@ -264,7 +264,7 @@ halt;halt;
 		sc %libc_gets_loopend%
 		jmpifneq
 		
-		rx0pop;		push %4%;	cbrx0;
+		rx0_3;	cbrx0;
 		getchar; //Hey, user, give me some data!
 		farista;
 		apush;
@@ -275,37 +275,34 @@ halt;halt;
 		lb 0xa;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;
 		lb 126;cmp;lb2;cmp;sc%libc_gets_loopend%;jmpifeq;
-		rx0pop;		rxincr;		rx0push;
+		rx0_3;		rxincr;		rx3_0;
 		rx0_2;		rxincr;		rx2_0;
 	sc %libc_gets_noecho_looptop%;jmp;
 	//We can actually share the same endings as gets, so we don't have anything here...
 
 //WAIT~~~~~~~~~~~~
+//Clobbers: A, B, C, RX0, RX1.
+//RX registers go unused.
 
-//variable used for waiting thousandths of a second.
-.libc_ld_wait_ms:farllda %&@%;
-.libc_st_wait_ms:farstla %&@%;
-nop;nop;
-//variable used for storing the start num of milliseconds.
-.libc_ld_start_ms_b:farlldb %&@%;
-.libc_ld_start_ms_a:farllda %&@%;
-.libc_st_start_ms_b:farstlb %&@%;
-.libc_st_start_ms_a:farstla %&@%;
-nop;nop;
+
+//wait_ms is in RX0.
+//start_ms is in RX1.
+
+
 //prototype: wait(short milliseconds)
 ..decl_farproc:proc_wait
-	//	retrieve our argument and store it in the desginated spot.
-	astp;lb5;sub;illdaa;libc_st_wait_ms;
-	//	store the start time.
-	clock;libc_st_start_ms_a;
+	//	retrieve our argument and store it in RX0.
+	astp;lb5;sub;illdaa;rx0a;
+	//	store the start time in RX1
+	clock;				rx1a;
 	//loop.
 	:libc_wait_looptop:
 		//grab the time.
 		clock;
-		libc_ld_start_ms_b;
+		brx1;
 		sub;
 		ba;
-		libc_ld_wait_ms;
+		arx0;
 		cmp;
 		lb 2;
 		cmp;
