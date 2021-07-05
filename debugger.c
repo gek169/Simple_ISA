@@ -59,8 +59,22 @@ void segmentation_violation(int bruh){
 
 char savenames(const char* filename){
 	unsigned long i = 0;
-	FILE* fout = fopen(filename, "w");
 	unsigned char have_written = 0;
+	FILE* fout = NULL;
+	if(n_breakpoints == 0 && n_names == 0) return 0;
+	for(i=0; i < n_breakpoints; i++){
+		if(sisa_breakpoints[i] != 0x1FFffFF)
+			have_written = 1;
+	}
+	for(i=0; i < n_names; i++)
+	{
+		if(names[i])
+			have_written = 1;
+	}
+	if(have_written == 0) return 0;
+	have_written = 0;
+	fout = fopen(filename, "w");
+	
 	if(!fout)
 	{
 		if(!debugger_setting_minimal)
