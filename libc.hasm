@@ -152,7 +152,7 @@ farret;
 		rx0_2;								//move RX2 to RX0 so we can keep it.
 		astp;lb5;sub;ca;
 		arx0; istla							//get the low 16 bits.
-		lrx1 %/16%
+		lb16;rx1b;
 		rxrsh
 		astp;lb6;sub;ca;
 		arx0; ista;
@@ -171,7 +171,7 @@ bytes %/0%;
 ..decl_farproc:proc_memcpy
 	rx3_0;
 	farstrx1 %&libc_mcpy_src%;
-	lrx1 %/0%;
+	lb0;rx1b;
 	:libc_mcpy_looptop:
 		//Quit? if not, decrement.
 		rx0_2 
