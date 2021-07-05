@@ -357,4 +357,37 @@ farret;
 	:libc_wait_loopout:
 farret;
 
+
+//atou_dec~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Argument is in RX0, and is returned in RX0.
+//Clobbers: A,B,C,RX0,RX1,RX2,RX3
+
+
+//Read a base ten integer from a string.
+..decl_farproc:proc_atou_dec
+	//the passed string is in RX0.
+	rx3_0;
+	lb 0; rx2b;					//happens to be a very fast way of transferring zero into a register.
+	:libc_atou_dec_looptop:
+		rx0_3; 
+		cbrx0; 
+		farilda;
+		apush; lb 0x30; cmp; lb 0; cmp; bpop; sc %libc_atou_dec_loopout%; jmpifeq;		//Jump if the character was less than 0x30.
+		ab; apush; lb 0x39; cmp; lb 2; cmp; bpop; sc %libc_atou_dec_loopout%; jmpifeq;		//Jump if the character was greater than 0x39.
+		ab; lb 0x30; sub;
+		rxincr;
+		rx3_0;
+		//the value is in A.
+		rx0_2			//load the value.
+		lb 10
+		rx1b
+		rxmul
+		rx1a
+		rxadd
+		rx2_0			//stash it away!
+		sc %libc_atou_dec_looptop%; jmp;
+	:libc_atou_dec_loopout:
+	rx0_2;
+farret;
+
 asm_end_region_restriction;
