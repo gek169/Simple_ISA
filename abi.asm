@@ -53,6 +53,7 @@ ZERO_STACK_POINTER;
 	la 10;putchar;
 	la 13;putchar;	
 	lrx0 %/3%;
+//	lrx0 %?3%;
 	rxitof;
 	lrx1 %?0.59%;
 	fltdiv;
