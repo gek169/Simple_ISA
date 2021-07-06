@@ -1,6 +1,14 @@
 #!/usr/local/bin/sisa16_asm -run
 
-..include"libc.hasm"
+
+
+//use a separately compiled libc.
+..include"libc.bin.hasm.tmp"
+..(2):
+	ASM_data_include libc.bin
+
+//use the normal libc.
+//..include"libc.hasm"
 
 ..(1):
 	la 0xc; apush; la 0; alpush;
