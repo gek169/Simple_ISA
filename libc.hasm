@@ -6,7 +6,8 @@
 //~~Let all that you do be done with love~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-section 0x20000;asm_begin_region_restriction;
+..(2):
+asm_begin_region_restriction;
 
 //EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //This must be placed at a region boundary, so it must be first.
