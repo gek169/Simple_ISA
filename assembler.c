@@ -684,7 +684,7 @@ int main(int argc, char** argv){
 			if(using_asciz) fputbyte(0, ofile);
 			goto end;
 		}
-		if(strprefix("ASM_header ", line)){
+		if(strprefix("ASM_header ", line) || strprefix("asm_header ", line)){
 			FILE* tmp; char* metaproc;
 			char* env_sisa16bin = NULL;
 			char* env_home = NULL;
@@ -728,7 +728,7 @@ int main(int argc, char** argv){
 			infile = tmp;
 			goto end;
 		}
-		if(strprefix("ASM_data_include ", line)){
+		if(strprefix("ASM_data_include ", line) || strprefix("asm_data_include ", line)){
 			/*data include! format is
 			[newline]asm_data_include filename
 			*/
