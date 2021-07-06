@@ -582,6 +582,34 @@ int main(int argc, char** argv){
 			);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
+		}else if(strprefix("..export\"", line)){
+			char* variable_name;
+			char found = 0;
+			long loc_eparen;
+			unsigned long i;
+			variable_name = line + strlen("..export\"");
+			loc_eparen = strfind(line + strlen("..export\""), "\"");
+			if(loc_eparen == -1){
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts("Line:");
+				puts(line_copy);
+				goto error;
+			}
+			loc_eparen += strlen("..export\"");
+			line[loc_eparen] = '\0';
+			for(i=nbuiltin_macros; i<nmacros; i++){
+				if(streq(variable_names[i], variable_name)){
+					found = 1;
+					variable_is_redefining_flag[i] |= 2;
+					break;
+				}
+			}
+			if(found == 0){
+				printf(compil_fail_pref);
+				printf("Unknown symbol %s to export!\n", variable_name);
+				goto error;
+			}
+			goto end;
 		} else if(strprefix("..decl_farproc:", line)){
 			char buf[900];
 			char* line_old = line;
@@ -1320,7 +1348,7 @@ int main(int argc, char** argv){
 			} else {char* temp;
 				if(npasses == 0)
 					{
-						variable_is_redefining_flag[index] = 1;
+						variable_is_redefining_flag[index] |= 1;
 					}
 				if(variable_names[index]) free(variable_names[index]);
 				variable_names[index] = macro_name;
@@ -1330,7 +1358,7 @@ int main(int argc, char** argv){
 						strlen(line+loc_pound+loc_pound2)
 				);
 				if(!temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				if(npasses == 1 && !variable_is_redefining_flag[index])
+				if(npasses == 1 && !(variable_is_redefining_flag[index]&1))
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
 					if(!streq(temp, variable_expansions[index])){
 						printf("\r\n\r\n<ASM BIG WARNING>\r\n\r\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
@@ -1686,7 +1714,10 @@ int main(int argc, char** argv){
 					}else
 						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
-			} else if (strprefix("asm_create_header", metaproc)){
+			} else if (
+				strprefix("asm_create_header", metaproc) ||
+				strprefix("asm_export_header", metaproc)
+			){
 				/*
 					Create a header file for this compilation unit. That means exporting all macros
 					that are not redefining.
@@ -1705,9 +1736,8 @@ int main(int argc, char** argv){
 					f = fopen(hfilename, "w");
 					if(f){
 						for(i = nbuiltin_macros; i < nmacros; i++){
-							if(!variable_is_redefining_flag[i])
-								if(int_checker(variable_expansions[i]) == 0)
-									fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
+							if( variable_is_redefining_flag[i]&2 )
+								fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
 						}
 					}else{
 						printf(general_fail_pref);

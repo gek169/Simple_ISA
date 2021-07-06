@@ -630,6 +630,17 @@ everything after the second # is part of the macro.
 Several built-in macros are evaluated inside of macro definitions, such as @ and $.
 
 .TP
+.B Exported Symbols
+
+You can set a symbol to be exported to a .hasm.tmp file using...
+
+..export"myMacro"
+
+You can then put, anywhere in the file, the following directive:
+
+asm_export_header
+
+.TP
 .B Syntactic Sugar
 
 There are various extremely common operations in sisa16 that have syntactic sugars available

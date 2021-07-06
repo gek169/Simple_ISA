@@ -110,4 +110,4 @@ uninstall:
 
 clean:
 	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes
-	clear
+	clear || echo "cannot clear?"
