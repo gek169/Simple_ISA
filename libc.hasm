@@ -6,7 +6,11 @@
 //~~Let all that you do be done with love~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-..(2):
+//if you wish to change the region that this is placed in,
+//search for LIBC_CHANGE_REGION in this source code. All lines marked must be changed.
+
+
+..(2):	//LIBC_CHANGE_REGION
 asm_begin_region_restriction;
 
 //EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -34,7 +38,7 @@ nop;nop;nop;nop;
 	farstrx0 %&libc_emulate_stack_data_store%
 	sc %0%; la 2; ista; //la
 	adecr;ca;			//put 1 into c.
-	lla %0x244%; istla;	//2- the region we want to jump to. lfarpc is 0x44.
+	lla %0x244%; istla;	//2- the region we want to jump to. lfarpc is 0x44. LIBC_CHANGE_REGION
 	ab;
 	emulate;
 	//restore stack integrity.
@@ -51,7 +55,7 @@ farret;
 	farstrx0 %&libc_emulate_stack_data_store%
 	sc %0%; la 2; ista; 	//la
 	adecr;ca;				//put 1 into c.
-	lla %0x244%; istla;		//2- the region we want to jump to. lfarpc is 0x44.
+	lla %0x244%; istla;		//2- the region we want to jump to. lfarpc is 0x44. LIBC_CHANGE_REGION
 	ab;
 	emulate_seg;
 	//restore stack integrity.

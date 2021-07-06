@@ -4,7 +4,7 @@
 
 ..(1):
 	la 0xc; apush; la 0; alpush;
-	proc_gets
+	proc_gets_noecho
 	la 0xa; putchar; la 0xd; putchar;
 	proc_strlen;
 	//we now have the length of the string stored, we have to get it into RX0.

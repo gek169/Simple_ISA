@@ -484,6 +484,10 @@ int main(int argc, char** argv){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..zero:"));
 			free(line_old);
+		}else if(strprefix("..z:", line)){
+			char* line_old = line;
+			line = strcatalloc("section0;", line+strlen("..z:"));
+			free(line_old);
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
 			line = strcatalloc("!", line+strlen("..ascii:"));
