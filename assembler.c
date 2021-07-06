@@ -792,6 +792,7 @@ int main(int argc, char** argv){
 				){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}
 		/*Find line comments... but only on non-VAR lines!*/
@@ -902,6 +903,7 @@ int main(int argc, char** argv){
 					
 					len_to_replace = strlen(variable_names[i]);
 					before = str_null_terminated_alloc(line_old, loc);
+					if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					if(i > 2) /*0,1,2 are special cases. 3,4,X are not.*/
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){ /*SYNTAX: @+7+ or @ alone*/
@@ -936,6 +938,7 @@ int main(int argc, char** argv){
 						sprintf(expansion, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
+						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} else if (i==1){
 						char expansion[1024]; unsigned long addval;
 						
@@ -969,6 +972,7 @@ int main(int argc, char** argv){
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
+						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} else if (i==2){
 						long loc_qmark=		-1;
 						long loc_slash=		-1;
@@ -1084,10 +1088,13 @@ int main(int argc, char** argv){
 							exit(1);
 						}
 						before = strcatallocf1(before, expansion);
+						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} 
 					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
 									linesize-loc-len_to_replace);
+					if(!after){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					line = strcatallocfb(before, after);
+					if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					free(line_old);
 					break; /*we have expanded something.*/
 				}
