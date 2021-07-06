@@ -517,6 +517,7 @@ int main(int argc, char** argv){
 					if(strfind(line,variable_names[i]) ==3)
 					{
 						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
+						line_old = line;
 						if(!line){
 							printf(general_fail_pref); printf("Failed Malloc."); exit(1);
 						}

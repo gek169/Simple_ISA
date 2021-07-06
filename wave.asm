@@ -13,8 +13,8 @@ section 0x40000;
 ..asciz: .:-=+*#%@%#*+=-:.
 
 
-
-..(3):
+.ITER_REGION:3
+..(ITER_REGION):
 bytes 0,0,0,0;
 
 ..include"libc.hasm"
