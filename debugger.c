@@ -61,7 +61,6 @@ char savenames(const char* filename){
 	unsigned long i = 0;
 	unsigned char have_written = 0;
 	FILE* fout = NULL;
-	if(n_breakpoints == 0 && n_names == 0) return 0;
 	for(i=0; i < n_breakpoints; i++){
 		if(sisa_breakpoints[i] != 0x1FFffFF)
 			have_written = 1;

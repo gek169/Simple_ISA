@@ -36,14 +36,14 @@ bytes 0xd, 0xa;
 //rx2 holds our time in seconds.
 ..(1):
 	//containerize execution of the clock.
-	lrx0 %/Lbl_clock_start%;
-	lb 0xEEEE;
-	proc_emulate_seg;
-	la 0xd;putchar;la 0xa;putchar;
-	la 0xAF;apush;la 0;alpush;
-		proc_puts;
-	pop %3%;
-	halt;
+//	lrx0 %/Lbl_clock_start%;
+//	lb 0xEEEE;
+//	proc_emulate_seg;
+//	la 0xd;putchar;la 0xa;putchar;
+//	la 0xAF;apush;la 0;alpush;
+//		proc_puts;
+//	pop %3%;
+//	halt;
 
 	
 	:Lbl_clock_start:
@@ -117,6 +117,10 @@ bytes 0xd, 0xa;
 	ld_secs;rx3a;llb %BENCH_SECONDS%;cmp;lb0;cmp;jmpifneq;
 	sc %main_looptop%;jmp;
 :main_loopout:
+	la 0xd;putchar;la 0xa;putchar;
+	la 0xAF;apush;la 0;alpush;
+		proc_puts;
+	pop %3%;
 halt;
 
 
