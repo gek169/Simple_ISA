@@ -15,9 +15,11 @@ static char enable_dis_comments = 1;
 static char clear_output = 0;
 static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
-static char* variable_names[65536] = {0};
-static char* variable_expansions[65536] = {0};
-static char variable_is_redefining_flag[65536] = {0};
+#define SISA16_MAX_MACROS 0x20000
+
+static char* variable_names[SISA16_MAX_MACROS] = {0};
+static char* variable_expansions[SISA16_MAX_MACROS] = {0};
+static char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
 static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
 static char int_checker(char* proc){
@@ -772,11 +774,11 @@ int main(int argc, char** argv){
 			was_macro=1; 
 		else 
 			was_macro = 0;
-		{unsigned char have_expanded = 0; unsigned short iteration = 0; long i;
+		{unsigned char have_expanded = 0; unsigned long iteration = 0; long i;
 			do{
 				have_expanded = 0;
 				if(debugging){
-					if(!clear_output)printf("\n~~Macro Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					if(!clear_output)printf("\n~~Macro Expansion Stage~~, iteration %lu\nLine:\n%s", iteration, line);
 					if(was_macro)
 						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
@@ -1044,7 +1046,7 @@ int main(int argc, char** argv){
 		}
 		/*MACRO_DEFINITION_STAGE*/
 		if(strprefix("VAR",line)){ long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
-			unsigned short index;
+			unsigned long index;
 			if(debugging){
 				if(!clear_output)printf("\nThis is a macro!\n");
 			}
@@ -1083,7 +1085,7 @@ int main(int argc, char** argv){
 			/*Search to see if we've already defined this macro*/
 			is_overwriting = 0;
 			index = 0;
-			{unsigned short i;for(i = 0; i < n_insns; i++){
+			{unsigned long i;for(i = 0; i < n_insns; i++){
 				if( (strfind(insns[i],macro_name)>-1) ||
 					(strfind(macro_name, insns[i])==0) 
 				){
@@ -1197,7 +1199,7 @@ int main(int argc, char** argv){
 				printf(syntax_fail_pref);printf("This macro would prevent language features from being used. You may not use this name:\n%s\n", macro_name);
 				goto error;	
 			}
-			{unsigned short i;for(i = 0; i < nmacros; i++){
+			{unsigned long i;for(i = 0; i < nmacros; i++){
 				if(i < nbuiltin_macros)
 					if( (strfind(variable_names[i],macro_name)>-1) ||
 						streq(macro_name, variable_names[i]))
@@ -1233,7 +1235,7 @@ int main(int argc, char** argv){
 				}
 			}}
 			if(!is_overwriting){
-				if(nmacros >= 0xffff) {
+				if(nmacros >= (SISA16_MAX_MACROS-1)) {
 					printf(compil_fail_pref);printf("Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
 					goto error;
 				}
