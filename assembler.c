@@ -15,8 +15,10 @@ static char enable_dis_comments = 1;
 static char clear_output = 0;
 static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
-#define SISA16_MAX_MACROS 0x20000
 
+#ifndef SISA16_MAX_MACROS
+#define SISA16_MAX_MACROS 0x80000
+#endif
 static char* variable_names[SISA16_MAX_MACROS] = {0};
 static char* variable_expansions[SISA16_MAX_MACROS] = {0};
 static char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
@@ -1317,11 +1319,11 @@ int main(int argc, char** argv){
 			goto error;
 		}}
 		/*INSN_EXPANSION_STAGE*/
-			{unsigned char have_expanded = 0; unsigned short iteration = 0;
+			{unsigned char have_expanded = 0; unsigned long iteration = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
-					if(!clear_output)printf("\n~~Insn Expansion Stage~~, iteration %u\nLine:\n%s", iteration, line);
+					if(!clear_output)printf("\n~~Insn Expansion Stage~~, iteration %lu\nLine:\n%s", iteration, line);
 				}
 				{unsigned long i;for(i = 0; i<n_insns; i++){
 					char* line_old; long loc, linesize; unsigned long j;
@@ -1435,7 +1437,7 @@ int main(int argc, char** argv){
 						free(line_old);
 					}
 				}}
-			}while(have_expanded && (iteration++ < 0xFFff)); /*Probably safe right?*/
+			}while(have_expanded && (iteration++ < 0x100000)); /*Probably safe right?*/
 		}
 		/*
 			Put out bytes.
