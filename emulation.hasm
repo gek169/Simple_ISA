@@ -19,6 +19,7 @@ nop;nop;nop;nop;
 //Both of these functions use register B to store the page that 
 
 ..decl_farproc:proc_emulate
+..export"proc_emulate"
 	//We are passed a place to jump to in RX0.
 	farstrx0 %&libc_emulate_jumploc%;
 	//We must memcpy three bytes, so we memcpy 4.
@@ -36,6 +37,7 @@ nop;nop;nop;nop;
 farret;
 
 ..decl_farproc:proc_emulate_seg
+..export"proc_emulate_seg"
 	//We are passed a place to jump to in RX0.
 	farstrx0 %&libc_emulate_jumploc%;
 	//copy four bytes from the bottom of the stack for the bootloader.

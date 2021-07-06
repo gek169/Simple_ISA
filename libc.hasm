@@ -8,6 +8,7 @@
 
 
 .LIBC_REGION:2
+..export"LIBC_REGION"
 ..(LIBC_REGION):
 ..include"emulation.hasm"
 ..include"printbytehex.hasm"

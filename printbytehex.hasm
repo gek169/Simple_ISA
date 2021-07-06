@@ -1,5 +1,6 @@
 
 ..decl_farproc:proc_printbytehex
+..export"proc_printbytehex"
 	//retrieve our argument.
 		astp;lb4;sub;ca;ilda;
 	//push it
@@ -51,6 +52,7 @@
 farret
 
 ..decl_farproc:proc_printbytelchex
+..export"proc_printbytelchex"
 	//retrieve our argument.
 		astp;lb4;sub;ca;ilda;
 	//push it
