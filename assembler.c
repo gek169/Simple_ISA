@@ -506,7 +506,7 @@ int main(int argc, char** argv){
 			char have_expanded = 0;
 			unsigned long secnum = 0;
 			char* line_old = line;
-			long loc_eparen = strfind(line, /*(*/"):");
+			long loc_eparen = -1;
 			/*
 				attempt to find a macro to expand here.
 			*/
@@ -532,6 +532,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			secnum = strtoul(line + 3, 0,0);
+			loc_eparen = strfind(line, /*(*/"):");
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for region selection is missing ending \"):\"");
 				puts("Line:");
