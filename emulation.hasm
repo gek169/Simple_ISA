@@ -1,4 +1,4 @@
-..(2):	//LIBC_CHANGE_REGION
+..(2):									//LIBC_CHANGE_REGION
 asm_begin_region_restriction;
 
 //EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -7,7 +7,7 @@
 
 ..include"libc.hasm"
 
-.BENCH_SECONDS:3
+.BENCH_SECONDS:256
 
 //Variable Section.
 section 0xAE0000;
@@ -117,10 +117,7 @@ bytes 0xd, 0xa;
 	ld_secs;rx3a;llb %BENCH_SECONDS%;cmp;lb0;cmp;jmpifneq;
 	sc %main_looptop%;jmp;
 :main_loopout:
-	la 0xd;putchar;la 0xa;putchar;
-	la 0xAF;apush;la 0;alpush;
-		proc_puts;
-	pop %3%;
+lb0;mod;
 halt;
 
 
