@@ -1,5 +1,4 @@
-..(LIBC_REGION):
-asm_begin_region_restriction;
+
 
 //EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //This must be placed at a region boundary, so it must be first.

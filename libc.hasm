@@ -10,12 +10,13 @@
 .LIBC_REGION:2
 ..export"LIBC_REGION"
 ..(LIBC_REGION):
-..include"emulation.hasm"
-..include"printbytehex.hasm"
-..include"puts.hasm"
-..include"strlen.hasm"
-..include"memcpy.hasm"
-..include"gets.hasm"
-..include"atoi_dec.hasm"
-..include"wait.hasm"
+asm_begin_region_restriction;
+	..include"emulation.hasm"
+	..include"printbytehex.hasm"
+	..include"puts.hasm"
+	..include"strlen.hasm"
+	..include"memcpy.hasm"
+	..include"gets.hasm"
+	..include"atoi_dec.hasm"
+	..include"wait.hasm"
 asm_end_region_restriction;
