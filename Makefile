@@ -15,6 +15,7 @@ all: main asm_programs
 
 q:
 	sudo $(MAKE) -B install
+	sudo $(MAKE) libc
 	sudo $(MAKE) clean
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
@@ -23,6 +24,7 @@ q:
 
 d:
 	sudo $(MAKE) -B install
+	sudo $(MAKE) libc
 	sudo $(MAKE) clean
 	./asmbuild.sh
 
