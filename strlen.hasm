@@ -1,6 +1,6 @@
 //STRLEN~~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0, RX1, RX2
-..decl_farproc:proc_strlen
+..decl_farproc(LIBC_REGION):proc_strlen
 ..export"proc_strlen"
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;

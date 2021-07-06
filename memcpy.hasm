@@ -8,10 +8,10 @@
 :libc_mcpy_src:
 nop;nop;nop;nop;
 
-..decl_farproc:proc_memcpy
+..decl_farproc(LIBC_REGION):proc_memcpy
 ..export"proc_memcpy"
 	rx3_0;
-	farstrx1 %&libc_mcpy_src%;
+	farstrx1 %~LIBC_REGION%, %libc_mcpy_src%;
 	lb0;rx1b;
 	:libc_mcpy_looptop:
 		//Quit? if not, decrement.
@@ -22,11 +22,11 @@ nop;nop;nop;nop;
 		rx2_0
 		
 		//load a single byte.
-		farldrx0 %&libc_mcpy_src%
+		farldrx0 %~LIBC_REGION%, %libc_mcpy_src%
 		cbrx0
 		farilda
 		rxincr
-		farstrx0 %&libc_mcpy_src%
+		farstrx0 %~LIBC_REGION%, %libc_mcpy_src%
 		//store that single byte.
 		rx0_3
 			cbrx0

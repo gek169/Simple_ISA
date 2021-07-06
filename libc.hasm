@@ -9,7 +9,9 @@
 
 .?LIBC_REGION:2
 ..export"LIBC_REGION"
-..(LIBC_REGION):
+.?LIBC_EXPORT_DCL:region LIBC_REGION;
+
+LIBC_EXPORT_DCL
 asm_begin_region_restriction;
 	..include"emulation.hasm"
 	..include"printbytehex.hasm"

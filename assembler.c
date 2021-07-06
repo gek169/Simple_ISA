@@ -627,6 +627,7 @@ int main(int argc, char** argv){
 			long loc_colon = -1;
 			unsigned long regioncode;
 			char* procedure_name;
+			char have_expanded;
 			char* inner_text;
 			const long len_decl = strlen("..decl_farproc(" /*)*/);
 			regioncode = outputcounter >>16;
@@ -643,16 +644,24 @@ int main(int argc, char** argv){
 			procedure_name = strcatalloc(line + loc_colon, "");
 			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			/*Construct the name.*/
-			{unsigned long i;
-				char have_found = 0;
-				for(i = nbuiltin_macros; i < nmacros; i++)
-					if(streq(variable_names[i], inner_text)){
-						have_found = 1;
-						regioncode = strtoul(variable_expansions[i],0,0);
-						break;	
+						/*
+				attempt to find a macro to expand here.
+			*/
+			do{
+				unsigned long i = 0;
+				have_expanded = 0;
+				for(i=nbuiltin_macros; i < nmacros; i++){
+					if(strfind(line,variable_names[i]) == len_decl)
+					{
+						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
+						line_old = line;
+						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						have_expanded = 1;
+						break;
 					}
-				if(!have_found) regioncode = strtoul(inner_text,0,0);
-			}
+				}
+			}while(have_expanded == 1);
+			regioncode = strtoul(line + len_decl, 0,0);
 			buf[2047] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, regioncode);
 			line = strcatalloc(buf,"");
@@ -1334,7 +1343,9 @@ int main(int argc, char** argv){
 				strfind("asm_",macro_name) != -1 ||
 				strfind("ASM_", macro_name) != -1 ||
 				strfind("section", macro_name) != -1 ||
+				strfind("region", macro_name) != -1 ||
 				strfind("fill", macro_name) != -1 ||
+				strfind("..decl_farproc(", macro_name) != -1 ||
 				strfind("asm_help", macro_name) != -1 ||
 				strfind("asm_export_header", macro_name) != -1 ||
 				strfind("asm_fix_outputcounter", macro_name) != -1 ||
@@ -1665,6 +1676,31 @@ int main(int argc, char** argv){
 					if(!clear_output){
 						printf(warn_pref);
 						printf("Section tag at zero. Might be a bad number. Line %s\n", line_copy);
+					}
+				}
+				if(debugging)
+					if(!clear_output)printf("Moving the output counter to %lu\n", dest);
+				outputcounter = dest;
+			} else if(strprefix("region", metaproc)){
+				unsigned long dest;
+				char* proc = metaproc + 6;
+				if(strlen(proc) == 0){
+					printf(syntax_fail_pref);puts("Cannot have empty region tag.");
+					goto error;
+				}
+				if(int_checker(proc)){
+					printf(syntax_fail_pref);printf("invalid integer literal for region. Line:\n%s\nInternal:\n%s\n",line_copy, line);
+					goto error;
+				}
+				dest = strtoul(proc, NULL, 0);
+				dest &= 0xff;
+				dest <<= 16;
+				if(dest == 0){
+				/*Explicitly check to see if they actually typed zero.*/
+					if(proc[0]!='0'  && npasses == 1)
+					if(!clear_output){
+						printf(warn_pref);
+						printf("region tag at zero. Might be a bad number. Line %s\n", line_copy);
 					}
 				}
 				if(debugging)
