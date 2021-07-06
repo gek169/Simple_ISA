@@ -3,7 +3,7 @@
 //Clobbers: A,B,C,RX0,RX1,RX2,RX3
 //Read a base ten integer from a string.
 //Note that whitespace is *not* skipped
-..decl_farproc:proc_atou_dec
+..decl_farproc(LIBC_REGION):proc_atou_dec
 ..export"proc_atou_dec"
 	//the passed string is in RX0.
 	rx3_0;

@@ -7,7 +7,7 @@
 //Note that whitespace is *not* skipped
 
 
-..decl_farproc:proc_atoi_dec
+..decl_farproc(LIBC_REGION):proc_atoi_dec
 ..export"proc_atoi_dec"
 	//the passed string is in RX0.
 		rx3_0;
