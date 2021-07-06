@@ -506,25 +506,35 @@ ZC:
 #endif
 ZD:
 #if !defined(NO_SEGMENT)
-{	
+{
 	STASH_REGS;
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
-	if(RX0 == 0)	{R=6;goto G_HALT;}
-	if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
-		SEGMENT_PAGES = RX0;
-		SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
-	}
-	if(!SEGMENT){
-		SEGMENT_PAGES = SEGMENT_PAGES_OLD;
-		SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
-	}
-	if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
-		/*Must initialize memory to zero.*/
-		register size_t end, i;
-		i = ((size_t)SEGMENT_PAGES_OLD) * 256;
-		end = ((size_t)SEGMENT_PAGES) * 256;
-		for(;i<end;i++)SEGMENT[i] = 0;
+	if(RX0 == 0){
+		if(SEGMENT) free(SEGMENT);
+		SEGMENT = NULL;
+		SEGMENT_PAGES = 0;
+	} else {
+		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
+			SEGMENT_PAGES = RX0;
+			if(!SEGMENT)
+				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
+			else
+				SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
+		}
+		if(!SEGMENT){
+			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
+			SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
+		}
+		if(SEGMENT_OLD)
+			if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
+				/*Must initialize memory to zero.*/
+				register size_t end, i;
+				i = ((size_t)SEGMENT_PAGES_OLD) * 256;
+				end = ((size_t)SEGMENT_PAGES) * 256;
+				for(;i<end;i++)SEGMENT[i] = 0;
+			}
+		
 	}
 	UNSTASH_REGS;
 }D

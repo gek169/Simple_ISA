@@ -1144,6 +1144,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);
+			if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			if(debugging){
 				if(!clear_output)printf("\nMacro Name is identified as %s\n", macro_name);
 			}
@@ -1315,6 +1316,7 @@ int main(int argc, char** argv){
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
+				if(!variable_expansions[nmacros-1]){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			} else {char* temp;
 				if(npasses == 0)
 					{
@@ -1327,13 +1329,11 @@ int main(int argc, char** argv){
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
-				if(npasses == 1 && 
-					!variable_is_redefining_flag[index] && 
-					!strprefix("_arg", variable_names[index])
-					)
+				if(!temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				if(npasses == 1 && !variable_is_redefining_flag[index])
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
 					if(!streq(temp, variable_expansions[index])){
-					printf("\r\n\r\n<ASM BIG WARNING>\r\n\r\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
+						printf("\r\n\r\n<ASM BIG WARNING>\r\n\r\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
 						free(variable_expansions[index]);
 						variable_expansions[index] = temp;
 					}
@@ -1498,10 +1498,14 @@ int main(int argc, char** argv){
 						len_to_replace = strlen(insns[i]);
 						
 						before = str_null_terminated_alloc(line_old, loc);
+						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						before = strcatallocf1(before, insn_repl[i]);
+						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
 										linesize-loc-len_to_replace);
+						if(!after){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						line = strcatallocfb(before, after);
+						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						free(line_old);
 					}
 				}}
@@ -1698,17 +1702,18 @@ int main(int argc, char** argv){
 					goto error;
 				}
 			}
-			{long next_semicolon = strfind(metaproc, ";");
-			long next_vbar = strfind(metaproc, "|");
-			if(next_semicolon == -1) break; /*We have handled all sublines.*/
-			if(next_vbar!=-1 && next_vbar < next_semicolon) break; /**/
-			metaproc += next_semicolon + 1;
-			if(strlen(metaproc) == 0) break; /*Convenient line break*/
+			{	long next_semicolon = strfind(metaproc, ";");
+				long next_vbar = strfind(metaproc, "|");
+				if(next_semicolon == -1) break; /*We have handled all sublines.*/
+				if(next_vbar!=-1 && next_vbar < next_semicolon) break; /**/
+				metaproc += next_semicolon + 1;
+				if(strlen(metaproc) == 0) break; /*Convenient line break*/
 			}
 		} while(1);
 		/*if this is a line with vertical bars, start processing the stuff after the next vertical bar. */
 		if(strfind(line, "|")!=-1){
 			char* line_temp = strcatalloc(line+strfind(line, "|")+1,"");
+			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line);line = line_temp;
 			goto pre_pre_processing;
 		}
@@ -1731,7 +1736,8 @@ int main(int argc, char** argv){
 		SEGMENT_PAGES = 1;
 		if(SEGMENT == NULL){
 			puts("<SISA16 EMULATOR ERROR: Could not allocate segment>");
-			return 1;
+			SEGMENT = NULL;
+			SEGMENT_PAGES = 0;
 		}
 #endif
 		if(
@@ -1780,7 +1786,10 @@ int main(int argc, char** argv){
 		if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
 		if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
 		if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
-		if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
+		if(R==6){
+			/*puts("\n<Errfl, Segment Cannot be Zero Pages>\n");*/
+			puts("\r\n<Errfl, deprecated error>\r\n");
+		}
 		if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
 		if(R==13)

@@ -269,7 +269,10 @@ int main(int rc,char**rv){
 	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
 	if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
 	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
-	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
+	if(R==6){
+		/*puts("\n<Errfl, Segment Cannot be Zero Pages>\n");*/
+		puts("\r\n<Errfl, deprecated error>\r\n");
+	}
 	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
 	if(R==13)

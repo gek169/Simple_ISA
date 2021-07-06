@@ -615,13 +615,14 @@ void debugger_hook(unsigned short *a,
 				puts("\r\n<bad>\r\n");
 			case 'h':help();goto repl_start;
 			case 'c':
-			{unsigned long i = 0;
+			{
 #if defined(WIN32) || defined(_WIN32)
 				system("CLS");
 #else
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
 				system("clear");
 #else
+				unsigned long i = 0;
 				for(;i < debugger_setting_clearlines;i++){
 					printf("\r\n");
 				}
@@ -1859,7 +1860,10 @@ int main(int rc,char**rv){
 	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");
 	if(R==4)puts("\n<Errfl, 32 bit mod by 0>\n");
 	if(R==5)puts("\n<Errfl, Bad Segment Page>\n");
-	if(R==6)puts("\n<Errfl, Segment Cannot be Zero Pages>\n");
+	if(R==6){
+		/*puts("\n<Errfl, Segment Cannot be Zero Pages>\n");*/
+		puts("\r\n<Errfl, deprecated error>\r\n");
+	}
 	if(R==7)puts("\n<Errfl, Segment Failed Allocation>\n");
 #if defined(NO_FP)
 	if(R==13)
