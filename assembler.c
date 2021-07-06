@@ -628,7 +628,6 @@ int main(int argc, char** argv){
 			unsigned long regioncode;
 			char* procedure_name;
 			char have_expanded;
-			char* inner_text;
 			const long len_decl = strlen("..decl_farproc(" /*)*/);
 			regioncode = outputcounter >>16;
 			loc_colon = strfind(line, /*(*/"):");
@@ -638,8 +637,6 @@ int main(int argc, char** argv){
 				printf("decl_farproc with region code is missing end parentheses and colon!");
 				goto error;
 			}
-			
-			inner_text = str_null_terminated_alloc(line + len_decl, loc_colon - len_decl);
 			loc_colon += 2;
 			procedure_name = strcatalloc(line + loc_colon, "");
 			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
@@ -668,7 +665,6 @@ int main(int argc, char** argv){
 			if(!line){
 				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
 			}
-			free(inner_text);
 			free(line_old);
 			free(procedure_name);
 		} else if(strprefix("..decl_lproc:", line)){

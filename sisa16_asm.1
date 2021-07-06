@@ -768,6 +768,17 @@ you can move the output counter anywhere in the file using section
 section 0x10000
 
 .TP
+.B region
+
+you can move the output counter to the beginning of a 64k area of memory with region.
+
+region 2
+
+is functionally identical to 
+
+section 0x20000
+
+.TP
 .B fill
 
 fill a region with a constant byte value
