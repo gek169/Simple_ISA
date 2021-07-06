@@ -51,23 +51,22 @@ nop;
 			adecr;
 		st_iteration_count;
 		//If we are using the SDL driver, display the screen.
-		la 0; interrupt;
+		//la 0; interrupt;
 		//the return value tells us if we are currently using SDL.
-		rx0a;
+		//rx0a;
 		//poll for the quit event.
-		la 1; interrupt;
-		llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
-		la 3; interrupt;
-		la 2;interrupt;
-		lb0x10;cmp;
-		sc %asciifun_loopout%; jmpifeq;
+		//la 1; interrupt;
+		//llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
+		//la 3; interrupt;
+		//la 2;interrupt;
+		//lb0x10;cmp;
+		//sc %asciifun_loopout%; jmpifeq;
 		//are we using SDL?
-		:asciifun_back:
-		lb1;
-		rx1b;
-		rxcmp;
-		sc %asciifun_looptop%;
-		jmpifeq;
+		//lb1;
+		//rx1b;
+		//rxcmp;
+		//sc %asciifun_looptop%;
+		//jmpifeq;
 		la %~wait_time%;
 		alpush;
 			proc_wait;
@@ -93,18 +92,20 @@ asm_end_restriction;
 
 section 0;
 //fill a section of memory with something
-	:L_make_tri_top:
+	//:L_make_tri_top:
 		//what sample are we on?
-		arx0;
+		//arx0;
 		//do some computation.
 
 
 		//triangle wave.
-		lb1;rsh;
-		llb %0x4%;
-		mod;
-		lb 0xF0;
-		mul;
+		//lb1;rsh;
+		//llb %0x4%;
+		//mod;
+		//lb 0xF0;
+		//mul;
+
+		
 		//square wave.
 		//lb 8;
 		//and;
@@ -112,7 +113,7 @@ section 0;
 		//rsh;
 		//llb %0x200%;
 		//mul;
-		sc %0xB5%;brx0;faristla;
-		rxincr;rxincr;lrx1 %/0x10000%; rxcmp;sc %L_make_tri_top%; jmpifneq;
-	la 3; interrupt;
+		//sc %0xB5%;brx0;faristla;
+		//rxincr;rxincr;lrx1 %/0x10000%; rxcmp;sc %L_make_tri_top%; jmpifneq;
+	//	la 3; interrupt;
 	la 1;lfarpc;
