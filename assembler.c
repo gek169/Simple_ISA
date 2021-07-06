@@ -160,14 +160,14 @@ int main(int argc, char** argv){
 			||strprefix("--no-comments",argv[i-2])) {
 			enable_dis_comments = 0;
 		}
-		if(strprefix("--disassemble",argv[i-2]) || strprefix("-dis",argv[i-2]) ){
+		if(strprefix("--disassemble",argv[i-2]) || strprefix("-dis",argv[i-2]) || strprefix("--disassembly",argv[i-2])){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
 			disassembler(argv[i-1], loc, 3, 256 * 256 * 256 + 1);
 			exit(0);
 		}
-		if(strprefix("--full-disassemble",argv[i-2]) || strprefix("-fdis",argv[i-2]) ){
+		if(strprefix("--full-disassemble",argv[i-2]) || strprefix("-fdis",argv[i-2]) || strprefix("--full-disassembly",argv[i-2]) ){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
