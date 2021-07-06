@@ -8,6 +8,7 @@
 
 
 ..decl_farproc:proc_atoi_dec
+..export"proc_atoi_dec"
 	//the passed string is in RX0.
 		rx3_0;
 		lb 0; rx2b;

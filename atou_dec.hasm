@@ -4,6 +4,7 @@
 //Read a base ten integer from a string.
 //Note that whitespace is *not* skipped
 ..decl_farproc:proc_atou_dec
+..export"proc_atou_dec"
 	//the passed string is in RX0.
 	rx3_0;
 	lb 0; rx2b;					//happens to be a very fast way of transferring zero into a register.

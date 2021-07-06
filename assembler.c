@@ -1736,8 +1736,16 @@ int main(int argc, char** argv){
 					f = fopen(hfilename, "w");
 					if(f){
 						for(i = nbuiltin_macros; i < nmacros; i++){
-							if( variable_is_redefining_flag[i]&2 )
-								fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
+							if( variable_is_redefining_flag[i]&2 ){
+								if(!(variable_is_redefining_flag[i]&1) ){
+									
+										fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
+								} else {
+									printf(compil_fail_pref);
+									printf("Cannot Export a redefining symbol.\n");
+									goto error;
+								}
+							}
 						}
 					}else{
 						printf(general_fail_pref);
