@@ -603,14 +603,16 @@ int main(int argc, char** argv){
 		else if(line[0] == '.'){
 			long loc_colon = strfind(line, ":");
 			if(line[1] == '.'){
-				printf("<ASM SYNTAX ERROR> Syntactic sugar has a second period but is recognized as a macro declaration. Most likely a spelling error. Line:\n%s\n", line_copy);
+				printf(syntax_fail_pref);
+				printf("Syntactic sugar has a second period but is recognized as a macro declaration. Most likely a spelling error. Line:\n%s\n", line_copy);
 				goto error;
 			}
 			if(loc_colon != -1){
 				line = str_repl_allocf(line, ".", "VAR#");
 				line = str_repl_allocf(line, ":", "#");
 			} else {
-				printf("<ASM SYNTAX ERROR> Syntactic sugar macro declaration without colon! Line:\n%s\n", line_copy);
+				printf(syntax_fail_pref);
+				printf("Syntactic sugar macro declaration without colon! Line:\n%s\n", line_copy);
 				goto error;
 			}
 		}
@@ -619,7 +621,8 @@ int main(int argc, char** argv){
 			char*  line_old = line;
 			long loc_colon2 = strfind(line+1, ":");
 			if(loc_colon2 == -1){
-				printf("<ASM SYNTAX ERROR> Syntactic sugar label declaration without second colon! Line:\n%s\n", line_copy);
+				printf(syntax_fail_pref);
+				printf("Syntactic sugar label declaration without second colon! Line:\n%s\n", line_copy);
 				goto error;
 			}
 			line = strcatallocf2(
