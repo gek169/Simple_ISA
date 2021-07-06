@@ -15,9 +15,9 @@ static char enable_dis_comments = 1;
 static char clear_output = 0;
 static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
-static char* variable_names[65535] = {0};
-static char* variable_expansions[65535] = {0};
-static char variable_is_redefining_flag[65535] = {0};
+static char* variable_names[65536] = {0};
+static char* variable_expansions[65536] = {0};
+static char variable_is_redefining_flag[65536] = {0};
 static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
 static char int_checker(char* proc){
@@ -1049,10 +1049,7 @@ int main(int argc, char** argv){
 				if(!clear_output)printf("\nThis is a macro!\n");
 			}
 			was_macro = 1;
-			if(nmacros == 0xffff) {
-				printf(compil_fail_pref);printf("Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
-				goto error;
-			}
+
 			loc_pound = strfind(line, "#");
 			loc_pound2 = 0;
 			if(loc_pound == -1) {
@@ -1236,6 +1233,10 @@ int main(int argc, char** argv){
 				}
 			}}
 			if(!is_overwriting){
+				if(nmacros >= 0xffff) {
+					printf(compil_fail_pref);printf("Too many macros. Cannot define another one. Line:\n%s\n", line_copy); 
+					goto error;
+				}
 				variable_names[nmacros] = macro_name;
 				variable_expansions[nmacros++] = 
 				str_null_terminated_alloc(
