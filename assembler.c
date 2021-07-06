@@ -495,6 +495,7 @@ int main(int argc, char** argv){
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
 			line = strcatalloc("!", line+strlen("..ascii:"));
+			using_asciz = 0;
 			free(line_old);
 		} else if(strprefix("..asciz:", line)){
 			char* line_old = line;
