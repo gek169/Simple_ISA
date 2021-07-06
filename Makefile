@@ -97,8 +97,11 @@ install_sdl2: sisa16_asm sisa16_emu sisa16_dbg sisa16_sdl2_asm sisa16_sdl2_emu s
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 libc:
+	sisa16_asm -i libc.asm -o libc.bin
 	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
-	@cp *.hasm /usr/include/sisa16/ && echo "Installed libraries." || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
+	@cp *.hasm /usr/include/sisa16/ && echo "Installed libraries." || echo "ERROR!!! Cannot install headers"
+	@cp libc.bin.hasm.tmp /usr/include/sisa16/libc_pre.hasm && echo "Installed libraries." || echo "ERROR!!! Cannot install libc_pre.hasm. It is the main utility library for sisa16"
+	@cp libc.bin /usr/include/sisa16/libc_pre.bin && echo "Installed libraries." || echo "ERROR!!! Cannot install libc_pre.bin It is the main utility library for sisa16"
 
 uninstall:
 	rm -f $(INSTALL_DIR)/sisa16*
