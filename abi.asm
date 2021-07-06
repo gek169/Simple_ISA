@@ -3,6 +3,7 @@
 section 0xFFffFF;bytes 0,0;
 //define the regions to use.
 //we also need to define these ADDR variables, just set them to zero.
+
 VAR#DATA_REGION_1#0x2A
 VAR#DATA_REGION_1_ADDR#0x2A0000
 VAR#__START__#0x1
@@ -37,7 +38,7 @@ bytes 0;
 
 
 VAR#BOOT_REGION#__START__
-ASM_header bootdol.hasm
+..include"bootdol.hasm"
 
 
 //MAIN FUNCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
