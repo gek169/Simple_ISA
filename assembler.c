@@ -487,19 +487,23 @@ int main(int argc, char** argv){
 		if(strprefix("..zero:", line)){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..zero:"));
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..z:", line)){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..z:"));
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
 			line = strcatalloc("!", line+strlen("..ascii:"));
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			using_asciz = 0;
 			free(line_old);
 		} else if(strprefix("..asciz:", line)){
 			char* line_old = line;
 			line = strcatalloc("!", line+strlen("..asciz:"));
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 			using_asciz = 1;
 		} else if(strprefix("..(", line)){
@@ -519,9 +523,7 @@ int main(int argc, char** argv){
 					{
 						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
 						line_old = line;
-						if(!line){
-							printf(general_fail_pref); printf("Failed Malloc."); exit(1);
-						}
+						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						have_expanded = 1;
 						break;
 					}
