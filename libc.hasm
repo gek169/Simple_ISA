@@ -14,7 +14,7 @@ section 0x20000;asm_begin_region_restriction;
 //They take a page to share with the client in the second parameter, so memory can be shared.
 //Register A (upon return) is the return value from the containerized machine, so you can use the error code if there was one.
 
-//Copy shit.
+//Copy sh*t.
 farldrx0 %&libc_emulate_stack_data_store%
 farstrx0 %&0%
 .libc_emulate_jumploc:@+1+
