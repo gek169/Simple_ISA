@@ -1192,6 +1192,21 @@ int main(int argc, char** argv){
 					goto error;	
 				}
 			}}
+
+			/*Conditional Declaration.*/
+			if(macro_name[0] == '?'){
+				unsigned long i;
+				char* mn_old = macro_name;
+				macro_name = strcatalloc(macro_name+1,"");
+				if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				free(mn_old);
+				
+				for(i = nbuiltin_macros; i < nmacros; i++)
+					if(streq(macro_name, variable_names[i])){
+						free(macro_name);
+						goto end;
+					}
+			}
 			/*
 				Prevent macros from being defined which are illegal.
 			*/
@@ -1209,21 +1224,6 @@ int main(int argc, char** argv){
 					printf(syntax_fail_pref);printf("This macro begins with a number! '%c':\n%s\n",macro_name[0], line_copy);
 					goto error;
 				}
-			}
-			if(macro_name[0] == '?'){
-				unsigned long i;
-				char* mn_old = macro_name;
-				macro_name = strcatalloc(macro_name+1,"");
-				if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				free(mn_old);
-				/*
-					Do not attempt to redefine this macro if it already exists.
-				*/
-				for(i = nbuiltin_macros; i < nmacros; i++)
-					if(streq(macro_name, variable_names[i])){
-						free(macro_name);
-						goto end;
-					}
 			}
 			/*
 				Check and make sure this is not a reserved name
