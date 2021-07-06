@@ -1661,7 +1661,8 @@ int main(int argc, char** argv){
 				/*The assembler will warn you if the block changes during the creation of the function.*/
 				region_restriction = (outputcounter>>8) & 0xFFFF;
 				region_restriction_mode = 1; /*block*/
-			} else if(strprefix("asm_end_block_restriction", metaproc)|| 
+			} else if(
+					strprefix("asm_end_block_restriction", metaproc)|| 
 					strprefix("asm_end_page_restriction", metaproc)||
 					strprefix("asm_end_restriction", metaproc)
 				)
@@ -1684,6 +1685,36 @@ int main(int argc, char** argv){
 						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],expansion);	
 					}else
 						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
+				}
+			} else if (strprefix("asm_create_header", metaproc)){
+				/*
+					Create a header file for this compilation unit. That means exporting all macros
+					that are not redefining.
+				*/
+				if(!run_sisa16)
+				if(npasses == 1){
+					char* hfilename;
+					unsigned long i;
+					FILE* f;
+					hfilename = strcatalloc(outfilename, ".hasm.tmp");
+					if(!hfilename){
+						printf(general_fail_pref);
+						printf("Failed Malloc");
+						exit(1);
+					}
+					f = fopen(hfilename, "w");
+					if(f){
+						for(i = nbuiltin_macros; i < nmacros; i++){
+							if(!variable_is_redefining_flag[i])
+								fprintf(f, "VAR#%s#%s", variable_names[i], variable_expansions[i]);
+						}
+					}else{
+						printf(general_fail_pref);
+						printf("Cannot open file %s", hfilename);
+						free(hfilename);
+						exit(1);
+					}
+					free(hfilename);
 				}
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)

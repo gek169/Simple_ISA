@@ -12,12 +12,18 @@ CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
-qdev:
+
+q:
 	sudo $(MAKE) -B install
 	sudo $(MAKE) clean
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
 	git push || echo "nothing to push"
+	./asmbuild.sh
+
+d:
+	sudo $(MAKE) -B install
+	sudo $(MAKE) clean
 	./asmbuild.sh
 
 sisa16_emu:
@@ -52,22 +58,24 @@ sisa16_sdl2_dbg:
 
 main: sisa16_asm sisa16_emu sisa16_dbg
 
-check: asm_programs
+asm: sisa16_asm
+	./asm_compile.sh
 
 isa_constexpr:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
-asm_programs: sisa16_asm
+#used by github actions.
+check: d
 #effectively, a check.
-	./asm_compile.sh
-	./sisa16_asm -C
-	./sisa16_asm -v
-	./sisa16_asm -dis clock.bin 0x10000
-	./sisa16_asm -dis clock.bin 0x20000
-	./sisa16_asm -fdis echo.bin 0
-	./sisa16_asm -dis echo2.bin 0x20000
-	./sisa16_asm -fdis switchcase.bin 0
-	./sisa16_asm -fdis controlflow_1.bin 0
+	./asmbuild.sh
+	sisa16_asm -C
+	sisa16_asm -v
+	sisa16_asm -dis clock.bin 0x10000
+	sisa16_asm -dis clock.bin 0x20000
+	sisa16_asm -fdis echo.bin 0
+	sisa16_asm -dis echo2.bin 0x20000
+	sisa16_asm -fdis switchcase.bin 0
+	sisa16_asm -fdis controlflow_1.bin 0
 	
 install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
