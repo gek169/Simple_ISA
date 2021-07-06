@@ -21,7 +21,6 @@ farstrx0 %&0%
 lrx0 %/0%; 
 farjmprx0;
 :libc_emulate_stack_data_store:
-:libc_mcpy_src:
 nop;nop;nop;nop;
 
 //Both of these functions use register B to store the page that 
@@ -219,6 +218,8 @@ farret;
 //src: RX1
 //dest: RX0
 //bytes: RX2
+:libc_mcpy_src:
+nop;nop;nop;nop;
 
 ..decl_farproc:proc_memcpy
 	rx3_0;
