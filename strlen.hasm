@@ -1,0 +1,29 @@
+//STRLEN~~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: A, B, C, RX0, RX1, RX2
+..decl_farproc:proc_strlen
+	//Grab the far pointer.
+	astp; lb 6; sub; ca; ildb;
+	rx0b; lb16; rx1b; rxlsh;
+	aincr; ca; illdb; 
+	rx1b; rxadd;
+	//It's in RX0.
+	//we now have our far pointer! put it on the top of the stack for easy access.
+	//we actually push 4 bytes, so we can rx0pop.
+	rx1_0;
+	lb0;rx2b;
+	:libc_strlen_looptop:
+		rx0_1;	cbrx0;
+		farilda;
+		lb0;		cmp;	sc%libc_strlen_loopend%;	jmpifeq;
+		rxincr;		rx1_0;
+		rx0_2;		rxincr;		rx2_0;
+		sc %libc_strlen_looptop%;jmp;
+	:libc_strlen_loopend:
+		rx0_2;								//move RX2 to RX0 so we can keep it.
+		astp;lb5;sub;ca;
+		arx0; istla							//get the low 16 bits.
+		lb16;rx1b;
+		rxrsh
+		astp;lb6;sub;ca;
+		arx0; ista;
+farret;

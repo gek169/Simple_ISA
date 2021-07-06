@@ -1,0 +1,27 @@
+//WAIT~~~~~~~~~~~~
+//Clobbers: A, B, C, RX0, RX1.
+//short argument is passed via the stack rather than a register.
+//RX registers go unused.
+//wait_ms is in RX0.
+//start_ms is in RX1.
+//prototype: wait(short milliseconds)
+..decl_farproc:proc_wait
+	//	retrieve our argument and store it in RX0.
+	astp;lb5;sub;illdaa;rx0a;
+	//	store the start time in RX1
+	clock;				rx1a;
+	//loop.
+	:libc_wait_looptop:
+		//grab the time.
+		clock;
+		brx1;
+		sub;
+		ba;
+		arx0;
+		cmp;
+		lb 2;
+		cmp;
+		sc %libc_wait_loopout%; jmpifneq;
+		sc %libc_wait_looptop%; jmp;
+	:libc_wait_loopout:
+farret;

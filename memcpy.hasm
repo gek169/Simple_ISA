@@ -1,0 +1,37 @@
+//MEMCPY~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: A,B,C, RX0, RX1, RX2, RX3.
+//RETURNS: Nothing.
+//ARGS:
+//src: RX1
+//dest: RX0
+//bytes: RX2
+:libc_mcpy_src:
+nop;nop;nop;nop;
+
+..decl_farproc:proc_memcpy
+	rx3_0;
+	farstrx1 %&libc_mcpy_src%;
+	lb0;rx1b;
+	:libc_mcpy_looptop:
+		//Quit? if not, decrement.
+		rx0_2 
+		rxcmp
+		sc %libc_mcpy_loopend%; jmpifeq;
+		rxdecr
+		rx2_0
+		
+		//load a single byte.
+		farldrx0 %&libc_mcpy_src%
+		cbrx0
+		farilda
+		rxincr
+		farstrx0 %&libc_mcpy_src%
+		//store that single byte.
+		rx0_3
+			cbrx0
+			farista
+			rxincr
+		rx3_0
+		sc %libc_mcpy_looptop%; jmp;
+	:libc_mcpy_loopend:
+farret;
