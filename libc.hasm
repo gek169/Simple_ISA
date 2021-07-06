@@ -6,11 +6,10 @@
 //~~Let all that you do be done with love~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//if you wish to change the region that this is placed in,
-//search for LIBC_CHANGE_REGION in this source code. All lines marked must be changed.
-//You may 
+
 
 ..(2):
+//if you wish to change the region that this is placed in, you must modify emulation.hasm.
 ..include"emulation.hasm"
 ..include"printbytehex.hasm"
 ..include"puts.hasm"

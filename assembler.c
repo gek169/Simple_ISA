@@ -39,7 +39,7 @@ static char int_checker(char* proc){
 		chars_read = 0;
 	} /*hex*/
 	if(int_mode == 1 && (proc[0] == ',' || proc[0] == ';' || proc[0] == '\0')) return 0; /*zero.*/
-	for(;!(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0');proc++){
+	for(;!(proc[0] == ',' || proc[0] == ';' || proc[0] ==/*(*/ ')' || proc[0] == '\0');proc++){
 		/*Check hex*/
 		if(int_mode==2 && 
 		!( (*proc <= '9' && *proc >= '0') || (*proc <= 'F' && *proc >= 'A') || (*proc <= 'f' && *proc >= 'a'))
@@ -503,9 +503,33 @@ int main(int argc, char** argv){
 			using_asciz = 1;
 		} else if(strprefix("..(", line)){
 			char buf[40];
+			char have_expanded = 0;
 			unsigned long secnum = 0;
 			char* line_old = line;
 			long loc_eparen = strfind(line, /*(*/"):");
+			/*
+				attempt to find a macro to expand here.
+			*/
+			do{
+				unsigned long i = 0;
+				have_expanded = 0;
+				for(i=nbuiltin_macros; i < nmacros; i++){
+					if(strfind(line,variable_names[i]) ==3)
+					{
+						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
+						if(!line){
+							printf(general_fail_pref); printf("Failed Malloc."); exit(1);
+						}
+						have_expanded = 1;
+						break;
+					}
+				}
+			}while(have_expanded == 1);
+			if(int_checker(line+3)){
+				printf(syntax_fail_pref);
+				printf("Bad integer constant inside of region select syntactic sugar.\n");
+				goto error;
+			}
 			secnum = strtoul(line + 3, 0,0);
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for region selection is missing ending \"):\"");
@@ -555,19 +579,19 @@ int main(int argc, char** argv){
 			);
 			free(line_old);
 		} else if(strprefix("..decl_farproc:", line)){
-			char buf[100];
+			char buf[900];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
-			buf[99] = 0;
+			buf[899] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
 			line = strcatalloc(buf,"");
 			free(line_old);
 			free(procedure_name);
 		} else if(strprefix("..decl_lproc:", line)){
-			char buf[100];
+			char buf[900];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_lproc:"), "");
-			buf[99] = 0;
+			buf[899] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;call;", procedure_name, outputcounter & 0xFFff);
 			line = strcatalloc(buf,"");
 			free(line_old);

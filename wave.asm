@@ -5,15 +5,17 @@
 .PUSH_FARPTR_VARIABLE:		ac;apush;blpush;
 
 //global variables.
-.ld_iteration_count:	sc%0x3%;lb 0;farillda;
-.st_iteration_count:	sc%0x3%;lb 0;faristla;
+.ld_iteration_count:	farllda %&0x30000%;
+.st_iteration_count:	farstla %&0x30000%;
 
 section 0x40000;
 :ascii_greyscale:
 ..asciz: .:-=+*#%@%#*+=-:.
 
+
+
 ..(3):
-bytes 0,0,0,5;
+bytes 0,0,0,0;
 
 ..include"libc.hasm"
 
