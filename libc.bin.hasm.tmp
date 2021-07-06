@@ -9,3 +9,4 @@ VAR#proc_memcpy#sc%644%;la2;farcall;
 VAR#proc_gets#sc%681%;la2;farcall;
 VAR#proc_atou_dec#sc%971%;la2;farcall;
 VAR#proc_atoi_dec#sc%1023%;la2;farcall;
+VAR#proc_wait#sc%1134%;la2;farcall;
