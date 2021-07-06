@@ -8,6 +8,7 @@
 .libc_gets_max_chars:0xffFE
 
 ..decl_farproc:proc_gets
+..export"proc_gets"
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;
 	rx0b; lb16; rx1b; rxlsh;

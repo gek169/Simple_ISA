@@ -9,6 +9,7 @@
 nop;nop;nop;nop;
 
 ..decl_farproc:proc_memcpy
+..export"proc_memcpy"
 	rx3_0;
 	farstrx1 %&libc_mcpy_src%;
 	lb0;rx1b;

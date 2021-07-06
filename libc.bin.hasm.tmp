@@ -1,0 +1,5 @@
+VAR#LIBC_REGION#2
+VAR#proc_emulate#sc%18%;la2;farcall;
+VAR#proc_emulate_seg#sc%53%;la2;farcall;
+VAR#proc_printbytehex#sc%88%;la2;farcall;
+VAR#proc_printbytelchex#sc%318%;la2;farcall;
