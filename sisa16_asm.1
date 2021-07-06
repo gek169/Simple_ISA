@@ -668,17 +668,40 @@ is syntactic sugar for
 
 VAR#myMacro#definition
 
+this works for conditionals as well:
+
+".?myMacro:definition"
+
+will expand to
+
+"VAR#?myMacro#definition"
+
 ":myLabel:"
 
 is syntactic sugar for
 
 VAR#myLabel#@
 
+you can also just use a single colon at the end
+
+"myLabel:"
+
+both of them expand to the same thing.
+
+Note that neither form of syntactic sugar may have anything else on the same line.
+
 "..decl_farproc:myProcedure"
 
 is syntactic sugar for
 
 VAR#myProcedure#sc %@%;la region;farcall;
+
+"..decl_farproc(3):myProcedure"
+
+is syntactically identical to above, but "region" will always be 3.
+You can also use a macro:
+
+"..decl_farproc(3):myProcedure"
 
 "..decl_lproc:myProcedure"
 

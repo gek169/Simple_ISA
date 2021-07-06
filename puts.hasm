@@ -1,6 +1,6 @@
 //PUTS~~~~~~~~~~~~~~~
 //CLOBBERS: A, B, C, RX0, RX1
-..decl_farproc:proc_puts
+..decl_farproc(LIBC_REGION):proc_puts
 ..export"proc_puts"
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;

@@ -611,13 +611,55 @@ int main(int argc, char** argv){
 			}
 			goto end;
 		} else if(strprefix("..decl_farproc:", line)){
-			char buf[900];
+			char buf[2048];
 			char* line_old = line;
 			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
-			buf[899] = 0;
+			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			buf[2047] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
 			line = strcatalloc(buf,"");
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			free(line_old);
+			free(procedure_name);
+		} else if(strprefix("..decl_farproc(" /*)*/, line)){
+			char buf[2048];
+			char* line_old = line;
+			long loc_colon = -1;
+			unsigned long regioncode;
+			char* procedure_name;
+			char* inner_text;
+			const long len_decl = strlen("..decl_farproc(" /*)*/);
+			regioncode = outputcounter >>16;
+			loc_colon = strfind(line, /*(*/"):");
+			if(loc_colon == -1)
+			{
+				printf(syntax_fail_pref);
+				printf("decl_farproc with region code is missing end parentheses and colon!");
+				goto error;
+			}
+			
+			inner_text = str_null_terminated_alloc(line + len_decl, loc_colon - len_decl);
+			loc_colon += 2;
+			procedure_name = strcatalloc(line + loc_colon, "");
+			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			/*Construct the name.*/
+			{unsigned long i;
+				char have_found = 0;
+				for(i = nbuiltin_macros; i < nmacros; i++)
+					if(streq(variable_names[i], inner_text)){
+						have_found = 1;
+						regioncode = strtoul(variable_expansions[i],0,0);
+						break;	
+					}
+				if(!have_found) regioncode = strtoul(inner_text,0,0);
+			}
+			buf[2047] = 0;
+			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, regioncode);
+			line = strcatalloc(buf,"");
+			if(!line){
+				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
+			}
+			free(inner_text);
 			free(line_old);
 			free(procedure_name);
 		} else if(strprefix("..decl_lproc:", line)){
