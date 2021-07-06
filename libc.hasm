@@ -7,9 +7,8 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-
-..(2):
-//if you wish to change the region that this is placed in, you must modify emulation.hasm.
+.LIBC_REGION:2
+..(LIBC_REGION):
 ..include"emulation.hasm"
 ..include"printbytehex.hasm"
 ..include"puts.hasm"

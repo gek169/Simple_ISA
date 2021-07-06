@@ -1,4 +1,4 @@
-..(2):									//LIBC_CHANGE_REGION
+..(LIBC_REGION):
 asm_begin_region_restriction;
 
 //EMULATION STATION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -26,7 +26,7 @@ nop;nop;nop;nop;
 	farstrx0 %&libc_emulate_stack_data_store%
 	sc %0%; la 2; ista; //la
 	adecr;ca;			//put 1 into c.
-	lla %0x244%; istla;	//2- the region we want to jump to. lfarpc is 0x44. LIBC_CHANGE_REGION
+	lla %~LIBC_REGION%, 0x44; istla;
 	ab;
 	emulate;
 	//restore stack integrity.
@@ -43,7 +43,7 @@ farret;
 	farstrx0 %&libc_emulate_stack_data_store%
 	sc %0%; la 2; ista; 	//la
 	adecr;ca;				//put 1 into c.
-	lla %0x244%; istla;		//2- the region we want to jump to. lfarpc is 0x44. LIBC_CHANGE_REGION
+	lla %~LIBC_REGION%, 0x44; istla;
 	ab;
 	emulate_seg;
 	//restore stack integrity.
