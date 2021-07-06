@@ -6,6 +6,7 @@
 //start_ms is in RX1.
 //prototype: wait(short milliseconds)
 ..decl_farproc:proc_wait
+..export"proc_wait"
 	//	retrieve our argument and store it in RX0.
 	astp;lb5;sub;illdaa;rx0a;
 	//	store the start time in RX1
