@@ -5,7 +5,12 @@
 .POP_FARPTR_VARIABLE:	blpop;apop;ca;
 .PUSH_FARPTR_VARIABLE:	ac;apush;blpush;
 
+
+
 ..include"libc.hasm"
+//..include"libc_pre.hasm"
+//..(2):
+//ASM_data_include libc_pre.bin
 
 .BENCH_SECONDS:256
 
