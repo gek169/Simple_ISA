@@ -238,6 +238,7 @@ static unsigned short interrupt(unsigned short a,
 				SEGMENT = calloc(1, 0x100*n_pages);
 				SEGMENT_PAGES = n_pages;
 				if(!SEGMENT){ /*error*/
+					fclose(ff);
 					SEGMENT = calloc(1, 0x100);
 					SEGMENT_PAGES = 1;
 					if(!SEGMENT){ /*error*/
