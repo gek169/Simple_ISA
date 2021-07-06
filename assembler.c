@@ -1707,7 +1707,7 @@ int main(int argc, char** argv){
 						for(i = nbuiltin_macros; i < nmacros; i++){
 							if(!variable_is_redefining_flag[i])
 								if(int_checker(variable_expansions[i]) == 0)
-									fprintf(f, "VAR#%s#%s\r\n", variable_names[i], variable_expansions[i]);
+									fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
 						}
 					}else{
 						printf(general_fail_pref);
