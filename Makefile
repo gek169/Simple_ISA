@@ -109,5 +109,5 @@ uninstall:
 	@echo "Note that if you have libraries under /usr/include/sisa16/, they were *not* removed."
 
 clean:
-	rm -f *.exe *.out *.o *.bin sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes
+	rm -f *.exe *.out *.o *.bin *.tmp sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes
 	clear || echo "cannot clear?"
