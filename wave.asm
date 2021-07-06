@@ -1,8 +1,8 @@
 #!/usr/local/bin/sisa16_asm -run
 
 .ZERO_STACK_POINTER:		astp;popa;
-.POP_FARPTR_VARIABLE:	blpop;apop;ca;
-.PUSH_FARPTR_VARIABLE:	ac;apush;blpush;
+.POP_FARPTR_VARIABLE:		blpop;apop;ca;
+.PUSH_FARPTR_VARIABLE:		ac;apush;blpush;
 
 //global variables.
 .ld_iteration_count:	sc%0x3%;lb 0;farillda;
