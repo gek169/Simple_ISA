@@ -629,6 +629,20 @@ everything after the second # is part of the macro.
 
 Several built-in macros are evaluated inside of macro definitions, such as @ and $.
 
+You can define a macro if it was not already defined, by putting a questionmark in front of its name:
+
+VAR#?myMacro#defaultvalue
+
+this allows you to give macros a "default value".
+
+if these two lines follow sequentially in a source file:
+
+VAR#LIBRARY_REGION#12
+
+VAR#?LIBRARY_REGION#2
+
+they will define LIBRARY_REGION to be 12, not 2.
+
 .TP
 .B Exported Symbols
 

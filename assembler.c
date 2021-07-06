@@ -1210,6 +1210,21 @@ int main(int argc, char** argv){
 					goto error;
 				}
 			}
+			if(macro_name[0] == '?'){
+				unsigned long i;
+				char* mn_old = macro_name;
+				macro_name = strcatalloc(macro_name+1,"");
+				if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				free(mn_old);
+				/*
+					Do not attempt to redefine this macro if it already exists.
+				*/
+				for(i = nbuiltin_macros; i < nmacros; i++)
+					if(streq(macro_name, variable_names[i])){
+						free(macro_name);
+						goto end;
+					}
+			}
 			/*
 				Check and make sure this is not a reserved name
 			*/
@@ -1375,13 +1390,14 @@ int main(int argc, char** argv){
 				if(!clear_output)printf("\nMacro Name is %s, size %u\n", variable_names[nmacros-1], (unsigned int)strlen(variable_names[nmacros-1]));
 			}
 		}
+		if(was_macro) goto end;
 		if(quit_after_macros || debugging) {
 			if(!clear_output)printf("\n#Line post macro expansion and evaluation:\n");
 			ASM_PUTS(line); 
 			if(quit_after_macros) goto end;
 		}
 
-		if(was_macro) goto end;
+		
 		/*We must first determine if this line contains a line comment. Don't search past the line comment for insns.*/
 		if(strfind(line, "//") != -1){
 			long loc_line_comment = strfind(line, "//");
