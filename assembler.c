@@ -431,11 +431,6 @@ int main(int argc, char** argv){
 	while(1){
 		char was_macro = 0;	
 		char using_asciz = 0;
-/*
-		if(!infile) {
-			puts("<ASM INTERNAL ERROR> infile is null? This should never happen.");
-		}
-*/
 		if(feof(infile)){
 			/*try popping from the fstack*/
 			if(include_level > 0){
@@ -449,11 +444,7 @@ int main(int argc, char** argv){
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
 		line = read_until_terminator_alloced(infile, &linesize, '\n', 180);
-		if(!line) {
-			printf(compil_fail_pref);
-			puts("failed malloc for line.");
-			goto error;
-		}
+		if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 		while(
 				strprefix(" ",line) 
 				|| strprefix("\t",line)
@@ -461,6 +452,7 @@ int main(int argc, char** argv){
 				){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}
 		/*if this line ends in a backslash...*/
@@ -472,7 +464,9 @@ int main(int argc, char** argv){
 			char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced(infile, &linesize, '\n', 1);
+			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			line = strcatallocfb(line,line_temp);
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			linesize = strlen(line);
 		}
 		line_copy = strcatalloc(line,"");
