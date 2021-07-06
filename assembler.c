@@ -1242,7 +1242,6 @@ int main(int argc, char** argv){
 				strfind(macro_name, "shorts") != -1 ||
 				strfind(macro_name, "asm_") != -1 ||
 				strfind(macro_name, "ASM_") != -1 ||
-				strfind(macro_name, "_arg") != -1 ||
 				/*begins with a number*/
 				(macro_name[0] <= '9' && macro_name[0] >= '0')
 			)
@@ -1255,7 +1254,7 @@ int main(int argc, char** argv){
 			if(
 				strfind("!", macro_name) != -1 ||
 				strfind("?", macro_name) != -1 ||
-				strfind(".", macro_name) != -1 ||
+				strfind("..", macro_name) != -1 ||
 				strfind(":", macro_name) != -1 ||
 				strfind("~", macro_name) != -1 ||
 				strfind("-", macro_name) != -1 ||
@@ -1277,11 +1276,10 @@ int main(int argc, char** argv){
 				strfind("shorts",macro_name) != -1 ||
 				strfind("asm_",macro_name) != -1 ||
 				strfind("ASM_", macro_name) != -1 ||
-				strfind("_arg", macro_name) != -1 ||
 				strfind("section", macro_name) != -1 ||
 				strfind("fill", macro_name) != -1 ||
 				strfind("asm_help", macro_name) != -1 ||
-				strfind("asm_call", macro_name) != -1 ||
+				strfind("asm_export_header", macro_name) != -1 ||
 				strfind("asm_fix_outputcounter", macro_name) != -1 ||
 				strfind("asm_print", macro_name) != -1 ||
 				strfind("asm_vars", macro_name) != -1 ||
@@ -1702,7 +1700,6 @@ int main(int argc, char** argv){
 				if(!clear_output)printf("<DUMPING SYMBOL TABLE ON PASS %ld>\n", npasses+1);
 				for(i=0;i<nmacros;i++){
 					if(i==nmacros) ASM_PUTS("Showing User Macros");
-					if(strprefix("_arg", variable_names[i])) if(!clear_output)printf("\n<auto>:");
 					if(i==0){char expansion[1024];
 						sprintf(expansion, "%lu", outputcounter);
 						expansion[1023] = '\0'; /*Just in case...*/
@@ -1715,7 +1712,6 @@ int main(int argc, char** argv){
 						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
 			} else if (
-				strprefix("asm_create_header", metaproc) ||
 				strprefix("asm_export_header", metaproc)
 			){
 				/*
