@@ -15,18 +15,15 @@ section 0x40000;
 ..(3):
 bytes 0,0,0,5;
 
-ASM_header libc.hasm
+..include"libc.hasm"
 
 
 .line_length:			90
 .line_length_plus_1:	91
 .wait_time:				16
 
-section 0xB00000;
-fill 153600,0x2E
-
-//section 0xB50000;
-
+//section 0xB00000;
+//fill 153600,0x2E
 
 section 0x10000;
 asm_begin_region_restriction;
@@ -51,22 +48,22 @@ nop;
 			adecr;
 		st_iteration_count;
 		//If we are using the SDL driver, display the screen.
-		//la 0; interrupt;
-		//the return value tells us if we are currently using SDL.
-		//rx0a;
-		//poll for the quit event.
-		//la 1; interrupt;
-		//llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
-		//la 3; interrupt;
-		//la 2;interrupt;
-		//lb0x10;cmp;
-		//sc %asciifun_loopout%; jmpifeq;
-		//are we using SDL?
-		//lb1;
-		//rx1b;
-		//rxcmp;
-		//sc %asciifun_looptop%;
-		//jmpifeq;
+			//la 0; interrupt;
+			//the return value tells us if we are currently using SDL.
+			//rx0a;
+			//poll for the quit event.
+			//la 1; interrupt;
+			//llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
+			//la 3; interrupt;
+			//la 2;interrupt;
+			//lb0x10;cmp;
+			//sc %asciifun_loopout%; jmpifeq;
+			//are we using SDL?
+			//lb1;
+			//rx1b;
+			//rxcmp;
+			//sc %asciifun_looptop%;
+			//jmpifeq;
 		la %~wait_time%;
 		alpush;
 			proc_wait;
