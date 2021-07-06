@@ -594,9 +594,29 @@ VAR#myLabel#@
 
 is one way of doing a label.
 
-:myLabel:
+":myLabel:"
 
-is the syntactic sugar for the same.
+is explicit syntactic sugar for the same.
+
+You can also do:
+
+"myLabel:"
+
+Note that regardless of anything else, there must never be anything after a label on the same line.
+
+"myLabel: la 1; lfarpc;"
+
+this will be tranformed under syntactic sugar rules to
+
+"VAR#myLabel#@"
+
+Everything after the colon is discarded.
+
+The same thing happens to this line:
+
+":myLabel: la 1; lfarpc;"
+
+So don't do that.
 
 .TP
 .B Macros

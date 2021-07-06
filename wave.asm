@@ -34,7 +34,7 @@ alpush;
 st_iteration_count;
 nop;
 nop;
-:asciifun_looptop:
+asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;
 			aincr;

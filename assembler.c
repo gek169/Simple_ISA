@@ -481,7 +481,7 @@ int main(int argc, char** argv){
 		if(strprefix("//",line)) goto end;
 
 		/*
-			syntactic sugars.
+			syntactic sugars. Only one may be used on a single line!
 		*/
 		/*syntactic sugar for declaring procedures that call to the current output counter.*/
 		if(strprefix("..zero:", line)){
@@ -551,6 +551,9 @@ int main(int argc, char** argv){
 					line + loc_eparen
 				)
 			);
+			if(!line){
+				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
+			}
 			free(line_old);
 		} else if(strprefix("..include\"", line)){
 			char* line_old = line;
@@ -565,6 +568,7 @@ int main(int argc, char** argv){
 				"ASM_header ",
 				str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)
 			);
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		} else if(strprefix("..include \"", line)){
 			char* line_old = line;
@@ -579,6 +583,7 @@ int main(int argc, char** argv){
 				"ASM_header ",
 				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)
 			);
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		} else if(strprefix("..decl_farproc:", line)){
 			char buf[900];
@@ -587,6 +592,7 @@ int main(int argc, char** argv){
 			buf[899] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
 			line = strcatalloc(buf,"");
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 			free(procedure_name);
 		} else if(strprefix("..decl_lproc:", line)){
@@ -596,6 +602,7 @@ int main(int argc, char** argv){
 			buf[899] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;call;", procedure_name, outputcounter & 0xFFff);
 			line = strcatalloc(buf,"");
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 			free(procedure_name);
 		}
@@ -609,7 +616,9 @@ int main(int argc, char** argv){
 			}
 			if(loc_colon != -1){
 				line = str_repl_allocf(line, ".", "VAR#");
+				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 				line = str_repl_allocf(line, ":", "#");
+				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			} else {
 				printf(syntax_fail_pref);
 				printf("Syntactic sugar macro declaration without colon! Line:\n%s\n", line_copy);
@@ -632,16 +641,41 @@ int main(int argc, char** argv){
 					"#@"
 				)
 			);
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
+		} else if(!strprefix("!",line) && !strprefix("VAR#",line)){
+			long loc = strfind(line, "//");
+			/*We must remove line comments.*/
+			if(loc!= -1){
+				line[loc] = '\0';
+			}
+			loc = strfind(line, "#");
+			if(loc!= -1){
+				line[loc] = '\0';
+			}
+			/*Now, remove succeeding whitespace.*/
+			/*Alternate syntax for labels, more traditional to assemblers.*/
+			loc = strfind(line, ":");
+			if(loc == 0){
+				printf(syntax_fail_pref);
+				printf("Cannot declare empty label!!.\r\n");
+				goto error;
+			}
+			if(
+				loc != -1
+			){
+				char* line_old = line;
+				line = strcatallocf2(
+					"VAR#",
+					strcatallocf1(
+						str_null_terminated_alloc(line, loc),
+						"#@"
+					)
+				);
+				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				free(line_old);
+			}
 		}
-		/*
-		else if(
-			(strlen(line) > 0) &&
-			(line[strlen(line)-1] == ':')
-		){
-			
-		}
-		*/
 		if(strprefix("!",line)) {unsigned long i;
 			/*We are writing out individual bytes for the rest of the line.*/
 			if(debugging)
@@ -764,6 +798,7 @@ int main(int argc, char** argv){
 			free(line_old);
 		}
 		/*Find line comments... but only on non-VAR lines!*/
+		/*Note that even though we already did this, we must do it again!*/
 		if(!strprefix("VAR#",line)){
 			if(strfind(line, "//") != -1){
 				line[strfind(line, "//")] = 0;
