@@ -1,6 +1,8 @@
 #!/usr/local/bin/sisa16_asm -run
 
-section 0;sc %L_main%; jmp;
+..zero:
+	sc %L_main%; jmp;
+
 section 1000;
 .proc_printbytehex:sc %1000%;call;
 	//retrieve our argument.

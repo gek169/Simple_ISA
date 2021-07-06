@@ -87,8 +87,9 @@ la 7; putchar;
 halt;
 asm_end_restriction;
 
-section 0;
-//fill a section of memory with something
+..zero:
+	//used for testing the SDL2 driver.
+	//You can just delete this.
 	//:L_make_tri_top:
 		//what sample are we on?
 		//arx0;

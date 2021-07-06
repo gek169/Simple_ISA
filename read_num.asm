@@ -41,5 +41,5 @@
 	proc_printbytelchex;
 		apop;
 	la 0xa; putchar; la 0xd; putchar;
-..(0):
+..zero:
 	la 1; lfarpc;

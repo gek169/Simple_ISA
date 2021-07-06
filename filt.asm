@@ -3,7 +3,7 @@
 ..include"libc.hasm"
 
 
-..(0):
+..zero:
 la 1; lfarpc;
 
 ..(1):

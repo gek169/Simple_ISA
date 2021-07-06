@@ -25,5 +25,5 @@
 	pop %3%;
 	halt;
 
-..(0):
+..zero:
 	la 1; lfarpc;

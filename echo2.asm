@@ -1,7 +1,7 @@
 #!/usr/local/bin/sisa16_asm -run
 //create a whole-memory image.
 
-section 0;
+..zero:
 la 1; lfarpc;
 
 
