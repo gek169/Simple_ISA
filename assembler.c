@@ -1712,7 +1712,7 @@ int main(int argc, char** argv){
 						if(!clear_output)printf("VAR#%s#%s\n",variable_names[i],variable_expansions[i]);
 				}
 			} else if (
-				strprefix("asm_export_header", metaproc)
+				strprefix("ASM_EXPORT_HEADER", metaproc)
 			){
 				/*
 					Create a header file for this compilation unit. That means exporting all macros

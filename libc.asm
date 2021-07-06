@@ -1,4 +1,4 @@
 
 ..include"libc.hasm"
 
-asm_export_header
+ASM_EXPORT_HEADER
