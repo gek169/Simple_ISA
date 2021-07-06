@@ -1123,6 +1123,10 @@ int main(int argc, char** argv){
 				strfind(macro_name, "/") != -1 ||
 				strfind(macro_name, " ") != -1 ||
 				strfind(macro_name, "\t") != -1 ||
+				strfind(macro_name, "\v") != -1 ||
+				strfind(macro_name, "\f") != -1 ||
+				strfind(macro_name, "\n") != -1 ||
+				strfind(macro_name, "\r") != -1 ||
 				strfind(macro_name, ";") != -1 ||
 				strfind(macro_name, "|") != -1 ||
 				strfind(macro_name, "#") != -1 ||
