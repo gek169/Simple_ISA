@@ -36,10 +36,10 @@ typedef struct asm_expr_stack_elem{
 		5 = float
 		needed because, 
 		for instance, this is invalid:
-		..eu16: uint(22+27*2) + 5
+		..eu16: u32(22+27*2) + 5
 		because math cannot be performed in a 16 bit unsigned expression between a u32 and the 16 bit 5.
 		however this is valid:
-		..eu16: uint_to_ushort(22+27*2) + 5
+		..eu16: u32_to_u16(22+27*2) + 5
 	*/
 	unsigned long ptr_level;
 	/*

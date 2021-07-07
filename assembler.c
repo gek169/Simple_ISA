@@ -114,7 +114,7 @@ static void fputbyte(unsigned char b, FILE* f){
 static void putshort(unsigned short sh, FILE* f){fputbyte(sh/256, f);fputbyte(sh, f);}
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
-#include "asm_expr_parser.h"
+/*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
