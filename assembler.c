@@ -116,6 +116,7 @@ static void putshort(unsigned short sh, FILE* f){fputbyte(sh/256, f);fputbyte(sh
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 /*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
+
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
 	char* metaproc;
@@ -154,7 +155,6 @@ int main(int argc, char** argv){
 			run_sisa16 = 1;
 			clear_output = 1;
 			outfilename = NULL;
-
 		}
 		if(	strprefix("-nc",argv[i-2])
 			||strprefix("--no-comments",argv[i-2])) {
@@ -1277,15 +1277,17 @@ int main(int argc, char** argv){
 			*/
 			if(
 				strfind(macro_name, "!") != -1 ||
+				strfind(macro_name, ".") != -1 ||
 				strfind(macro_name, "?") != -1 ||
 				strfind(macro_name, ".") != -1 ||
 				strfind(macro_name, ":") != -1 ||
 				strfind(macro_name, "~") != -1 ||
 				strfind(macro_name, "-") != -1 ||
 				strfind(macro_name, "[") != -1 ||
+				strfind(macro_name, "(") != -1 ||
 				strfind(macro_name, "]") != -1 ||
+				strfind(macro_name, ")") != -1 ||
 				strfind(macro_name, "\\") != -1 ||
-				strfind(macro_name, "//") != -1 ||
 				strfind(macro_name, "/") != -1 ||
 				strfind(macro_name, " ") != -1 ||
 				strfind(macro_name, "\t") != -1 ||
@@ -1314,26 +1316,6 @@ int main(int argc, char** argv){
 			}
 
 			if(
-				strfind("!", macro_name) != -1 ||
-				strfind("?", macro_name) != -1 ||
-				strfind("..", macro_name) != -1 ||
-				strfind(":", macro_name) != -1 ||
-				strfind("~", macro_name) != -1 ||
-				strfind("-", macro_name) != -1 ||
-				strfind("[", macro_name) != -1 ||
-				strfind("]", macro_name) != -1 ||
-				strfind("\\", macro_name) != -1 ||
-				strfind("//", macro_name) != -1 ||
-				strfind("/", macro_name) != -1 ||
-				strfind(" ", macro_name) != -1 ||
-				strfind("\t", macro_name) != -1 ||
-				strfind(";", macro_name) != -1 ||
-				strfind("|", macro_name) != -1 ||
-				strfind("#", macro_name) != -1 ||
-				strfind("$", macro_name) != -1 ||
-				strfind("&", macro_name) != -1 ||
-				strfind("@", macro_name) != -1 ||
-				strfind("%",macro_name) != -1 ||
 				strfind("bytes",macro_name) != -1 ||
 				strfind("shorts",macro_name) != -1 ||
 				strfind("asm_",macro_name) != -1 ||
