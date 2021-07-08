@@ -68,7 +68,6 @@
 	proc_printbytelchex;
 		apop;
 	la '\n'; putchar; la '\r'; putchar;
-	halt;
 	lrx0 %/0x400%;
 		proc_alloc;
 		rx2_0

@@ -10,6 +10,7 @@
 bytes %/0x2000%;
 
 //the last available page in memory.
+//It can be allocated!
 :libc_alloc_last_page:
 bytes %/0xFF00%;
 
@@ -136,9 +137,17 @@ farret
 //Every page will be marked with both bits set high.
 //RX0: address to mark as used.
 //RX1: number of pages.
+//
 ..decl_farproc(LIBC_REGION):proc_use
 ..export"proc_use"
-	
+	rx2_0;
+	rx3_0;
+	farldrx1 %~LIBC_REGION%, %libc_alloc_last_page%;
+	rxcmp;
+	lb2;cmp;sc %libc_use_futile_ending%; jmpifeq;
+	libc_use_mark_looptop:
+
+	libc_use_futile_ending:
 farret
 
 
@@ -162,5 +171,4 @@ farret
 
 //we actually fill more than is necessary to guarantee that the user won't have an issue.
 :libc_alloc_page_map:
-bytes 0x57,0x55,0x77
 fill 16000,0
