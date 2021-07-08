@@ -30,16 +30,16 @@
 		apush;
 		lb 0;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
-		lb 0xd;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb '\r';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
-		lb 0xa;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb '\n';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 
 
 		//ascii del chars.
 		lb 0x7f;cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
 		ab;bpush;
-		lb 8;cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
+		lb '\b';cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
 		
 
 
