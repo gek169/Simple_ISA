@@ -45,7 +45,7 @@
 
 		//greater than 126?
 		ab;bpush;
-		lb 126;cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		lb '~';cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 
 		//If This is what we do if its not a delete character.
 		ab;
