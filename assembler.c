@@ -27,7 +27,7 @@ static const unsigned long max_lines_disassembler = 0x1ffFFff;
 static char int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
 	unsigned long chars_read = 0;
-	if(proc[0] == ',' || proc[0] == ';' || proc[0] == '\0') return 1;
+	if(!isdigit(proc[0])) return 1;
 	if(proc[0] == '0') {
 		int_mode = 1;proc++;
 		chars_read++;
@@ -718,7 +718,7 @@ int main(int argc, char** argv){
 			);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
-		} else if(!strprefix("!",line) && !strprefix("VAR#",line)){
+		} else if(!strprefix("!",line) && !strprefix("VAR#",line)){ /*Additional syntactic sugar for labels.*/
 			long loc = strfind(line, "//");
 			/*We must remove line comments.*/
 			if(loc!= -1){
@@ -982,7 +982,7 @@ int main(int argc, char** argv){
 					len_to_replace = strlen(variable_names[i]);
 					before = str_null_terminated_alloc(line_old, loc);
 					if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-					if(i > 3) /*0,1,2 are special cases. 3,4,X are not.*/
+					if(i > 3) /*0,1,2,3 are special cases. 4,5,X are not.*/
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){ /*SYNTAX: @+7+ or @ alone*/
 						char expansion[1024];
