@@ -12,7 +12,7 @@ bytes %/0x2000%;
 //the last available page in memory.
 //It can be allocated!
 :libc_alloc_last_page:
-bytes %/0xFF00%;
+bytes %/0xFFFF%;
 
 .libc_ld_start_page: farldrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
 .libc_ld_last_page: farldrx0 %~LIBC_REGION%, %libc_alloc_last_page%;
@@ -49,7 +49,7 @@ bytes %/0xFF00%;
 	arx0;lb3;and;lb2;mul;ba;												\
 	apop;lsh;apush;															\
 	la3;lsh;compl;															\
-	bc;and;ba;apop;or;		apush;proc_printbytelchex;apop;					\
+	bc;and;ba;apop;or;														\
 	rx0_1;cbrx0;farista;													\
 	
 
@@ -80,7 +80,7 @@ bytes %/0xFF00%;
 		//Grab those page bits!
 		libc_ld_page_bits;
 		
-		apush;proc_printbytehex;la'\r'; putchar; la'\n'; putchar;apop;		//DEBUG
+		//apush;proc_printbytehex;la'\r'; putchar; la'\n'; putchar;apop;		//DEBUG
 		lb0;cmp;sc %libc_alloc_found_free_page%; jmpifeq;
 
 		//FAILURE!
@@ -103,14 +103,14 @@ bytes %/0xFF00%;
 		rx2_0;
 		rx0push;
 		//we must must mark all the pages as used, starting with the first one.
-		la '\r';putchar;la '\n';putchar;
+		//la '\r';putchar;la '\n';putchar;
 		la 3;
 		libc_st_page_bits;
 		rx0_2;rxincr;rx2_0;
 		rx0_3;rxdecr;rx3_0;
 		lb0;rx1b;rxcmp;sc %libc_alloc_final%; jmpifeq;		//only needed a single page!
 		libc_alloc_mark_used_looptop:
-			la '\r';putchar;la '\n';putchar;
+//			la '\r';putchar;la '\n';putchar;
 			rx0_2;la 1;
 			libc_st_page_bits;
 			rx0_2;rxincr;rx2_0;
@@ -157,6 +157,8 @@ farret
 //Clobbers: [all]
 //Mark an allocation as free'd
 //RX0: start address to begin free-ing.
+//return value: 1 in a if the operation succeeded,
+//0 in a if it failed.
 ..decl_farproc(LIBC_REGION):proc_free
 ..export"proc_free"
 	
@@ -171,4 +173,4 @@ farret
 
 //we actually fill more than is necessary to guarantee that the user won't have an issue.
 :libc_alloc_page_map:
-fill 16000,0
+fill 14500,0
