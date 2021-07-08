@@ -1,0 +1,108 @@
+
+
+//the first available page in memory.
+//note that 0x200 is the first page of the libc, 0x2FF is the last page of the libc
+//This defaults to giving the user about 2 megs of space for code
+//all the user has to do is modify this before calling alloc for the first time.
+
+
+:libc_alloc_start_page:
+bytes %/0x2000%;
+
+//the last available page in memory.
+:libc_alloc_last_page:
+bytes %/0xFF00%;
+
+.libc_ld_start_page: farldrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
+.libc_ld_last_page: farldrx0 %~LIBC_REGION%, %libc_alloc_last_page%;
+
+//From the (relative) page number in RX0, load page bits into the "A" register.
+//the exact byte is RX0/4, which must be added to the alloc_page_map address.
+//the 2 bits to select are determined by the last 2 bits of the page number.
+//this macro clobbers RX0, RX1, and A,B, and C.
+
+.libc_ld_page_bits: 	rx0push;										\
+	lb 2; rx1b; rxrsh; 													\
+	lrx1 0,%~LIBC_REGION%, %libc_alloc_page_map%; rxadd;	cbrx0;		\
+	farilda; ca;														\
+	rx0pop;																\
+	arx0;lb3;and;lb2;mul;ba;ac;rsh;lb3;and; 
+	//^This is what actually extracts the loaded bits.
+
+//This one is more complicated. A holds the bits loaded from ld_page_bits, or set by hand.
+//Now, we want to *write* to the page table, indicated by RX0.
+//The address of the computed byte is stored this time in RX1 (that's the rx1_0 insn.)
+//We stash away the loaded byte after farilda-ing it into register .
+//we restore RX0.
+//We then compute the correct shift the same way we did with ld_page_bits,
+//We modify our original set of bits
+//We then modify the bit pattern of the byte using a mask, we AND it to zero.
+
+.libc_st_page_bits:		apush; rx0push;										\
+	lb 2; rx1b; rxrsh; 														\
+	lrx1 0,%~LIBC_REGION%, %libc_alloc_page_map%; rxadd;rx1_0;cbrx0;		\
+	farilda; ca;															\
+	rx0pop;																	\
+	arx0;lb3;and;lb2;mul;ba;												\
+	apop;lsh;apush;															\
+	la3;lsh;compl;															\
+	bc;and;ba;apop;or;														\
+	rx0_1;cbrx0;farista;													\
+	
+
+//ALLOC~~~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: [all]
+//Only argument: in RX0, the number of contiguous bytes needed.
+//the return value is also in RX0.
+//the return value is 0 if a suitable area of memory could not be found.
+//the return value is otherwise a pointer to the first page of the allocated memory.
+..decl_farproc(LIBC_REGION):proc_alloc
+..export"proc_alloc"
+	//How many pages do we need?
+	lb 0xff; rx1b; rxadd;
+	lb 8; rx1b; rxrsh;
+	//Push it onto the stack.
+	rx0push;
+	//Linearly search the page map. First, initialize loop variables
+	lrx2 %/0%; //The page we are investigating.
+	lrx3 %/0%; //The number of free bytes.
+	libc_alloc_search_looptop:
+		//TODO
+	libc_alloc_loopend_success:
+		rx0_2;
+		libc_ld_page_bits;
+		
+	farret
+	libc_alloc_loopend_failure:
+		pop %4%;
+		lb0;rx0b;
+farret
+
+//USE~~~~~~~~~~~~~~~~~~~~
+//Clobbers: [all]
+//Mark pages as used.
+//Every page will be marked with both bits set high.
+//RX0: address to mark as used.
+//RX1: number of pages.
+..decl_farproc(LIBC_REGION):proc_use
+..export"proc_use"
+	
+farret
+
+//FREE~~~~~~~~~~~~~~~~~~~~~
+//Clobbers: [all]
+//Mark an allocation as free'd
+//RX0: start address to begin free-ing.
+..decl_farproc(LIBC_REGION):proc_free
+..export"proc_free"
+	
+farret
+
+//For every page, we keep 2 bits to indicate...
+//1) is it allocated?
+//2) is it the start of an allocation?
+
+
+//we actually fill more than is necessary to guarantee that the user won't have an issue.
+:libc_alloc_page_map:
+fill 16000,0

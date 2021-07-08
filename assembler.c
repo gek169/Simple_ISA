@@ -1601,7 +1601,7 @@ int main(int argc, char** argv){
 						if(line[j] == ';' || line[j] == '\n' || line[j] == '\0'){
 							if(num_commas_needed > 0)
 							{ /*Too many commas.*/
-								printf(syntax_fail_pref);printf("Insn requires more arguments. line %s", line_copy);
+								printf(syntax_fail_pref);printf("Insn requires more arguments. line: %s\ninsn: %s\n", line_copy, line + loc);
 								goto error;
 							}
 							break; /*Out of this for loop.*/
