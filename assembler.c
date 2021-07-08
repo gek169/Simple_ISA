@@ -1191,6 +1191,7 @@ int main(int argc, char** argv){
 								else if(character_literal == 'a') character_literal = '\a';
 								else if(character_literal == 'b') character_literal = '\b';
 								else if(character_literal == 'f') character_literal = '\f';
+								else if(character_literal == 'e') character_literal = '\e';
 								else if(character_literal == 'v') character_literal = '\v';
 								else if(character_literal == 't') character_literal = '\t';
 								else if(character_literal == '0') character_literal = '\0';
