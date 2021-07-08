@@ -31,6 +31,7 @@ section 0x10000;
 asm_begin_region_restriction;
 la line_length;
 alpush;
+asm_print @&
 st_iteration_count;
 nop;
 nop;

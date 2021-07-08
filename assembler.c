@@ -1013,6 +1013,10 @@ int main(int argc, char** argv){
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
+						if(strprefix("&",line_old+loc+1)){
+							addval >>= 16;
+							len_to_replace++;
+						}
 						sprintf(expansion, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
@@ -1020,7 +1024,6 @@ int main(int argc, char** argv){
 					} else if (i==1){
 						char expansion[1024]; 
 						unsigned long addval;
-						
 						addval = 0;
 						if(strprefix("+",line_old+loc+1)){char* add_text; long loc_eparen;
 							add_text = line_old+loc+2;
@@ -1045,7 +1048,7 @@ int main(int argc, char** argv){
 								}
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
-						addval += outputcounter;
+
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
