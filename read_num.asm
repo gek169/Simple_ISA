@@ -3,17 +3,17 @@
 
 
 //use a separately compiled libc.
-..include"libc_pre.hasm"
-..(2):
-ASM_data_include libc_pre.bin
+//..include"libc_pre.hasm"
+//..(2):
+//ASM_data_include libc_pre.bin
 
 //use the normal libc.
-//..include"libc.hasm"
+..include"libc.hasm"
 
 ..(1):
 	la 0xc; apush; la 0; alpush;
 	proc_gets
-	la 0xa; putchar; la 0xd; putchar;
+	la '\n'; putchar; la '\r'; putchar;
 	proc_strlen;
 	//we now have the length of the string stored, we have to get it into RX0.
 	alpop; rx2a;
@@ -29,7 +29,7 @@ ASM_data_include libc_pre.bin
 	proc_memcpy;
 	la 0xd; apush; la 0; alpush;
 	proc_puts;
-	la 0xa; putchar; la 0xd; putchar;
+	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	//We now attempt to get an unsigned decimal value from the text.
 	lrx0 %/0xd0000%
@@ -48,6 +48,6 @@ ASM_data_include libc_pre.bin
 		apop;
 	proc_printbytelchex;
 		apop;
-	la 0xa; putchar; la 0xd; putchar;
+	la '\n'; putchar; la '\r'; putchar;
 ..zero:
 	la 1; lfarpc;
