@@ -14,6 +14,10 @@ bytes %/0x2000%;
 :libc_alloc_last_page:
 bytes %/0xFFFF%;
 
+
+..export"libc_alloc_start_page"
+..export"libc_alloc_last_page"
+
 .libc_ld_start_page: farldrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
 .libc_st_start_page: farstrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
 .libc_ld_last_page: farldrx0 %~LIBC_REGION%, %libc_alloc_last_page%;
