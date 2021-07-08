@@ -45,7 +45,7 @@ asciifun_looptop: //Comment.
 		sc %iter_is_endval%;llb %line_length%;cmp;jmpifeq;
 		sc %iter_is_not_endval%;jmp;
 
-	:iter_is_endval:
+	iter_is_endval:
 		la '\r'; putchar;
 		ld_iteration_count; 
 			adecr;
@@ -73,7 +73,7 @@ asciifun_looptop: //Comment.
 		alpop;
 	sc %asciifun_looptop%;jmp;
 
-	:iter_is_not_endval:
+	iter_is_not_endval:
 		ld_iteration_count;
 		blpop;blpush;
 		add;lb 18;mod;
@@ -85,7 +85,7 @@ asciifun_looptop: //Comment.
 		farilda;
 		putchar;
 	sc %asciifun_looptop%;jmp;
-:asciifun_loopout:
+asciifun_loopout:
 la 7; putchar;
 halt;
 asm_end_restriction;
@@ -93,7 +93,7 @@ asm_end_restriction;
 ..zero:
 	//used for testing the SDL2 driver.
 	//You can just delete this.
-	//:L_make_tri_top:
+	//L_make_tri_top:
 		//what sample are we on?
 		//arx0;
 		//do some computation.

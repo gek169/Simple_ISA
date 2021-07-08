@@ -808,7 +808,7 @@ int main(int argc, char** argv){
 		}
 		if(strprefix("ASM_data_include ", line) || strprefix("asm_data_include ", line)){
 			/*data include! format is
-			[newline]asm_data_include filename
+			asm_data_include filename
 			*/
 			FILE* tmp; char* metaproc; unsigned long len;
 			const char *env_sisa16bin, *env_home;
@@ -867,7 +867,7 @@ int main(int argc, char** argv){
 				strprefix(" ",line) 
 				|| strprefix("\t",line)
 				|| (isspace(line[0]) && line[0] != '\0')
-				){ /*Remove preceding whitespace... we do this twice, actually...*/
+		){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
 			line = strcatalloc(line+1,"");
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
@@ -886,8 +886,8 @@ int main(int argc, char** argv){
 		if(	
 			strprefix("ASM_COPYRIGHT", line)
 			|| strprefix("asm_copyright", line)
-			){
-			ASM_PUTS("SISA-16 Assembler, Disassembler, and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.\nLet all that you do be done with love.\n");
+		){
+			puts("SISA-16 Assembler, Disassembler, Debugger and Emulator by David M.H.S. Webster 2021 AD\navailable to you under the Creative Commons Zero license.\nLet all that you do be done with love.\n");
 			goto end;
 		}
 		if(
