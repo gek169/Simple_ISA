@@ -122,28 +122,31 @@ int main(int argc, char** argv){
 	char* metaproc;
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 7; 
+	const unsigned long nmacrodef_macros = 4;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
 	variable_expansions[1] = variable_expansions[0];
 	variable_names[2] = "%";
 	variable_expansions[2] = variable_expansions[0];
-	/*Macros to remove whitespace- this assembler works without using any whitespace at all. There is no tokenizer.*/
-	variable_names[3] = "\t";
+	variable_names[3] = "'";
 	variable_expansions[3] = variable_expansions[0];
-	variable_names[4] = " ";
+	/*Macros to remove whitespace- this assembler works without using any whitespace at all. There is no tokenizer.*/
+	variable_names[4] = "\t";
 	variable_expansions[4] = variable_expansions[0];
-	variable_names[5] = "\v";
+	variable_names[5] = " ";
 	variable_expansions[5] = variable_expansions[0];
-	variable_names[6] = "\f";
+	variable_names[6] = "\v";
 	variable_expansions[6] = variable_expansions[0];
-	variable_names[7] = "\r";
+	variable_names[7] = "\f";
 	variable_expansions[7] = variable_expansions[0];
-	variable_names[8] = "  ";
-	variable_expansions[8] = variable_expansions[0];	
-	variable_names[9] = ";;";
-	variable_expansions[9] = ";";
-	nmacros = 10;
+	variable_names[8] = "\r";
+	variable_expansions[8] = variable_expansions[0];
+	variable_names[9] = "  ";
+	variable_expansions[9] = variable_expansions[0];	
+	variable_names[10] = ";;";
+	variable_expansions[10] = ";";
+	nmacros = 11;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
@@ -921,7 +924,7 @@ int main(int argc, char** argv){
 					if(was_macro)
 						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
-				for(i = (was_macro?nbuiltin_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
+				for(i = (was_macro?nmacrodef_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
 					char* line_old; long loc; long linesize; char found_longer_match;
 					long len_to_replace; char* before;char* after;
 					long j, loc_vbar = 0;;
@@ -979,7 +982,7 @@ int main(int argc, char** argv){
 					len_to_replace = strlen(variable_names[i]);
 					before = str_null_terminated_alloc(line_old, loc);
 					if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-					if(i > 2) /*0,1,2 are special cases. 3,4,X are not.*/
+					if(i > 3) /*0,1,2 are special cases. 3,4,X are not.*/
 						before = strcatallocf1(before, variable_expansions[i]);
 					else if (i == 0){ /*SYNTAX: @+7+ or @ alone*/
 						char expansion[1024];
@@ -1015,7 +1018,8 @@ int main(int argc, char** argv){
 						before = strcatallocf1(before, expansion);
 						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} else if (i==1){
-						char expansion[1024]; unsigned long addval;
+						char expansion[1024]; 
+						unsigned long addval;
 						
 						addval = 0;
 						if(strprefix("+",line_old+loc+1)){char* add_text; long loc_eparen;
@@ -1042,8 +1046,6 @@ int main(int argc, char** argv){
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						
-						/*snif(!clear_output)printf(expansion, 1023, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));*/
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
 						before = strcatallocf1(before, expansion);
@@ -1164,7 +1166,49 @@ int main(int argc, char** argv){
 						}
 						before = strcatallocf1(before, expansion);
 						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-					} 
+					} else if (i==3){
+						char expansion[30];
+						unsigned char character_literal;
+						if(strlen(line_old+loc) == 0){
+							printf(syntax_fail_pref);
+							printf("character literal is at end of line. Line:\n%s\n", line_copy);
+							goto error;
+						}
+						expansion[29] = '\0';
+						for(;line_old[loc+len_to_replace] && line_old[loc+len_to_replace] != '\'';len_to_replace++){
+							if(line_old[loc+len_to_replace] == '\\'){
+								len_to_replace++;
+								if(line_old[loc+len_to_replace] == '\0'){
+									printf(syntax_fail_pref);
+									printf("character literal escapes the end of line??? Line:\n%s\n", line_copy);
+								}
+								character_literal = ((unsigned char*)line_old)[loc+len_to_replace];
+								if(character_literal == 'n') character_literal = '\n';
+								else if(character_literal == 'r') character_literal = '\r';
+								else if(character_literal == 'a') character_literal = '\a';
+								else if(character_literal == 'b') character_literal = '\b';
+								else if(character_literal == 'f') character_literal = '\f';
+								else if(character_literal == 'v') character_literal = '\v';
+								else if(character_literal == 't') character_literal = '\t';
+								else if(character_literal == '0') character_literal = '\0';
+								else if(character_literal == 'x') {
+									printf(syntax_fail_pref);
+									printf("Hex character literals not supported. Just use 0xXX for your number. Line:\n%s\n", line_copy);
+									goto error;
+								}
+							} else {
+								character_literal = ((unsigned char*)line_old)[loc+len_to_replace];
+							}
+						}
+						if(line_old[loc+len_to_replace] != '\''){
+							printf(syntax_fail_pref);
+							printf("Character literal missing ending single quote! Line:\n%s\n", line_copy);
+							goto error;
+						}
+						len_to_replace++;
+						sprintf(expansion, "%lu", (unsigned long)character_literal);
+						before = strcatallocf1(before, expansion);
+					}
 					after = str_null_terminated_alloc(line_old+loc+len_to_replace, 
 									linesize-loc-len_to_replace);
 					if(!after){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}

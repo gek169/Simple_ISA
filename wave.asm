@@ -45,7 +45,7 @@ asciifun_looptop: //Comment.
 		sc %iter_is_not_endval%;jmp;
 
 	:iter_is_endval:
-		la 0xd; putchar;
+		la '\r'; putchar;
 		ld_iteration_count; 
 			adecr;
 		st_iteration_count;
