@@ -151,10 +151,10 @@ farret
 		rx2_0;
 	//bad page numbers. Greater than the end, or less than the beginning? Can't!
 		farldrx1 %~LIBC_REGION%, %libc_alloc_last_page%;
-		rxcmp;lb2;cmp;sc %libc_use_futile_ending%; jmpifeq;
+		rxcmp;lb2;cmp;sc %libc_free_fail%; jmpifeq;
 
 		farldrx1 %~LIBC_REGION%, %libc_alloc_start_page%;
-		rxcmp;lb0;cmp;sc %libc_use_futile_ending%; jmpifeq;
+		rxcmp;lb0;cmp;sc %libc_free_fail%; jmpifeq;
 
 	//set up our loop variable.
 		rx0_2;
