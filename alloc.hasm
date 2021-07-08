@@ -15,7 +15,14 @@ bytes %/0x2000%;
 bytes %/0xFFFF%;
 
 .libc_ld_start_page: farldrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
+.libc_st_start_page: farstrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
 .libc_ld_last_page: farldrx0 %~LIBC_REGION%, %libc_alloc_last_page%;
+.libc_st_last_page: farldrx0 %~LIBC_REGION%, %libc_alloc_last_page%;
+..export"libc_ld_start_page"
+..export"libc_st_start_page"
+..export"libc_ld_last_page"
+..export"libc_st_last_page"
+
 
 //From the (relative) page number in RX0, load page bits into the "A" register.
 //the exact byte is RX0/4, which must be added to the alloc_page_map address.
@@ -131,28 +138,6 @@ bytes %/0xFFFF%;
 		lb0;rx0b;
 farret
 
-//USE~~~~~~~~~~~~~~~~~~~~
-//Clobbers: [all]
-//Mark pages as used.
-//Every page will be marked with both bits set high.
-//RX0: address to mark as used.
-//RX1: number of pages.
-//
-..decl_farproc(LIBC_REGION):proc_use
-..export"proc_use"
-	rx2_0;
-	rx3_0;
-	farldrx1 %~LIBC_REGION%, %libc_alloc_last_page%;
-	rxcmp;
-	lb2;cmp;sc %libc_use_futile_ending%; jmpifeq;
-	libc_use_mark_looptop:
-
-	libc_use_futile_ending:
-farret
-
-
-
-
 //FREE~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: [all]
 //Mark an allocation as free'd
@@ -161,8 +146,45 @@ farret
 //0 in a if it failed.
 ..decl_farproc(LIBC_REGION):proc_free
 ..export"proc_free"
-	
-farret
+	//modify the argument to page indexing.
+		lb8;rx1b;rxrsh;
+		rx2_0;
+	//bad page numbers. Greater than the end, or less than the beginning? Can't!
+		farldrx1 %~LIBC_REGION%, %libc_alloc_last_page%;
+		rxcmp;lb2;cmp;sc %libc_use_futile_ending%; jmpifeq;
+
+		farldrx1 %~LIBC_REGION%, %libc_alloc_start_page%;
+		rxcmp;lb0;cmp;sc %libc_use_futile_ending%; jmpifeq;
+
+	//set up our loop variable.
+		rx0_2;
+		farldrx1 %~LIBC_REGION%, %libc_alloc_start_page%;
+		rxsub;
+		rx2_0;
+	//First, we check to make sure that the bits are indeed set to 3.
+		libc_ld_page_bits;
+		lb 3; cmp; sc %libc_free_fail%; jmpifneq;
+		rx0_2;
+		la0;
+		libc_st_page_bits;
+		rx0_2;rxincr;rx2_0;
+	//Now, the loop!
+		libc_setter_looptop:
+			rx0_2;
+			libc_ld_page_bits;
+			lb 1; cmp; sc %libc_free_success%; jmpifneq;
+			rx0_2;
+			la 0;
+			libc_st_page_bits;
+			rx0_2;rxincr;rx2_0;
+			sc %libc_setter_looptop%; jmp;
+	libc_free_fail:
+		la 0;
+		farret
+
+	libc_free_success:
+		la 1;
+		farret
 
 
 
@@ -171,6 +193,6 @@ farret
 //2) is it the start of an allocation?
 //they are bit 1 and 2 respectively.
 
-//we actually fill more than is necessary to guarantee that the user won't have an issue.
+//we actually fill more than is necessary so that the region can be expanded.
 :libc_alloc_page_map:
-fill 14500,0
+fill 15500,0

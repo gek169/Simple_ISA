@@ -67,8 +67,11 @@
 		apop;
 	proc_printbytelchex;
 		apop;
+	rx0_2;
+	//lrx1 %/256%;rxadd;
+	proc_free;
 	la '\n'; putchar; la '\r'; putchar;
-	lrx0 %/0x400%;
+	lrx0 %/0xBAFF00%;
 		proc_alloc;
 		rx2_0
 			//print the number!
