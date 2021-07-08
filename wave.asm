@@ -29,7 +29,7 @@ bytes 0,0,0,0;
 
 .line_length:			90
 .line_length_plus_1:	91
-.num_lines:				30
+.num_lines:				20
 .wait_time:				16
 
 section 0x10000;
@@ -53,23 +53,23 @@ asciifun_looptop: //Comment.
 		sc %iter_is_not_endval%;jmp;
 
 	iter_is_endval:
-		la '\r';putchar;
 		la '\n';putchar;
-		interrupt;
+		la '\r';putchar;
 		ld_iteration_count; 
 			adecr;
 		st_iteration_count;
-		
 		ld_line_count;aincr;st_line_count;
 		lb num_lines;cmp;lb2;cmp;sc %reached_num_lines%; jmpifeq;
 	sc %asciifun_looptop%;jmp;
 
 	reached_num_lines:
+		la '\n'
+		interrupt;
 		proc_clear_terminal;
 		la 0;
 		st_line_count;
 		ld_page_count;
-		aincr;
+		adecr;
 		st_page_count;
 		st_iteration_count;
 		la %~wait_time%;
