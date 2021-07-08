@@ -46,7 +46,7 @@ asciifun_looptop: //Comment.
 		sc %iter_is_not_endval%;jmp;
 
 	iter_is_endval:
-		la '\r'; putchar;
+		la '\r';putchar;
 		ld_iteration_count; 
 			adecr;
 		st_iteration_count;
@@ -71,6 +71,7 @@ asciifun_looptop: //Comment.
 		alpush;
 			proc_wait;
 		alpop;
+		proc_clear_terminal;
 	sc %asciifun_looptop%;jmp;
 
 	iter_is_not_endval:
