@@ -8,6 +8,13 @@
 .ld_iteration_count:	farllda %&0x30000%;
 .st_iteration_count:	farstla %&0x30000%;
 
+.ld_line_count:			farllda %&0x30002%;
+.st_line_count:			farstla %&0x30002%;
+
+.ld_page_count:	farllda %&0x30004%;
+.st_page_count:	farstla %&0x30004%;
+
+
 section 0x40000;
 :ascii_greyscale:
 ..asciz: .:-=+*#%@%#*+=-:.
@@ -22,10 +29,8 @@ bytes 0,0,0,0;
 
 .line_length:			90
 .line_length_plus_1:	91
+.num_lines:				30
 .wait_time:				16
-
-//section 0xB00000;
-//fill 153600,0x2E
 
 section 0x10000;
 asm_begin_region_restriction;
@@ -33,6 +38,8 @@ la line_length;
 alpush;
 asm_print @&
 st_iteration_count;
+st_page_count;
+st_line_count;
 nop;
 nop;
 asciifun_looptop: //Comment.
@@ -47,33 +54,30 @@ asciifun_looptop: //Comment.
 
 	iter_is_endval:
 		la '\r';putchar;
+		la '\n';putchar;
+		interrupt;
 		ld_iteration_count; 
 			adecr;
 		st_iteration_count;
-		//If we are using the SDL driver, display the screen.
-			//la 0; interrupt;
-			//the return value tells us if we are currently using SDL.
-			//rx0a;
-			//poll for the quit event.
-			//la 1; interrupt;
-			//llb %0xffFF%; cmp; sc %asciifun_loopout%; jmpifeq;
-			//la 3; interrupt;
-			//la 2;interrupt;
-			//lb0x10;cmp;
-			//sc %asciifun_loopout%; jmpifeq;
-			//are we using SDL?
-			//lb1;
-			//rx1b;
-			//rxcmp;
-			//sc %asciifun_looptop%;
-			//jmpifeq;
+		
+		ld_line_count;aincr;st_line_count;
+		lb num_lines;cmp;lb2;cmp;sc %reached_num_lines%; jmpifeq;
+	sc %asciifun_looptop%;jmp;
+
+	reached_num_lines:
+		proc_clear_terminal;
+		la 0;
+		st_line_count;
+		ld_page_count;
+		aincr;
+		st_page_count;
+		st_iteration_count;
 		la %~wait_time%;
 		alpush;
 			proc_wait;
 		alpop;
-		proc_clear_terminal;
-	sc %asciifun_looptop%;jmp;
-
+		sc %asciifun_looptop%;jmp;
+	
 	iter_is_not_endval:
 		ld_iteration_count;
 		blpop;blpush;
@@ -87,35 +91,9 @@ asciifun_looptop: //Comment.
 		putchar;
 	sc %asciifun_looptop%;jmp;
 asciifun_loopout:
-la 7; putchar;
-halt;
-asm_end_restriction;
+	la 7; putchar;
+	halt;
+	asm_end_restriction;
 
 ..zero:
-	//used for testing the SDL2 driver.
-	//You can just delete this.
-	//L_make_tri_top:
-		//what sample are we on?
-		//arx0;
-		//do some computation.
-
-
-		//triangle wave.
-		//lb1;rsh;
-		//llb %0x4%;
-		//mod;
-		//lb 0xF0;
-		//mul;
-
-		
-		//square wave.
-		//lb 8;
-		//and;
-		//lb3;
-		//rsh;
-		//llb %0x200%;
-		//mul;
-		//sc %0xB5%;brx0;faristla;
-		//rxincr;rxincr;lrx1 %/0x10000%; rxcmp;sc %L_make_tri_top%; jmpifneq;
-	//	la 3; interrupt;
 	la 1;lfarpc;

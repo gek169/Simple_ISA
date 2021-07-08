@@ -123,7 +123,7 @@ static void dcl(){return;}
 #endif
 
 static unsigned short gch(){return (unsigned short)getchar();}
-static void pch(unsigned short a){putchar(a);if(a==0xa||a == 0xd)fflush(stdout);}
+static void pch(unsigned short a){putchar(a);}
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,
@@ -205,6 +205,8 @@ static unsigned short interrupt(unsigned short a,
 		return 0;
 	}
 #endif
+
+	if(a==0xa||a == 0xd) {fflush(stdout);return a;}
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
 		for(i=0;i<(1<<24)-31;i+=32)
