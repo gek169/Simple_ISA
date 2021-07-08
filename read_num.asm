@@ -71,7 +71,7 @@
 	//lrx1 %/256%;rxadd;
 	proc_free;
 	la '\n'; putchar; la '\r'; putchar;
-	lrx0 %/0xBAFF00%;
+	lrx0 %/0xF00%;
 		proc_alloc;
 		rx2_0
 			//print the number!
@@ -87,5 +87,22 @@
 			apop;
 		proc_printbytelchex;
 			apop;
+	la '\n'; putchar; la '\r'; putchar;
+	lrx0 %/0xBAFF00%;
+			proc_alloc;
+			rx2_0
+				//print the number!
+			rx0_2;arx0;apush;
+			lb8; rx1b;rxrsh;arx0;apush;
+			rx0_2;lb16;rx1b;rxrsh;arx0;apush;
+			rx0_2;lb24;rx1b;rxrsh;arx0;apush;
+			proc_printbytelchex;
+				apop;
+			proc_printbytelchex;
+				apop;
+			proc_printbytelchex;
+				apop;
+			proc_printbytelchex;
+				apop;
 ..zero:
 	la 1; lfarpc;
