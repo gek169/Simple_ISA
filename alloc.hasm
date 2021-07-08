@@ -35,8 +35,10 @@ bytes %/0xFF00%;
 //We stash away the loaded byte after farilda-ing it into register .
 //we restore RX0.
 //We then compute the correct shift the same way we did with ld_page_bits,
-//We modify our original set of bits
+//We modify our requested set of bits
 //We then modify the bit pattern of the byte using a mask, we AND it to zero.
+//Finally, we 'or' in the a value.
+//Then we stash away our completed byte!
 
 .libc_st_page_bits:		apush; rx0push;										\
 	lb 2; rx1b; rxrsh; 														\
@@ -46,7 +48,7 @@ bytes %/0xFF00%;
 	arx0;lb3;and;lb2;mul;ba;												\
 	apop;lsh;apush;															\
 	la3;lsh;compl;															\
-	bc;and;ba;apop;or;														\
+	bc;and;ba;apop;or;		apush;proc_printbytelchex;apop;					\
 	rx0_1;cbrx0;farista;													\
 	
 
@@ -58,21 +60,71 @@ bytes %/0xFF00%;
 //the return value is otherwise a pointer to the first page of the allocated memory.
 ..decl_farproc(LIBC_REGION):proc_alloc
 ..export"proc_alloc"
-	//How many pages do we need?
+	//How many pages do we need? adding 255 is the classic round-up
 	lb 0xff; rx1b; rxadd;
 	lb 8; rx1b; rxrsh;
 	//Push it onto the stack.
 	rx0push;
 	//Linearly search the page map. First, initialize loop variables
 	lrx2 %/0%; //The page we are investigating.
-	lrx3 %/0%; //The number of free bytes.
+	lrx3 %/0%; //The number of free pages.
 	libc_alloc_search_looptop:
-		//TODO
-	libc_alloc_loopend_success:
+		//First we need to know if we have reached past the end of the page map.
 		rx0_2;
+		farldrx1 %~LIBC_REGION%, %libc_alloc_last_page%;
+		rxcmp;
+		lb2;
+		cmp;
+		sc %libc_alloc_loopend_failure%; jmpifeq;		//If we have gone past the last page, die.
+		//Grab those page bits!
 		libc_ld_page_bits;
 		
-	farret
+		apush;proc_printbytehex;la'\r'; putchar; la'\n'; putchar;apop;		//DEBUG
+		lb0;cmp;sc %libc_alloc_found_free_page%; jmpifeq;
+
+		//FAILURE!
+		rx0_2;rxincr;rx2_0;
+		lb0;rx3b;
+		sc %libc_alloc_search_looptop%; jmp;
+	libc_alloc_found_free_page:
+		rx0_2;rxincr;rx2_0;
+		rx0_3;rxincr;rx3_0;
+		//we should now check if that is enough pages.
+		rx1pop;
+		rxcmp; 
+		sc %libc_alloc_loopend_success%; jmpifeq;
+		rx1push;
+		sc %libc_alloc_search_looptop%; jmp;
+	libc_alloc_loopend_success:
+		rx0_2;
+		rx1_3;
+		rxsub;
+		rx2_0;
+		rx0push;
+		//we must must mark all the pages as used, starting with the first one.
+		la '\r';putchar;la '\n';putchar;
+		la 3;
+		libc_st_page_bits;
+		rx0_2;rxincr;rx2_0;
+		rx0_3;rxdecr;rx3_0;
+		lb0;rx1b;rxcmp;sc %libc_alloc_final%; jmpifeq;		//only needed a single page!
+		libc_alloc_mark_used_looptop:
+			la '\r';putchar;la '\n';putchar;
+			rx0_2;la 1;
+			libc_st_page_bits;
+			rx0_2;rxincr;rx2_0;
+			rx0_3;rxdecr;rx3_0;
+			lb0;rx1b;rxcmp;sc %libc_alloc_final%; jmpifeq;
+			sc %libc_alloc_mark_used_looptop%; jmp;
+		libc_alloc_final:
+		rx0pop;
+		lb 8; rx1b; rxlsh;
+		rx0push;
+		farldrx0 %~LIBC_REGION%, %libc_alloc_start_page%;
+		rxlsh;
+		rx1pop;
+		rxadd;
+		farret
 	libc_alloc_loopend_failure:
 		pop %4%;
 		lb0;rx0b;
@@ -89,6 +141,9 @@ farret
 	
 farret
 
+
+
+
 //FREE~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: [all]
 //Mark an allocation as free'd
@@ -98,11 +153,14 @@ farret
 	
 farret
 
+
+
 //For every page, we keep 2 bits to indicate...
 //1) is it allocated?
 //2) is it the start of an allocation?
-
+//they are bit 1 and 2 respectively.
 
 //we actually fill more than is necessary to guarantee that the user won't have an issue.
 :libc_alloc_page_map:
+bytes 0x57,0x55,0x77
 fill 16000,0
