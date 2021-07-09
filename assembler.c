@@ -570,17 +570,17 @@ int main(int argc, char** argv){
 			);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
-		} else if(strprefix("..include \"", line)){
+		} else if(strprefix("..dinclude\"", line)){
 			char* line_old = line;
-			long loc_eparen = strfind(line+ strlen("..include \""), "\"");
+			long loc_eparen = strfind(line+ strlen("..dinclude\""), "\"");
 			if(loc_eparen == -1){
-				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
 				puts("Line:");
 				puts(line_copy);
 				goto error;
 			}
 			line = strcatallocf2(
-				"ASM_header ",
+				"ASM_data_include ",
 				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)
 			);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
