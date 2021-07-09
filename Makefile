@@ -14,18 +14,18 @@ CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value
 all: main asm_programs
 
 q:
-	sudo $(MAKE) -B install
-	sudo $(MAKE) libc
-	sudo $(MAKE) clean
+	admin $(MAKE) -B install
+	admin $(MAKE) libc
+	admin $(MAKE) clean
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
 	git push || echo "nothing to push"
 	./asmbuild.sh
 
 d:
-	sudo $(MAKE) -B install
-	sudo $(MAKE) libc
-	sudo $(MAKE) clean
+	admin $(MAKE) -B install
+	admin $(MAKE) libc
+	admin $(MAKE) clean
 	./asmbuild.sh
 
 sisa16_emu:
