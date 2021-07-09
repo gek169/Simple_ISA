@@ -32,7 +32,7 @@ bytes 0,0,0,0;
 .num_lines:				20
 .wait_time:				16
 
-section 0x10000;
+..main:
 asm_begin_region_restriction;
 la line_length;
 alpush;
@@ -94,6 +94,3 @@ asciifun_loopout:
 	la 7; putchar;
 	halt;
 	asm_end_restriction;
-
-..zero:
-	la 1;lfarpc;
