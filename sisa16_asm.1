@@ -726,6 +726,8 @@ they must be at the beginning of a line, after preceding whitespace:
 
 "..asciz:Hello World!" is syntactic sugar for "!Hello World!" followed by a line which says "bytes0"
 
+"..main:" is syntactic sugar for "section0;la1;lfarpc;section1;" it quickly creates a bootloader to section 1.
+
 (Note that you shouldn't enter quotes for any of these)
 
 .TP

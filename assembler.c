@@ -480,7 +480,7 @@ int main(int argc, char** argv){
 		/*
 			syntactic sugars. Only one may be used on a single line!
 		*/
-		/*syntactic sugar for declaring procedures that call to the current output counter.*/
+		/*section0;la 1;lfarpc;*/
 		if(strprefix("..zero:", line)){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..zero:"));
@@ -490,6 +490,67 @@ int main(int argc, char** argv){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..z:"));
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			free(line_old);
+		}else if(strprefix("..main:", line)){
+			char* line_old = line;
+			line = strcatalloc("section0;la1;lfarpc;section1;", line+strlen("..main:"));
+			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			free(line_old);
+		}else if(strprefix("..main(", line)){
+			char buf[40];
+			char have_expanded = 0;
+			unsigned long secnum = 0;
+			char* line_old = line;
+			long loc_eparen = -1;
+			const long len_command = strlen("..main(");
+			/*
+				attempt to find a macro to expand here.
+			*/
+			do{
+				unsigned long i = 0;
+				have_expanded = 0;
+				for(i=nbuiltin_macros; i < nmacros; i++){
+					if(strfind(line,variable_names[i]) == len_command)
+					{
+						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
+						line_old = line;
+						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						have_expanded = 1;
+						break;
+					}
+				}
+			}while(have_expanded == 1);
+			if(int_checker(line+len_command)){
+				printf(syntax_fail_pref);
+				printf("Bad integer constant inside of main region selection syntactic sugar.\n");
+				goto error;
+			}
+			secnum = strtoul(line+len_command, 0,0);
+			loc_eparen = strfind(line, /*(*/"):");
+			if(loc_eparen == -1){
+				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for main with region selection is missing ending \"):\"");
+				puts("Line:");
+				puts(line_copy);
+				goto error;
+			}
+			loc_eparen += 2;
+			sprintf(buf, "%lu", secnum * 256 * 256);
+			line = strcatallocfb(
+				strcatalloc(
+					"section0;la",
+					buf
+				),
+				strcatallocf1(
+					strcatallocf1(
+						strcatalloc("lfarpc;section", buf),
+						";"
+					),
+					line + loc_eparen
+				)
+			);
+			if(!line){
+				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
+			}
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
