@@ -718,7 +718,7 @@ int main(int argc, char** argv){
 			);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
-		} else if(!strprefix("!",line) && !strprefix("VAR#",line)){ /*Additional syntactic sugar for labels.*/
+		} else if(!strprefix("!",line) && !strprefix("VAR#",line) && !strprefix("ASM_",line) && !strprefix("asm_", line)){ /*Additional syntactic sugar for labels.*/
 			long loc = strfind(line, "//");
 			/*We must remove line comments.*/
 			if(loc!= -1){
