@@ -67,8 +67,11 @@ isa_constexpr:
 	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
 
 #used by github actions.
-check: d
+check:
 #effectively, a check.
+	sudo $(MAKE) -B install
+	sudo $(MAKE) libc
+	sudo $(MAKE) clean
 	./asmbuild.sh
 	sisa16_asm -C
 	sisa16_asm -v
