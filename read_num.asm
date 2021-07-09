@@ -5,7 +5,7 @@
 //use a separately compiled libc.
 ..include"libc_pre.hasm"
 ..(2):
-ASM_data_include libc_pre.bin
+..dinclude"libc_pre.bin"
 
 //use the normal libc.
 //..include"libc.hasm"
