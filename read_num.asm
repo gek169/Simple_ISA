@@ -10,7 +10,7 @@
 //use the normal libc.
 //..include"libc.hasm"
 
-..(1):
+..main(1):
 	la 0xc; apush; la 0; alpush;
 	proc_gets
 	la '\n'; putchar; la '\r'; putchar;
@@ -104,5 +104,4 @@
 				apop;
 			proc_printbytelchex;
 				apop;
-..zero:
-	la 1; lfarpc;
+

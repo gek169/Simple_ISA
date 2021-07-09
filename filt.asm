@@ -3,10 +3,8 @@
 ..include"libc.hasm"
 
 
-..zero:
-la 1; lfarpc;
 
-..(1):
+..main:
 	:filt_looptop:
 	getchar;
 	sc %filt_printbytehex%

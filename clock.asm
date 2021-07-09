@@ -39,7 +39,7 @@ bytes 0xd, 0xa;
 //main routine.
 
 //rx2 holds our time in seconds.
-..(1):
+..main:
 	//containerize execution of the clock.
 	lrx0 %/Lbl_clock_start%;
 	lb 0xEEEE;

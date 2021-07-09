@@ -16,13 +16,13 @@
 
 
 section 0x40000;
-:ascii_greyscale:
-..asciz: .:-=+*#%@%#*+=-:.
+	:ascii_greyscale:
+	..asciz: .:-=+*#%@%#*+=-:.
 
 
 .ITER_REGION:3
 ..(ITER_REGION):
-bytes 0,0,0,0;
+	bytes 0,0,0,0;
 
 ..include"libc.hasm"
 

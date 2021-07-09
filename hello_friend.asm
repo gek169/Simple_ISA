@@ -2,7 +2,7 @@
 
 ..include"libc.hasm"
 
-..(1):
+..main(1):
 	la 0xc; apush; la 0; alpush;
 	proc_gets_noecho
 	la 0xa; putchar; la 0xd; putchar;
@@ -25,5 +25,3 @@
 	pop %3%;
 	halt;
 
-..zero:
-	la 1; lfarpc;

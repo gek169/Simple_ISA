@@ -1,9 +1,6 @@
 #!/usr/local/bin/sisa16_asm -run
 //create a whole-memory image.
 
-..zero:
-la 1; lfarpc;
-
 
 ASM_header libc.hasm
 
@@ -25,7 +22,7 @@ bytes %/0%;
 bytes %/0%;
 bytes %/0%;
 
-section 0x10000;asm_begin_region_restriction;
+..main(1): asm_begin_region_restriction;
 lrx0 %/0%;st_iter;
 la0;st_current_char;
 VAR#echo_looptop#@
