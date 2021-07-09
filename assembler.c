@@ -553,7 +553,6 @@ int main(int argc, char** argv){
 			if(!line){
 				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
 			}
-			printf("\r\n%s\r\n", line);
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
