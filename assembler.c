@@ -493,12 +493,11 @@ int main(int argc, char** argv){
 			free(line_old);
 		}else if(strprefix("..main:", line)){
 			char* line_old = line;
-			line = strcatalloc("section0;la1;lfarpc;section1;", line+strlen("..main:"));
+			line = strcatalloc("section0;la1;lfarpc;region1;", line+strlen("..main:"));
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..main(", line)){
 			char buf[40];
-			char buf2[40];
 			char have_expanded = 0;
 			unsigned long secnum = 0;
 			char* line_old = line;
@@ -536,7 +535,6 @@ int main(int argc, char** argv){
 			}
 			loc_eparen += 2;
 			sprintf(buf, "%lu", secnum);
-			sprintf(buf2, "%lu", secnum*256*256);
 			line = strcatallocfb(
 				strcatalloc(
 					"section0;la",
@@ -544,7 +542,7 @@ int main(int argc, char** argv){
 				),
 				strcatallocf1(
 					strcatallocf1(
-						strcatalloc(";lfarpc;section", buf2),
+						strcatalloc(";lfarpc;region", buf),
 						";"
 					),
 					line + loc_eparen

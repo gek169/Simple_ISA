@@ -1,7 +1,7 @@
 #!/usr/local/bin/sisa16_asm -run
 //Example program from the manual to demonstrate basic control flow.
 
-..main(7):
+..main:
 getchar; 
 farstla %&0x20000%; 
 putchar;
