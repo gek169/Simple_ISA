@@ -724,9 +724,11 @@ they must be at the beginning of a line, after preceding whitespace:
 
 "..ascii:Hello World!" is syntactic sugar for "!Hello World!"
 
-"..asciz:Hello World!" is syntactic sugar for "!Hello World!" followed by a line which says "bytes0"
+"..asciz:Hello World!" is syntactic sugar for "!Hello World!" followed by a line which says "bytes0", it writes a null-terminated string to the output file.
 
-"..main:" is syntactic sugar for "section0;la1;lfarpc;section1;" it quickly creates a bootloader to section 1.
+"..main:" is syntactic sugar for "section0;la1;lfarpc;region1;" it quickly creates a bootloader to region 1. It can be followed immediately by code on the same line.
+
+"..main(X):" is syntactic sugar for selecting region X to be main, and writing a bootloader. It can be followed immediately by code on the same line.
 
 (Note that you shouldn't enter quotes for any of these)
 
