@@ -498,6 +498,7 @@ int main(int argc, char** argv){
 			free(line_old);
 		}else if(strprefix("..main(", line)){
 			char buf[40];
+			char buf2[40];
 			char have_expanded = 0;
 			unsigned long secnum = 0;
 			char* line_old = line;
@@ -535,6 +536,7 @@ int main(int argc, char** argv){
 			}
 			loc_eparen += 2;
 			sprintf(buf, "%lu", secnum);
+			sprintf(buf2, "%lu", secnum*256*256);
 			line = strcatallocfb(
 				strcatalloc(
 					"section0;la",
@@ -542,7 +544,7 @@ int main(int argc, char** argv){
 				),
 				strcatallocf1(
 					strcatallocf1(
-						strcatalloc(";lfarpc;section", buf),
+						strcatalloc(";lfarpc;section", buf2),
 						";"
 					),
 					line + loc_eparen
