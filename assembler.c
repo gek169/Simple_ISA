@@ -534,7 +534,7 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			loc_eparen += 2;
-			sprintf(buf, "%lu", secnum * 256 * 256);
+			sprintf(buf, "%lu", secnum);
 			line = strcatallocfb(
 				strcatalloc(
 					"section0;la",
@@ -542,7 +542,7 @@ int main(int argc, char** argv){
 				),
 				strcatallocf1(
 					strcatallocf1(
-						strcatalloc("lfarpc;section", buf),
+						strcatalloc(";lfarpc;section", buf),
 						";"
 					),
 					line + loc_eparen
@@ -551,6 +551,7 @@ int main(int argc, char** argv){
 			if(!line){
 				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
 			}
+			printf("\r\n%s\r\n", line);
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
 			char* line_old = line;
