@@ -121,7 +121,7 @@ int main(int argc, char** argv){
 	FILE *infile,*ofile; 
 	char* metaproc;
 	unsigned long include_level = 0;
-	const unsigned long nbuiltin_macros = 7; 
+	const unsigned long nbuiltin_macros = 5; 
 	const unsigned long nmacrodef_macros = 4;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
@@ -132,21 +132,9 @@ int main(int argc, char** argv){
 	variable_names[3] = "'";
 	variable_expansions[3] = variable_expansions[0];
 	/*Macros to remove whitespace- this assembler works without using any whitespace at all. There is no tokenizer.*/
-	variable_names[4] = "\t";
+	variable_names[4] = " ";
 	variable_expansions[4] = variable_expansions[0];
-	variable_names[5] = " ";
-	variable_expansions[5] = variable_expansions[0];
-	variable_names[6] = "\v";
-	variable_expansions[6] = variable_expansions[0];
-	variable_names[7] = "\f";
-	variable_expansions[7] = variable_expansions[0];
-	variable_names[8] = "\r";
-	variable_expansions[8] = variable_expansions[0];
-	variable_names[9] = "  ";
-	variable_expansions[9] = variable_expansions[0];	
-	variable_names[10] = ";;";
-	variable_expansions[10] = ";";
-	nmacros = 11;
+	nmacros = 5;
 
 	{int i;for(i = 2; i < argc; i++)
 	{
@@ -458,6 +446,7 @@ int main(int argc, char** argv){
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}
+
 		/*if this line ends in a backslash...*/
 		while(!feof(infile) && strlen(line) > 0 
 							&& !strprefix("!",line) 
@@ -972,12 +961,16 @@ int main(int argc, char** argv){
 			goto end;
 		}
 		/*Step 1: Expand Macros on this line. This includes whitespace removal.*/
+		{size_t i = 0;
+			for(;i<strlen(line);i++)
+				if(isspace(line[i]) || line[i] == '\r') line[i] = ' ';
+		}
 		/*MACRO_EXPANSION*/
 		if(strprefix("VAR#",line))
 			was_macro=1; 
 		else 
 			was_macro = 0;
-		{unsigned char have_expanded = 0; unsigned long iteration = 0; long i;
+		{unsigned char have_expanded = 0; unsigned long iteration = 0; long i; unsigned char have_reached_builtins = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -985,7 +978,10 @@ int main(int argc, char** argv){
 					if(was_macro)
 						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
 				}
-				for(i = (was_macro?nmacrodef_macros:nmacros)-1; i>=0; i--){ /*Only check builtin macros when writing a macro.*/
+				for(i = 
+					(have_reached_builtins?(was_macro?nmacrodef_macros:nbuiltin_macros):(was_macro?nmacrodef_macros:nmacros))-1; 
+					i>=0; i--)
+				{ /*Only check builtin macros when writing a macro. */
 					char* line_old; long loc; long linesize; char found_longer_match;
 					long len_to_replace; char* before;char* after;
 					long j, loc_vbar = 0;;
@@ -1004,9 +1000,8 @@ int main(int argc, char** argv){
 					if(debugging) printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
-					if(!was_macro ||
-						 (i > (long)nbuiltin_macros)
-					)
+					if(i < (long)nbuiltin_macros) have_reached_builtins = 1;
+					if(!was_macro && (i > (long)nbuiltin_macros))
 					for(j = i-1; j>=(long)nbuiltin_macros; j--){
 						if(j == i) continue;
 						if(strlen(variable_names[j]) > strlen(variable_names[i])){
