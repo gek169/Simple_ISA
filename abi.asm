@@ -37,8 +37,8 @@ VAR#failed_to_load_file#@
 bytes 0;
 
 
-VAR#BOOT_REGION#__START__
-..include"bootdol.hasm"
+.BOOT_REGION:__START__
+..zero:la BOOT_REGION;lfarpc;asm_print;
 
 
 //MAIN FUNCTION~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

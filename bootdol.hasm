@@ -1,6 +1,0 @@
-
-//Try moving this file to ~/sisa16/ or /usr/include/sisa16/
-//Then you can include it in any program you write on your system just by doing ASM_header bootdol.hasm
-
-
-..zero:la BOOT_REGION;lfarpc;asm_print;
