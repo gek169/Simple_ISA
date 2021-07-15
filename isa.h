@@ -1,5 +1,5 @@
 #ifndef SISA_VERSION
-#define SISA_VERSION "1.7_official"
+#define SISA_VERSION "1.8_official"
 #endif
 
 #define k case
@@ -87,8 +87,8 @@ k 64:goto G_FARILLDB;k 65:goto G_FARISTLB;k 66:goto G_FARPAGEL;k 67:goto G_FARPA
 k 72:goto G_FARISTA;k 73:goto G_FARILDB;k 74:goto G_FARISTB;\
 k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
 k 80:goto U0;k 81:goto U1;k 82:goto U2;k 83:goto U3;k 84:goto U4;k 85:goto U5;k 86:goto U6;k 87:goto U7;\
-k 88:goto U8;k 89:goto U9;k 90:goto UA;k 91:\
-goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
+k 88:goto U8;k 89:goto U9;k 90:goto UA;\
+k 91:goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
 k 96:goto G_ALPOP;k 97:goto G_BLPOP;k 98:goto G_CPOP;k 99:goto G_APOP;k 100:goto G_BPOP;\
 k 101:goto G_INTERRUPT;k 102:goto G_CLOCK;\
 k 103:goto G_ARX0;\
