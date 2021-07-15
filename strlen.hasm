@@ -8,8 +8,6 @@
 	aincr; ca; illdb; 
 	rx1b; rxadd;
 	//It's in RX0.
-	//we now have our far pointer! put it on the top of the stack for easy access.
-	//we actually push 4 bytes, so we can rx0pop.
 	rx1_0;
 	lb0;rx2b;
 	:libc_strlen_looptop:
