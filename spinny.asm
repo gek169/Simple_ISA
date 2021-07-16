@@ -41,7 +41,7 @@ alpush;
 		farilda;
 		putchar;
 		la '\r'; putchar;
-		la 'f'; putchar; asm_print;
+		la ' '; putchar; asm_print;
 		la '\n'; interrupt;
 		
 		la %~wait_time%;
