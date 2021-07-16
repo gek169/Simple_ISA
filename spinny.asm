@@ -5,7 +5,7 @@
 
 section 0x40000;
 	:ascii_spinny:
-	..asciz:/|\-
+	..asciz:-\|/
 	.ascii_spinny_len:4
 
 .ITER_REGION:3
@@ -21,7 +21,7 @@ section 0x40000;
 .line_length:			90
 .line_length_plus_1:	91
 .num_lines:				20
-.wait_time:				100
+.wait_time:				50
 
 ..main:
 asm_begin_region_restriction;
@@ -31,7 +31,7 @@ st_iter;
 alpush;
 	//our loop!
 	asciifun_looptop: 
-		
+		la ' '; putchar;
 		alpop; 
 			aincr; 
 		alpush;
@@ -41,7 +41,7 @@ alpush;
 		farilda;
 		putchar;
 		la '\r'; putchar;
-		la ' '; putchar; asm_print;
+		
 		la '\n'; interrupt;
 		
 		la %~wait_time%;
