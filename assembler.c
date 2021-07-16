@@ -1227,7 +1227,7 @@ int main(int argc, char** argv){
 						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} else if (i==3){
 						char expansion[30];
-						unsigned char character_literal;
+						unsigned char character_literal = 0;
 						if(strlen(line_old+loc) == 0){
 							printf(syntax_fail_pref);
 							printf("character literal is at end of line. Line:\n%s\n", line_copy);

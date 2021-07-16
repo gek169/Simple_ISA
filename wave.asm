@@ -18,7 +18,7 @@
 section 0x40000;
 	:ascii_greyscale:
 	..asciz: .:-=+*#%@%#*+=-:.
-
+	.ascii_greyscale_len:18
 
 .ITER_REGION:3
 ..(ITER_REGION):
@@ -81,7 +81,9 @@ asciifun_looptop: //Comment.
 	iter_is_not_endval:
 		ld_iteration_count;
 		blpop;blpush;
-		add;lb 18;mod;
+		add;
+		lb %~ascii_greyscale_len%;
+		mod;
 		//we now have the offset calculated in register a.
 		sc %0x4%; 
 		lb %~ascii_greyscale%;
