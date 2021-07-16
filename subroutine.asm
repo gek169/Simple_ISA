@@ -1,4 +1,4 @@
-#!/usr/local/bin/sisa16_asm -run
+#!/usr/bin/sisa16_asm -run
 
 ..zero:
 	sc %L_main%; jmp;

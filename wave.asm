@@ -1,4 +1,4 @@
-#!/usr/local/bin/sisa16_asm -run
+#!/usr/bin/sisa16_asm -run
 
 .ZERO_STACK_POINTER:		astp;popa;
 .POP_FARPTR_VARIABLE:		blpop;apop;ca;
