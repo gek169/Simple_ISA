@@ -33,7 +33,8 @@
 	pop %3%;
 	//We now attempt to get an unsigned decimal value from the text.
 	lrx0 %/0xd0000%
-	proc_atof_dec
+	proc_atoi_dec
+	//proc_atof_dec
 	rx2_0
 		//print the number!
 	rx0_2;arx0;apush;

@@ -10,8 +10,8 @@
 ..decl_farproc(LIBC_REGION):proc_atoi_dec
 ..export"proc_atoi_dec"
 	//the passed string is in RX0.
-		rx3_0;
 		lb 0; rx2b;
+		rx3_0;
 	//before anything else, we need to test if the first character is NULL.
 	//Notice we are using the previous function's return as our return. This is a code de-duplication.
 		cbrx0; farilda; lb 0; cmp; sc %libc_atou_dec_loopout%; jmpifeq;
@@ -19,39 +19,20 @@
 		cbrx0; farilda; lb 45; cmp; sc %libc_atoi_dec_minus%; jmpifeq;
 		cbrx0; farilda; lb 43; cmp; sc %libc_atoi_dec_plus%; jmpifeq;
 		la 0; apush;
-		sc %libc_atoi_dec_looptop%; jmp;
+		sc %libc_atoi_dec_handle%; jmp;
 	:libc_atoi_dec_plus:
 		la 0; apush;
 		rx0_3; rxincr; rx3_0;
-		sc %libc_atoi_dec_looptop%; jmp;
+		sc %libc_atoi_dec_handle%; jmp;
 	:libc_atoi_dec_minus:
 		la 1; apush;
 		rx0_3; rxincr; rx3_0;
-	:libc_atoi_dec_looptop:
-		rx0_3; 
-		cbrx0; 
-		farilda;
-		apush; lb 0x30; cmp; lb 0; cmp; bpop; sc %libc_atoi_dec_loopout%; jmpifeq;			//Jump if the character was less than 0x30.
-		ab; apush; lb 0x39; cmp; lb 2; cmp; bpop; sc %libc_atoi_dec_loopout%; jmpifeq;		//Jump if the character was greater than 0x39.
-		ab; lb 0x30; sub;
-		rxincr;
-		rx3_0;
-		//the value is in A.
-		rx0_2			//load the value.
-		lb 10
-		rx1b
-		rxmul
-		rx1a
-		rxadd
-		rx2_0			//stash it away!
-		sc %libc_atoi_dec_looptop%; jmp;
-	:libc_atoi_dec_loopout:
-		rx0_2
-		apop
+	libc_atoi_dec_handle:
+		rx0_3;
+		proc_atou_dec;
+		apop;
 		sc %libc_atoi_dec_handle_minus%; jmpifeq;
 		farret;
-	:libc_atoi_dec_handle_minus:
-		rx0_2
-		rxcompl
-		rxincr
-		farret
+	libc_atoi_dec_handle_minus:
+		rxcompl;rxincr;
+		farret;
