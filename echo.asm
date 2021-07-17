@@ -92,15 +92,16 @@ nop;nop;nop;nop;nop;
 
 :Lbl_BROKE_EMU:
 	la0xd;putchar;
-	la69;putchar;
-	la82;putchar;
-	la82;putchar;
-	la0x30;putchar;
-	la82;putchar;
-	la0x20;putchar;
-	la0x20;putchar;
-	la0x20;putchar;
-	la0x20;putchar;
+	la 'E';putchar;
+	la 'R';putchar;
+	la 'R';putchar;
+	la '0';putchar;
+	la 'R';putchar;
+	la0; alpush;
+	space_printer_looptop:
+		la ' ';putchar;
+		alpop;aincr;alpush;
+		lb 20; cmp; lb 0; cmp; sc %space_printer_looptop%; jmpifeq;
 	lrx1 %/0%;
 	rximod;
 	nop;nop;nop;
