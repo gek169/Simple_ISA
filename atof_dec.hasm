@@ -1,0 +1,98 @@
+
+
+
+//ATOF~~~~~~~~~~~~~~~
+//Pointer to a string is passed in RX0.
+
+.libc_atof_ld_steps: farldrx0 %~LIBC_REGION%, %@%;
+.libc_atof_ld_stepsrx1: farldrx1 %~LIBC_REGION%, %@%;
+.libc_atof_st_steps: farstrx0 %~LIBC_REGION%, %@%;
+bytes 0,0,0,0;
+
+.libc_atof_ld_val: farldrx0 %~LIBC_REGION%, %@%;
+.libc_atof_ld_valrx1: farldrx1 %~LIBC_REGION%, %@%;
+.libc_atof_st_val: farstrx0 %~LIBC_REGION%, %@%;
+bytes 0,0,0,0;
+
+..decl_farproc(LIBC_REGION):proc_atof_dec
+..export"proc_atof_dec"
+	//the passed string is in RX0.
+		rx3_0;
+		lrx2 %?0%;
+
+	//before anything else, we need to test if the first character is NULL.
+		cbrx0; farilda; lb 0; cmp; sc %libc_atof_dec_loopout_early%; jmpifeq;
+	//Now, we test for the presence of + and - and use those to push
+		cbrx0; farilda; lb 45; cmp; sc %libc_atof_dec_minus%; jmpifeq;
+		cbrx0; farilda; lb 43; cmp; sc %libc_atof_dec_plus%; jmpifeq;
+		la 0; apush;
+		sc %libc_atof_dec_loop_int_portion%; jmp;
+	:libc_atof_dec_plus:
+		la 0; apush;
+		rx0_3; rxincr; rx3_0;
+		sc %libc_atof_dec_loop_int_portion%; jmp;
+	:libc_atof_dec_minus:
+		la 1; apush;
+		rx0_3; rxincr; rx3_0;
+	libc_atof_dec_loop_int_portion:
+
+		//We quit if we see a period.
+		//TODO: check for E portion.
+		rx0_3;	cbrx0; farilda; lb '.'; cmp; 				sc %libc_atof_dec_frac_portion%; jmpifeq;
+				cbrx0; farilda; lb '0'; cmp; lb 0; cmp;		sc %libc_atof_dec_loopout%; jmpifeq;
+				cbrx0; farilda; lb '9'; cmp; lb 2; cmp;		sc %libc_atof_dec_loopout%; jmpifeq;
+		//multiply the number we have collected thus far by 10.
+		rx0_2; lrx1 %?10%; fltmul; rx2_0;
+		//get the character, convert to float.
+		rx0_3; cbrx0; farilda; lb '0'; sub; rx0a; rxitof;
+		//add it.
+		rx1_2; fltadd; rx2_0;
+		//increment.
+		rx0_3; rxincr; rx3_0;
+		//jump.
+		sc %libc_atof_dec_loop_int_portion%; jmp;
+	libc_atof_dec_frac_portion:
+		//1 needs to be used here instead of zero! for the mul to work.
+		la 1; rx0a; libc_atof_st_steps;
+		//increment past the period.
+		rx0_3; rxincr; rx3_0;
+	libc_atof_dec_loop_frac_portion:
+		//make sure this is a kosher character.
+		rx0_3;
+		//TODO check for E portion.
+		cbrx0; farilda; lb '0'; cmp; lb 0; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
+		cbrx0; farilda; lb '9'; cmp; lb 2; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
+		//get the character, convert to float, stash it in val.
+		cbrx0; farilda; lb '0'; sub; rx0a; rxitof; libc_atof_st_val;
+
+		//increment the number of characters past the period.
+		libc_atof_ld_steps; lb10; rx1b; rxmul; libc_atof_st_steps;
+		
+		//Check if we have gone too far! steps will be 0 or non-divisible by 10.
+		lb0; rx1b; rxcmp; 					sc %libc_atof_dec_loopout%; jmpifeq;
+		lb10; rx1b; rxmod; lb0; rx1b; rxcmp; sc %libc_atof_dec_loopout%; jmpifneq;
+
+		//convert steps to float. Divide val (which was already converted to float) by the number of steps.
+		libc_atof_ld_steps; rxitof; rx1_0;
+		libc_atof_ld_val;
+		fltdiv;
+		//add this value to the value in rx2.
+		rx1_2;
+		fltadd;
+		rx2_0;
+		//increment.
+		rx0_3; rxincr; rx3_0;
+		sc %libc_atof_dec_loop_frac_portion%; jmp;
+	libc_atof_dec_loopout_early:
+		lrx0 %?0%;
+		farret
+	libc_atof_dec_loopout:
+		apop
+		sc %libc_atof_mult_negative1%; jmpifeq;
+		rx0_2;
+		farret;
+		libc_atof_mult_negative1:
+			rx0_2;
+			lrx1 %?-1%;
+			fltmul;
+			farret
