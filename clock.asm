@@ -7,10 +7,10 @@
 
 
 
-..include"libc.hasm"
-//..include"libc_pre.hasm"
-//..(2):
-//ASM_data_include libc_pre.bin
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 .BENCH_SECONDS:256
 
