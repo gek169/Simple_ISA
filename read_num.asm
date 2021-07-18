@@ -3,12 +3,12 @@
 
 
 //use a separately compiled libc.
-//..include"libc_pre.hasm"
-//..(2):
-//..dinclude"libc_pre.bin"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 //use the normal libc.
-..include"libc.hasm"
+//..include"libc.hasm"
 
 ..main(1):
 	la 0xc; apush; la 0; alpush;
