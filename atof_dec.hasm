@@ -109,7 +109,6 @@ bytes 0,0,0,0;
 			sc %libc_atof_dec_e_applyloop%; jmp;
 		libc_atof_dec_e_applyloop_end:
 			rx1pop;
-//		sc %libc_atof_dec_loopout%; jmp;
 	libc_atof_dec_loopout:
 		apop
 		sc %libc_atof_mult_negative1%; jmpifeq;
