@@ -35,10 +35,9 @@ bytes 0,0,0,0;
 		la 1; apush;
 		rx0_3; rxincr; rx3_0;
 	libc_atof_dec_loop_int_portion:
-
-		//We quit if we see a period.
-		//TODO: check for E portion.
 		rx0_3;	cbrx0; farilda; lb '.'; cmp; 				sc %libc_atof_dec_frac_portion%; jmpifeq;
+				cbrx0; farilda; lb 'e'; cmp; 				sc %libc_atof_dec_e_portion%; jmpifeq;
+				cbrx0; farilda; lb 'E'; cmp; 				sc %libc_atof_dec_e_portion%; jmpifeq;
 				cbrx0; farilda; lb '0'; cmp; lb 0; cmp;		sc %libc_atof_dec_loopout%; jmpifeq;
 				cbrx0; farilda; lb '9'; cmp; lb 2; cmp;		sc %libc_atof_dec_loopout%; jmpifeq;
 		//multiply the number we have collected thus far by 10.
@@ -59,9 +58,10 @@ bytes 0,0,0,0;
 	libc_atof_dec_loop_frac_portion:
 		//make sure this is a kosher character.
 		rx0_3;
-		//TODO check for E portion.
-		cbrx0; farilda; lb '0'; cmp; lb 0; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
-		cbrx0; farilda; lb '9'; cmp; lb 2; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
+			cbrx0; farilda; lb 'e'; cmp; 				sc %libc_atof_dec_e_portion%; jmpifeq;
+			cbrx0; farilda; lb 'E'; cmp; 				sc %libc_atof_dec_e_portion%; jmpifeq;
+			cbrx0; farilda; lb '0'; cmp; lb 0; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
+			cbrx0; farilda; lb '9'; cmp; lb 2; cmp; sc %libc_atof_dec_loopout%; jmpifeq;
 		//get the character, convert to float, stash it in val.
 		cbrx0; farilda; lb '0'; sub; rx0a; rxitof; libc_atof_st_val;
 
@@ -83,9 +83,33 @@ bytes 0,0,0,0;
 		//increment.
 		rx0_3; rxincr; rx3_0;
 		sc %libc_atof_dec_loop_frac_portion%; jmp;
-	libc_atof_dec_loopout_early:
-		lrx0 %?0%;
-		farret
+	libc_atof_dec_e_portion:
+		//increment past the E.
+		rx0_3; rxincr; rx3_0;
+		rx3push;rx2push;
+		rx0_3;
+		proc_atoi_dec;
+		rx2pop;rx3pop;
+		lb0; rx1b; rxicmp; lb 0; cmp; sc %libc_atof_dec_e_negative%; jmpifeq; //Less than zero? it's negative!
+			libc_atof_st_val; //stash
+			lrx1 %?10.0%;
+			rx1push;
+			sc %libc_atof_dec_e_applyloop%; jmp;
+		libc_atof_dec_e_negative:
+			rxcompl; rxincr; libc_atof_st_val; //negate and stash.
+			lrx1 %?0.1%;
+			rx1push;
+		libc_atof_dec_e_applyloop:
+			//check if it's zero.
+			libc_atof_ld_val; lb 0;rx1b; rxcmp; sc %libc_atof_dec_e_applyloop_end%; jmpifeq
+			//it's not! decrement and multiply.
+			rxdecr; libc_atof_st_val;
+			rx1pop; rx1push;
+			rx0_2; fltmul; rx2_0;
+			sc %libc_atof_dec_e_applyloop%; jmp;
+		libc_atof_dec_e_applyloop_end:
+			rx1pop;
+//		sc %libc_atof_dec_loopout%; jmp;
 	libc_atof_dec_loopout:
 		apop
 		sc %libc_atof_mult_negative1%; jmpifeq;
@@ -96,3 +120,6 @@ bytes 0,0,0,0;
 			lrx1 %?-1%;
 			fltmul;
 			farret
+	libc_atof_dec_loopout_early:
+		lrx0 %?0%;
+		farret
