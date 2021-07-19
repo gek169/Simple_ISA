@@ -78,9 +78,9 @@ bytes 0xd, 0xa;
 	rsh;
 	apush;
 	//print the number of seconds.
-	proc_printbytelchex;
+	proc_printbytehex;
 	apop;
-	proc_printbytelchex;
+	proc_printbytehex;
 	apop;
 	//print the iterations string.
 	la 0xAF;apush;lla %iterations_strings%;alpush;
@@ -91,13 +91,13 @@ bytes 0xd, 0xa;
 			lb8; rx1b;rxrsh;arx0;apush;
 	ld_iter;lb16;rx1b;rxrsh;arx0;apush;
 	ld_iter;lb24;rx1b;rxrsh;arx0;apush;
-	proc_printbytelchex;
+	proc_printbytehex;
 		apop;
-	proc_printbytelchex;
+	proc_printbytehex;
 		apop;
-	proc_printbytelchex;
+	proc_printbytehex;
 		apop;
-	proc_printbytelchex;
+	proc_printbytehex;
 		apop;
 
 	
@@ -105,13 +105,13 @@ bytes 0xd, 0xa;
 	la 0xAF;apush;lla %STP_STRING%;alpush;
 	proc_puts;
 	pop %3%;
-	astp;apush;proc_printbytelchex;apop;
+	astp;apush;proc_printbytehex;apop;
 	//print the length of string string.
 	//print the length of that very same string.
 	la 0xAF;apush;lla %LENGTH_OF_STRING_STRING%;alpush;
 	proc_puts;
 	proc_strlen;
-	proc_printbytelchex;
+	proc_printbytehex;
 	pop %3%;
 		//Reset iteration counter.
 	la0
