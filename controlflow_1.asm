@@ -3,16 +3,15 @@
 
 ..main:
 getchar; 
-farstla %&0x20000%; 
 putchar;
-lb '8'; cmp; lb 0; cmp; 
-sc %Lbl_val_is_lt%; jmpifeq;
+lb '1'; cmp;
+sc %Lbl_val_is_lt%; jmpifneq;
 sc %Lbl_val_is_gte%; jmp;
 
 :Lbl_val_is_lt:
 	halt;
 :Lbl_val_is_gte:
-	farllda %&0x20000%;
+	la '1';
 	cpc; 
 	putchar; 
 	jmp;
