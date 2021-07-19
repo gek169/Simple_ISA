@@ -1500,8 +1500,7 @@ int main(int argc, char** argv){
 					}
 				if(variable_names[index]) free(variable_names[index]);
 				variable_names[index] = macro_name;
-				temp = 
-				str_null_terminated_alloc(
+				temp = str_null_terminated_alloc(
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
