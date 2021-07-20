@@ -742,14 +742,13 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		M_SAVED = malloc(0x1000000);
+		M_SAVED = M_SAVER[EMULATE_DEPTH];
 		SEG_SAVED = SEGMENT;
 		SEG_PAGES_SAVED = SEGMENT_PAGES;
 		SEGMENT = malloc(0x100);
 		SEGMENT_PAGES = 1;
-		if(!M_SAVED || !SEGMENT){
+		if(!SEGMENT){
 			if(SEGMENT)free(SEGMENT);
-			if(M_SAVED)free(M_SAVED);
 			SEGMENT = SEG_SAVED;
 			SEGMENT_PAGES = SEG_PAGES_SAVED;
 			R=12; goto G_HALT;
@@ -766,7 +765,6 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		free(M_SAVED);
 		UNSTASH_REGS;
 	}D
 #else
@@ -799,10 +797,7 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		M_SAVED = malloc(0x1000000);
-		if(!M_SAVED){
-			R=12; goto G_HALT;
-		}
+		M_SAVED = M_SAVER[EMULATE_DEPTH];
 		memcpy(M_SAVED, M, 0x1000000);
 		EMULATE_DEPTH++;
 			e();
@@ -812,7 +807,6 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		free(M_SAVED);
 		UNSTASH_REGS;
 	}D
 #else
