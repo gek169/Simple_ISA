@@ -209,7 +209,6 @@ Both the emulator and the assembler are c89 compliant.
 
 I plan on making the assembler self-hosting at some point.
 
-```
 
 Read the documentation for more information.
 
@@ -221,4 +220,8 @@ Manual.pdf
 Written by
 ~~~DMHSW~~~
 for the public domain
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~Let all that you do be done with love~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ```
