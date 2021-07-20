@@ -119,7 +119,7 @@ k 194:goto G_AA18;k 195:goto G_AA19;k 196:goto G_AA20;k 197:goto G_AA21;\
 k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AINCR;k 204:goto G_ADECR;k 205:goto G_RX0INCR;\
 k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
-k 208:goto G_AA32;k 209:goto G_AA33;\
+k 208:goto G_ITOF;k 209:goto G_FTOI;\
 k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
@@ -221,8 +221,8 @@ const void* const goto_table[256] = {
 &&G_RX0INCR,
 &&G_RX0DECR,
 &&G_EMULATE,
-&&G_AA32,
-&&G_AA33,
+&&G_ITOF,
+&&G_FTOI,
 &&G_EMULATE_SEG,
 &&G_RXICMP,
 &&G_HALT,&&G_HALT,
@@ -769,16 +769,16 @@ G_AA12:{SUU SRX0, SRX1;
 	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
 #endif
 #if defined(NO_FP)
-	G_AA32:G_AA33:R=8;goto G_HALT;
+	G_ITOF:G_FTOI:R=8;goto G_HALT;
 #else
-	G_AA32:{
+	G_ITOF:{
 		float fRX0;
 		SUU lRX0 = RX0;
 		fRX0 = (float)lRX0;
 		memcpy(&lRX0, &fRX0, 4);
 		RX0 = lRX0;
 	}D
-	G_AA33:{
+	G_FTOI:{
 		float fRX0;
 		SUU lRX0 = RX0;
 			memcpy(&fRX0,&lRX0,4);
