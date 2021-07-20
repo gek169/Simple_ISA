@@ -6,7 +6,7 @@ MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 OPTLEVEL= -O3
 #make the emulator safe for fuzz testing.
-MORECFLAGS=-DUSE_COMPUTED_GOTO -Wall
+MORECFLAGS=-DUSE_COMPUTED_GOTO -Wall -g
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL) -s 
 CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL) -s
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
