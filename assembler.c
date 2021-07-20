@@ -122,7 +122,7 @@ int main(int argc, char** argv){
 	char* metaproc;
 	unsigned long include_level = 0;
 	const unsigned long nbuiltin_macros = 5; 
-	const unsigned long nmacrodef_macros = 4;
+	const unsigned long nmacrodef_macros = 2;
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
@@ -135,7 +135,7 @@ int main(int argc, char** argv){
 	variable_names[4] = " ";
 	variable_expansions[4] = variable_expansions[0];
 	nmacros = 5;
-
+	if(argc < 2) goto ASSEMBLER_SHOW_HELP;
 	{int i;for(i = 2; i < argc; i++)
 	{
 		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
@@ -372,6 +372,7 @@ int main(int argc, char** argv){
 			strprefix("--help",argv[i]) ||
 			strprefix("--version",argv[i])
 		){
+			ASSEMBLER_SHOW_HELP:;
 			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
 			puts("Optional argument: -i: specify input file.");
 			puts("Optional argument: -dis, --disassemble: disassemble a file, requires an input file and a location to start disassembling.");
@@ -988,7 +989,7 @@ int main(int argc, char** argv){
 				if(debugging){
 					if(!clear_output)printf("\n~~Macro Expansion Stage~~, iteration %lu\nLine:\n%s", iteration, line);
 					if(was_macro)
-						ASM_PUTS("\n~~~~~~~~~~~~~~~This is a macro line~~~~~~~~~~~~~~~\n");
+						ASM_PUTS("\n(This is a macro line)\n");
 				}
 				for(i = 
 					(have_reached_builtins?(was_macro?nmacrodef_macros:nbuiltin_macros):(was_macro?nmacrodef_macros:nmacros))-1; 
