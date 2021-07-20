@@ -4,17 +4,42 @@ SISA16 is an extremely lightweight virtual machine designed to replace languages
 
 it executes identically on every major platform and computer architecture. 
 
+Platforms Tested and confirmed for 100% compliance:
+
+```
+	Windows 10 x86_64 (i7-6700) on MSYS2
+	Windows 10 x86_64 (i7-6700) on WSL2
+	Debian 11 x86_64 (i7-6700)
+	Raspbian ArmV8 (BCM2837B0)
+	Debian 11 IA32 (i7-6700)
+	Alpine Linux IA32 (JSlinux)
+	Buildroot Linux Riscv64 (JSLinux)
+```
+
+Platforms planned to be tested:
+
+```
+	Debian ppc32
+	(any) ppc64
+	(any) ppc64le
+	(any) Mips64el
+	(any) Mips64be
+	(any) Mips64le
+	Sega Naomi Hitachi Sh-4
+```
+
 ## Why is SISA16 special?
 
 * Minimal dependence on the host operating system. A very minimal C standard library will build the assembler
 	and emulator just fine.
 
-* CPU architecture independence- With the exception of floating point arithmetic (And to a limited extent, signed integer division) all SISA16 operations are fully
-	architecture independent. A softFP implementation is planned. 
-	Fixed point arithmetic is provided as an alternative to floating point if needed, and
-	signed integer division can be simulated in software if needed.
+* CPU architecture independence- The behavior of the VM is host-independent. There are only two behaviors which may vary by architecture:
+	* Floating point numbers. Their layout in memory may vary, although IEEE-754 compliance is nearly ubiquitous...
+	* Signed integers. Non-twos-complement architectures are not supported, and the sign bit must be the highest bit.
 
-	The emulator and assembler are confirmed to work on many different architectures of varying endiannesses.
+	Luckily, virtually every architecture around today guarantees both of these things.
+
+	The emulator and assembler are confirmed to work on literally dozens of architectures and operating systems.
 
 * Unique. SISA16 is no ordinary virtual machine language...
 
