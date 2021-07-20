@@ -93,22 +93,28 @@ bytes 0,0,0,0;
 		lb0; rx1b; rxicmp; lb 0; cmp; sc %libc_atof_dec_e_negative%; jmpifeq; //Less than zero? it's negative!
 			libc_atof_st_val; //stash
 			lrx1 %?10.0%;
-			rx1push;
 			sc %libc_atof_dec_e_applyloop%; jmp;
 		libc_atof_dec_e_negative:
 			rxcompl; rxincr; libc_atof_st_val; //negate and stash.
 			lrx1 %?0.1%;
-			rx1push;
+		libc_atof_dec_e_applyloop_neg:
+			//check if it's zero.
+			libc_atof_ld_val; lb 0;rx1b; rxcmp; sc %libc_atof_dec_e_applyloop_end%; jmpifeq
+			//it's not! decrement and multiply.
+			rxdecr; libc_atof_st_val;
+			lrx1 %?10%
+			rx0_2; fltdiv; rx2_0;
+			sc %libc_atof_dec_e_applyloop_neg%; jmp;
 		libc_atof_dec_e_applyloop:
 			//check if it's zero.
 			libc_atof_ld_val; lb 0;rx1b; rxcmp; sc %libc_atof_dec_e_applyloop_end%; jmpifeq
 			//it's not! decrement and multiply.
 			rxdecr; libc_atof_st_val;
-			rx1pop; rx1push;
+			lrx1 %?10%
 			rx0_2; fltmul; rx2_0;
 			sc %libc_atof_dec_e_applyloop%; jmp;
 		libc_atof_dec_e_applyloop_end:
-			rx1pop;
+			//a comment.
 	libc_atof_dec_loopout:
 		apop
 		sc %libc_atof_mult_negative1%; jmpifeq;
