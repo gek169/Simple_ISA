@@ -92,11 +92,9 @@ bytes 0,0,0,0;
 		rx2pop;rx3pop;
 		lb0; rx1b; rxicmp; lb 0; cmp; sc %libc_atof_dec_e_negative%; jmpifeq; //Less than zero? it's negative!
 			libc_atof_st_val; //stash
-			lrx1 %?10.0%;
 			sc %libc_atof_dec_e_applyloop%; jmp;
 		libc_atof_dec_e_negative:
 			rxcompl; rxincr; libc_atof_st_val; //negate and stash.
-			lrx1 %?0.1%;
 		libc_atof_dec_e_applyloop_neg:
 			//check if it's zero.
 			libc_atof_ld_val; lb 0;rx1b; rxcmp; sc %libc_atof_dec_e_applyloop_end%; jmpifeq
