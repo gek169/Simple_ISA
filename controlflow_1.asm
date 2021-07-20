@@ -5,12 +5,12 @@
 getchar; 
 putchar;
 lb '1'; cmp;
-sc %Lbl_val_is_lt%; jmpifneq;
-sc %Lbl_val_is_gte%; jmp;
+sc %Lbl_false%; jmpifneq;
+sc %Lbl_true%; jmp;
 
-:Lbl_val_is_lt:
+:Lbl_false:
 	halt;
-:Lbl_val_is_gte:
+:Lbl_true:
 	la '1';
 	cpc; 
 	putchar; 
