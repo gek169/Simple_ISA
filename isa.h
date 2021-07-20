@@ -109,7 +109,7 @@ k 168:goto Z8;k 169:goto Z9;k 170:goto ZA;\
 k 171:goto ZB;k 172:goto ZC;k 173:goto ZD;\
 k 174:goto ZE;k 175:goto ZF;\
 k 176:goto G_AA0;k 177:goto G_AA1;\
-k 178:goto G_AA2;k 179:goto G_AA3;\
+k 178:goto G_FLTCMP;k 179:goto G_AA3;\
 k 180:goto G_AA4;k 181:goto G_AA5;k 182:goto G_AA6;\
 k 183:goto G_AA7;k 184:goto G_AA8;k 185:goto G_AA9;\
 k 186:goto G_AA10;k 187:goto G_AA11;\
@@ -191,7 +191,7 @@ const void* const goto_table[256] = {
 &&ZD,&&ZE,&&ZF,
 &&G_AA0,
 &&G_AA1,
-&&G_AA2,
+&&G_FLTCMP,
 &&G_AA3,
 &&G_AA4,
 &&G_AA5,
@@ -314,8 +314,10 @@ G_DIV:{if(b!=0)a/=b;else{R=1;goto G_HALT;}}D
 G_MOD:{if(b!=0)a%=b;else{R=2;goto G_HALT;}}D
 G_CMP:
 
-/*{if(a<b)a=0;else if(a>b)a=2;else a=1;}*/
-a = ((a>b)*2) + (a==b)*1;
+if(a<b)a=0;
+else if(a>b) a=2;
+else a=1;
+/*a = ((a>b)*2) + (a==b)*1;*/
 
 D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
@@ -484,8 +486,10 @@ Z7:RX0=RX0|RX1;D
 Z8:RX0=RX0^RX1;D
 Z9:RX0=~RX0;D
 ZA:
-	/*if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;*/
-	a= (RX0>RX1)*2 + (RX0==RX1);
+	if(RX0<RX1)a=0;
+	else if(RX0>RX1)a=2;
+	else a=1;
+	/*a= (RX0>RX1)*2 + (RX0==RX1);*/
 D
 ZB:
 #if !defined(NO_SEGMENT)
@@ -561,7 +565,7 @@ ZF: R=8; goto G_HALT;
 G_AA0: R=8; goto G_HALT;
 G_AA1: R=8; goto G_HALT;
 /*cmp*/
-G_AA2: R=8; goto G_HALT;
+G_FLTCMP: R=8; goto G_HALT;
 #else
 ZE:{
 	float fRX0, fRX1;
@@ -608,7 +612,7 @@ G_AA1: {
 	RX0 = RX0_CP;
 }D
 /*cmp*/
-G_AA2: {
+G_FLTCMP: {
 	float fRX0, fRX1;
 	UU RX0_CP = RX0;
 	UU RX1_CP = RX1;
@@ -819,12 +823,11 @@ G_AA12:{SUU SRX0, SRX1;
 	{
 		register SUU RX0I = RX0;
 		register SUU RX1I = RX1;
-		/*
 		if(RX0I<RX1I)		a=0;
 		else if(RX0I>RX1I)	a=2;
 		else 				a=1;
-		*/
-		a = (RX0I>RX1I) * 2 + (RX0I==RX1I);
+		
+		/*a = (RX0I>RX1I) * 2 + (RX0I==RX1I);*/
 	}D
 	/*add more insns here.*/
 	G_HALT:dcl();return 0;
