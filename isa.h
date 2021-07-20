@@ -312,7 +312,12 @@ G_SUB:a-=b;D
 G_MUL:a*=b;D
 G_DIV:{if(b!=0)a/=b;else{R=1;goto G_HALT;}}D
 G_MOD:{if(b!=0)a%=b;else{R=2;goto G_HALT;}}D
-G_CMP:{if(a<b)a=0;else if(a>b)a=2;else a=1;}D
+G_CMP:
+
+/*{if(a<b)a=0;else if(a>b)a=2;else a=1;}*/
+a = ((a>b)*2) + (a==b)*1;
+
+D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
 G_FARISTLA:write_2bytes(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
@@ -478,7 +483,10 @@ Z6:RX0=RX0&RX1;D
 Z7:RX0=RX0|RX1;D
 Z8:RX0=RX0^RX1;D
 Z9:RX0=~RX0;D
-ZA:if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;D
+ZA:
+	/*if(RX0<RX1)a=0;else if(RX0>RX1)a=2;else a=1;*/
+	a= (RX0>RX1)*2 + (RX0==RX1);
+D
 ZB:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
@@ -811,9 +819,12 @@ G_AA12:{SUU SRX0, SRX1;
 	{
 		register SUU RX0I = RX0;
 		register SUU RX1I = RX1;
+		/*
 		if(RX0I<RX1I)		a=0;
 		else if(RX0I>RX1I)	a=2;
 		else 				a=1;
+		*/
+		a = (RX0I>RX1I) * 2 + (RX0I==RX1I);
 	}D
 	/*add more insns here.*/
 	G_HALT:dcl();return 0;
