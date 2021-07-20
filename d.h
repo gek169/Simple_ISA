@@ -214,69 +214,40 @@ static unsigned short interrupt(unsigned short a,
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 		return a;
 	}
-
-#if !defined(NO_SEGMENT)
-	if(a == 0xffFE){ /*Disk Read.*/
-		UU i; char buf[0x10000];
-		for(i = 0; i<0x10000; i++){
-			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
-			buf[i] = M[ind];
-			if(M[ind] == '\0')break;
+	if(a == 0xFF00){ /*Read short from saved disk.*/
+		unsigned short bruh;
+		RX0 &= 0x7FffFFff;
+		FILE* f = fopen("sisa16.dsk", "rb+");
+		if(!f){
+			return 0;
 		}
-		buf[0xFFff] = '\0';
-		/*
-			Attempt to load it into the segment.
-		*/
-		{FILE* ff;size_t len;UU n_pages;
-			ff = fopen(buf, "rb");
-			if(!ff) return 0;
-			fseek(ff, 0, SEEK_END);
-			len = ftell(ff);
-			fseek(ff, 0, SEEK_SET);
-			n_pages = (len + 255)/256;
-			if(n_pages == 0) return 0;
-			if(SEGMENT_PAGES < n_pages){
-				free(SEGMENT);
-				SEGMENT = calloc(1, 0x100*n_pages);
-				SEGMENT_PAGES = n_pages;
-				if(!SEGMENT){ /*error*/
-					fclose(ff);
-					SEGMENT = calloc(1, 0x100);
-					SEGMENT_PAGES = 1;
-					if(!SEGMENT){ /*error*/
-						SEGMENT = NULL;
-						SEGMENT_PAGES = 0;
-						return 0;
-					}
-					return 0;
-				}
-			}
-			fread(SEGMENT, 1, len, ff);
-			fclose(ff);
+		fseek(f, 0, SEEK_END);
+		if((unsigned long)ftell(f) < (unsigned long)RX0){
+			return 0;
 		}
+		fseek(f, RX0, SEEK_SET);
+		bruh = (unsigned char)fgetc(f);
+		bruh <<= 8;
+		bruh |= (unsigned char)fgetc(f);
+		fclose(f);
+		return bruh;
+	}
+	if(a == 0xFF01){ /*write short 'b' to saved disk.*/
+		FILE* f = fopen("sisa16.dsk", "wb+");
+		RX0 &= 0x7FffFFff;
+		if(!f){
+			return 0;
+		}
+		fseek(f, 0, SEEK_END);
+		if((unsigned long)ftell(f) < (unsigned long)RX0){
+			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);	
+			fflush(f);
+		}
+		fseek(f, RX0, SEEK_SET);
+		fputc(b>>8, f);
+		fputc(b&0xff, f);
+		fclose(f);
 		return 1;
 	}
-#endif
-#if !defined(FUZZTEST) && !defined(NO_SEGMENT)
-	if(a == 0xffFD){ /*Disk Write*/
-		UU i; char buf[0x10000];
-		for(i = 0; i<0x10000; i++){
-			UU ind = ( (((UU)c&255)<<16)+((UU)b) + i) & 0xffFFff;
-			buf[i] = M[ind];
-			if(M[ind] == '\0')break;
-		}
-		buf[0xFFff] = '\0';
-		/*
-			Attempt to store the segment.
-		*/
-		{FILE* ff;
-			ff = fopen(buf, "wb");
-			if(!ff) return 0;
-			fwrite(SEGMENT, 1, ((size_t)SEGMENT_PAGES) * 256, ff);
-			fclose(ff);
-		}
-		return 1;
-	}
-#endif
 	return a;
 }
