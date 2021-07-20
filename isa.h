@@ -812,7 +812,6 @@ G_AA12:{SUU SRX0, SRX1;
 #else
 	G_EMULATE_SEG: R=14; goto G_HALT;
 #endif
-
 	G_RXICMP:
 	{
 		register SUU RX0I = RX0;
