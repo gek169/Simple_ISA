@@ -120,7 +120,7 @@ k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AINCR;k 204:goto G_ADECR;k 205:goto G_RX0INCR;\
 k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_AA32;k 209:goto G_AA33;\
-k 210:goto G_AA34;k 211:goto G_RXICMP;k 212:k 213:k 214:k 215:k 216:k 217:\
+k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:k 213:k 214:k 215:k 216:k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -223,7 +223,7 @@ const void* const goto_table[256] = {
 &&G_EMULATE,
 &&G_AA32,
 &&G_AA33,
-&&G_AA34,
+&&G_EMULATE_SEG,
 &&G_RXICMP,
 &&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
@@ -766,7 +766,7 @@ G_AA12:{SUU SRX0, SRX1;
 		UNSTASH_REGS;
 	}D
 #else
-	G_EMULATE: goto G_AA34; /*emulate_seg.*/
+	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
 #endif
 #if defined(NO_FP)
 	G_AA32:G_AA33:R=8;goto G_HALT;
@@ -788,7 +788,7 @@ G_AA12:{SUU SRX0, SRX1;
 	}D
 #endif
 #if !defined(NO_EMULATE)
-	G_AA34:{
+	G_EMULATE_SEG:{
 		STASH_REGS;
 		u* M_SAVED = NULL;
 		UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
@@ -812,7 +812,7 @@ G_AA12:{SUU SRX0, SRX1;
 		UNSTASH_REGS;
 	}D
 #else
-	G_AA34: R=14; goto G_HALT;
+	G_EMULATE_SEG: R=14; goto G_HALT;
 #endif
 
 	G_RXICMP:
