@@ -41,7 +41,13 @@ bytes %/0%;
 	lrx1 %/200%							//the destination.
 	lrx2 %/0xd0000%						//the source in memory.
 	proc_fwrite
-	lrx0 %/0xd0000%
+
+	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
+	lrx2 %/200%							//the source in file.
+	lrx1 %/0xe0000%						//the destination in memory.
+	proc_fread
+	
+	lrx0 %/0xe0000%
 	proc_atoi_dec
 	proc_rxsqrt
 	rx2_0
