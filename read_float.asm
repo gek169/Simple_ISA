@@ -32,8 +32,7 @@
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	lrx0 %/0xd0000%
-	proc_atoi_dec
-	proc_rxsqrt
+	proc_atof_dec
 	rx2_0
 		//print the number!
 	rx0_2;arx0;apush;
