@@ -17,6 +17,7 @@
 	rxcmp;
 	lb 0; cmp;
 	sc %fib_return_one%; jmpifeq;
+	//Sum fib(i-1) and fib(i-2)
 	rx0push;
 	rxdecr;
 	proc_fib;
@@ -36,24 +37,8 @@
 	la 0xc; apush; la 0; alpush;
 	proc_gets
 	la '\n'; putchar; la '\r'; putchar;
-	proc_strlen;
-	//we now have the length of the string stored, we have to get it into RX0.
-	alpop; rx2a;
-	apop; rx0a;
-	lrx1 %/16%; rxlsh;
-	rx1_2;
-	rxadd;
-	rxincr;
-	rx2_0;
-	//The length of the string (plus one, for the null byte) is now in RX2, the src and dest arguments must be setup.
-	lrx0 %/0xd0000%
-	lrx1 %/0xc0000%
-	proc_memcpy;
-	la 0xd; apush; la 0; alpush;
-	proc_puts;
-	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
-	lrx0 %/0xd0000%
+	lrx0 %/0xc0000%
 	proc_atoi_dec
 	proc_fib
 	rx2_0
