@@ -3,12 +3,16 @@
 
 
 //use a separately compiled libc.
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 
 //use the normal libc.
-//..include"libc.hasm"
+..include"libc.hasm"
+
+..(5):
+length_of_input_string:
+bytes %/0%;
 
 ..main(1):
 	la 0xc; apush; la 0; alpush;
@@ -22,6 +26,7 @@
 	rx1_2;
 	rxadd;
 	rxincr;
+	farstrx0 %&length_of_input_string%;
 	rx2_0;
 	//The length of the string (plus one, for the null byte) is now in RX2, the src and dest arguments must be setup.
 	lrx0 %/0xd0000%
@@ -31,6 +36,11 @@
 	proc_puts;
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
+	//We would now like to write to disk.
+	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
+	lrx1 %/0%							//the destination.
+	lrx2 %/0xd0000%						//the source in memory.
+	proc_fwrite
 	lrx0 %/0xd0000%
 	proc_atoi_dec
 	proc_rxsqrt

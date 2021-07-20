@@ -1,0 +1,72 @@
+
+//FREAD
+//Arguments:
+//RX0: number of bytes to be read.
+//RX1: Destination of bytes to be read.
+//RX2: source of bytes to be read.
+
+//Variable storage locations:
+//RX2: source of bytes 
+//RX3: number of bytes to be read
+//Stacktop: Destination.
+
+..decl_farproc(LIBC_REGION):proc_fread
+..export"proc_fread"
+	rx3_1;
+	//Don't allow zero bytes to be read.
+	lrx1 %/0%; rxcmp; sc %libc_fread_early_out%; jmpifeq;
+	//A valid number of bytes is go be read.
+	rx3push; rx3_0;
+	
+	libc_fread_looptop:
+		lla %0xFF00%;rx0_2;interrupt;	//Fetch that byte
+		rx0pop;							//get the number of bytes.
+		cbrx0;farista;					//Store that shizzle
+		//increment our destination.
+		rxincr; rx0push;
+		//increment our source
+		rx0_2; rxincr; rx2_0;
+		//decrement number of bytes.
+		rx0_3; rxdecr; rx3_0;
+		//Continue with the loop if it is not zero.
+		lrx1 %/0%; rxcmp; sc %libc_fread_looptop%; jmpifneq;
+		//Otherwise, return.
+	rx0pop
+	farret
+	libc_fread_early_out:
+		farret
+
+//FWRITE
+//Arguments:
+//RX0: number of bytes to be written.
+//RX1: Destination of bytes to be written to disk.
+//RX2: source of bytes to be read from memory.
+
+//Variable storage locations:
+//RX2: source of bytes from memory
+//RX3: number of bytes to be read
+//Stacktop: Destination.
+
+..decl_farproc(LIBC_REGION):proc_fwrite
+..export"proc_fwrite"
+	rx3_1;
+	//Don't allow zero bytes to be written.
+	lrx1 %/0%; rxcmp; sc %libc_fread_early_out%; jmpifeq;	//Notice we are using the previous function's early end.
+	//A valid number of bytes is go be read.
+	rx3push; rx3_0;
+	
+	libc_fwrite_looptop:
+		rx0_2;cbrx0;farilda;ba;			//load byte from memory.
+		lla %0xFF01%;rx0pop; interrupt; //Store to disk.
+		
+		//increment our destination.
+		rxincr; rx0push;
+		//increment our source
+		rx0_2; rxincr; rx2_0;
+		//decrement number of bytes.
+		rx0_3; rxdecr; rx3_0;
+		//Continue with the loop if it is not zero.
+		lrx1 %/0%; rxcmp; sc %libc_fwrite_looptop%; jmpifneq;
+		//Otherwise, return.
+	rx0pop
+	farret

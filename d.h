@@ -214,7 +214,7 @@ static unsigned short interrupt(unsigned short a,
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 		return a;
 	}
-	if(a == 0xFF00){ /*Read short from saved disk.*/
+	if(a == 0xFF00){ /*Read char from saved disk.*/
 		unsigned short bruh;
 		RX0 &= 0x7FffFFff;
 		FILE* f = fopen("sisa16.dsk", "rb+");
@@ -227,12 +227,10 @@ static unsigned short interrupt(unsigned short a,
 		}
 		fseek(f, RX0, SEEK_SET);
 		bruh = (unsigned char)fgetc(f);
-		bruh <<= 8;
-		bruh |= (unsigned char)fgetc(f);
 		fclose(f);
 		return bruh;
 	}
-	if(a == 0xFF01){ /*write short 'b' to saved disk.*/
+	if(a == 0xFF01){ /*write char 'b' to saved disk.*/
 		FILE* f = fopen("sisa16.dsk", "wb+");
 		RX0 &= 0x7FffFFff;
 		if(!f){
@@ -244,7 +242,6 @@ static unsigned short interrupt(unsigned short a,
 			fflush(f);
 		}
 		fseek(f, RX0, SEEK_SET);
-		fputc(b>>8, f);
 		fputc(b&0xff, f);
 		fclose(f);
 		return 1;
