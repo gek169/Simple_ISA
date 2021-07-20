@@ -1,0 +1,26 @@
+
+
+//RXSQRRT
+//finds the sqrt of the number passed in RX0.
+//rx2: the number we're trying to find the square root of.
+//rx3: the current number we're trying.
+
+..decl_farproc(LIBC_REGION):proc_rxsqrt
+..export"proc_rxsqrt"
+	rx2_0;
+	lb0; rx3b;
+	libc_sqrt_loop:
+		rx0_3;rx1_3;rxmul;
+		rx1_2;
+		rxcmp;
+		sc %libc_sqrt_iseq%; jmpifeq; //Is it exactly equal? 
+		lb 2; cmp;
+		sc %libc_sqrt_other_end%; jmpifeq;
+		rx0_3;rxincr;rx3_0;
+		sc %libc_sqrt_loop%; jmp;
+	libc_sqrt_iseq:
+		rx0_3;
+		farret
+	libc_sqrt_other_end:
+		rx0_3; rxdecr;
+		farret;

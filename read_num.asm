@@ -3,12 +3,12 @@
 
 
 //use a separately compiled libc.
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 
 //use the normal libc.
-//..include"libc.hasm"
+..include"libc.hasm"
 
 ..main(1):
 	la 0xc; apush; la 0; alpush;
@@ -31,10 +31,10 @@
 	proc_puts;
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
-	//We now attempt to get an unsigned decimal value from the text.
 	lrx0 %/0xd0000%
-	//proc_atoi_dec
-	proc_atof_dec
+	proc_atoi_dec
+	proc_rxsqrt
+	//proc_atof_dec
 	rx2_0
 		//print the number!
 	rx0_2;arx0;apush;
