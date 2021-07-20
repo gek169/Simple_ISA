@@ -231,10 +231,16 @@ static unsigned short interrupt(unsigned short a,
 		return bruh;
 	}
 	if(a == 0xFF01){ /*write char 'b' to saved disk.*/
-		FILE* f = fopen("sisa16.dsk", "wb+");
+		FILE* f = fopen("sisa16.dsk", "rb+");
 		RX0 &= 0x7FffFFff;
 		if(!f){
-			return 0;
+			f = fopen("sisa16.dsk", "wb");
+			if(!f) return 0;
+			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);	
+			fflush(f);
+			fclose(f);
+			f = fopen("sisa16.dsk", "rb+");
+			if(!f) return 0;
 		}
 		fseek(f, 0, SEEK_END);
 		if((unsigned long)ftell(f) < (unsigned long)RX0){
