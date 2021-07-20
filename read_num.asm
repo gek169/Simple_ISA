@@ -3,12 +3,12 @@
 
 
 //use a separately compiled libc.
-//..include"libc_pre.hasm"
-//..(2):
-//..dinclude"libc_pre.bin"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 //use the normal libc.
-..include"libc.hasm"
+//..include"libc.hasm"
 
 ..(5):
 length_of_input_string:
