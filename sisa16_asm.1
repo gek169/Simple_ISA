@@ -111,14 +111,14 @@ the topmost region, where the stack pointer is stuck and where normal non-far lo
 .B Device: 
 the implementation of gch(), pch(), di(), dcl(), and interrupt from d.h which is used for I/O,
 accessible with getchar, putchar, and interrupt
-in the assembly language.
+in the assembly language. The default driver is a textmode driver with very basic functionality.
 
 .B Segment:
 The additional region of memory outside the normal SISA16 address space, which is 
 allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
 but can also be used to hold code.
 
-.B SDL2 Driver Only
+.B (SDL2 Driver Features Only)
 
 .B Screen Memory:
 153600 bytes starting at 0xB00000 which are used for the screen in the AV driver.
@@ -565,7 +565,7 @@ rxincr: (1 byte) (CD)
 
 rxdecr: (1 byte) (CE)
 
-emulate: Run a SISA16 sandboxed machine sharing the segment and a single page of choice according to register A (1 byte) (CF)
+emulate: Run a SISA16 sandboxed machine with a single sharedpage of choice according to register A (1 byte) (CF)
 	Errors in the sandboxed machine are trapped and returned to register A.
 
 	The segment is also sandboxed and a new 256 byte segment is allocated for the child program.
@@ -576,7 +576,7 @@ rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 
 rxftoi: convert RX0 from float to signed int. (1 byte) (D1)
 
-emulate_seg: Same as Emulate, but the segment is passed down to the child. (1 byte) (D2)
+emulate_seg: Same as Emulate, but the segment is shared with the child. (1 byte) (D2)
 
 rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 
@@ -585,6 +585,8 @@ The rest: halt duplicates, free for expansion (1 byte)
 .TP
 .B Comments
 comment lines are lines that begin with // or #.
+
+You can also include comments on most lines by typing `//` on the line.`
 
 .TP
 .B Labels
@@ -656,6 +658,8 @@ You can then put at the bottom of the file:
 
 ASM_EXPORT_HEADER
 
+This can be used to create separate compilation units, such as the "libc" that comes with the emulator.
+
 .TP
 .B Syntactic Sugar
 
@@ -698,6 +702,8 @@ is syntactic sugar for
 
 VAR#myProcedure#sc %@%;la region;farcall;
 
+where "region" is not literally placed, but rather the integer associated with the current 64k memory area.
+
 "..decl_farproc(3):myProcedure"
 
 is syntactically identical to above, but "region" will always be 3.
@@ -722,7 +728,7 @@ they must be at the beginning of a line, after preceding whitespace:
 
 "..z:" is identical to the above.
 
-"..(37):" is syntactic sugar for "section2424832;". It selects a region. 
+"..(37):" is syntactic sugar for "region37;". It selects a region. 
 
 "..ascii:Hello World!" is syntactic sugar for "!Hello World!"
 

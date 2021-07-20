@@ -499,7 +499,11 @@ int main(int argc, char** argv){
 				unsigned long i = 0;
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
-					if(strfind(line,variable_names[i]) == len_command)
+					if(
+						strfind(line,variable_names[i]) == len_command
+						&&
+						line[len_command+strlen(variable_names[i])] == /*(*/')'
+						)
 					{
 						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
 						line_old = line;
@@ -566,7 +570,11 @@ int main(int argc, char** argv){
 				unsigned long i = 0;
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
-					if(strfind(line,variable_names[i]) ==3)
+					if(
+						strfind(line,variable_names[i]) ==3
+						&&
+						line[3+strlen(variable_names[i])] == /*(*/')'
+					)
 					{
 						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
 						line_old = line;
@@ -701,7 +709,11 @@ int main(int argc, char** argv){
 				unsigned long i = 0;
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
-					if(strfind(line,variable_names[i]) == len_decl)
+					if(
+						strfind(line,variable_names[i]) == len_decl
+						&&
+						line[len_decl+strlen(variable_names[i])] == /*(*/')'
+					)
 					{
 						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
 						line_old = line;
