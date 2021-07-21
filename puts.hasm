@@ -11,7 +11,7 @@
 		cbrx0;
 		farilda;
 		apush;
-		lb0;cmp;bpop;sc%libc_puts_loopend%;jmpifeq;
+		nota;bpop;sc%libc_puts_loopend%;jmpifeq;
 		ab
 		putchar
 		rxincr;
