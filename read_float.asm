@@ -70,7 +70,7 @@
 	//lrx1 %/256%;rxadd;
 	proc_free;
 	la '\n'; putchar; la '\r'; putchar;
-	lrx0 %/0xF00%;
+	lrx0 %/0xE10%;
 		proc_alloc;
 		rx2_0
 			//print the number!
