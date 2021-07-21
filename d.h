@@ -154,18 +154,10 @@ static void dcl(){return;}
 #endif
 
 static unsigned short gch(){
-#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
 return (unsigned short)getchar_unlocked();
-#else
-return (unsigned short)getchar();
-#endif
 }
 static void pch(unsigned short a){
-#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
 putchar_unlocked(a);
-#else
-putchar(a);
-#endif
 }
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
@@ -279,7 +271,7 @@ static unsigned short interrupt(unsigned short a,
 		return a;
 	}
 	if(a == 0xFF00){ /*Read char from saved disk.*/
-		unsigned short bruh;
+		register unsigned char bruh;
 		RX0 &= 0x7FffFFff;
 		FILE* f = fopen("sisa16.dsk", "rb+");
 		if(!f){
@@ -304,13 +296,6 @@ static unsigned short interrupt(unsigned short a,
 			f = fopen("sisa16.dsk", "rb+");
 			if(!f) return 0;
 		}
-		/*
-		fseek(f, 0, SEEK_END);
-		if((unsigned long)ftell(f) < (unsigned long)RX0){
-			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);	
-			fflush(f);
-		}
-		*/
 		if(fseek(f, RX0, SEEK_SET)){
 			fseek(f, 0, SEEK_END);
 			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);
