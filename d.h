@@ -116,8 +116,39 @@ static void dcl(){
 static void di(){if(EMULATE_DEPTH==0)initscr(); return;}
 static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #else
+#ifdef USE_TERMIOS
+#include <termios.h>
+#include <unistd.h>
+/*#include <fcntl.h>*/
+static struct termios oldChars;
+static struct termios newChars;
+void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
+{
+  /*fcntl(0, F_SETFL, O_NONBLOCK);*/ /*Do you want non-blocking IO? This is how you get non-blocking IO.*/
+  tcgetattr(STDIN_FILENO, &oldChars); /* grab old terminal i/o settings */
+  newChars = oldChars; /* make new settings same as old settings */
+  newChars.c_lflag &= ~ICANON; /* disable buffered i/o */
+  newChars.c_lflag &= echo ? ECHO : ~ECHO; /* set echo mode */
+  tcsetattr(STDIN_FILENO, TCSAFLUSH, &newChars); /* use these new terminal i/o settings now */
+}
+void dieTermios(){
+	tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldChars); /* use these new terminal i/o settings now */	
+}
+static void di(){
+if(EMULATE_DEPTH==0){
+	initTermios(0);
+	atexit(dieTermios);
+}
+}
+static void dcl(){
+if(EMULATE_DEPTH==0){
+	/*We actually just do nothing!*/
+}
+}
+#else
 static void di(){return;}
 static void dcl(){return;}
+#endif
 #endif
 
 #endif

@@ -5,7 +5,7 @@ INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 OPTLEVEL= -O3  -s
-MORECFLAGS=-DUSE_COMPUTED_GOTO
+MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL)
 CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL)
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
@@ -28,15 +28,15 @@ d:
 	./asmbuild.sh
 
 sisa16_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses|| $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT -lncurses|| $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
 	@echo "~~Built emulator."
 
 sisa16_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT -DUSE_NCURSES -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
+	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT  -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
 sisa16_dbg:
-	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_NCURSES -DUSE_UNSIGNED_INT -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg  -DUSE_UNSIGNED_INT -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
 	@echo "~~Built debugger."
 
 # SDL2 versions, if you want to mess with graphics and audio
