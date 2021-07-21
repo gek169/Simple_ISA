@@ -1,5 +1,9 @@
+#ifndef SISA_GIT_HASH
+#define SISA_GIT_HASH "<git hash omitted>"
+#endif
+
 #ifndef SISA_VERSION
-#define SISA_VERSION "1.8_official"
+#define SISA_VERSION "1.8_official commit=" SISA_GIT_HASH
 #endif
 
 #define k case

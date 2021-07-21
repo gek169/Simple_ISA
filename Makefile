@@ -4,12 +4,14 @@ CC=gcc
 INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
-OPTLEVEL= -O3 -s
+GIT_HASH= $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD || echo no)
+OPTLEVEL= -O3 -s -DSISA_GIT_HASH=\"$(GIT_HASH)\"
 MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT
 SDL2CFLAGS=-DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL)
 CFLAGS_SDL2= $(SDL2CFLAGS) $(OPTLEVEL)
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
+
 
 all: main asm_programs
 
