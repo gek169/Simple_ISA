@@ -15,6 +15,7 @@ length_of_input_string:
 bytes %/0%;
 
 ..main(1):
+	//	lla %0xE000%; interrupt; //Proof of non-blocking getchar.
 	la 0xc; apush; la 0; alpush;
 	proc_gets
 	la '\n'; putchar; la '\r'; putchar;
