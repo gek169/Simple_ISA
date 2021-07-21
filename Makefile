@@ -5,9 +5,8 @@ INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 OPTLEVEL= -O3  -s
-MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS
+MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL)
-CASMFLAGS=  $(MORECFLAGS) $(OPTLEVEL)
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
@@ -28,29 +27,29 @@ d:
 	./asmbuild.sh
 
 sisa16_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT -lncurses|| $(CC) $(CFLAGS) isa.c -o sisa16_emu -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) isa.c -o sisa16_emu  || $(CC) $(CFLAGS) isa.c -o sisa16_emu 
 	@echo "~~Built emulator."
 
 sisa16_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT  -lncurses || $(CC) $(CASMFLAGS) assembler.c -o sisa16_asm -DUSE_UNSIGNED_INT
+	$(CC) $(CFLAGS) assembler.c -o sisa16_asm    || $(CC) $(CFLAGS) assembler.c -o sisa16_asm 
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
 sisa16_dbg:
-	$(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg  -DUSE_UNSIGNED_INT -lncurses || $(CC) $(CASMFLAGS) debugger.c -o sisa16_dbg -DUSE_UNSIGNED_INT 
+	$(CC) $(CFLAGS) debugger.c -o sisa16_dbg    || $(CC) $(CFLAGS) debugger.c -o sisa16_dbg  
 	@echo "~~Built debugger."
 
 # SDL2 versions, if you want to mess with graphics and audio
 
 sisa16_sdl2_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_sdl2_emu -lSDL2 -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
+	$(CC) $(CFLAGS) isa.c -o sisa16_sdl2_emu -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
 	@echo "~~Built SDL2 emulator."
 
 sisa16_sdl2_asm:
-	$(CC) $(CASMFLAGS) assembler.c -o sisa16_sdl2_asm -lSDL2 -DUSE_UNSIGNED_INT -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
+	$(CC) $(CFLAGS) assembler.c -o sisa16_sdl2_asm -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
 	@echo "~~Built SDL2 assembler (Which has an emulator built into it.)"
 
 sisa16_sdl2_dbg:
-	$(CC) $(CASMFLAGS) debugger.c -o sisa16_sdl2_dbg -DUSE_UNSIGNED_INT -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
+	$(CC) $(CFLAGS) debugger.c -o sisa16_sdl2_dbg  -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
 	@echo "~~Built SDL2 debugger."
 
 
