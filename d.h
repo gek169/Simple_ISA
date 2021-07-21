@@ -57,7 +57,7 @@ static void di(){
 	        exit(1);
 	    }
 		sdl_spec.freq = 16000;//Sampling rate
-		sdl_spec.format = AUDIO_U16MSB; //Number of data bits
+		sdl_spec.format = AUDIO_U8; //Number of data bits
 		sdl_spec.channels = 1;//Number of channels
 		sdl_spec.silence = 0;
 		sdl_spec.samples = 2048;

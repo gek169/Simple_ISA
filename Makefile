@@ -6,7 +6,9 @@ MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 OPTLEVEL= -O3  -s
 MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT
+SDL2CFLAGS=-DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL)
+CFLAGS_SDL2= $(SDL2CFLAGS) $(OPTLEVEL)
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
 all: main asm_programs
@@ -41,15 +43,15 @@ sisa16_dbg:
 # SDL2 versions, if you want to mess with graphics and audio
 
 sisa16_sdl2_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_sdl2_emu -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
+	$(CC) $(CFLAGS_SDL2) isa.c -o sisa16_sdl2_emu -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
 	@echo "~~Built SDL2 emulator."
 
 sisa16_sdl2_asm:
-	$(CC) $(CFLAGS) assembler.c -o sisa16_sdl2_asm -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
+	$(CC) $(CFLAGS_SDL2) assembler.c -o sisa16_sdl2_asm -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
 	@echo "~~Built SDL2 assembler (Which has an emulator built into it.)"
 
 sisa16_sdl2_dbg:
-	$(CC) $(CFLAGS) debugger.c -o sisa16_sdl2_dbg  -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
+	$(CC) $(CFLAGS_SDL2) debugger.c -o sisa16_sdl2_dbg  -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
 	@echo "~~Built SDL2 debugger."
 
 
