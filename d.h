@@ -221,11 +221,9 @@ static unsigned short interrupt(unsigned short a,
 		if(!f){
 			return 0;
 		}
-		fseek(f, 0, SEEK_END);
-		if((unsigned long)ftell(f) < (unsigned long)RX0){
+		if(fseek(f, RX0, SEEK_SET)){
 			return 0;
 		}
-		fseek(f, RX0, SEEK_SET);
 		bruh = (unsigned char)fgetc(f);
 		fclose(f);
 		return bruh;
@@ -242,12 +240,17 @@ static unsigned short interrupt(unsigned short a,
 			f = fopen("sisa16.dsk", "rb+");
 			if(!f) return 0;
 		}
+		/*
 		fseek(f, 0, SEEK_END);
 		if((unsigned long)ftell(f) < (unsigned long)RX0){
 			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);	
 			fflush(f);
 		}
-		fseek(f, RX0, SEEK_SET);
+		*/
+		if(fseek(f, RX0, SEEK_SET)){
+			fseek(f, 0, SEEK_END);
+			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);
+		}
 		fputc(b&0xff, f);
 		fclose(f);
 		return 1;
