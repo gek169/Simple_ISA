@@ -119,7 +119,7 @@ static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #ifdef USE_TERMIOS
 #include <termios.h>
 #include <unistd.h>
-/*#include <fcntl.h>*/
+#include <fcntl.h>
 static struct termios oldChars;
 static struct termios newChars;
 void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
@@ -250,6 +250,27 @@ static unsigned short interrupt(unsigned short a,
 #endif
 
 	if(a==0xa||a == 0xd) {fflush(stdout);return a;}
+
+	if(a==0xE000){
+#ifdef USE_TERMIOS
+		/* set O_NONBLOCK on fd */
+		int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+		fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+		return 1;
+#else
+		return 0;
+#endif
+	}
+	if(a==0xE001){
+#ifdef USE_TERMIOS
+		/* set O_NONBLOCK on fd */
+		int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+		fcntl(STDIN_FILENO, F_SETFL, flags & ~O_NONBLOCK);
+		return 1;
+#else
+		return 0;
+#endif
+	}
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
 		for(i=0;i<(1<<24)-31;i+=32)
