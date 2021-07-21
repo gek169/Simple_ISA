@@ -38,12 +38,12 @@ bytes %/0%;
 	pop %3%;
 	//We would now like to write to disk.
 	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
-	lrx1 %/200%							//the destination.
+	lrx1 %/10%							//the destination.
 	lrx2 %/0xd0000%						//the source in memory.
 	proc_fwrite
 
 	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
-	lrx2 %/200%							//the source in file.
+	lrx2 %/10%							//the source in file.
 	lrx1 %/0xe0000%						//the destination in memory.
 	proc_fread
 	
