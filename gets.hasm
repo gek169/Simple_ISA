@@ -4,8 +4,7 @@
 //GETS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Clobbers: A, B, C, RX0, RX1, RX2, RX3
 //Designed for interactive mode.
-//Limit of 0xffFE characters.
-.libc_gets_max_chars:0xffFE
+.libc_gets_max_chars:0xffFD
 
 ..decl_farproc(LIBC_REGION):proc_gets
 ..export"proc_gets"
