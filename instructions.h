@@ -1,4 +1,4 @@
-static char* insns[212] = {
+static char* insns[216] = {
 	"halt", /*0*/
 	"lda",
 	"la",
@@ -231,9 +231,14 @@ static char* insns[212] = {
 	"rxitof",
 	"rxftoi",
 	"emulate_seg",
-	"rxicmp"
+	"rxicmp",
+	/*Boolean logic*/
+	"logor",
+	"logand",
+	"boolify",
+	"nota"
 };
-static unsigned char insns_numargs[212] = {
+static unsigned char insns_numargs[216] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -346,9 +351,11 @@ static unsigned char insns_numargs[212] = {
 		/*emulate_seg*/
 		0,
 		/*rxicmp*/
-		0
+		0,
+		/*Boolean ops, logor, logand, boolify, nota*/
+		0,0,0,0
 };
-static char* insn_repl[212] = {
+static char* insn_repl[216] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -585,6 +592,11 @@ static char* insn_repl[212] = {
 	/*emulate_seg*/
 		"bytes210;",
 	/*rxicmp*/
-		"bytes211;"
+		"bytes211;",
+	/*logor, logand, boolify, nota*/
+		"bytes212;",
+		"bytes213;",
+		"bytes214;",
+		"bytes215;",
 };
-static const unsigned int n_insns = 212;
+static const unsigned int n_insns = 216;

@@ -580,6 +580,14 @@ emulate_seg: Same as Emulate, but the segment is shared with the child. (1 byte)
 
 rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 
+logor: logical and, a = a || b (1 byte) (D4)
+
+logand: logical and, a = a && b (1 byte) (D5)
+
+boolify: make a into boolean, a = (a != 0) (D6)
+
+nota: make a into inverse boolean, a = (a == 0) (D7)
+
 The rest: halt duplicates, free for expansion (1 byte)
 
 .TP
