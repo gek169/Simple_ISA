@@ -42,6 +42,7 @@ st_page_count;
 st_line_count;
 nop;
 nop;
+lla %0xE000%; interrupt;
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;
