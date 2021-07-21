@@ -5,6 +5,7 @@
 
 
 ..main:
+	lla %0xE000%; interrupt; //enable non-blocking IO.
 	:filt_looptop:
 	getchar;
 	sc %filt_printbytehex%
@@ -61,4 +62,5 @@
 	bpush
 	proc_printbytehex
 	bpop
+	lla %0xE001%; interrupt;
 	halt
