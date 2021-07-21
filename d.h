@@ -122,8 +122,20 @@ static void dcl(){return;}
 
 #endif
 
-static unsigned short gch(){return (unsigned short)getchar();}
-static void pch(unsigned short a){putchar(a);}
+static unsigned short gch(){
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
+return (unsigned short)getchar_unlocked();
+#else
+return (unsigned short)getchar();
+#endif
+}
+static void pch(unsigned short a){
+#if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__) || defined(__unix__)
+putchar_unlocked(a);
+#else
+putchar(a);
+#endif
+}
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,
