@@ -122,7 +122,7 @@ static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #include <fcntl.h>
 static struct termios oldChars;
 static struct termios newChars;
-void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
+static void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
 {
   /*fcntl(0, F_SETFL, O_NONBLOCK);*/ /*Do you want non-blocking IO? This is how you get non-blocking IO.*/
   tcgetattr(STDIN_FILENO, &oldChars); /* grab old terminal i/o settings */
@@ -131,7 +131,7 @@ void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
   newChars.c_lflag &= echo ? ECHO : ~ECHO; /* set echo mode */
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &newChars); /* use these new terminal i/o settings now */
 }
-void dieTermios(){
+static void dieTermios(){
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldChars); /* use these new terminal i/o settings now */	
 }
 static void di(){
