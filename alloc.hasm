@@ -91,8 +91,7 @@ bytes %/0xFFFF%;
 		//Grab those page bits!
 		libc_ld_page_bits;
 		
-		//apush;proc_printbytehex;la'\r'; putchar; la'\n'; putchar;apop;		//DEBUG
-		lb0;cmp;sc %libc_alloc_found_free_page%; jmpifeq;
+		nota;sc %libc_alloc_found_free_page%; jmpifeq;
 
 		//FAILURE!
 		rx0_2;rxincr;rx2_0;
@@ -158,7 +157,7 @@ farret
 		rxcmp;lb2;cmp;sc %libc_free_fail%; jmpifeq;
 
 		farldrx1 %~LIBC_REGION%, %libc_alloc_start_page%;
-		rxcmp;lb0;cmp;sc %libc_free_fail%; jmpifeq;
+		rxcmp;nota;sc %libc_free_fail%; jmpifeq;
 
 	//set up our loop variable.
 		rx0_2;
