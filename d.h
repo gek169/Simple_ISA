@@ -4,6 +4,13 @@
 
 static unsigned char stdout_buf[0x100000];
 
+#ifdef ATTRIB_NOINLINE
+#define DONT_WANT_TO_INLINE_THIS __attribute__ ((noinline))
+#else
+#define DONT_WANT_TO_INLINE_THIS /*A comment.*/
+#endif
+
+
 #ifdef USE_SDL2
 /*
 	SDL2 driver, plus simple text mode.
@@ -39,7 +46,7 @@ static const UU arne_palette[16] = {
 		0x31a2f2,
 		0xb2dcef
 };
-static void sdl_audio_callback(void *udata, Uint8 *stream, int len){
+static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stream, int len){
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
@@ -48,7 +55,7 @@ static void sdl_audio_callback(void *udata, Uint8 *stream, int len){
 	audio_left -= len;
 }
 
-static void di(){
+static void DONT_WANT_TO_INLINE_THIS di(){
 	if(EMULATE_DEPTH==0){
 		setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
@@ -96,7 +103,7 @@ static void di(){
 		SDL_PauseAudio(0);
 	}
 }
-static void dcl(){
+static void DONT_WANT_TO_INLINE_THIS dcl(){
 	if(EMULATE_DEPTH==0){
 		SDL_DestroyTexture(sdl_tex);
 		SDL_DestroyRenderer(sdl_rend);
@@ -114,10 +121,10 @@ static void dcl(){
 
 #ifdef USE_NCURSES
 #include <ncurses.h>
-static void di(){
+static void DONT_WANT_TO_INLINE_THIS di(){
 if(EMULATE_DEPTH==0){initscr();setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));} return;
 }
-static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
+static void DONT_WANT_TO_INLINE_THIS dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #else
 #ifdef USE_TERMIOS
 #include <termios.h>
@@ -136,18 +143,14 @@ static void initTermios(int echo)
 static void dieTermios(){
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldChars); /* use these new terminal i/o settings now */	
 }
-static void di(){
+static void DONT_WANT_TO_INLINE_THIS di(){
 if(EMULATE_DEPTH==0){
 	initTermios(0);
 	atexit(dieTermios);
 	setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 }
 }
-static void dcl(){
-if(EMULATE_DEPTH==0){
-	/*We actually just do nothing!*/
-}
-}
+static void dcl(){}
 #else
 static void di(){return;}
 static void dcl(){return;}
@@ -170,7 +173,7 @@ static void pch(unsigned short a){
 	putchar(a);
 #endif
 }
-static unsigned short interrupt(unsigned short a,
+static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,
 									unsigned short stack_pointer,

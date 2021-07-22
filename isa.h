@@ -135,7 +135,11 @@ k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 #endif
 
+#ifdef ATTRIB_NOINLINE
+int __attribute__ ((noinline)) e()
+#else
 int e()
+#endif
 {
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
