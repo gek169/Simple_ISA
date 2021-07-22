@@ -44,20 +44,24 @@
 											(((UU)M[(((UU)c&255)<<16)+(UU)((U)(a+2))])<<8)+\
 											((UU)M[(((UU)c&255)<<16)+(UU)((U)(a+3))])\
 											)
-#define write_byte(v,d)M[d]=v;
-#define write_2bytes(v,d)	M[d]=					(v)>>8;\
-							M[((UU)(d)+1)&0xFFffFF]=	(v)&255;
-#define write_4bytes(v,d)	M[((UU)(d))&0xFFffFF]=		(v)>>24;\
-							M[((UU)(d)+1)&0xFFffFF]=	(v)>>16;\
-							M[((UU)(d)+2)&0xFFffFF]=	(v)>>8;\
-							M[((UU)(d)+3)&0xFFffFF]=	(v)&255;
+#define write_byte(v,d)		M[d]=v;
+
+#define write_2bytes(v,d)	{UU tmp = d; M[tmp]=					(v)>>8;\
+							M[(tmp+1)&0xFFffFF]=	(v)&255;}
+							
+#define write_4bytes(v,d)	{UU tmp = d; M[(tmp)&0xFFffFF]=		(v)>>24;\
+							M[(tmp+1)&0xFFffFF]=	(v)>>16;\
+							M[(tmp+2)&0xFFffFF]=	(v)>>8;\
+							M[(tmp+3)&0xFFffFF]=	(v)&255;}
+
+/*
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
 #define STASH_REGS STASH_REG(a);STASH_REG(b);STASH_REG(c);STASH_REG(stack_pointer);STASH_REG(program_counter);STASH_REG(program_counter_region);\
 		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);
 #define UNSTASH_REGS UNSTASH_REG(a);UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
 		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);
-
+*/
 
 #ifdef SISA_DEBUGGER
 void debugger_hook(	unsigned short *a,
@@ -136,12 +140,12 @@ int e()
 {
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
-	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
+	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	UU RX0=0,RX1=0,RX2=0,RX3=0;
 	EMULATE_DEPTH=0;
 #else
 	register u program_counter_region=0;
-	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;/*Would require edit if you wanted a 32 bit PC*/
+	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	register UU RX0=0,RX1=0,RX2=0,RX3=0;
 #endif
 #ifdef USE_COMPUTED_GOTO
@@ -254,15 +258,11 @@ G_OR:a|=b;D
 G_XOR:a^=b;D
 G_GETCHAR:
 {
-	STASH_REGS;
-	a_stash=gch();
-	UNSTASH_REGS;
+	a=gch();
 }
 D
 G_PUTCHAR:{
-	STASH_REGS;
 	pch(a);
-	UNSTASH_REGS;
 }D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
@@ -330,15 +330,11 @@ G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
 G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)+((UU)a)))D
 G_FARPAGEL:
 {
-	STASH_REGS;
 	memmove(M+(((UU)a)<<8),M+(((UU)c)<<8),256);
-	UNSTASH_REGS;
 }
 D
 G_FARPAGEST:{
-	STASH_REGS;
 	memmove(M+(((UU)c)<<8),M+(((UU)a)<<8),256);
-	UNSTASH_REGS;
 }D
 G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
@@ -375,17 +371,13 @@ G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 /*Would require edit if you wanted a 32 bit PC*/
 G_INTERRUPT:
 {
-	STASH_REGS;
-	a_stash=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);
-	UNSTASH_REGS;
+	a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);
 }
 D
 G_CLOCK:{
 	size_t q;
 	{
-		STASH_REGS;
 		q=clock();
-		UNSTASH_REGS;
 	}
 	a=((q)/(CLOCKS_PER_SEC/1000));
 	b=q/CLOCKS_PER_SEC;
@@ -488,9 +480,7 @@ ZB:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
-		STASH_REGS;
 		memcpy(M + 0x100 * ((size_t)(RX0&0xffFF)), SEGMENT + 0x100 * ((size_t)RX1), 0x100);
-		UNSTASH_REGS;
 	}
 	D
 #else
@@ -501,9 +491,7 @@ ZC:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	else
 	{
-		STASH_REGS;
 		memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
-		UNSTASH_REGS;
 	}
 	D
 #else
@@ -512,7 +500,6 @@ ZC:
 ZD:
 #if !defined(NO_SEGMENT)
 {
-	STASH_REGS;
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 	if(RX0 == 0){
@@ -541,7 +528,6 @@ ZD:
 			}
 		
 	}
-	UNSTASH_REGS;
 }D
 #else
 	R=14; goto G_HALT;
@@ -727,7 +713,6 @@ G_AA12:{SUU SRX0, SRX1;
 	G_RX0DECR:RX0--;D
 #if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_EMULATE:{
-		STASH_REGS;
 		u* M_SAVED = NULL;
 		u* SEG_SAVED = NULL;
 		UU SEG_PAGES_SAVED;
@@ -749,7 +734,7 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M_SAVED, M, 0x1000000);
 		EMULATE_DEPTH++;
 			e();
-			a_stash=R;
+			a=R;
 			R=0;
 		EMULATE_DEPTH--;
 		if(SEGMENT)free(SEGMENT);
@@ -758,7 +743,6 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		UNSTASH_REGS;
 	}D
 #else
 	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
@@ -784,7 +768,6 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE_SEG:{
-		STASH_REGS;
 		u* M_SAVED = NULL;
 		UU PAGE_TO_SAVE = a;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
@@ -794,13 +777,12 @@ G_AA12:{SUU SRX0, SRX1;
 		memcpy(M_SAVED, M, 0x1000000);
 		EMULATE_DEPTH++;
 			e();
-			a_stash=R;
+			a=R;
 			R=0;
 		EMULATE_DEPTH--;
 		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
 		memcpy(M, M_SAVED, 0x1000000);
 		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		UNSTASH_REGS;
 	}D
 #else
 	G_EMULATE_SEG: R=14; goto G_HALT;
