@@ -24,7 +24,7 @@ static char* variable_expansions[SISA16_MAX_MACROS] = {0};
 static char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
 static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
-static char int_checker(char* proc){
+static char DONT_WANT_TO_INLINE_THIS int_checker(char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
 	unsigned long chars_read = 0;
 	if(!isdigit(proc[0])) return 1;
@@ -71,7 +71,7 @@ static unsigned long linesize = 0;
 static char* line = NULL, *line_copy = NULL;
 static unsigned long region_restriction = 0;
 static char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
-static void fputbyte(unsigned char b, FILE* f){
+static void DONT_WANT_TO_INLINE_THIS fputbyte(unsigned char b, FILE* f){
 	if(!run_sisa16 && !quit_after_macros)
 		if((unsigned long)ftell(f) != outputcounter){
 			/*seek to the end*/

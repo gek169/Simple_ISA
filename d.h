@@ -4,11 +4,7 @@
 
 static unsigned char stdout_buf[0x100000];
 
-#ifdef ATTRIB_NOINLINE
-#define DONT_WANT_TO_INLINE_THIS __attribute__ ((noinline))
-#else
-#define DONT_WANT_TO_INLINE_THIS /*A comment.*/
-#endif
+
 
 
 #ifdef USE_SDL2
