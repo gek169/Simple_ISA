@@ -56,13 +56,13 @@ bytes 0xd, 0xa;
 	rx3b;
 	:main_looptop:
 		//during iteration counting, use
-		rx0_2;rxincr;rx2_0;
+		rxincr;
 		clock;
 		arx3;
 		//jump to the top if the number of seconds elapsed is the same.
 		sc %main_looptop%;cmp;jmpifeq;
 
-	rx0_2;
+	rx2_0;
 	st_iter;
 	//the time elapsed is different! it is still in b.
 	st_secs_b
