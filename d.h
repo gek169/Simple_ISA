@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static unsigned char stdout_buf[0x10000];
 
 #ifdef USE_SDL2
 /*
@@ -49,6 +50,7 @@ void sdl_audio_callback(void *udata, Uint8 *stream, int len){
 
 static void di(){
 	if(EMULATE_DEPTH==0){
+		setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 	    // Initialize SDL
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
@@ -113,7 +115,9 @@ static void dcl(){
 
 #ifdef USE_NCURSES
 #include <ncurses.h>
-static void di(){if(EMULATE_DEPTH==0)initscr(); return;}
+static void di(){
+if(EMULATE_DEPTH==0){initscr();setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));} return;
+}
 static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #else
 #ifdef USE_TERMIOS
@@ -137,6 +141,7 @@ static void di(){
 if(EMULATE_DEPTH==0){
 	initTermios(0);
 	atexit(dieTermios);
+	setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 }
 }
 static void dcl(){
