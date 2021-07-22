@@ -56,17 +56,17 @@ ret;
 
 section 500;
 	:L_main:
-		getchar;putchar;
+		getchar;putchar; 
 		lb 0x30;sub;
 		apush;
 		
-		la 0xa; putchar; la 0xd; putchar;
+		la 0xa; putchar; la 0xd; putchar;interrupt;
 		getchar;putchar;
 		lb 0x30;sub;
 		bpop;
 		mul;
 		apush;
-		la 0xa; putchar; la 0xd; putchar;
+		la 0xa; putchar; la 0xd; putchar;interrupt
 		proc_printbytehex;
 		la 0xa; putchar; la 0xd; putchar;
 	halt;
