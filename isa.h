@@ -47,12 +47,12 @@
 #define write_byte(v,d)		M[d]=v;
 
 #define write_2bytes(v,d)	{UU tmp = d; U vuv = v; M[tmp]=					(vuv)>>8;\
-							M[(tmp+1)&0xFFffFF]=	vuv;}
+													M[(tmp+1)&0xFFffFF]=	vuv;}
 							
 #define write_4bytes(v,d)	{UU tmp = d;UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
-							M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
-							M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
-							M[(tmp+3)&0xFFffFF]=	(vuv);}
+													M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
+													M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
+													M[(tmp+3)&0xFFffFF]=	(vuv);}
 
 /*
 #define STASH_REG(XX)   UU XX##_stash = XX;
