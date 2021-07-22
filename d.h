@@ -255,8 +255,8 @@ static unsigned short interrupt(unsigned short a,
 	if(a==0xE001){
 #ifdef USE_TERMIOS
 		/* set O_NONBLOCK on fd */
-		int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-		fcntl(STDIN_FILENO, F_SETFL, (~O_NONBLOCK) & flags);
+		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
+		fcntl(STDIN_FILENO, F_SETFL, 0);
 		return 1;
 #else
 		return 0;
