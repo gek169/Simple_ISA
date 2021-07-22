@@ -2,17 +2,23 @@
 
 //\e[H\e[2J\e[3J
 
-..decl_farproc(LIBC_REGION):proc_clear_terminal
-..export"proc_clear_terminal"
-	la '\e';putchar;
-	la '[';putchar;
-	la 'H';putchar;
-	la '\e';putchar;
-	la '[';putchar;
-	la '2';putchar;
+
+
+.clear_terminal:\
+	la '\e';putchar;\
+	la '[';putchar;\
+	la 'H';putchar;\
+	la '\e';putchar;\
+	la '[';putchar;\
+	la '2';putchar;\
+	la 'J';putchar;\
+	la '\e';putchar;\
+	la '[';putchar;\
+	la '3';putchar;\
 	la 'J';putchar;
-	la '\e';putchar;
-	la '[';putchar;
-	la '3';putchar;
-	la 'J';putchar;
+
+..export"clear_terminal"
+
+.flush_stdout:la '\n';interrupt;
+	
 farret;

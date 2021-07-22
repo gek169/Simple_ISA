@@ -66,7 +66,7 @@ asciifun_looptop: //Comment.
 	reached_num_lines:
 		la '\n'
 		interrupt;
-		proc_clear_terminal;
+		clear_terminal;
 		la 0;
 		st_line_count;
 		ld_page_count;
