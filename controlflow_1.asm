@@ -13,5 +13,5 @@ sc %Lbl_true%; jmp;
 :Lbl_true:
 	la '1';
 	cpc; 
-	putchar; 
+	putchar;
 	jmp;
