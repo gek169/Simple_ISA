@@ -54,14 +54,13 @@
 													M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
 													M[(tmp+3)&0xFFffFF]=	(vuv);}
 
-/*
+
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
 #define STASH_REGS STASH_REG(a);STASH_REG(b);STASH_REG(c);STASH_REG(stack_pointer);STASH_REG(program_counter);STASH_REG(program_counter_region);\
 		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);
 #define UNSTASH_REGS UNSTASH_REG(a);UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
 		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);
-*/
 
 #ifdef SISA_DEBUGGER
 void debugger_hook(	unsigned short *a,
@@ -173,6 +172,7 @@ const void* const goto_table[256] = {
 &&TF,&&U0,&&U1,&&U2,
 &&U3,&&U4,&&U5,&&U6,
 &&U7,&&U8,&&U9,&&UA,
+
 &&G_ALPUSH,&&G_BLPUSH,
 &&G_CPUSH,&&G_APUSH,&&G_BPUSH,&&G_ALPOP,
 &&G_BLPOP,&&G_CPOP,&&G_APOP,
@@ -256,8 +256,16 @@ G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
 G_XOR:a^=b;D
-G_GETCHAR:{a=gch();}D
-G_PUTCHAR:{pch(a);}D
+G_GETCHAR:{
+STASH_REGS;
+a=gch();
+UNSTASH_REGS;
+}D
+G_PUTCHAR:{
+STASH_REGS;
+pch(a_stash);
+UNSTASH_REGS;
+}D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
 G_ILDA:a=r(c)D
@@ -324,11 +332,15 @@ G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
 G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)|((UU)a)))D
 G_FARPAGEL:
 {
-	memmove(M+(((UU)a)<<8),M+(((UU)c)<<8),256);
+	STASH_REGS;
+	memmove(M+(((UU)a_stash)<<8),M+(((UU)c_stash)<<8),256);
+	UNSTASH_REGS;
 }
 D
 G_FARPAGEST:{
-	memmove(M+(((UU)c)<<8),M+(((UU)a)<<8),256);
+	STASH_REGS;
+	memmove(M+(((UU)c_stash)<<8),M+(((UU)a_stash)<<8),256);
+	UNSTASH_REGS;
 }D
 G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
@@ -365,13 +377,28 @@ G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 /*Would require edit if you wanted a 32 bit PC*/
 G_INTERRUPT:
 {
-	a=interrupt(a,b,c,stack_pointer,program_counter,program_counter_region,RX0,RX1,RX2,RX3);
+	STASH_REGS;
+	a_stash=interrupt(
+		a_stash,
+		b_stash,
+		c_stash,
+		stack_pointer_stash,
+		program_counter_stash,
+		program_counter_region_stash,
+		RX0_stash,
+		RX1_stash,
+		RX2_stash,
+		RX3_stash
+	);
+	UNSTASH_REGS;
 }
 D
 G_CLOCK:{
 	size_t q;
-	{
+	{	
+		STASH_REGS;
 		q=clock();
+		UNSTASH_REGS;
 	}
 	a=((q)/(CLOCKS_PER_SEC/1000));
 	b=q/(CLOCKS_PER_SEC);
@@ -474,7 +501,9 @@ ZB:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
+		STASH_REGS;
 		memcpy(M + 0x100 * (RX0&0xffFF), SEGMENT + 0x100 * RX1, 0x100);
+		UNSTASH_REGS;
 	}
 	D
 #else
@@ -485,7 +514,9 @@ ZC:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	else
 	{
+		STASH_REGS;
 		memcpy(SEGMENT + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
+		UNSTASH_REGS;
 	}
 	D
 #else
@@ -497,16 +528,20 @@ ZD:
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 	if(RX0 == 0){
+		STASH_REGS;
 		if(SEGMENT) free(SEGMENT);
 		SEGMENT = NULL;
 		SEGMENT_PAGES = 0;
+		UNSTASH_REGS;
 	} else {
 		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
+			STASH_REGS;
 			SEGMENT_PAGES = RX0;
 			if(!SEGMENT)
 				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
 			else
 				SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
+			UNSTASH_REGS;
 		}
 		if(!SEGMENT){
 			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
@@ -707,36 +742,38 @@ G_AA12:{SUU SRX0, SRX1;
 	G_RX0DECR:RX0--;D
 #if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_EMULATE:{
-		u* M_SAVED = NULL;
-		u* SEG_SAVED = NULL;
-		UU SEG_PAGES_SAVED;
-		UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
-		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
-			R=11; goto G_HALT;
-		}
-		M_SAVED = M_SAVER[EMULATE_DEPTH];
-		SEG_SAVED = SEGMENT;
-		SEG_PAGES_SAVED = SEGMENT_PAGES;
-		SEGMENT = malloc(0x100);
-		SEGMENT_PAGES = 1;
-		if(!SEGMENT){
+		STASH_REGS;
+			u* M_SAVED = NULL;
+			u* SEG_SAVED = NULL;
+			UU SEG_PAGES_SAVED;
+			UU PAGE_TO_SAVE = a_stash; /*Bad name- should be page*/
+			if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+				R=11; goto G_HALT;
+			}
+			M_SAVED = M_SAVER[EMULATE_DEPTH];
+			SEG_SAVED = SEGMENT;
+			SEG_PAGES_SAVED = SEGMENT_PAGES;
+			SEGMENT = malloc(0x100);
+			SEGMENT_PAGES = 1;
+			if(!SEGMENT){
+				if(SEGMENT)free(SEGMENT);
+				SEGMENT = SEG_SAVED;
+				SEGMENT_PAGES = SEG_PAGES_SAVED;
+				R=12; goto G_HALT;
+			}
+			memcpy(M_SAVED, M, 0x1000000);
+			EMULATE_DEPTH++;
+				e();
+				a_stash=R;
+				R=0;
+			EMULATE_DEPTH--;
 			if(SEGMENT)free(SEGMENT);
 			SEGMENT = SEG_SAVED;
 			SEGMENT_PAGES = SEG_PAGES_SAVED;
-			R=12; goto G_HALT;
-		}
-		memcpy(M_SAVED, M, 0x1000000);
-		EMULATE_DEPTH++;
-			e();
-			a=R;
-			R=0;
-		EMULATE_DEPTH--;
-		if(SEGMENT)free(SEGMENT);
-		SEGMENT = SEG_SAVED;
-		SEGMENT_PAGES = SEG_PAGES_SAVED;
-		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-		memcpy(M, M_SAVED, 0x1000000);
-		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
+			memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
+			memcpy(M, M_SAVED, 0x1000000);
+			memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
+		UNSTASH_REGS;
 	}D
 #else
 	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
@@ -762,21 +799,23 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE_SEG:{
-		u* M_SAVED = NULL;
-		UU PAGE_TO_SAVE = a;
-		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
-			R=11; goto G_HALT;
-		}
-		M_SAVED = M_SAVER[EMULATE_DEPTH];
-		memcpy(M_SAVED, M, 0x1000000);
-		EMULATE_DEPTH++;
-			e();
-			a=R;
-			R=0;
-		EMULATE_DEPTH--;
-		memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-		memcpy(M, M_SAVED, 0x1000000);
-		memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
+		STASH_REGS;
+			u* M_SAVED = NULL;
+			UU PAGE_TO_SAVE = a_stash;
+			if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+				R=11; goto G_HALT;
+			}
+			M_SAVED = M_SAVER[EMULATE_DEPTH];
+			memcpy(M_SAVED, M, 0x1000000);
+			EMULATE_DEPTH++;
+				e();
+				a_stash=R;
+				R=0;
+			EMULATE_DEPTH--;
+			memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
+			memcpy(M, M_SAVED, 0x1000000);
+			memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
+		UNSTASH_REGS;
 	}D
 #else
 	G_EMULATE_SEG: R=14; goto G_HALT;
@@ -793,7 +832,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_LOGAND: a = a && b;D
 	G_BOOLIFY: a = (a!=0)D
 	G_NOTA: a=(a==0)D
-	/*add more insns here.*/
+	/*add more insns here. remember the free slots above!*/
 	G_HALT:dcl();return 0;
 }
 #undef D
