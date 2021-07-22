@@ -124,7 +124,6 @@ static struct termios oldChars;
 static struct termios newChars;
 static void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
 {
-  /*fcntl(0, F_SETFL, O_NONBLOCK);*/ /*Do you want non-blocking IO? This is how you get non-blocking IO.*/
   tcgetattr(STDIN_FILENO, &oldChars); /* grab old terminal i/o settings */
   newChars = oldChars; /* make new settings same as old settings */
   newChars.c_lflag &= ~ICANON; /* disable buffered i/o */
@@ -246,8 +245,8 @@ static unsigned short interrupt(unsigned short a,
 	if(a==0xE000){
 #ifdef USE_TERMIOS
 		/* set O_NONBLOCK on fd */
-		int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-		fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
+		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 		return 1;
 #else
 		return 0;
@@ -257,7 +256,7 @@ static unsigned short interrupt(unsigned short a,
 #ifdef USE_TERMIOS
 		/* set O_NONBLOCK on fd */
 		int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-		fcntl(STDIN_FILENO, F_SETFL, flags & ~O_NONBLOCK);
+		fcntl(STDIN_FILENO, F_SETFL, (~O_NONBLOCK) & flags);
 		return 1;
 #else
 		return 0;
