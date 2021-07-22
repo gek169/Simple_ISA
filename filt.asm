@@ -8,6 +8,7 @@
 	lla %0xE000%; interrupt; //enable non-blocking IO.
 //	lla %0xE001%; interrupt; //disable non-blocking IO.
 	:filt_looptop:
+//	lla %500%; alpush; proc_wait; alpop;
 	getchar;
 	sc %filt_printbytehex%
 	apush;lb 0; cmp; bpop;				jmpifeq;
@@ -42,8 +43,8 @@
 	ab;apush;lb 31; cmp; bpop;			jmpifeq;
 //	ab;apush;lb 82; cmp; bpop;			jmpifeq;
 //	ab;apush;lb 81; cmp; bpop;			jmpifeq;
-	ab;apush;lb 10; cmp; bpop;			sc %filt_newline%;		jmpifeq;
-	ab;apush;lb 13; cmp; bpop;			jmpifeq;
+	ab;apush;lb '\n'; cmp; bpop;			sc %filt_newline%;		jmpifeq;
+	ab;apush;lb '\r'; cmp; bpop;			jmpifeq;
 	ab;apush;lb 0xff; cmp; bpop;		sc %filt_end%;			jmpifeq;
 	ab;apush;lb 126;cmp;lb2;cmp;bpop;	sc %filt_printbytehex%;	jmpifeq;
 	ab;putchar;
