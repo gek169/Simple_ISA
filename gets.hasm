@@ -87,6 +87,7 @@
 		la 32; putchar;
 		la 32; putchar;
 		la 0xd; putchar;
+		la '\n'; interrupt;
 		sc %libc_gets_looptop%;jmp;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
 	:libc_gets_loopend:
