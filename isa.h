@@ -14,18 +14,18 @@
 #define r(d) M[d]
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_TWO_BYTES (program_counter+=2,\
-						((((U)M[PP+((U)(program_counter-2))]))<<8)+\
-						(U)M[PP+((U)(program_counter-1))])
+						((((U)M[PP+(0xffFF&(program_counter-2))]))<<8)+\
+						(U)M[PP+(0xffFF&(program_counter-1))])
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_FOUR_BYTES (program_counter+=4,\
-						((((UU)M[PP+((U)(program_counter-4))]))<<24)+\
-						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
-						((((UU)M[PP+((U)(program_counter-2))]))<<8)+\
-						(UU)M[PP+((U)(program_counter-1))])
+						((((UU)M[PP+(0xffFF&(program_counter-4))]))<<24)+\
+						((((UU)M[PP+(0xffFF&(program_counter-3))]))<<16)+\
+						((((UU)M[PP+(0xffFF&(program_counter-2))]))<<8)+\
+						(UU)M[PP+(0xffFF&(program_counter-1))])
 #define CONSUME_THREE_BYTES (program_counter+=3,\
-						((((UU)M[PP+((U)(program_counter-3))]))<<16)+\
-						((((UU)M[PP+((U)(program_counter-2))]))<<8)+\
-						(UU)M[PP+((U)(program_counter-1))])
+						((((UU)M[PP+(0xffFF&(program_counter-3))]))<<16)+\
+						((((UU)M[PP+(0xffFF&(program_counter-2))]))<<8)+\
+						(UU)M[PP+(0xffFF&(program_counter-1))])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
@@ -256,14 +256,8 @@ G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
 G_XOR:a^=b;D
-G_GETCHAR:
-{
-	a=gch();
-}
-D
-G_PUTCHAR:{
-	pch(a);
-}D
+G_GETCHAR:{a=gch();}D
+G_PUTCHAR:{pch(a);}D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
 G_ILDA:a=r(c)D
@@ -273,7 +267,7 @@ G_AB:a=b;D
 G_BA:b=a;D
 G_ALC:a=c&0xff;D
 G_AHC:a=(c>>8);D
-G_CBA:c=((b&255)<<8)+(a&255)D
+G_CBA:c=((b&0xff)<<8)+(a&0xff)D
 G_LLA:a=CONSUME_TWO_BYTES;D
 G_ILLDA:a=Z_READ_TWO_BYTES_THROUGH_C;D
 G_LLB:b=CONSUME_TWO_BYTES;D
