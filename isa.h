@@ -46,11 +46,11 @@
 											)
 #define write_byte(v,d)M[d]=v;
 #define write_2bytes(v,d)	M[d]=					(v)>>8;\
-							M[((d)+1)&0xFFffFF]=	(v)&255;
-#define write_4bytes(v,d)	M[((d))&0xFFffFF]=		(v)>>24;\
-							M[((d)+1)&0xFFffFF]=	(v)>>16;\
-							M[((d)+2)&0xFFffFF]=	(v)>>8;\
-							M[((d)+3)&0xFFffFF]=	(v)&255;
+							M[((UU)(d)+1)&0xFFffFF]=	(v)&255;
+#define write_4bytes(v,d)	M[((UU)(d))&0xFFffFF]=		(v)>>24;\
+							M[((UU)(d)+1)&0xFFffFF]=	(v)>>16;\
+							M[((UU)(d)+2)&0xFFffFF]=	(v)>>8;\
+							M[((UU)(d)+3)&0xFFffFF]=	(v)&255;
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
 #define STASH_REGS STASH_REG(a);STASH_REG(b);STASH_REG(c);STASH_REG(stack_pointer);STASH_REG(program_counter);STASH_REG(program_counter_region);\
@@ -357,7 +357,10 @@ G_FARISTA:write_byte(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILDB:b=r((((UU)c&255)<<16)+((UU)a))D
 G_FARISTB:write_byte(b,((((UU)c&255)<<16)+((UU)a)))D
 /*free slots!*/
-TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:goto G_NOP;
+TB:TC:TD:TE:
+TF:U0:U1:U2:
+U3:U4:U5:U6:
+U7:U8:U9:UA:goto G_NOP;
 
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
