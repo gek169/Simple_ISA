@@ -356,23 +356,9 @@ G_FARILDA:a=r((((UU)c&255)<<16)+((UU)b))D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)+((UU)b)))D
 G_FARILDB:b=r((((UU)c&255)<<16)+((UU)a))D
 G_FARISTB:write_byte(b,((((UU)c&255)<<16)+((UU)a)))D
-/*fixed point mults*/
-TB:a=(((UU)a)*((UU)b))>>1;D
-TC:a=(((UU)a)*((UU)b))>>2;D
-TD:a=(((UU)a)*((UU)b))>>3;D
-TE:a=(((UU)a)*((UU)b))>>4;D
-TF:a=(((UU)a)*((UU)b))>>5;D
-U0:a=(((UU)a)*((UU)b))>>6;D
-U1:a=(((UU)a)*((UU)b))>>7;D
-U2:a=(((UU)a)*((UU)b))>>8;D
-U3:a=(((UU)a)*((UU)b))>>9;D
-U4:a=(((UU)a)*((UU)b))>>10;D
-U5:a=(((UU)a)*((UU)b))>>11;D
-U6:a=(((UU)a)*((UU)b))>>12;D
-U7:a=(((UU)a)*((UU)b))>>13;D
-U8:a=(((UU)a)*((UU)b))>>14;D
-U9:a=(((UU)a)*((UU)b))>>15;D
-UA:a=(((UU)a)*((UU)b))>>16;D
+/*free slots!*/
+TB:TC:TD:TE:TF:U0:U1:U2:U3:U4:U5:U6:U7:U8:U9:UA:goto G_NOP;
+
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D

@@ -79,22 +79,22 @@ static char* insns[216] = {
 	"farista",
 	"farildb",
 	"faristb",
-	"imul15.1",
-	"imul14.2",
-	"imul13.3",
-	"imul12.4",
-	"imul11.5",
-	"imul10.6",
-	"imul9.7",
-	"imul8.8",
-	"imul7.9",
-	"imul6.10",
-	"imul5.11",
-	"imul4.12",
-	"imul3.13",
-	"imul2.14",
-	"imul1.15",
-	"imul.16",
+	"ASM_FREE_INSN0",
+	"ASM_FREE_INSN1",
+	"ASM_FREE_INSN2",
+	"ASM_FREE_INSN3",
+	"ASM_FREE_INSN4",
+	"ASM_FREE_INSN5",
+	"ASM_FREE_INSN6",
+	"ASM_FREE_INSN7",
+	"ASM_FREE_INSN8",
+	"ASM_FREE_INSN9",
+	"ASM_FREE_INSNA",
+	"ASM_FREE_INSNB",
+	"ASM_FREE_INSNC",
+	"ASM_FREE_INSND",
+	"ASM_FREE_INSNE",
+	"ASM_FREE_INSNF",
 	/*quickly push registers onto the stack*/
 	"alpush",
 	"blpush",
@@ -272,7 +272,7 @@ static unsigned char insns_numargs[216] = {
 	0,0, /*Far page load and store*/
 	0,0,0, /*lfarpc, farcall, farret,*/
 	0,0,0,0, /*Far memory access- a and b, as single bytes*/
-	/*Fixed point multiplies.*/
+	/*FREE SLOTS!*/
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0,
@@ -446,7 +446,7 @@ static char* insn_repl[216] = {
 	"bytes72;", 
 	"bytes73;", 
 	"bytes74;", 
-	/*Fixed point ops*/
+	/*FREE SLOTS!*/
 	"bytes75;","bytes76;","bytes77;","bytes78;",
 	"bytes79;","bytes80;","bytes81;","bytes82;",
 	"bytes83;","bytes84;","bytes85;","bytes86;",
