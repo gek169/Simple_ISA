@@ -46,10 +46,10 @@
 											)
 #define write_byte(v,d)		M[d]=v;
 
-#define write_2bytes(v,d)	{UU tmp = d; M[tmp]=					(v)>>8;\
+#define write_2bytes(v,d)	{register UU tmp = d; M[tmp]=					(v)>>8;\
 							M[(tmp+1)&0xFFffFF]=	(v)&255;}
 							
-#define write_4bytes(v,d)	{UU tmp = d; M[(tmp)&0xFFffFF]=		(v)>>24;\
+#define write_4bytes(v,d)	{register UU tmp = d; M[(tmp)&0xFFffFF]=		(v)>>24;\
 							M[(tmp+1)&0xFFffFF]=	(v)>>16;\
 							M[(tmp+2)&0xFFffFF]=	(v)>>8;\
 							M[(tmp+3)&0xFFffFF]=	(v)&255;}
