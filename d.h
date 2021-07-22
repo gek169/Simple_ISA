@@ -57,7 +57,7 @@ static void di(){
 	        exit(1);
 	    }
 		sdl_spec.freq = 16000;//Sampling rate
-		sdl_spec.format = AUDIO_U8; //Number of data bits
+		sdl_spec.format = AUDIO_U16MSB; //format is u16.
 		sdl_spec.channels = 1;//Number of channels
 		sdl_spec.silence = 0;
 		sdl_spec.samples = 2048;
@@ -153,10 +153,18 @@ static void dcl(){return;}
 #endif
 
 static unsigned short gch(){
-return (unsigned short)getchar_unlocked();
+#if defined(USE_TERMIOS)
+	return (unsigned short)getchar_unlocked();
+#else
+	return (unsigned short)getchar();
+#endif
 }
 static void pch(unsigned short a){
-putchar_unlocked(a);
+#if defined(USE_TERMIOS)
+	putchar_unlocked(a);
+#else
+	putchar(a);
+#endif
 }
 static unsigned short interrupt(unsigned short a,
 									unsigned short b,
