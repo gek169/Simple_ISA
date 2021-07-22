@@ -10,34 +10,34 @@
 /*Would require edit if you wanted a 32 bit PC*/
 #define PP (((UU)program_counter_region)<<16)
 /*Would require edit if you wanted a 32 bit PC*/
-#define CONSUME_BYTE M[PP|((U)(program_counter++))]
+#define CONSUME_BYTE M[PP | ((U)(program_counter++))]
 #define r(d) M[d]
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_TWO_BYTES (program_counter+=2,\
-						((((U)M[PP|(0xffFF&(program_counter-2))]))<<8)|\
-						(U)M[PP|(0xffFF&(program_counter-1))])
+						((((U)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
+						(U)M[PP | (0xffFF&(program_counter-1))])
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_FOUR_BYTES (program_counter+=4,\
-						((((UU)M[PP|(0xffFF&(program_counter-4))]))<<24)|\
-						((((UU)M[PP|(0xffFF&(program_counter-3))]))<<16)|\
-						((((UU)M[PP|(0xffFF&(program_counter-2))]))<<8)|\
+						((((UU)M[PP | (0xffFF&(program_counter-4))]))<<24) |\
+						((((UU)M[PP | (0xffFF&(program_counter-3))]))<<16) |\
+						((((UU)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
 						(UU)M[PP|(0xffFF&(program_counter-1))])
 #define CONSUME_THREE_BYTES (program_counter+=3,\
-						((((UU)M[PP|(0xffFF&(program_counter-3))]))<<16)|\
-						((((UU)M[PP|(0xffFF&(program_counter-2))]))<<8)|\
-						(UU)M[PP|(0xffFF&(program_counter-1))])
-#define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8)+(U)M[c+1])
-#define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8)+(U)M[a+1])
-#define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8)+(U)M[b+1])
-#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8)+(U)M[stack_pointer+1])
+						((((UU)M[PP | (0xffFF&(program_counter-3))]))<<16) |\
+						((((UU)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
+						(UU)M[PP | (0xffFF&(program_counter-1))])
+#define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8) | (U)M[c+1])
+#define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8) | (U)M[a+1])
+#define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8) | (U)M[b+1])
+#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8) | (U)M[stack_pointer+1])
 #define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
 										(((UU)M[stack_pointer])<<24)|\
 										(((UU)M[stack_pointer+1])<<16)|\
 										(((UU)M[stack_pointer+2])<<8)|\
 										(UU)M[stack_pointer+3]\
 									)
-#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16)|((UU)b)])<<8)|(U)M[(((UU)c&255)<<16)|(UU)((U)(b+1))])
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16)|((UU)a)])<<8)|(U)M[(((UU)c&255)<<16)|(UU)((U)(a+1))])
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)b)])<<8) | (U)M[(((UU)c&255)<<16) | (UU)(0xffFF&(b+1))])
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)a)])<<8) | (U)M[(((UU)c&255)<<16) | (UU)(0xffFF&(a+1))])
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 (\
 											(((UU)M[(((UU)c&255)<<16)|((UU)a)])<<24)|\
 											(((UU)M[(((UU)c&255)<<16)|(UU)((U)(a+1))])<<16)|\
@@ -52,7 +52,7 @@
 #define write_4bytes(v,d)	{UU tmp = d;UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
 							M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
 							M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
-							M[(tmp+3)&0xFFffFF]=	(vuv)&255;}
+							M[(tmp+3)&0xFFffFF]=	(vuv);}
 
 /*
 #define STASH_REG(XX)   UU XX##_stash = XX;
@@ -262,12 +262,12 @@ G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
 G_ILDA:a=r(c)D
 G_ILDB:b=r(c)D
-G_CAB:c=((a&255)<<8)|(b&255)D
+G_CAB:c=(a<<8)|(b&255)D
 G_AB:a=b;D
 G_BA:b=a;D
 G_ALC:a=c&0xff;D
 G_AHC:a=(c>>8);D
-G_CBA:c=((b&0xff)<<8)|(a&0xff)D
+G_CBA:c=(b<<8)|(a&0xff)D
 G_LLA:a=CONSUME_TWO_BYTES;D
 G_ILLDA:a=Z_READ_TWO_BYTES_THROUGH_C;D
 G_LLB:b=CONSUME_TWO_BYTES;D
@@ -437,10 +437,10 @@ Y0:RX1=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
 Y1:RX2=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
 Y2:RX3=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4;D
 /*far indirect stores, through C and A*/
-Y3:write_4bytes(RX0,((((UU)c&255)<<16)|((UU)a)))D
-Y4:write_4bytes(RX1,((((UU)c&255)<<16)|((UU)a)))D
-Y5:write_4bytes(RX2,((((UU)c&255)<<16)|((UU)a)))D
-Y6:write_4bytes(RX3,((((UU)c&255)<<16)|((UU)a)))D
+Y3:write_4bytes(RX0,((((UU)c)<<16)|((UU)a)))D
+Y4:write_4bytes(RX1,((((UU)c)<<16)|((UU)a)))D
+Y5:write_4bytes(RX2,((((UU)c)<<16)|((UU)a)))D
+Y6:write_4bytes(RX3,((((UU)c)<<16)|((UU)a)))D
 /*math*/
 Y7:RX0=(RX0+RX1)&0xffFFffFF;D
 Y8:RX0=(RX0-RX1)&0xffFFffFF;D
@@ -474,7 +474,7 @@ ZB:
 #if !defined(NO_SEGMENT)
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
-		memcpy(M + 0x100 * ((size_t)(RX0&0xffFF)), SEGMENT + 0x100 * ((size_t)RX1), 0x100);
+		memcpy(M + 0x100 * (RX0&0xffFF), SEGMENT + 0x100 * RX1, 0x100);
 	}
 	D
 #else
@@ -485,7 +485,7 @@ ZC:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	else
 	{
-		memcpy(SEGMENT + 0x100 * ((size_t)RX1), M + 0x100 * ((size_t)(RX0&0xffFF)), 0x100);
+		memcpy(SEGMENT + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
 	}
 	D
 #else
@@ -607,7 +607,7 @@ G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) |
 			(((UU)M[(RX0+1)&0xffFFff])<<16) |
 			(((UU)M[(RX0+2)&0xffFFff])<<8) |
 			(((UU)M[(RX0+3)&0xffFFff]))D
-G_AA6:program_counter_region=(RX0>>16)&255;program_counter=RX0;D
+G_AA6:program_counter_region=RX0>>16;program_counter=RX0;D
 G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
@@ -632,45 +632,45 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 	G_AA13:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		RX0=(((UU)M[(flight)&0xffFFff])<<24) | 
+		RX0=(((UU)M[flight])<<24) | 
 					(((UU)M[(flight+1)&0xffFFff])<<16) |
 					(((UU)M[(flight+2)&0xffFFff])<<8) |
 					(((UU)M[(flight+3)&0xffFFff]));
 	}D
 	G_AA14:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		RX1=(((UU)M[(flight)&0xffFFff])<<24) | 
-					(((UU)M[(flight+1)&0xffFFff])<<16) |
-					(((UU)M[(flight+2)&0xffFFff])<<8) |
-					(((UU)M[(flight+3)&0xffFFff]));
+		RX1=(((UU)M[flight])<<24) | 
+							(((UU)M[(flight+1)&0xffFFff])<<16) |
+							(((UU)M[(flight+2)&0xffFFff])<<8) |
+							(((UU)M[(flight+3)&0xffFFff]));
 	}D
 	G_AA15:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		RX2=(((UU)M[(flight)&0xffFFff])<<24) |
-					(((UU)M[(flight+1)&0xffFFff])<<16) |
-					(((UU)M[(flight+2)&0xffFFff])<<8) |
-					(((UU)M[(flight+3)&0xffFFff]));
+		RX2=(((UU)M[flight])<<24) | 
+							(((UU)M[(flight+1)&0xffFFff])<<16) |
+							(((UU)M[(flight+2)&0xffFFff])<<8) |
+							(((UU)M[(flight+3)&0xffFFff]));
 	}D
 	G_AA16:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		RX3=(((UU)M[(flight)&0xffFFff])<<24) | 
-					(((UU)M[(flight+1)&0xffFFff])<<16) |
-					(((UU)M[(flight+2)&0xffFFff])<<8) |
-					(((UU)M[(flight+3)&0xffFFff]));
+		RX3=(((UU)M[flight])<<24) | 
+							(((UU)M[(flight+1)&0xffFFff])<<16) |
+							(((UU)M[(flight+2)&0xffFFff])<<8) |
+							(((UU)M[(flight+3)&0xffFFff]));
 	}D
 	G_AA17:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		a=(((UU)M[(flight)&0xffFFff])<<8) | 
+		a=(((UU)M[(flight)])<<8) | 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
 	G_AA18:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		b=(((UU)M[(flight)&0xffFFff])<<8) | 
+		b=(((UU)M[(flight)])<<8) | 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
 	G_AA19:{UU flight;
 		flight = CONSUME_THREE_BYTES;
-		c=(((UU)M[(flight)&0xffFFff])<<8) | 
+		c=(((UU)M[(flight)])<<8) | 
 					(((UU)M[(flight+1)&0xffFFff]));
 	}D
 	G_AA20:{UU flight;
