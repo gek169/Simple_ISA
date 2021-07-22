@@ -39,7 +39,7 @@ static const UU arne_palette[16] = {
 		0x31a2f2,
 		0xb2dcef
 };
-void sdl_audio_callback(void *udata, Uint8 *stream, int len){
+static void sdl_audio_callback(void *udata, Uint8 *stream, int len){
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
@@ -257,7 +257,6 @@ static unsigned short interrupt(unsigned short a,
 	if(a==0xE000){
 #ifdef USE_TERMIOS
 		/* set O_NONBLOCK on fd */
-		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
 		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
 		return 1;
 #else
@@ -266,7 +265,7 @@ static unsigned short interrupt(unsigned short a,
 	}
 	if(a==0xE001){
 #ifdef USE_TERMIOS
-		/* set O_NONBLOCK on fd */
+		/* set ~O_NONBLOCK on fd */
 		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
 		fcntl(STDIN_FILENO, F_SETFL, 0);
 		return 1;
