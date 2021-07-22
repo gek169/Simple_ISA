@@ -258,7 +258,7 @@ G_OR:a|=b;D
 G_XOR:a^=b;D
 G_GETCHAR:{
 STASH_REGS;
-a=gch();
+a_stash=gch();
 UNSTASH_REGS;
 }D
 G_PUTCHAR:{
