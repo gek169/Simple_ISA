@@ -6,8 +6,6 @@
 
 ..main:
 	lla %0xE000%; interrupt; //enable non-blocking IO.
-	lla %0xE001%; interrupt; //disable non-blocking IO.
-	lla %0xE000%; interrupt; //enable non-blocking IO.
 //	lla %0xE001%; interrupt; //disable non-blocking IO.
 	:filt_looptop:
 //	lla %500%; alpush; proc_wait; alpop;
