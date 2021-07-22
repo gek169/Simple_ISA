@@ -164,7 +164,7 @@ const void* const goto_table[256] = {
 &&G_LFARPC,&&G_FARCALL,&&G_FARRET,
 &&G_FARILDA,&&G_FARISTA,
 &&G_FARILDB,&&G_FARISTB,
-/*fixed point ops*/
+/*FREE SLOTS!*/
 &&TB,&&TC,&&TD,&&TE,
 &&TF,&&U0,&&U1,&&U2,
 &&U3,&&U4,&&U5,&&U6,
