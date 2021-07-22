@@ -120,6 +120,7 @@ bytes 0xd, 0xa;
 	//exit the loop if we have have passed the limit.
 	sc %main_loopout%;
 	ld_secs;rx3a;llb %BENCH_SECONDS%;cmp;lb0;cmp;jmpifneq;
+	la '\n'; interrupt;
 	sc %main_looptop%;jmp;
 :main_loopout:
 lb0;mod;

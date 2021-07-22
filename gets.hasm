@@ -62,7 +62,8 @@
 			proc_puts;
 		pop %3%;
 		la 0xd; putchar;
-	:libc_gets_zero_chars:
+	libc_gets_zero_chars:
+		la '\n'; interrupt;
 		sc %libc_gets_looptop%;jmp;
 	//Handle ascii DEL and Backspace.
 	:libc_gets_handle_del:
