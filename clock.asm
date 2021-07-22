@@ -44,7 +44,6 @@ bytes 0xd, 0xa;
 	lrx0 %/Lbl_clock_start%;
 	lb 0xEEEE;
 	proc_emulate_seg;
-	la 0xd;putchar;la 0xa;putchar;
 	la 0xAF;apush;la 0;alpush;
 		proc_puts;
 	pop %3%;
@@ -130,6 +129,4 @@ halt;
 
 //bootloader
 ..zero:
-la 0xa; putchar;
-la 0xd; putchar;
 la 1;lfarpc;

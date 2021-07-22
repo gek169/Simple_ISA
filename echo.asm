@@ -25,8 +25,8 @@ GOTO_TOP;
 
 section 0x1F0
 //set C to jump to the top of our big for loop
-	//sc 1,0xF0;
 	cpc
+	la '\n'; interrupt;
 //Read character from stdin into A and echo it backIgnore newlines.
 	getchar;
 	IS_A_NEWLINE;	jmpifeq;GET_A_BACK;
