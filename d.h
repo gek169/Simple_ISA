@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static unsigned char stdout_buf[0x10000];
+static unsigned char stdout_buf[0x100000];
 
 #ifdef USE_SDL2
 /*
