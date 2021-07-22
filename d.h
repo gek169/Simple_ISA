@@ -51,16 +51,15 @@ void sdl_audio_callback(void *udata, Uint8 *stream, int len){
 static void di(){
 	if(EMULATE_DEPTH==0){
 		setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
-	    // Initialize SDL
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
 	        printf("SDL2 could not be initialized!\n"
 	               "SDL_Error: %s\n", SDL_GetError());
 	        exit(1);
 	    }
-		sdl_spec.freq = 16000;//Sampling rate
-		sdl_spec.format = AUDIO_U16MSB; //format is u16.
-		sdl_spec.channels = 1;//Number of channels
+		sdl_spec.freq = 16000;
+		sdl_spec.format = AUDIO_U16MSB; 
+		sdl_spec.channels = 1;
 		sdl_spec.silence = 0;
 		sdl_spec.samples = 2048;
 		sdl_spec.callback = sdl_audio_callback;
@@ -126,7 +125,7 @@ static void dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #include <fcntl.h>
 static struct termios oldChars;
 static struct termios newChars;
-static void initTermios(int echo) //struct termios &oldChars, struct termios &newChars)
+static void initTermios(int echo) 
 {
   tcgetattr(STDIN_FILENO, &oldChars); /* grab old terminal i/o settings */
   newChars = oldChars; /* make new settings same as old settings */
