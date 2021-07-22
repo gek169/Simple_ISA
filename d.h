@@ -281,7 +281,7 @@ static unsigned short interrupt(unsigned short a,
 		return a;
 	}
 	if(a == 0xFF00){ /*Read char from saved disk.*/
-		register unsigned char bruh;
+		unsigned char bruh;
 		RX0 &= 0x7FffFFff;
 		FILE* f = fopen("sisa16.dsk", "rb+");
 		if(!f){

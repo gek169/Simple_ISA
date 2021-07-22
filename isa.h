@@ -46,10 +46,10 @@
 											)
 #define write_byte(v,d)		M[d]=v;
 
-#define write_2bytes(v,d)	{register UU tmp = d; M[tmp]=					(v)>>8;\
+#define write_2bytes(v,d)	{UU tmp = d; M[tmp]=					(v)>>8;\
 							M[(tmp+1)&0xFFffFF]=	(v)&255;}
 							
-#define write_4bytes(v,d)	{register UU tmp = d; M[(tmp)&0xFFffFF]=		(v)>>24;\
+#define write_4bytes(v,d)	{UU tmp = d; M[(tmp)&0xFFffFF]=		(v)>>24;\
 							M[(tmp+1)&0xFFffFF]=	(v)>>16;\
 							M[(tmp+2)&0xFFffFF]=	(v)>>8;\
 							M[(tmp+3)&0xFFffFF]=	(v)&255;}
@@ -521,7 +521,7 @@ ZD:
 		if(SEGMENT_OLD)
 			if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
 				/*Must initialize memory to zero.*/
-				register size_t end, i;
+				size_t end, i;
 				i = ((size_t)SEGMENT_PAGES_OLD) * 256;
 				end = ((size_t)SEGMENT_PAGES) * 256;
 				for(;i<end;i++)SEGMENT[i] = 0;
@@ -716,7 +716,7 @@ G_AA12:{SUU SRX0, SRX1;
 		u* M_SAVED = NULL;
 		u* SEG_SAVED = NULL;
 		UU SEG_PAGES_SAVED;
-		register UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
+		UU PAGE_TO_SAVE = a; /*Bad name- should be page*/
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
@@ -789,8 +789,8 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 	G_RXICMP:
 	{
-		register SUU RX0I = RX0;
-		register SUU RX1I = RX1;
+		SUU RX0I = RX0;
+		SUU RX1I = RX1;
 		if(RX0I<RX1I)		a=0;
 		else if(RX0I>RX1I)	a=2;
 		else 				a=1;
