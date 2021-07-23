@@ -350,8 +350,12 @@ user_farilda: a = user memory[ ((c&255) << 16) + b]. (56)
 
 user_seta: set user mode's A register. (57)
 
+task_st: save a task to the task buffer. (58)
+
+task_ld: load a task from the task buffer. (59)
+
 .B FREE OPCODES:
-3 free opcodes, behaving as nop duplicates.
+1 free opcode, behaving as nop duplicates.
 ranging from 58 to 5A. All 1 byte.
 
 

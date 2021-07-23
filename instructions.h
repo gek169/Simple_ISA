@@ -92,8 +92,8 @@ static char* insns[216] = {
 	"user_getr",
 	"user_farilda",
 	"user_seta",
-	"ASM_FREE_INSND",
-	"ASM_FREE_INSNE",
+	"task_st",
+	"task_ld",
 	"ASM_FREE_INSNF",
 	/*quickly push registers onto the stack*/
 	"alpush",

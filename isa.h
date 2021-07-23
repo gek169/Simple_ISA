@@ -278,7 +278,7 @@ debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&
 
 
 /*Free slots!*/
-U8:U9:UA:
+UA:
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -437,7 +437,16 @@ U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].program_counter_region;D
 U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[1][ (((UU)c&255)<<16) | (UU)b]D
 
 U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[1].a=a;D
-
+U8: /*task_ld*/
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	REG_SAVER_TASK_BUF[a % SISA_MAX_TASKS] = REG_SAVER[1];
+	memcpy(M_SAVER_TASK_BUF[a % SISA_MAX_TASKS], M_SAVER[1], 0x1000000);
+D
+U9:
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	REG_SAVER[1] = REG_SAVER_TASK_BUF[a % SISA_MAX_TASKS];
+	memcpy(M_SAVER[1], M_SAVER_TASK_BUF[a % SISA_MAX_TASKS], 0x1000000);
+D
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
