@@ -119,6 +119,7 @@ bytes 0,0;
 	//Set the active task's info.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+	//PID 0 is the initial program...
 		la 1; farstla %~LIBC_REGION%, %libc_krenel_task_isactive_array%;
 	//Set all tasks to be zero... except the first one.
 		lb1;rx0b; 
@@ -145,7 +146,6 @@ bytes 0,0;
 		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
 		farstrx0 %&0%
 	//a holds the value. CHECK IT.
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SCHEDULER ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -153,12 +153,14 @@ bytes 0,0;
 		alpush;
 		lb 19; cmp; blpop; sc %libc_krenel_syscall%; jmpifeq;
 		ab; alpush;
-		//Notice how 18 is mysteriously absent from this list... interrupt is illegal in user mode.
+		lb 18; cmp; blpop; sc %libc_krenel_tried_interrupt%; jmpifeq; //might as well print out an error message.
+		ab; alpush;
 		lb 17; cmp; blpop; sc %libc_krenel_putchar%; jmpifeq;
 		ab; alpush;
 		lb 16; cmp; blpop; sc %libc_krenel_getchar%; jmpifeq;
 		ab; alpush;
 		lb 0xff; cmp; blpop; sc %libc_krenel_was_preempted%; jmpifeq;
+		la 'k'; putchar;putchar;putchar; //DEBUG
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_syscall:
 		//TODO: provide services based on user registers.
@@ -175,20 +177,18 @@ bytes 0,0;
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		//Flush.
-			user_geta;
-			lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-			user_geta;
-			lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-		//Shutdown.
-			user_geta;
-			llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
-		//Kill PID.
-			user_geta;
-			llb %0xDE00%; cmp; sc %libc_krenel_kill_pid%; jmpifeq;
-
+			user_geta;lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
+			user_geta;llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
+			user_geta;llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
+			user_geta;llb %0xDE02%; cmp; sc %libc_krenel_syscall_disk_append%; jmpifeq;
+			user_geta;llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
+			user_geta;llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 		//I don't recognize this syscall. Just ignore it... for now.
 		sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_kill_pid:
+		
+		:libc_krenel_syscall_kill_pid:
 			user_getb;
 			lb libc_krenel_max_active_tasks; mod;
 			lb 2;mul;ba;sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%;
@@ -196,7 +196,8 @@ bytes 0,0;
 			la 0; faristla;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
-			la '\n'; interrupt;
+			la 'a'; putchar;
+			la '\n'; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//TODO (complicated)
@@ -219,13 +220,21 @@ bytes 0,0;
 	libc_krenel_getchar:
 		getchar;
 		user_seta;
-
-
 		sc %libc_krenel_preempt%; jmp;
 	libc_krenel_putchar:
 		user_geta;
 		putchar;
-
+		sc %libc_krenel_preempt%; jmp;
+	libc_krenel_tried_interrupt:
+		la 'k'; putchar;
+		la 'i'; putchar;
+		la 'l'; putchar;
+		la 'l'; putchar;
+		la 'e'; putchar;
+		la 'd'; putchar;
+		la '\r'; putchar;
+		la '\n'; putchar;
+		la '\n'; interrupt;
 		sc %libc_krenel_preempt%; jmp;
 	libc_krenel_was_preempted:
 		lla %libc_krenel_max_returns%;
@@ -239,9 +248,8 @@ bytes 0,0;
 		llb %libc_krenel_max_returns%; cmp; lb 2; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;
-
-
 	libc_krenel_cswitch_killtask:
+		la 'k';putchar;la 'k';putchar;la 'k';putchar; //DEBUG
 		//Kill the current task.
 			task_kill;
 		//Set active task to be in the "dead" state- 0.
@@ -253,8 +261,8 @@ bytes 0,0;
 		//Try to select a task.
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
-		//la 'a';putchar;la 'a';putchar;la 'a';putchar;
-		lrx0 %/0%;
+		la 's';putchar;putchar;putchar; //DEBUG
+		lb 0; rx0b;
 		lb libc_krenel_max_active_tasks; rx1b;
 	libc_krenel_try_select_task_loop:
 		//Loop from where we are, and around again. If we find a task to execute... execute it!
@@ -262,18 +270,24 @@ bytes 0,0;
 			aincr; lb libc_krenel_max_active_tasks; mod;
 			farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			lb 2;mul;
-			sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%;
+			sc %LIBC_REGION%;
+			llb %libc_krenel_task_isactive_array%;
 			add;ba;
 			farilda;
 		//Did we find it?
 			lb 1; cmp; sc %libc_krenel_cswitch_looptop%; jmpifeq;
 		//We didn't! Should we quit?
-			rxincr;rxcmp;lb2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
+			rxincr
+			rxcmp
+			lb 2
+			cmp
+			sc %libc_krenel_shutdown%; jmpifeq;
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;
 
 
 	libc_krenel_shutdown:
 		//Shut down the system.
+		la 'q';putchar;la 'q';putchar;la 'q';putchar;
 		lla %0xE001%; interrupt; //make IO blocking again.
 		farret;
