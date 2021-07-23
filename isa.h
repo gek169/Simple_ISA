@@ -149,14 +149,14 @@ int DONT_WANT_TO_INLINE_THIS e()
 #endif
 
 #ifndef PREEMPT_TIMER
-#define PREEMPT_TIMER 0x2000000
+#define PREEMPT_TIMER 0x20000
 #endif
 
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
-#define PREEMPT() {\
+#define PREEMPT() if(EMULATE_DEPTH){\
 	instruction_counter += EMULATE_DEPTH;\
-	if(EMULATE_DEPTH && instruction_counter >= PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
+	if(instruction_counter >= PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
 
 #else
@@ -811,7 +811,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_RX0DECR:RX0--;D
 #if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_EMULATE:{
-		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+		if(EMULATE_DEPTH >= 1) {
 			R=11; goto G_HALT;
 		}
 		instruction_counter = 0;
@@ -866,7 +866,7 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE_SEG:{
-		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+		if(EMULATE_DEPTH >= 1) {
 			R=11; goto G_HALT;
 		}
 		instruction_counter = 0;

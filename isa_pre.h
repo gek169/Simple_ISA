@@ -15,17 +15,11 @@ static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode
 1:		User mode
-This will be used later when I implement pre-emption into the ISA. 
 
-New instructions will be added, to allow for timer interrupts.
-~DMHSW
+User mode is pre-empted.
 */
-#define SISA16_MAX_RECURSION_DEPTH 1
 
-
-
-
-static u M_SAVER[SISA16_MAX_RECURSION_DEPTH + 1][0x1000000];
+static u M_SAVER[2][0x1000000];
 
 typedef struct {
 	u* SEGMENT;
@@ -36,7 +30,7 @@ typedef struct {
 	u ACTION_FLAGS;
 }sisa_regfile;
 
-static sisa_regfile REG_SAVER[SISA16_MAX_RECURSION_DEPTH+1];
+static sisa_regfile REG_SAVER[2];
 
 #define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
 #define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;

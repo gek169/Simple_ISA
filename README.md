@@ -43,14 +43,14 @@ Platforms planned to be tested:
 
 * Unique. SISA16 is no ordinary virtual machine language...
 
-	* Self-sandboxing- run code while handling errors and handling side effects.
+	* Privileged- Has a "privileged" and "user" mode, w
 
 	* Tiny- Less than 100 kilobytes for a full emulator and assembler toolchain!
 
 	* Hackable- More instructions can be added at a whim.
 
-	* Fast. a 2.2 GHZ Ryzen 7 will execute code with branches at 1.09 Giga-IPS. 
-		a 4.0 ghz i7-6700 will execute that same code at 1.15 Giga-IPS.
+	* Fast. a 2.2 GHZ Ryzen 7 will execute code with branches at ~1.09 Giga-IPS. 
+		a 4.0 ghz i7-6700 will execute that same code at ~1.15 Giga-IPS.
 
 * Trivially embeddable. Implement five small and easy-to-understand functions in a single header file
 	to add SISA16 scripting to any system.
