@@ -40,6 +40,7 @@ bytes '\r' ,'\n', 0;
 	farllda %&0xAABBCC%; 
 	nota;
 	sc %side_process_looptop%; jmpifeq; //continue looping while zero.
+	//lla %0xDEAD%; syscall;
 	lb 0; div;
 	halt;
 ..(8):
