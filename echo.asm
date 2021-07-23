@@ -69,11 +69,6 @@ section 0x1F0
 			sc %miniLoopTop%;llb %2%;cmp;lb 0;cmp;jmpifeq;
 		//signify the end of the loop by printing some newlines.
 		GOTO_TOP
-//separating nops.
-nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;
 
 //if you type in a q, you get ten Qs.
 :Lbl_BONUSDUCKS:
