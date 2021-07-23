@@ -40,16 +40,6 @@ bytes 0xd, 0xa;
 
 //rx2 holds our time in seconds.
 ..main:
-	//containerize execution of the clock.
-	lrx0 %/Lbl_clock_start%;
-	llb %0xEEEE%;
-	proc_emulate;
-	la '\n';putchar;
-	la '\r';putchar;
-	la 0xAF;apush;la 0;alpush;
-		proc_puts;
-	pop %3%;
-	halt;
 
 	
 	:Lbl_clock_start:
@@ -124,7 +114,11 @@ bytes 0xd, 0xa;
 	la '\n'; interrupt;
 	sc %main_looptop%;jmp;
 :main_loopout:
-lb0;mod;
+	la '\n';putchar;
+	la '\r';putchar;
+	la 0xAF;apush;la 0;alpush;
+		proc_puts;
+	pop %3%;
 halt;
 
 
