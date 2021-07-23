@@ -93,23 +93,40 @@ prints all lines to base assembler file-building instructions (bytes)
 .SH LANGUAGE
 .TP
 Terminology:
+.B Instruction:
+An opcode telling the CPU what to do.
+
+.B Instruction Operand:
+Data immediately following an instruction, which gives it needed information.
+
 .B Address: 
-Location where data is stored in main memory
+Location where data is stored in main memory.
 
 .B Register: 
-a very fast form of memory which is not part of main memory, like a kind of variable.
+CPU variables of a constant size and location.
 
 .B Page: 
 256 bytes starting at an address whose low byte is zero.
 
 .B Region: 
-64 kilobytes starting at an address whose 2 low bytes is zero.
+64 kilobytes starting at an address with 2 low bytes equalling zero.
+
+0x390000 is a region, specifically "region 0x39"
+
+0x10000 is a region, region 1.
+
+
+0x123406 is not, because the lower four hex-digits "3406" are not zero.
+
+0x0 is a region, because when fully written out: 0x000000 its lowest two bytes are all zeroes.
 
 .B Zero 'Home' or 'Stack' Region: 
 the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
 
+region 0.
+
 .B Device: 
-the implementation of gch(), pch(), di(), dcl(), and interrupt from d.h which is used for I/O,
+the implementation of gch(), pch(), di(), dcl(), and interrupt() from d.h which is used for I/O,
 accessible with getchar, putchar, and interrupt
 in the assembly language. The default driver is a textmode driver with very basic functionality.
 
@@ -119,6 +136,14 @@ By default, these are all privileged instructions.
 The additional region of memory outside the normal SISA16 address space, which is 
 allocated at runtime, used for mass storage (the heap). Typically for loading files or extremely large structures,
 but can also be used to hold code.
+
+.B Privilege:
+The sisa16 architecture has two modes of execution: Privileged [0] and User[1].
+
+You boot into Privileged by default. User mode must be entered manually either with emulate,
+emulate_seg, or priv_drop.
+
+Some instructions cannot be executed in User mode. getchar, putchar, interrupt, emulate, emulate_seg and the user_ instructions
 
 .B (SDL2 Driver Features Only)
 

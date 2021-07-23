@@ -58,9 +58,9 @@
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
 #define STASH_REGS STASH_REG(a);STASH_REG(b);STASH_REG(c);STASH_REG(stack_pointer);STASH_REG(program_counter);STASH_REG(program_counter_region);\
-		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);
+		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);u* M_STASH = M;STASH_REG(EMULATE_DEPTH);
 #define UNSTASH_REGS UNSTASH_REG(a);UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
-		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);
+		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);M = M_STASH;UNSTASH_REG(EMULATE_DEPTH);
 
 #ifdef SISA_DEBUGGER
 void debugger_hook(	unsigned short *a,
@@ -138,7 +138,7 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 
 int DONT_WANT_TO_INLINE_THIS e()
 {
-	register u* M=M_SAVER[0];
+	register u *M=M_SAVER[0];
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
