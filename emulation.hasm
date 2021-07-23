@@ -185,6 +185,7 @@ bytes 0,0;
 		lb 0xff; cmp; blpop; sc %libc_krenel_was_preempted%; jmpifeq;
 		ab; alpush;
 		lb 0; cmp; blpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
+		libc_lproc_krenel_print_krenel;
 		la 'e'; putchar;
 		la 'r'; putchar;
 		la 'r'; putchar;
@@ -329,4 +330,4 @@ bytes 0,0;
 	libc_krenel_shutdown:
 		//Shut down the system.
 		lla %0xE001%; interrupt; //make IO blocking again.
-		farret;													asm_print; //DEBUG
+		farret;													asm_print; //I want information!
