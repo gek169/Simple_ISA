@@ -32,10 +32,12 @@ bytes '\r' ,'\n', 0;
 	proc_puts;
 	halt;
 ..(55):
-	cpc;
+	side_process_looptop:
 	la 'V';
 	putchar;
-	jmp;
+	la '\n'; syscall;
+	la 100; alpush; proc_wait; alpop;
+	sc %side_process_looptop%; jmp;
 	lb 0; div;
 	halt;
 ..(8):
