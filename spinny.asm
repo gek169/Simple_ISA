@@ -47,10 +47,7 @@ alpush;
 		farilda;
 		putchar;
 		la '\r'; putchar;
-		
 		la '\n'; interrupt;
-		//la '\n'; syscall;
-		
 		la %~wait_time%;
 		alpush; proc_wait; alpop;
 		sc %asciifun_looptop%;jmp;

@@ -28,6 +28,8 @@ la 's'; putchar;
 la 'h'; putchar;
 la 'e'; putchar;
 la 'd'; putchar;
+la '\r'; putchar;
+la '\n'; putchar; interrupt;
 halt;
 true_start:
 nop;nop;
