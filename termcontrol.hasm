@@ -20,5 +20,7 @@
 ..export"clear_terminal"
 
 .flush_stdout:la '\n';interrupt;
-	
+..export"flush_stdout"
+.flush_stdout_user:la '\n';syscall;
+..export"flush_stdout_user"	
 farret;
