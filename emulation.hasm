@@ -291,14 +291,16 @@ bytes 0,0;
 				arx0;task_set;
 				farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
 				//apush;proc_printbytehex;apop;halt;
+
 				//Mark it as running.
 				lb 2; mul; ba;
 				sc %LIBC_REGION%;
 				lla %libc_krenel_task_isactive_array%;
 				add;ba;
 				la 1; faristla;
+
 				//Create a bootloader
-				//We're execing the at *our* assigned location.
+				//We're execing the at *our* assigned location, because that's where we copied it!
 				lrx0 0,libc_krenel_exec_region,0,0
 				farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
 			//We must copy three bytes, so we do 4 for speed's sake.
@@ -308,6 +310,7 @@ bytes 0,0;
 				adecr;ca;			//put 1 into c.
 				lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
 				emulate;
+				apush;proc_printbytehex;halt;		//DEBUG
 			//restore stack integrity.
 				farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
 				farstrx0 %&0%
