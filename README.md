@@ -35,19 +35,22 @@ Platforms planned to be tested:
 
 * CPU architecture independence- The behavior of the VM is host-independent. There are only two behaviors which may vary by architecture:
 	* Floating point numbers. Their layout in memory may vary, although IEEE-754 compliance is nearly ubiquitous...
+
 	* Signed integers. Non-twos-complement architectures are not supported, and the sign bit must be the highest bit.
 
-	Luckily, virtually every architecture around today guarantees both of these things.
+	(Luckily, virtually every architecture around today guarantees both of these things.)
+
+	* Execution time. Slower processors run code slower.
 
 	The emulator and assembler are confirmed to work on literally dozens of architectures and operating systems.
 
 * Unique. SISA16 is no ordinary virtual machine language...
 
-	* Privileged- Has a "privileged" and "user" mode, w
+	* Privileged- Has a "privileged" and "user" mode, with privileged and unprivileged instructions.
 
-	* Tiny- Less than 100 kilobytes for a full emulator and assembler toolchain!
+	* Tiny- Less than 400 kilobytes for a full emulator, assembler, and debugger toolchain! The standard library fits in less than 64k.
 
-	* Hackable- More instructions can be added at a whim.
+	* Hackable- More instructions can be added at a whim. Compiler flags allow for altering the emulator's behavior.
 
 	* Fast. a 2.2 GHZ Ryzen 7 will execute code with branches at ~1.09 Giga-IPS. 
 		a 4.0 ghz i7-6700 will execute that same code at ~1.15 Giga-IPS.
