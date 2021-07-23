@@ -12,7 +12,7 @@
 //..(2):
 //..dinclude"libc_pre.bin"
 
-.BENCH_SECONDS:169
+.BENCH_SECONDS:5
 
 //Variable Section.
 section 0xAE0000;

@@ -412,7 +412,6 @@ TB: /**/
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
-		M=M_SAVER[1];
 		SAVE_REGISTER(a, 0);
 		SAVE_REGISTER(b, 0);
 		SAVE_REGISTER(c, 0);
@@ -423,7 +422,7 @@ TB: /**/
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
-		EMULATE_DEPTH++;
+		EMULATE_DEPTH = 1;M=M_SAVER[1];
 		/*Load on up again! We're continuing where we left off!*/
 		LOAD_REGISTER(a, 1);
 		LOAD_REGISTER(b, 1);
@@ -840,7 +839,7 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE:G_EMULATE_SEG:{
-		if(EMULATE_DEPTH >= 1) {
+		if(EMULATE_DEPTH > 0) {
 			R=11; goto G_HALT;
 		}
 #ifndef NO_PREEMPT
@@ -849,9 +848,9 @@ G_AA12:{SUU SRX0, SRX1;
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[1], M_SAVER[0], 0x1000000);
-			M = M_SAVER[1];
 			UNSTASH_REGS;
 		}
+		
 		SAVE_REGISTER(a, 0);
 		SAVE_REGISTER(b, 0);
 		SAVE_REGISTER(c, 0);
@@ -862,7 +861,8 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
-		EMULATE_DEPTH++;
+		EMULATE_DEPTH = 1;
+		M = M_SAVER[1];
 		stack_pointer=0;
 		program_counter_region=0;
 		program_counter=0;
@@ -870,7 +870,7 @@ G_AA12:{SUU SRX0, SRX1;
 		a=0;b=0;c=0;
 	}D
 #else
-	G_EMULATE_SEG: R=14; goto G_HALT;
+	G_EMULATE:G_EMULATE_SEG: R=14; goto G_HALT;
 #endif
 	G_RXICMP:
 	{
@@ -901,25 +901,16 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX3, 1);
 		M=M_SAVER[0];
 		EMULATE_DEPTH=0;
+		a=R;R=0;
 		LOAD_REGISTER(b, 0);
 		LOAD_REGISTER(c, 0);
 		LOAD_REGISTER(program_counter, 0);
 		LOAD_REGISTER(program_counter_region, 0);
 		LOAD_REGISTER(stack_pointer, 0);
-		LOAD_REGISTER(RX0, EMULATE_DEPTH);
-		LOAD_REGISTER(RX1, EMULATE_DEPTH);
-		LOAD_REGISTER(RX2, EMULATE_DEPTH);
-		LOAD_REGISTER(RX3, EMULATE_DEPTH);
-		a=R;
-		R=0;
-		{
-			STASH_REGS;
-			memcpy(M + (((UU)REG_SAVER[0].a)<<8),
-							 M_SAVER[0] + (((UU)REG_SAVER[0].a)<<8), 
-							 256
-					 	);
-			UNSTASH_REGS;
-		}
+		LOAD_REGISTER(RX0, 0);
+		LOAD_REGISTER(RX1, 0);
+		LOAD_REGISTER(RX2, 0);
+		LOAD_REGISTER(RX3, 0);
 		D
 	}
 }
