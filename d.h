@@ -17,6 +17,9 @@ static unsigned char stdout_buf[0x100000];
 #define SDL_DISABLE_IMMINTRIN_H 1
 #endif
 #include <SDL2/SDL.h>
+/*
+	TODO- refactor/rewrite av driver, integrate with getchar/putchar to make a "text mode".
+*/
 static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
@@ -46,7 +49,7 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
-	SDL_MixAudio(stream, M + 0xB50000 + audio_pos, len, SDL_MIX_MAXVOLUME);
+	SDL_MixAudio(stream, M_SAVER[0] + 0xB50000 + audio_pos, len, SDL_MIX_MAXVOLUME);
 	audio_pos += len;
 	audio_left -= len;
 }
