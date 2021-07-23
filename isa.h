@@ -152,17 +152,15 @@ int DONT_WANT_TO_INLINE_THIS e()
 #define PREEMPT_TIMER 0x20000
 #endif
 
+
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
 #define PREEMPT() if(EMULATE_DEPTH){\
 	instruction_counter += EMULATE_DEPTH;\
 	if(instruction_counter >= PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
-
 #else
-
 #define PREEMPT() /*a comment*/
-
 #endif
 
 
@@ -388,7 +386,9 @@ G_FARISTB:write_byte(b,((((UU)c&255)<<16)|((UU)a)))D
 TB: /**/
 {
 		if(EMULATE_DEPTH > 0) {R=15; goto G_HALT;}
+#ifndef NO_PREEMPT
 		instruction_counter = 0;
+#endif
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
@@ -828,7 +828,9 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= 1) {
 			R=11; goto G_HALT;
 		}
+#ifndef NO_PREEMPT
 		instruction_counter = 0;
+#endif
 		REG_SAVER[EMULATE_DEPTH].a = a; 
 		{
 			STASH_REGS;

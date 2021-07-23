@@ -6,11 +6,12 @@ MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 GIT_HASH= $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD || echo no)
 #-O3 -s -march=native seems to be the best, got 10.9 seconds for rxincrmark
-OPTLEVEL= -O2 -s -march=native -DSISA_GIT_HASH=\"$(GIT_HASH)\"
+OPTLEVEL= -O2 -s -march=native -DNO_PREEMPT -DSISA_GIT_HASH=\"$(GIT_HASH)\"
 #"
 MORECFLAGS=-DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE
 SDL2CFLAGS=-DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
 CFLAGS= $(MORECFLAGS) $(OPTLEVEL)
+CFLAGS_NOPREEMPT= $(MORECFLAGS) $(OPTLEVEL) 
 CFLAGS_SDL2= $(SDL2CFLAGS) $(OPTLEVEL)
 CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value -std=c++17 -finline-limit=64000 -fno-math-errno
 
