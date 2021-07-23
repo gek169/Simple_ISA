@@ -181,6 +181,11 @@ static char* read_until_terminator_alloced_modified(FILE* f){
 	unsigned long blen = 0;
 	buf = STRUTIL_ALLOC(40);
 	if(!buf) return NULL;
+	fflush(stdout);
+#ifdef USE_TERMIOS
+	fcntl(STDIN_FILENO, F_SETFL, 0);
+#endif
+	setvbuf ( stdout, stdout_buf, _IONBF, sizeof(stdout_buf));
 	while(1){
 		if(feof(f)){break;}
 		c = fgetc(f);

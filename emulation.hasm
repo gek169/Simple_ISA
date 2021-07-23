@@ -32,7 +32,20 @@ nop;nop;nop;nop;
 	//restore stack integrity.
 		farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
 		farstrx0 %&0%
-	//a holds the value
+	//a holds the value. CHECK IT.
+	bpush;
+	libc_emulate_cswitch_looptop:
+		lb 0xFF;cmp;
+		sc %libc_emulate_cswitch_loopout%; jmpifneq;
+		la 'a'; putchar;
+		la 'a'; putchar;
+		la 'a'; putchar;
+		la 'a'; putchar;
+		apop;apush;
+		priv_drop;
+		sc %libc_emulate_cswitch_looptop%; jmp;
+	libc_emulate_cswitch_loopout:
+	bpop;
 farret;
 
 ..decl_farproc(LIBC_REGION):proc_emulate_seg
@@ -48,7 +61,16 @@ farret;
 	ab;
 	emulate_seg;
 	//restore stack integrity.
-		farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
-		farstrx0 %&0%
-	//a holds the return value.
+	farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
+	farstrx0 %&0%
+	//a holds the value. CHECK IT.
+	bpush;
+	libc_emulate_seg_cswitch_looptop:
+		lb 0xFF;cmp;
+		sc %libc_emulate_seg_cswitch_loopout%; jmpifneq;
+		apop;apush;
+		priv_drop;
+		sc %libc_emulate_seg_cswitch_looptop%; jmp;
+	libc_emulate_seg_cswitch_loopout:
+	bpop;
 farret;

@@ -42,14 +42,8 @@ bytes 0xd, 0xa;
 ..main:
 	//containerize execution of the clock.
 	lrx0 %/Lbl_clock_start%;
-	lb 0xEEEE;
+	llb %0xEEEE%;
 	proc_emulate;
-	LBL_cswitch_looptop:
-		lb 0xFF;cmp;
-		sc %LBL_cswitch_loopout%; jmpifneq;
-		priv_drop;
-		sc %LBL_cswitch_looptop%; jmp;
-	LBL_cswitch_loopout:
 	la 0xAF;apush;la 0;alpush;
 		proc_puts;
 	pop %3%;
@@ -57,6 +51,7 @@ bytes 0xd, 0xa;
 
 	
 	:Lbl_clock_start:
+	push %10%;
 	clock;
 	st_secs_b;
 	rx3b;
@@ -67,7 +62,6 @@ bytes 0xd, 0xa;
 		arx3;
 		//jump to the top if the number of seconds elapsed is the same.
 		sc %main_looptop%;cmp;jmpifeq;
-
 	rx2_0;
 	st_iter;
 	//the time elapsed is different! it is still in b.
