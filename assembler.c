@@ -1197,7 +1197,7 @@ int main(int argc, char** argv){
 						}
 						{
 							const char* error_fmt = "Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n";
-							if(!do_32bit){
+							if(!do_32bit && !do_8bit){
 								if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
 									if(!clear_output){
 										printf(warn_pref);
