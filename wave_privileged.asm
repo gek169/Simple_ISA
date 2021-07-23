@@ -33,11 +33,6 @@ section 0x40000;
 .wait_time:				16
 
 ..main:
-	lrx0 %/0x770000%;
-	proc_krenel;
-	halt;
-
-..(0x77):
 asm_begin_region_restriction;
 la line_length;
 alpush;
@@ -47,7 +42,7 @@ st_page_count;
 st_line_count;
 nop;
 nop;
-//lla %0xE000%; interrupt;
+lla %0xE000%; interrupt;
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;
@@ -55,8 +50,7 @@ asciifun_looptop: //Comment.
 			llb %line_length_plus_1%; 
 			mod;
 		alpush;
-		sc %iter_is_endval%;
-		llb %line_length%;cmp;jmpifeq;
+		sc %iter_is_endval%;llb %line_length%;cmp;jmpifeq;
 		sc %iter_is_not_endval%;jmp;
 
 	iter_is_endval:
@@ -71,7 +65,6 @@ asciifun_looptop: //Comment.
 
 	reached_num_lines:
 		la '\n'
-		//syscall;
 		interrupt;
 		clear_terminal;
 		la 0;

@@ -26,10 +26,6 @@ section 0x40000;
 
 
 ..main:
-	lrx0 %/0x70000%;
-	proc_krenel;
-	halt;
-..(7):
 asm_begin_region_restriction;
 la '\r'; putchar; 
 la 0;

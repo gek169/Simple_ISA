@@ -346,6 +346,9 @@ bytes 0,0;
 		putchar;
 		sc %libc_krenel_preempt%; jmp;
 	libc_krenel_tried_interrupt:
+
+		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		ab; lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		la 'k'; putchar;
 		la 'i'; putchar;
 		la 'l'; putchar;
