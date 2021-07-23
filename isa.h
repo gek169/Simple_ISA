@@ -451,8 +451,8 @@ U9:
 	REG_SAVER[current_task].SEGMENT = NULL;
 D
 UA:
-	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	else {R=19; goto G_HALT;}
+	if(EMULATE_DEPTH){R=19; goto G_HALT;}
+	else {R=15; goto G_HALT;}
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D

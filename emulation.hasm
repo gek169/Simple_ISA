@@ -115,7 +115,7 @@ bytes 0,0;
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
-		lla %0xE001%; interrupt;
+		//lla %0xE001%; interrupt;	//DEBUG--- Blocking input.
 	//Set the active task's info.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
@@ -162,13 +162,18 @@ bytes 0,0;
 		lb 16; cmp; blpop; sc %libc_krenel_getchar%; jmpifeq;
 		ab; alpush;
 		lb 0xff; cmp; blpop; sc %libc_krenel_was_preempted%; jmpifeq;
-		la 'u'; putchar;putchar;putchar; //DEBUG
-		la 'n'; putchar;putchar;putchar; //DEBUG
-		la 'k'; putchar;putchar;putchar; //DEBUG
-		la 'n'; putchar;putchar;putchar; //DEBUG
-		la 'o'; putchar;putchar;putchar; //DEBUG
-		la 'w'; putchar;putchar;putchar; //DEBUG
-		la 'n'; putchar;putchar;putchar; //DEBUG
+		la 'b'; putchar;
+		la 'a'; putchar;
+		la 'd'; putchar;
+		la 'k'; putchar;
+		la 'i'; putchar;
+		la 'l'; putchar;
+		la 'l'; putchar;
+		la 'e'; putchar;
+		la 'd'; putchar;
+		la '\r'; putchar;
+		la '\n'; putchar;
+		la '\n'; interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_syscall:
 		//TODO: provide services based on user registers.
@@ -184,15 +189,14 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		//Flush.
-			user_geta;lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-			user_geta;lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-			user_geta;llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
-			user_geta;llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
-			user_geta;llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
-			user_geta;llb %0xDE02%; cmp; sc %libc_krenel_syscall_disk_append%; jmpifeq;
-			user_geta;llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
-			user_geta;llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
+			user_geta;	lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
+			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
+			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
+			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_syscall_disk_append%; jmpifeq;
+			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
+			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 		//I don't recognize this syscall. Just ignore it... for now.
 		sc %libc_krenel_syscall_end%; jmp;
 		
@@ -204,6 +208,8 @@ bytes 0,0;
 			la 0; faristla;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
+			la 'a'; putchar;
+			la 'a'; putchar;
 			la 'a'; putchar;
 			la '\n'; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
@@ -219,6 +225,7 @@ bytes 0,0;
 		:libc_krenel_syscall_exec:
 			//TODO (extra complicated)
 			sc %libc_krenel_syscall_end%; jmp;
+			
 		:libc_krenel_syscall_end:
 			//Syscalls are expensive. Increment an extra time, just to punish them!
 			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;

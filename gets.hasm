@@ -111,6 +111,7 @@ farret;
 	rx3_0;
 	lb0;rx2b;
 	:libc_gets_user_looptop:
+		la 'Z'; putchar;
 		rx0_2
 		llb %libc_gets_max_chars%; rx1b
 		rxcmp
@@ -182,7 +183,7 @@ farret;
 		la 32; putchar;
 		la 32; putchar;
 		la 32; putchar;
-		la 0xd; putchar;
+		la '\r'; putchar;
 		la '\n'; syscall;
 		sc %libc_gets_user_looptop%;jmp;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
