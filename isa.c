@@ -251,7 +251,7 @@ int main(int rc,char**rv){
 		puts("SISA16 emulator cannot open this file.");
 		exit(1);
 	}
-		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
+		for(i=0;i<0x1000000 && !feof(F);){M_SAVER[0][i++]=fgetc(F);}
 	fclose(F);
 #if !defined(NO_SEGMENT)
 	{
@@ -263,7 +263,7 @@ int main(int rc,char**rv){
 	R=0;e();
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
-			printf("%02x%c",M[j],((j+1)%8)?' ':'|');
+			printf("%02x%c",M_SAVER[0][j],((j+1)%8)?' ':'|');
 	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
 	if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
 	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");

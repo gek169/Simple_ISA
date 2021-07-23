@@ -410,7 +410,8 @@ void debugger_hook(unsigned short *a,
 									UU *RX0,
 									UU *RX1,
 									UU *RX2,
-									UU *RX3
+									UU *RX3,
+									u* EMULATE_DEPTH
 ){
 	char* line = NULL;
 	if(freedom)
@@ -493,7 +494,7 @@ void debugger_hook(unsigned short *a,
 			break;
 			case 'E':
 			case 'e':
-				if (EMULATE_DEPTH == watched_register_value) return;
+				if (*EMULATE_DEPTH == watched_register_value) return;
 			break;
 			case 'G':
 			case 'g':
@@ -533,11 +534,11 @@ void debugger_hook(unsigned short *a,
 		for(;i<insns && lines < max_lines_disassembler && (location+i < 0x1000000);i++){
 			unsigned char opcode;
 			unsigned long j;
-			opcode = M[location+i];
-			printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
-			if(M[location+i] < n_insns){
+			opcode = M_SAVER[*EMULATE_DEPTH][location+i];
+			printf(": %02lx", (unsigned long)M_SAVER[*EMULATE_DEPTH][(location+i) & 0xffFFff]);
+			if(M_SAVER[*EMULATE_DEPTH][location+i] < n_insns){
 				for(j=0;j<insns_numargs[opcode];j++){
-					printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
+					printf(" %02lx", (unsigned long)M_SAVER[*EMULATE_DEPTH][(location+i+j+1) & 0xffFFff]);
 				}
 				if(insns_numargs[opcode])
 					i += j;
@@ -555,7 +556,8 @@ void debugger_hook(unsigned short *a,
 			filename, 
 			(unsigned long)*program_counter + (((unsigned long)*program_counter_region)<<16), 
 			debugger_setting_maxhalts,
-			0x1000000
+			0x1000000,
+			M_SAVER[*EMULATE_DEPTH]
 		);
 	}
 
@@ -569,7 +571,7 @@ void debugger_hook(unsigned short *a,
 		line = read_until_terminator_alloced_modified(stdin);
 		if(!line){
 			puts("\r\n Failed Malloc.");
-			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+			for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();
 			exit(1);
 		}
 		if(line[0] == '\0' && debugger_setting_repeat && debugger_saved_last)
@@ -578,7 +580,7 @@ void debugger_hook(unsigned short *a,
 			if(!line)
 			{
 				puts("\r\n Failed Malloc.");
-				for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+				for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();
 				exit(1);
 			}
 			if(!debugger_setting_minimal)
@@ -594,7 +596,7 @@ void debugger_hook(unsigned short *a,
 					line = str_repl_allocf(line, names[i], get_name_eval(i));
 							if(!line){
 								puts("\r\n Failed Malloc.");
-								for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+								for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();
 								exit(1);
 							}
 				}
@@ -604,7 +606,7 @@ void debugger_hook(unsigned short *a,
 					line = str_repl_allocf(line, "@", name_buf_temp);
 					if(!line){
 						puts("\r\n Failed Malloc.");
-						for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+						for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();
 						exit(1);
 					}
 				}
@@ -641,7 +643,7 @@ void debugger_hook(unsigned short *a,
 					printf("\r\nCannot open dump.bin\r\n");
 					goto repl_start;
 				}
-				fwrite(M, 1, 0x1000000, duck);
+				fwrite(M_SAVER[*EMULATE_DEPTH], 1, 0x1000000, duck);
 				fclose(duck);
 				if(!debugger_setting_minimal)
 					printf("\r\nSuccessfully dumped memory to dump.bin\r\n");
@@ -710,7 +712,7 @@ void debugger_hook(unsigned short *a,
 				goto repl_start;
 			}
 			case 'q':
-			for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();
+			for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();
 			{
 				char* tmp =strcatalloc(filename, ".dbg");
 				savenames(tmp);
@@ -750,7 +752,8 @@ void debugger_hook(unsigned short *a,
 							filename, 
 							location, 
 							debugger_setting_maxhalts,
-							0x1000000
+							0x1000000,
+							M_SAVER[*EMULATE_DEPTH]
 					);
 				max_lines_disassembler = tempsetting;
 				goto repl_start;
@@ -777,11 +780,11 @@ void debugger_hook(unsigned short *a,
 				for(;i<0x1000000 && lines < insns && (location+i < 0x1000000);i++){
 					unsigned char opcode;
 					unsigned long j;
-					opcode = M[location+i];
-					printf(": %02lx", (unsigned long)M[(location+i) & 0xffFFff]);
-					if(M[location+i] < n_insns){
+					opcode = M_SAVER[*EMULATE_DEPTH][location+i];
+					printf(": %02lx", (unsigned long)M_SAVER[*EMULATE_DEPTH][(location+i) & 0xffFFff]);
+					if(M_SAVER[*EMULATE_DEPTH][location+i] < n_insns){
 						for(j=0;j<insns_numargs[opcode];j++){
-							printf(" %02lx", (unsigned long)M[(location+i+j+1) & 0xffFFff]);
+							printf(" %02lx", (unsigned long)M_SAVER[*EMULATE_DEPTH][(location+i+j+1) & 0xffFFff]);
 						}
 						if(insns_numargs[opcode])i += j;
 					} else{
@@ -817,7 +820,7 @@ void debugger_hook(unsigned short *a,
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
-				M[addr & 0xFFffFF] = value;
+				M_SAVER[*EMULATE_DEPTH][addr & 0xFFffFF] = value;
 				printf("\r\n");
 				goto repl_start;
 			}
@@ -915,13 +918,13 @@ void debugger_hook(unsigned short *a,
 				}
 				addr = strtoul(line + stepper, 0,0) & 0xffFFff;
 				{
-					val8  = 	  M[addr];
-					val16 = 	  M[addr               ] * 256 
-								+ M[(addr+1) & 0xffFFff];
-					val32 = 	  M[addr				] * 256*256*256
-								+ M[(addr+1) & 0xffFFff	] * 256*256
-								+ M[(addr+2) & 0xffFFff	] * 256
-								+ M[(addr+3) & 0xffFFff	];
+					val8  = 	  M_SAVER[*EMULATE_DEPTH][addr];
+					val16 = 	  M_SAVER[*EMULATE_DEPTH][addr               ] * 256 
+								+ M_SAVER[*EMULATE_DEPTH][(addr+1) & 0xffFFff];
+					val32 = 	  M_SAVER[*EMULATE_DEPTH][addr				] * 256*256*256
+								+ M_SAVER[*EMULATE_DEPTH][(addr+1) & 0xffFFff	] * 256*256
+								+ M_SAVER[*EMULATE_DEPTH][(addr+2) & 0xffFFff	] * 256
+								+ M_SAVER[*EMULATE_DEPTH][(addr+3) & 0xffFFff	];
 					memcpy(&sval32, &val32, 4);
 #ifndef NO_FP
 					memcpy(&valf, &val32, 4);
@@ -964,36 +967,36 @@ void debugger_hook(unsigned short *a,
 				string_printer:
 				for(;i<chars;i++){
 					if(addr + i >= 0x1000000) break;
-					if(isspace(M[addr+i]) && M[addr+i] != ' '){
-						if(M[addr+i] == '\t')
+					if(isspace(M_SAVER[*EMULATE_DEPTH][addr+i]) && M_SAVER[*EMULATE_DEPTH][addr+i] != ' '){
+						if(M_SAVER[*EMULATE_DEPTH][addr+i] == '\t')
 							printf("<tab character>\r\n");
-						else if(M[addr+i] == '\v')
+						else if(M_SAVER[*EMULATE_DEPTH][addr+i] == '\v')
 							printf("<vertical tab character>\r\n");
-						else if(M[addr+i] == '\r')
+						else if(M_SAVER[*EMULATE_DEPTH][addr+i] == '\r')
 							printf("<cr>\r\n");
-						else if(M[addr+i] == '\n')
+						else if(M_SAVER[*EMULATE_DEPTH][addr+i] == '\n')
 							printf("<nl>\r\n");
 						else
-							printf("<spacechar %u>\r\n", M[addr+i]);
+							printf("<spacechar %u>\r\n", M_SAVER[*EMULATE_DEPTH][addr+i]);
 						continue;
 					}
-					if(M[addr+i] == 127) {
+					if(M_SAVER[*EMULATE_DEPTH][addr+i] == 127) {
 						printf("<del>\r\n");
 						continue;
 					}
-					if(M[addr+i] > 127){
-						printf("<unprintable %u>\r\n", M[addr+i]);
+					if(M_SAVER[*EMULATE_DEPTH][addr+i] > 127){
+						printf("<unprintable %u>\r\n", M_SAVER[*EMULATE_DEPTH][addr+i]);
 						continue;
 					}
-					if(M[addr+i] == 0) break;
-					if(isgraph(M[addr+i]) || M[addr+i] == ' '){
-						if(M[addr+i] == '<')
+					if(M_SAVER[*EMULATE_DEPTH][addr+i] == 0) break;
+					if(isgraph(M_SAVER[*EMULATE_DEPTH][addr+i]) || M_SAVER[*EMULATE_DEPTH][addr+i] == ' '){
+						if(M_SAVER[*EMULATE_DEPTH][addr+i] == '<')
 							putchar('\\');
-						else if(M[addr+i] == '\\') {putchar('\\');putchar('\\');}
-						putchar(M[addr+i]);
+						else if(M_SAVER[*EMULATE_DEPTH][addr+i] == '\\') {putchar('\\');putchar('\\');}
+						putchar(M_SAVER[*EMULATE_DEPTH][addr+i]);
 						continue;
 					}else{
-						printf("<unprintable %u>\r\n", M[addr+i]);
+						printf("<unprintable %u>\r\n", M_SAVER[*EMULATE_DEPTH][addr+i]);
 					}
 					
 				}
@@ -1023,8 +1026,8 @@ void debugger_hook(unsigned short *a,
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
-				M[addr & 0xFFffFF] = value/256;
-				M[(addr+1) & 0xFFffFF] = value;
+				M_SAVER[*EMULATE_DEPTH][addr & 0xFFffFF] = value/256;
+				M_SAVER[*EMULATE_DEPTH][(addr+1) & 0xFFffFF] = value;
 				printf("\r\n");
 				goto repl_start;
 			}
@@ -1051,10 +1054,10 @@ void debugger_hook(unsigned short *a,
 					goto repl_start;
 				}
 				value = strtoul(line + stepper, 0,0);
-				M[addr & 0xFFffFF] = value/(256*256*256);
-				M[(addr+1) & 0xFFffFF] = value/(256*256);
-				M[(addr+2) & 0xFFffFF] = value/(256);
-				M[(addr+3) & 0xFFffFF] = value;
+				M_SAVER[*EMULATE_DEPTH][addr & 0xFFffFF] = value/(256*256*256);
+				M_SAVER[*EMULATE_DEPTH][(addr+1) & 0xFFffFF] = value/(256*256);
+				M_SAVER[*EMULATE_DEPTH][(addr+2) & 0xFFffFF] = value/(256);
+				M_SAVER[*EMULATE_DEPTH][(addr+3) & 0xFFffFF] = value;
 				printf("\r\n");
 				goto repl_start;
 			}
@@ -1137,7 +1140,7 @@ void debugger_hook(unsigned short *a,
 					unsigned long i = 0;
 					for(;i < targ;i++){
 							*program_counter += 1 + insns_numargs[
-								M[
+								M_SAVER[*EMULATE_DEPTH][
 									*program_counter + (((UU)(*program_counter_region))<<16)
 								]
 							];
@@ -1147,22 +1150,22 @@ void debugger_hook(unsigned short *a,
 				{
 					unsigned long i = 0;
 					for(;i < 0xffFF;i++){
-						if(M[*program_counter + (((UU)(*program_counter_region))<<16)] >= n_insns)
+						if(M_SAVER[*EMULATE_DEPTH][*program_counter + (((UU)(*program_counter_region))<<16)] >= n_insns)
 						{
 							if(!debugger_setting_minimal)
 								printf("Hit Illegal Opcode.\r\n");
 							else
 								printf("[illop]\r\n");
 						}
-						if(  (insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]])[0] == targchar){
+						if(  (insns[M_SAVER[*EMULATE_DEPTH][*program_counter + (((UU)(*program_counter_region))<<16)]])[0] == targchar){
 							if(!debugger_setting_minimal)
-								printf("Hit Op %s\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+								printf("Hit Op %s\r\n", insns[M_SAVER[*EMULATE_DEPTH][*program_counter + (((UU)(*program_counter_region))<<16)]]);
 							else
-								printf("[Op %s]\r\n", insns[M[*program_counter + (((UU)(*program_counter_region))<<16)]]);
+								printf("[Op %s]\r\n", insns[M_SAVER[*EMULATE_DEPTH][*program_counter + (((UU)(*program_counter_region))<<16)]]);
 							goto repl_start;
 						}
 						*program_counter += 1 + insns_numargs[
-							M[
+							M_SAVER[*EMULATE_DEPTH][
 								*program_counter + (((UU)(*program_counter_region))<<16)
 							]
 						];
@@ -1227,7 +1230,7 @@ void debugger_hook(unsigned short *a,
 					if(mode == '+'){
 						unsigned long i = 0;
 						for(;i < modval;i++){
-							if(M[location & 0xffFFff] >= n_insns)
+							if(M_SAVER[*EMULATE_DEPTH][location & 0xffFFff] >= n_insns)
 							{
 								if(!debugger_setting_minimal)
 									printf("Hit Illegal Opcode.\r\n");
@@ -1235,7 +1238,7 @@ void debugger_hook(unsigned short *a,
 									printf("[illop]\r\n");
 							}
 							location += 1 + insns_numargs[
-								M[location & 0xffFFff]
+								M_SAVER[*EMULATE_DEPTH][location & 0xffFFff]
 							];
 						}
 					}
@@ -1309,7 +1312,7 @@ void debugger_hook(unsigned short *a,
 					case '2':watched_register_value = *RX2;break;
 					case '3':watched_register_value = *RX3;break;
 					case 'E':
-					case 'e':watched_register_value = EMULATE_DEPTH;break;
+					case 'e':watched_register_value = *EMULATE_DEPTH;break;
 					case 'g':
 					case 'G':watched_register_value = SEGMENT_PAGES;break;
 				}
@@ -1447,8 +1450,8 @@ void debugger_hook(unsigned short *a,
 			 		break;
 			 		case 'e':
 			 		case 'E':
-			 			perform_surgery(EMULATE_DEPTH);
-			 			printf(error_fmt);
+			 			perform_surgery(*EMULATE_DEPTH);
+			 			*EMULATE_DEPTH &= 1;
 			 		break;
 			 		case 'g':
 			 		case 'G':
@@ -1477,12 +1480,12 @@ void debugger_hook(unsigned short *a,
 				printf("\r\nRX[1]       = 0x%08lx", (unsigned long)*RX1);
 				printf("\r\nRX[2]       = 0x%08lx", (unsigned long)*RX2);
 				printf("\r\nRX[3]       = 0x%08lx", (unsigned long)*RX3);
-				printf("\r\n[E]MU DEPTH =       0x%02lx", (unsigned long)EMULATE_DEPTH);
+				printf("\r\n[E]MU DEPTH =       0x%02lx", (unsigned long)(*EMULATE_DEPTH));
 				printf("\r\nSEG PA[G]ES = 0x%08lx", (unsigned long)SEGMENT_PAGES);
 				printf("\r\n");
 			goto repl_start;
 			case 'r':
-				memcpy(M, M2, sizeof(M));
+				memcpy(M_SAVER[*EMULATE_DEPTH], M2, 0x1000000);
 				*a = 0;
 				*b = 0;
 				*c = 0;
@@ -1496,7 +1499,8 @@ void debugger_hook(unsigned short *a,
 #if !defined(NO_SEGMENT)
 				if(SEGMENT)free(SEGMENT);
 				SEGMENT = calloc(1, 256);
-				if(!SEGMENT) {printf("\r\n Failed Malloc.\r\n");for(;EMULATE_DEPTH >0;){dcl();EMULATE_DEPTH--;}dcl();exit(1);}
+				if(!SEGMENT) {printf("\r\n Failed Malloc.\r\n");
+				for(;*EMULATE_DEPTH >0;){(*EMULATE_DEPTH)--;}dcl();exit(1);}
 				SEGMENT_PAGES = 1;
 #else
 				SEGMENT_PAGES = 0;
@@ -1840,8 +1844,8 @@ int main(int rc,char**rv){
 		exit(1);
 	}
 	filename = rv[1];
-		for(i=0;i<0x1000000 && !feof(F);){M[i++]=fgetc(F);}
-		memcpy(M2, M, sizeof(M));
+		for(i=0;i<0x1000000 && !feof(F);){M_SAVER[0][i++]=fgetc(F);}
+		memcpy(M2, M_SAVER[0], 0x1000000);
 	fclose(F);
 #if !defined(NO_SEGMENT)
 	{
@@ -1859,7 +1863,7 @@ int main(int rc,char**rv){
 	if(R==0)puts("\r\nNo Errors Encountered.\r\n");
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
 		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
-			printf("%02x%c",M[j],((j+1)%8)?' ':'|');
+			printf("%02x%c",M_SAVER[0][j],((j+1)%8)?' ':'|');
 	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
 	if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");
 	if(R==3)puts("\n<Errfl, 32 bit div by 0>\n");

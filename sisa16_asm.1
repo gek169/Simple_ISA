@@ -297,8 +297,6 @@ faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 
 priv_drop: Drop privilege after returning from emulate, return to user mode. (4B)
 
-	the value of register A will indicate the new shared page with the emulated machine.
-
 	this effectively just invokes EMULATE, but without using the current memory map- the lower one is used.
 
 user_geta: a = usermode register A. (4C)
@@ -566,13 +564,15 @@ rxincr: (1 byte) (CD)
 
 rxdecr: (1 byte) (CE)
 
-emulate: Run a SISA16 sandboxed machine with a single shared page of choice according to register A (1 byte) (CF)
+emulate: Run a SISA16 sandboxed machine. (1 byte) (CF)
 
 	This machine will execute at a lower privilege level than the current machine and is pre-emptively executed for
 
 	a compiletime-defined number of cycles (Default: 0x20000) at which point it will return. the return value in A
 
-	will be 255 if this happens, otherwise it will be zero for normal termination, or 
+	will be 255 if this happens, otherwise it will be zero for normal termination, or an error code.
+
+	You may use this error code to provide services to the machine, such as privileged instructions.
 
 rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 

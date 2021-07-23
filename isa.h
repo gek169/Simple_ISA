@@ -72,16 +72,17 @@ void debugger_hook(	unsigned short *a,
 					UU *RX0,
 					UU *RX1,
 					UU *RX2,
-					UU *RX3
+					UU *RX3,
+					u *EMULATE_DEPTH
 );
 #else
-#define debugger_hook(FBRUH1,FBRUH2,FBRUH3,FBRUH4,FBRUH5,FBRUH6,FBRUH7,FBRUH8,FBRUH9,FBRUH10) /*a comment*/
+#define debugger_hook(FBRUH1,FBRUH2,FBRUH3,FBRUH4,FBRUH5,FBRUH6,FBRUH7,FBRUH8,FBRUH9,FBRUH10,FBRUH11) /*a comment*/
 #endif
 
 #ifdef USE_COMPUTED_GOTO
-#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);goto *goto_table[CONSUME_BYTE];
+#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3,&EMULATE_DEPTH);goto *goto_table[CONSUME_BYTE];
 #else
-#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);switch(CONSUME_BYTE){\
+#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3,&EMULATE_DEPTH);switch(CONSUME_BYTE){\
 k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
@@ -141,11 +142,12 @@ int DONT_WANT_TO_INLINE_THIS e()
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	UU RX0=0,RX1=0,RX2=0,RX3=0;
-	EMULATE_DEPTH=0;
+	u EMULATE_DEPTH=0;
 #else
 	register u program_counter_region=0;
 	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	register UU RX0=0,RX1=0,RX2=0,RX3=0;
+	register u EMULATE_DEPTH=0;
 #endif
 
 #ifndef PREEMPT_TIMER
@@ -265,9 +267,11 @@ const void* const goto_table[256] = {
 &&G_HALT
 };
 #endif
-R=0;di();
+register u* M=M_SAVER[0];
+R=0;
+di();
 #ifdef SISA_DEBUGGER
-debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);
+debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3,&EMULATE_DEPTH);
 #endif
 
 
@@ -407,11 +411,7 @@ TB: /**/
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
-		{
-			STASH_REGS;
-			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
-			UNSTASH_REGS;
-		}
+		M=M_SAVER[1];
 		SAVE_REGISTER(a, EMULATE_DEPTH);
 		SAVE_REGISTER(b, EMULATE_DEPTH);
 		SAVE_REGISTER(c, EMULATE_DEPTH);
@@ -425,9 +425,10 @@ TB: /**/
 		EMULATE_DEPTH++;
 		{
 			STASH_REGS;
-			memcpy(PTEMP, M + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8), 256);
-			memcpy(M, M_SAVER[EMULATE_DEPTH], 0x1000000);
-			memcpy(M + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8),PTEMP, 256);
+			memcpy(M_SAVER[1] + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8),
+				 M_SAVER[0] + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8), 
+				 256
+		 	);
 			UNSTASH_REGS;
 		}
 		/*Load on up again! We're continuing where we left off!*/
@@ -852,21 +853,22 @@ G_AA12:{SUU SRX0, SRX1;
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
-		REG_SAVER[EMULATE_DEPTH].a = a; 
+		REG_SAVER[0].a = a; 
 		{
 			STASH_REGS;
-			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
+			memcpy(M_SAVER[1], M_SAVER[0], 0x1000000);
+			M = M_SAVER[1];
 			UNSTASH_REGS;
 		}
-		SAVE_REGISTER(b, EMULATE_DEPTH);
-		SAVE_REGISTER(c, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
-		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
-		SAVE_REGISTER(RX0, EMULATE_DEPTH);
-		SAVE_REGISTER(RX1, EMULATE_DEPTH);
-		SAVE_REGISTER(RX2, EMULATE_DEPTH);
-		SAVE_REGISTER(RX3, EMULATE_DEPTH);
+		SAVE_REGISTER(b, 0);
+		SAVE_REGISTER(c, 0);
+		SAVE_REGISTER(program_counter, 0);
+		SAVE_REGISTER(stack_pointer, 0);
+		SAVE_REGISTER(program_counter_region, 0);
+		SAVE_REGISTER(RX0, 0);
+		SAVE_REGISTER(RX1, 0);
+		SAVE_REGISTER(RX2, 0);
+		SAVE_REGISTER(RX3, 0);
 		EMULATE_DEPTH++;
 		stack_pointer=0;
 		program_counter_region=0;
@@ -894,24 +896,23 @@ G_AA12:{SUU SRX0, SRX1;
 	if(EMULATE_DEPTH == 0){
 		dcl();return 0;
 	} else {
-		SAVE_REGISTER(a, EMULATE_DEPTH);
-		SAVE_REGISTER(b, EMULATE_DEPTH);
-		SAVE_REGISTER(c, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
-		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
-		SAVE_REGISTER(RX0, EMULATE_DEPTH);
-		SAVE_REGISTER(RX1, EMULATE_DEPTH);
-		SAVE_REGISTER(RX2, EMULATE_DEPTH);
-		SAVE_REGISTER(RX3, EMULATE_DEPTH);
-		memcpy(M_SAVER[EMULATE_DEPTH],M, 0x1000000);
-
-		EMULATE_DEPTH--;
-		LOAD_REGISTER(b, EMULATE_DEPTH);
-		LOAD_REGISTER(c, EMULATE_DEPTH);
-		LOAD_REGISTER(program_counter, EMULATE_DEPTH);
-		LOAD_REGISTER(program_counter_region, EMULATE_DEPTH);
-		LOAD_REGISTER(stack_pointer, EMULATE_DEPTH);
+		SAVE_REGISTER(a, 1);
+		SAVE_REGISTER(b, 1);
+		SAVE_REGISTER(c, 1);
+		SAVE_REGISTER(program_counter, 1);
+		SAVE_REGISTER(stack_pointer, 1);
+		SAVE_REGISTER(program_counter_region, 1);
+		SAVE_REGISTER(RX0, 1);
+		SAVE_REGISTER(RX1, 1);
+		SAVE_REGISTER(RX2, 1);
+		SAVE_REGISTER(RX3, 1);
+		M=M_SAVER[0];
+		EMULATE_DEPTH=0;
+		LOAD_REGISTER(b, 0);
+		LOAD_REGISTER(c, 0);
+		LOAD_REGISTER(program_counter, 0);
+		LOAD_REGISTER(program_counter_region, 0);
+		LOAD_REGISTER(stack_pointer, 0);
 		LOAD_REGISTER(RX0, EMULATE_DEPTH);
 		LOAD_REGISTER(RX1, EMULATE_DEPTH);
 		LOAD_REGISTER(RX2, EMULATE_DEPTH);
@@ -920,9 +921,10 @@ G_AA12:{SUU SRX0, SRX1;
 		R=0;
 		{
 			STASH_REGS;
-			memcpy(PTEMP, M + (((UU)REG_SAVER[EMULATE_DEPTH].a)<<8), 256);
-			memcpy(M, M_SAVER[EMULATE_DEPTH], 0x1000000);
-			memcpy(M + (((UU)REG_SAVER[EMULATE_DEPTH].a)<<8),PTEMP, 256);
+			memcpy(M + (((UU)REG_SAVER[0].a)<<8),
+							 M_SAVER[0] + (((UU)REG_SAVER[0].a)<<8), 
+							 256
+					 	);
 			UNSTASH_REGS;
 		}
 		D

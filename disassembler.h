@@ -1,7 +1,8 @@
 static int disassembler(char* fname, 
 		unsigned long location, 
 		unsigned long SISA16_DISASSEMBLER_MAX_HALTS,
-		unsigned long end_location){
+		unsigned long end_location,
+		u* M){
 	unsigned long n_halts = 0;
 	unsigned long n_illegals = 0;
 	unsigned long i = location & 0xffFFff;

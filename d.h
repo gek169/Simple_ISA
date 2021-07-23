@@ -118,7 +118,7 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 	setvbuf(stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
  	return;
 }
-static void DONT_WANT_TO_INLINE_THIS dcl(){if(EMULATE_DEPTH==0)endwin();return;}
+static void DONT_WANT_TO_INLINE_THIS dcl(){endwin();return;}
 #else
 #ifdef USE_TERMIOS
 #include <termios.h>
@@ -177,7 +177,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									UU RX3
 								)
 {
-
+	u* M=M_SAVER[0];
 #ifdef USE_SDL2
 	if(a == 0){ /*magic value to display the screen.*/
 		UU i = 0;

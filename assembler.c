@@ -106,7 +106,7 @@ static void DONT_WANT_TO_INLINE_THIS fputbyte(unsigned char b, FILE* f){
 				fputc(b, f);
 		} else {
 			if(npasses == 1)
-				M[outputcounter]=b;
+				M_SAVER[0][outputcounter]=b;
 		}
 	}
 	outputcounter++; outputcounter&=0xffffff;
@@ -155,14 +155,14 @@ int main(int argc, char** argv){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
-			disassembler(argv[i-1], loc, 3, 256 * 256 * 256 + 1);
+			disassembler(argv[i-1], loc, 3, 256 * 256 * 256 + 1, M_SAVER[0]);
 			exit(0);
 		}
 		if(strprefix("--full-disassemble",argv[i-2]) || strprefix("-fdis",argv[i-2]) || strprefix("--full-disassembly",argv[i-2]) ){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
 			loc = strtoul(argv[i],0,0) & 0xffFFff;
-			disassembler(argv[i-1], loc, 0x1000001, 256 * 256 * 256 + 1);
+			disassembler(argv[i-1], loc, 0x1000001, 256 * 256 * 256 + 1, M_SAVER[0]);
 			exit(0);
 		}
 	}}
