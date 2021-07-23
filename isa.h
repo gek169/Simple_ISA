@@ -95,7 +95,7 @@ k 64:goto G_FARILLDB;k 65:goto G_FARISTLB;k 66:goto G_FARPAGEL;k 67:goto G_FARPA
 k 72:goto G_FARISTA;k 73:goto G_FARILDB;k 74:goto G_FARISTB;\
 k 75:goto TB;k 76:goto TC;k 77:goto TD;k 78:goto TE;k 79:goto TF;\
 k 80:goto U0;k 81:goto U1;k 82:goto U2;k 83:goto U3;k 84:goto U4;k 85:goto U5;k 86:goto U6;k 87:goto U7;\
-k 88:goto U8;k 89:goto U9;k 90:goto UA;\
+k 88:goto G_TASK_SET;k 89:goto U9;k 90:goto UA;\
 k 91:goto G_ALPUSH;k 92:goto G_BLPUSH;k 93:goto G_CPUSH;k 94:goto G_APUSH;k 95:goto G_BPUSH;\
 k 96:goto G_ALPOP;k 97:goto G_BLPOP;k 98:goto G_CPOP;k 99:goto G_APOP;k 100:goto G_BPOP;\
 k 101:goto G_INTERRUPT;k 102:goto G_CLOCK;\
@@ -192,7 +192,7 @@ const void* const goto_table[256] = {
 &&TB,&&TC,&&TD,&&TE,
 &&TF,&&U0,&&U1,&&U2,
 &&U3,&&U4,&&U5,&&U6,
-&&U7,&&U8,&&U9,&&UA,
+&&U7,&&G_TASK_SET,&&U9,&&UA,
 
 &&G_ALPUSH,&&G_BLPUSH,
 &&G_CPUSH,&&G_APUSH,&&G_BPUSH,&&G_ALPOP,
@@ -435,7 +435,7 @@ U4:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counte
 U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counter_region;D
 U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]D
 U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[current_task].a=a;D
-U8: /*task_set*/
+G_TASK_SET: /*task_set*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	current_task = a%SISA_MAX_TASKS;
 D
