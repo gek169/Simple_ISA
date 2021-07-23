@@ -139,6 +139,7 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 int DONT_WANT_TO_INLINE_THIS e()
 {
 	register u *M=M_SAVER[0];
+	u current_task=1;
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
@@ -381,10 +382,10 @@ write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edi
 program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
 G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D/*Would require edit if you wanted a 32 bit PC*/
 G_FARCALL:
-write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
-write_byte(program_counter_region,stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
-program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
-program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
+	write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
+	write_byte(program_counter_region,stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
+	program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
+	program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
 D
 G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
 G_FARILDA:a=r((((UU)c&255)<<16)|((UU)b))D
@@ -408,44 +409,42 @@ TB: /**/
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
-		EMULATE_DEPTH = 1;M=M_SAVER[1];
+		EMULATE_DEPTH = 1;M=M_SAVER[current_task];
 		/*Load on up again! We're continuing where we left off!*/
-		LOAD_REGISTER(a, 1);
-		LOAD_REGISTER(b, 1);
-		LOAD_REGISTER(c, 1);
-		LOAD_REGISTER(program_counter, 1);
-		LOAD_REGISTER(program_counter_region, 1);
-		LOAD_REGISTER(stack_pointer, 1);
-		LOAD_REGISTER(RX0, 1);
-		LOAD_REGISTER(RX1, 1);
-		LOAD_REGISTER(RX2, 1);
-		LOAD_REGISTER(RX3, 1);
+		LOAD_REGISTER(a, current_task);
+		LOAD_REGISTER(b, current_task);
+		LOAD_REGISTER(c, current_task);
+		LOAD_REGISTER(program_counter, current_task);
+		LOAD_REGISTER(program_counter_region, current_task);
+		LOAD_REGISTER(stack_pointer, current_task);
+		LOAD_REGISTER(RX0, current_task);
+		LOAD_REGISTER(RX1, current_task);
+		LOAD_REGISTER(RX2, current_task);
+		LOAD_REGISTER(RX3, current_task);
 }D
 
-TC:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].a;D
-TD:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].b;D
-TE:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].c;D
-TF:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX0;D
-U0:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX1;D
-U1:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX2;D
-U2:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX3;D
-U3:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].stack_pointer;D
-U4:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].program_counter;D
-U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].program_counter_region;D
+TC:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].a;D
+TD:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].b;D
+TE:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].c;D
+TF:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[current_task].RX0;D
+U0:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[current_task].RX1;D
+U1:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[current_task].RX2;D
+U2:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[current_task].RX3;D
+U3:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].stack_pointer;D
+U4:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counter;D
+U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counter_region;D
 
 
-U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[1][ (((UU)c&255)<<16) | (UU)b]D
+U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]D
 
-U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[1].a=a;D
+U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[current_task].a=a;D
 U8: /*task_ld*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	REG_SAVER_TASK_BUF[a % SISA_MAX_TASKS] = REG_SAVER[1];
-	memcpy(M_SAVER_TASK_BUF[a % SISA_MAX_TASKS], M_SAVER[1], 0x1000000);
+	current_task = a%SISA_MAX_TASKS;
 D
 U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	REG_SAVER[1] = REG_SAVER_TASK_BUF[a % SISA_MAX_TASKS];
-	memcpy(M_SAVER[1], M_SAVER_TASK_BUF[a % SISA_MAX_TASKS], 0x1000000);
+	current_task = (a%SISA_MAX_TASKS) + 1;
 D
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
@@ -855,7 +854,7 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 		{
 			STASH_REGS;
-			memcpy(M_SAVER[1], M_SAVER[0], 0x1000000);
+			memcpy(M_SAVER[current_task], M_SAVER[0], 0x1000000);
 			UNSTASH_REGS;
 		}
 		
@@ -870,7 +869,7 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
 		EMULATE_DEPTH = 1;
-		M = M_SAVER[1];
+		M = M_SAVER[current_task];
 		stack_pointer=0;
 		program_counter_region=0;
 		program_counter=0;
@@ -897,16 +896,16 @@ G_AA12:{SUU SRX0, SRX1;
 	if(EMULATE_DEPTH == 0){
 		dcl();return 0;
 	} else {
-		SAVE_REGISTER(a, 1);
-		SAVE_REGISTER(b, 1);
-		SAVE_REGISTER(c, 1);
-		SAVE_REGISTER(program_counter, 1);
-		SAVE_REGISTER(stack_pointer, 1);
-		SAVE_REGISTER(program_counter_region, 1);
-		SAVE_REGISTER(RX0, 1);
-		SAVE_REGISTER(RX1, 1);
-		SAVE_REGISTER(RX2, 1);
-		SAVE_REGISTER(RX3, 1);
+		SAVE_REGISTER(a, current_task);
+		SAVE_REGISTER(b, current_task);
+		SAVE_REGISTER(c, current_task);
+		SAVE_REGISTER(program_counter, current_task);
+		SAVE_REGISTER(stack_pointer, current_task);
+		SAVE_REGISTER(program_counter_region, current_task);
+		SAVE_REGISTER(RX0, current_task);
+		SAVE_REGISTER(RX1, current_task);
+		SAVE_REGISTER(RX2, current_task);
+		SAVE_REGISTER(RX3, current_task);
 		M=M_SAVER[0];
 		EMULATE_DEPTH=0;
 		a=R;R=0;

@@ -29,18 +29,15 @@ User mode is pre-empted.
 #define SISA_MAX_TASKS 4
 #endif
 
-static u M_SAVER[2][0x1000000] = {0};
+
 
 typedef struct {
 	UU RX0,RX1,RX2,RX3;
 	U a,b,c,program_counter,stack_pointer;
 	u program_counter_region;
 }sisa_regfile;
-
-static sisa_regfile REG_SAVER[2] = {0};
-
-static u M_SAVER_TASK_BUF[SISA_MAX_TASKS][0x1000000] = {0};
-static sisa_regfile REG_SAVER_TASK_BUF[SISA_MAX_TASKS] = {0};
+static u M_SAVER[1+SISA_MAX_TASKS][0x1000000] = {0};
+static sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
 #define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
 #define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;
 
