@@ -101,7 +101,7 @@ farret;
 
 //krenel constants:
 .libc_krenel_max_active_tasks:8
-.libc_krenel_max_returns:4
+.libc_krenel_max_returns:20
 .libc_krenel_exec_region:50
 
 
@@ -226,13 +226,13 @@ bytes 0,0;
 		//I don't recognize this syscall. Just ignore it... for now.
 		sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
-			user_getc; ca; //the machine they want to interact with.
-			ac;	task_set;
-			user_getb; ba; //the value they want to write.
+			
 			user_get0; //The location in memory to write it.
-			ac;task_set;
-			ab;
 			cbrx0;
+			user_getb;apush; //the byte you want to write.
+			user_getc; //the machine they want to interact with.
+			task_set;
+			apop;
 			user_farista;	//write it!
 			//Re-set our active task.
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
