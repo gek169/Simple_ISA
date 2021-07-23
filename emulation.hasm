@@ -276,7 +276,7 @@ bytes 0,0;
 			sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
-			farilda;
+			farillda;
 		//Did we find it?
 			lb 1; cmp; sc %libc_krenel_cswitch_looptop%; jmpifeq;
 		//We didn't! Should we quit?
