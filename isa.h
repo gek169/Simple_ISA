@@ -270,12 +270,24 @@ R=0;di();
 debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);
 #endif
 
-/*Free slots!*/
-TC:TD:TE:
-TF:U0:U1:U2:
-U3:U4:U5:U6:
-U7:U8:U9:UA:
 
+TC:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].a;D
+TD:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].b;D
+TE:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].c;D
+TF:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX0;D
+U0:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX1;D
+U1:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX2;D
+U2:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[1].RX3;D
+U3:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].stack_pointer;D
+U4:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].program_counter;D
+U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[1].program_counter_region;D
+
+
+U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[1][ (((UU)c&255)<<16) | (UU)b]D
+
+U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[1].a=a;D
+/*Free slots!*/
+U8:U9:UA:
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -449,7 +461,7 @@ G_INTERRUPT:
 {
 	STASH_REGS;
 #ifndef NO_DEVICE_PRIVILEGE
-	if(EMULATE_DEPTH){R = 17; goto G_HALT;}
+	if(EMULATE_DEPTH){R = 18; goto G_HALT;}
 #endif
 	a_stash=interrupt(
 		a_stash,

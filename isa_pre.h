@@ -9,7 +9,7 @@ typedef signed int SUU;
 typedef unsigned long UU;
 typedef long SUU;
 #endif
-static u R=0, M[0x1000000], PTEMP[256], *SEGMENT = NULL;
+static u R=0,M[0x1000000], PTEMP[256], *SEGMENT = NULL;
 static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;
 
 /*This is important later!!! Only two privilege levels.

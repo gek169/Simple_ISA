@@ -293,7 +293,7 @@ farildb: load byte using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 
 faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4A)
 
-.B FREE SLOTS: 
+.B PRIVILEGED INSTRUCTIONS: 
 
 priv_drop: Drop privilege after returning from emulate, return to user mode. (4B)
 
@@ -301,8 +301,33 @@ priv_drop: Drop privilege after returning from emulate, return to user mode. (4B
 
 	this effectively just invokes EMULATE, but without using the current memory map- the lower one is used.
 
-15 free opcodes, behaving as nop duplicates.
-ranging from 4C to 5A. All 1 byte.
+user_geta: a = usermode register A. (4C)
+
+user_getb: a = usermode register B. (4D)
+
+user_getc: a = usermode register C. (4E)
+
+user_get0: RX0 = usermode register RX0. (4F)
+
+user_get1: RX0 = usermode register RX1. (50)
+
+user_get2: RX0 = usermode register RX2. (51)
+
+user_get3: RX0 = usermode register RX3. (52)
+
+user_getstp: a = usermode stack pointer. (53)
+
+user_getpc: a = usermode program counter. (54)
+
+user_getr: a = usermode program counter region. (55)
+
+user_farilda: a = user memory[ ((c&255) << 16) + b]. (56)
+
+user_seta: set user mode's A register. (57)
+
+.B FREE OPCODES:
+3 free opcodes, behaving as nop duplicates.
+ranging from 58 to 5A. All 1 byte.
 
 
 alpush: push short register a onto the stack. (1 byte) (5B)

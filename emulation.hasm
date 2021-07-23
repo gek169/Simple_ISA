@@ -36,9 +36,35 @@ nop;nop;nop;nop;
 	//a holds the value. CHECK IT.
 	blpush;
 	libc_emulate_cswitch_looptop:
-		lb 0xFF;cmp;
-		sc %libc_emulate_cswitch_loopout%; jmpifneq;
-		alpop;alpush;
+		alpush;
+		lb 18; cmp; blpop; sc %libc_emulate_interrupt%; jmpifeq;
+		ab; alpush;
+		lb 17; cmp; blpop; sc %libc_emulate_putchar%; jmpifeq;
+		ab; alpush;
+		lb 16; cmp; blpop; sc %libc_emulate_getchar%; jmpifeq;
+		ab; alpush;
+		lb 0xff; cmp; blpop; sc %libc_emulate_preempt%; jmpifeq;
+	libc_emulate_interrupt:
+		user_getb;ba;
+		user_getc;ca;
+		user_geta;
+		user_get1;rx1_0;
+		user_get2;rx2_0;
+		user_get3;rx3_0;
+		user_get0;
+		interrupt;
+		user_seta;
+		sc %libc_emulate_preempt%; jmp;
+	libc_emulate_getchar:
+		getchar;
+		user_seta;
+		sc %libc_emulate_preempt%; jmp;
+	libc_emulate_putchar:
+		user_geta;
+		putchar;
+//		sc %libc_emulate_preempt%; jmp;
+	libc_emulate_preempt:
+		alpop; push %2%;
 		priv_drop;
 		sc %libc_emulate_cswitch_looptop%; jmp;
 	libc_emulate_cswitch_loopout:

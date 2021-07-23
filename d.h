@@ -52,7 +52,6 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 }
 
 static void DONT_WANT_TO_INLINE_THIS di(){
-	if(EMULATE_DEPTH==0){
 		setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
@@ -97,16 +96,13 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 		  exit(-1);
 		}
 		SDL_PauseAudio(0);
-	}
 }
 static void DONT_WANT_TO_INLINE_THIS dcl(){
-	if(EMULATE_DEPTH==0){
 		SDL_DestroyTexture(sdl_tex);
 		SDL_DestroyRenderer(sdl_rend);
 		SDL_CloseAudio();
     	SDL_DestroyWindow(sdl_win);
 	    SDL_Quit();
-	}
 }
 #else
 
@@ -118,7 +114,9 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
 #ifdef USE_NCURSES
 #include <ncurses.h>
 static void DONT_WANT_TO_INLINE_THIS di(){
-if(EMULATE_DEPTH==0){initscr();setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));} return;
+	initscr();
+	setvbuf(stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
+ 	return;
 }
 static void DONT_WANT_TO_INLINE_THIS dcl(){if(EMULATE_DEPTH==0)endwin();return;}
 #else
@@ -140,11 +138,9 @@ static void dieTermios(){
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &oldChars); /* use these new terminal i/o settings now */	
 }
 static void DONT_WANT_TO_INLINE_THIS di(){
-if(EMULATE_DEPTH==0){
 	initTermios(0);
 	atexit(dieTermios);
 	setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
-}
 }
 static void dcl(){}
 #else

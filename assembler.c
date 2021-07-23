@@ -2077,8 +2077,8 @@ int main(int argc, char** argv){
 			puts("\n<Errfl, Internal error, Reporting bad segment but not set that way at compiletime. Report this bug! https://github.com/gek169/Simple_ISA/   >");
 #endif
 		}
-		if(R==15){
-			puts("\n<Errfl, Bad privilege execution.>");
+		if(R==15 || R==16 || R==17 || R==18){
+			puts("\n<Errfl, Privileged opcode executed underprivileged.>");
 		}
 		
 	}
