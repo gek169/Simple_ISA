@@ -19,7 +19,7 @@ static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;
 User mode is pre-empted.
 */
 
-static u M_SAVER[2][0x1000000];
+static u M_SAVER[2][0x1000000] = {0};
 
 typedef struct {
 	u* SEGMENT;
@@ -30,7 +30,7 @@ typedef struct {
 	u ACTION_FLAGS;
 }sisa_regfile;
 
-static sisa_regfile REG_SAVER[2];
+static sisa_regfile REG_SAVER[2] = {0};
 
 #define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
 #define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;
