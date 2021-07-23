@@ -135,17 +135,14 @@ bytes 0,0;
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
-		lla %0xE000%; interrupt;	//DEBUG--- Blocking input.
+		lla %0xE000%; interrupt;
 		
 	//Set the active task's info.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
-	//PID 0 is the initial program...
-		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
-		la 1; 
-		faristla;
+
 	//Set all tasks to be zero... except the first one.
-		lb1;rx0b; 
+		lb0;rx0b; 
 		lb libc_krenel_max_active_tasks; rx1b;
 		libc_krenel_zero_tasks_looptop:
 			arx0;lb 2;mul;ba;
@@ -154,7 +151,10 @@ bytes 0,0;
 			la 0; faristla;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_looptop%; jmpifeq;
-
+	//PID 0 is the initial program...
+		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
+		la 1;
+		farstla %~LIBC_REGION%,  %libc_krenel_task_isactive_array%;
 	//get that important argument back!
 		rx0pop;
 		farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
@@ -308,6 +308,7 @@ bytes 0,0;
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			aincr; lb libc_krenel_max_active_tasks; mod;
 			farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			task_set;
 			lb 2;mul;ba
 			sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
