@@ -265,8 +265,8 @@ bytes 0,0;
 				sc %libc_krenel_exec_region%; 
 				farista;
 				//apush;proc_printbytehex;apop;halt;		//DEBUG
-				rxincr;rxcmp;lb 2;cmp; //++rx0 <= 
-				sc %libc_krenel_syscall_exec_copymem_looptop%; jmpifneq;
+				rxincr;rxcmp;lb 0;cmp; //++rx0 < rx1
+				sc %libc_krenel_syscall_exec_copymem_looptop%; jmpifeq;
 
 			//The memory is copied. We must now find a free PID.
 			lrx1 %/libc_krenel_max_active_tasks%; lb 0; rx0b;
@@ -310,7 +310,6 @@ bytes 0,0;
 				adecr;ca;			//put 1 into c.
 				lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
 				emulate;
-				apush;proc_printbytehex;halt;		//DEBUG
 			//restore stack integrity.
 				farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
 				farstrx0 %&0%
