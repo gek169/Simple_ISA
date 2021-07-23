@@ -846,13 +846,13 @@ G_AA12:{SUU SRX0, SRX1;
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
-		REG_SAVER[0].a = a; 
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[1], M_SAVER[0], 0x1000000);
 			M = M_SAVER[1];
 			UNSTASH_REGS;
 		}
+		SAVE_REGISTER(a, 0);
 		SAVE_REGISTER(b, 0);
 		SAVE_REGISTER(c, 0);
 		SAVE_REGISTER(program_counter, 0);
