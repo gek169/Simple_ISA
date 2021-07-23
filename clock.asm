@@ -44,6 +44,12 @@ bytes 0xd, 0xa;
 	lrx0 %/Lbl_clock_start%;
 	lb 0xEEEE;
 	proc_emulate;
+	LBL_cswitch_looptop:
+		lb 0xFF;cmp;
+		sc %LBL_cswitch_loopout%; jmpifneq;
+		priv_drop;
+		sc %LBL_cswitch_looptop%; jmp;
+	LBL_cswitch_loopout:
 	la 0xAF;apush;la 0;alpush;
 		proc_puts;
 	pop %3%;

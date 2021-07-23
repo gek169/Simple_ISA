@@ -79,9 +79,9 @@ void debugger_hook(	unsigned short *a,
 #endif
 
 #ifdef USE_COMPUTED_GOTO
-#define D ;debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);goto *goto_table[CONSUME_BYTE];
+#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);goto *goto_table[CONSUME_BYTE];
 #else
-#define D ;debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);switch(CONSUME_BYTE){\
+#define D ;PREEMPT();debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);switch(CONSUME_BYTE){\
 k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:goto G_SC;k 6:goto G_STA;k 7:goto G_STB;\
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
@@ -147,6 +147,25 @@ int DONT_WANT_TO_INLINE_THIS e()
 	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	register UU RX0=0,RX1=0,RX2=0,RX3=0;
 #endif
+
+#ifndef PREEMPT_TIMER
+#define PREEMPT_TIMER 0x20000
+#endif
+
+#ifndef NO_PREEMPT
+register UU instruction_counter = 0;
+#define PREEMPT() {\
+	instruction_counter += EMULATE_DEPTH;\
+	if(instruction_counter >= PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
+}
+
+#else
+
+#define PREEMPT() /*a comment*/
+
+#endif
+
+
 #ifdef USE_COMPUTED_GOTO
 const void* const goto_table[256] = {
 &&G_HALT,&&G_LDA,&&G_LA,&&G_LDB,&&G_LB,&&G_SC,&&G_STA,&&G_STB,
@@ -358,8 +377,43 @@ G_FARILDA:a=r((((UU)c&255)<<16)|((UU)b))D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)|((UU)b)))D
 G_FARILDB:b=r((((UU)c&255)<<16)|((UU)a))D
 G_FARISTB:write_byte(b,((((UU)c&255)<<16)|((UU)a)))D
+
+TB: /**/
+{
+		if(EMULATE_DEPTH > 0) {R=15; goto G_HALT;}
+		instruction_counter = 0;
+		{
+			STASH_REGS;
+			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
+			UNSTASH_REGS;
+		}
+		SAVE_REGISTER(a, EMULATE_DEPTH);
+		SAVE_REGISTER(b, EMULATE_DEPTH);
+		SAVE_REGISTER(c, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
+		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
+		SAVE_REGISTER(RX0, EMULATE_DEPTH);
+		SAVE_REGISTER(RX1, EMULATE_DEPTH);
+		SAVE_REGISTER(RX2, EMULATE_DEPTH);
+		SAVE_REGISTER(RX3, EMULATE_DEPTH);
+		REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS = 0; /*Do not Restore the segment upon reloading.*/
+		EMULATE_DEPTH++;
+		memcpy(M, M_SAVER[EMULATE_DEPTH], 0x1000000);
+		LOAD_REGISTER(a, EMULATE_DEPTH);
+		LOAD_REGISTER(b, EMULATE_DEPTH);
+		LOAD_REGISTER(c, EMULATE_DEPTH);
+		LOAD_REGISTER(program_counter, EMULATE_DEPTH);
+		LOAD_REGISTER(program_counter_region, EMULATE_DEPTH);
+		LOAD_REGISTER(stack_pointer, EMULATE_DEPTH);
+		LOAD_REGISTER(RX0, EMULATE_DEPTH);
+		LOAD_REGISTER(RX1, EMULATE_DEPTH);
+		LOAD_REGISTER(RX2, EMULATE_DEPTH);
+		LOAD_REGISTER(RX3, EMULATE_DEPTH);
+}
+D
 /*free slots!*/
-TB:TC:TD:TE:
+TC:TD:TE:
 TF:U0:U1:U2:
 U3:U4:U5:U6:
 U7:U8:U9:UA:goto G_NOP;
@@ -745,7 +799,8 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE = a;
+		instruction_counter = 0;
+		REG_SAVER[EMULATE_DEPTH].a = a;
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
@@ -799,7 +854,8 @@ G_AA12:{SUU SRX0, SRX1;
 		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 			R=11; goto G_HALT;
 		}
-		REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE = a; 
+		instruction_counter = 0;
+		REG_SAVER[EMULATE_DEPTH].a = a; 
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
@@ -842,6 +898,18 @@ G_AA12:{SUU SRX0, SRX1;
 	if(EMULATE_DEPTH == 0){
 		dcl();return 0;
 	} else {
+		SAVE_REGISTER(a, EMULATE_DEPTH);
+		SAVE_REGISTER(b, EMULATE_DEPTH);
+		SAVE_REGISTER(c, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
+		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
+		SAVE_REGISTER(RX0, EMULATE_DEPTH);
+		SAVE_REGISTER(RX1, EMULATE_DEPTH);
+		SAVE_REGISTER(RX2, EMULATE_DEPTH);
+		SAVE_REGISTER(RX3, EMULATE_DEPTH);
+		memcpy(M_SAVER[EMULATE_DEPTH],M, 0x1000000);
+
 		EMULATE_DEPTH--;
 		LOAD_REGISTER(b, EMULATE_DEPTH);
 		LOAD_REGISTER(c, EMULATE_DEPTH);
@@ -861,9 +929,9 @@ G_AA12:{SUU SRX0, SRX1;
 		}
 		{
 			STASH_REGS;
-			memcpy(PTEMP, M + (((UU)REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE)<<8), 256);
+			memcpy(PTEMP, M + (((UU)REG_SAVER[EMULATE_DEPTH].a)<<8), 256);
 			memcpy(M, M_SAVER[EMULATE_DEPTH], 0x1000000);
-			memcpy(M + (((UU)REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE)<<8),PTEMP, 256);
+			memcpy(M + (((UU)REG_SAVER[EMULATE_DEPTH].a)<<8),PTEMP, 256);
 			UNSTASH_REGS;
 		}
 		D

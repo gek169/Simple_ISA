@@ -294,8 +294,15 @@ farildb: load byte using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4A)
 
 .B FREE SLOTS: 
-16 free opcodes, behaving as nop duplicates.
-ranging from 4B to 5A. All 1 byte.
+
+priv_drop: Drop privilege after returning from EMULATE or EMULATE_SEG, return to user mode. (4B)
+
+	the value of register A will indicate the new shared page with the emulated machine.
+
+	this effectively just invokes EMULATE, but without using the current memory map- the lower one is used.
+
+15 free opcodes, behaving as nop duplicates.
+ranging from 4C to 5A. All 1 byte.
 
 
 alpush: push short register a onto the stack. (1 byte) (5B)
@@ -534,12 +541,11 @@ rxincr: (1 byte) (CD)
 
 rxdecr: (1 byte) (CE)
 
-emulate: Run a SISA16 sandboxed machine with a single sharedpage of choice according to register A (1 byte) (CF)
-	Errors in the sandboxed machine are trapped and returned to register A.
+emulate: Run a SISA16 sandboxed machine with a single shared page of choice according to register A (1 byte) (CF)
 
-	The segment is also sandboxed and the sandboxed machine has a NULL segment to begin with.
-	
-	the maximum recursion allowed by the implementation is defined by SISA16_MAX_RECURSION_DEPTH in isa_pre.h
+	This machine will execute at a lower privilege level than the current machine and is pre-emptively executed for
+
+	a compiletime-defined number of cycles (Default: 0x20000) at which point it will return. This return 
 
 rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 

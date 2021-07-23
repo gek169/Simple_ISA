@@ -1897,4 +1897,8 @@ int main(int rc,char**rv){
 		puts("\n<Errfl, Internal error, Reporting segment disabled but not set that way at compiletime. Report this bug! https://github.com/gek169/Simple_ISA/   >");
 #endif
 	}
+	if(R==15){
+		puts("\n<Errfl, Bad privilege execution.>");
+	}
+	return 0;
 }

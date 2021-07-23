@@ -79,7 +79,7 @@ static char* insns[216] = {
 	"farista",
 	"farildb",
 	"faristb",
-	"ASM_FREE_INSN0",
+	"priv_drop",
 	"ASM_FREE_INSN1",
 	"ASM_FREE_INSN2",
 	"ASM_FREE_INSN3",
@@ -272,8 +272,10 @@ static unsigned char insns_numargs[216] = {
 	0,0, /*Far page load and store*/
 	0,0,0, /*lfarpc, farcall, farret,*/
 	0,0,0,0, /*Far memory access- a and b, as single bytes*/
+	/*priv_drop*/
+	0,
 	/*FREE SLOTS!*/
-	0,0,0,0,
+	0,0,0,
 	0,0,0,0,
 	0,0,0,0,
 	0,0,0,0,
@@ -446,8 +448,11 @@ static char* insn_repl[216] = {
 	"bytes72;", 
 	"bytes73;", 
 	"bytes74;", 
+	
+	/*priv_drop*/
+	"bytes75;",
 	/*FREE SLOTS!*/
-	"bytes75;","bytes76;","bytes77;","bytes78;",
+	"bytes76;","bytes77;","bytes78;",
 	"bytes79;","bytes80;","bytes81;","bytes82;",
 	"bytes83;","bytes84;","bytes85;","bytes86;",
 	"bytes87;","bytes88;","bytes89;","bytes90;",
