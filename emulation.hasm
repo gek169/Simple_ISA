@@ -264,7 +264,6 @@ bytes 0,0;
 				cbrx0; user_farilda;
 				sc %libc_krenel_exec_region%; 
 				farista;
-				//apush;proc_printbytehex;apop;halt;		//DEBUG
 				rxincr;rxcmp;lb 0;cmp; //++rx0 < rx1
 				sc %libc_krenel_syscall_exec_copymem_looptop%; jmpifeq;
 
@@ -290,7 +289,6 @@ bytes 0,0;
 				//It is in RX0.
 				arx0;task_set;
 				farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
-				//apush;proc_printbytehex;apop;halt;
 
 				//Mark it as running.
 				lb 2; mul; ba;
