@@ -10,6 +10,8 @@ bytes 0, '\r' ,'\n';
 ..main:
 	lrx0 %/krenel_boot%;
 	proc_krenel;
+	lrx0 0, %&STR_my_string%;
+	rx0push;
 	halt;
 	krenel_boot:
 		lrx0 0, %&STR_my_string%;
