@@ -31,6 +31,13 @@ bytes '\r' ,'\n', 0;
 	rx0push;
 	proc_puts;
 	halt;
+..(55):
+	cpc;
+	la 'V';
+	putchar;
+	jmp;
+	lb 0; div;
+	halt;
 ..(8):
 	krenel_boot:
 		//Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
@@ -47,6 +54,8 @@ bytes '\r' ,'\n', 0;
 		rx0push;
 		proc_puts;
 		la '\n'; syscall;
+		lla %0xDE04%; lb 55; syscall;
+		nota; sc %main_program_failure%; jmpifeq;
 		getchar;
 		getchar;
 		getchar;
@@ -67,4 +76,5 @@ bytes '\r' ,'\n', 0;
 		proc_puts;
 		rx0pop;
 		//lb 0; rx1b; fltdiv
+		main_program_failure:
 		halt;

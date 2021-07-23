@@ -101,6 +101,7 @@ farret;
 //krenel constants:
 .libc_krenel_max_active_tasks:8
 .libc_krenel_max_returns:4
+.libc_krenel_exec_region:50
 
 
 //all tasks start out as 0- inactive.
@@ -168,7 +169,7 @@ bytes 0,0;
 	//restore stack integrity.
 		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
 		farstrx0 %&0%
-	//a holds the value. CHECK IT.
+	//a holds the return value. CHECK IT.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SCHEDULER ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,7 +203,7 @@ bytes 0,0;
 		//Needed services:
 		//Kill pid-					Kill another process.
 		//Shutdown-					Kill the system.
-		//Exec-						load a process image and run it. Needs to be loaded from dsk.
+		//Exec-						load a single region of code
 		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'.
 		//Disk Read File-			read a file from .dsk by name.
 		//Disk Write File-			write a file to .dsk by name.
@@ -252,9 +253,69 @@ bytes 0,0;
 			//TODO (complicated)
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_exec:
-			//TODO (extra complicated)
-			sc %libc_krenel_syscall_end%; jmp;
+			user_getb;			//The region;
 			
+			lb 8; lsh;			//times 256
+			rx0a; lb 8; rx1b; rxlsh;rx3_0; //again...
+			lrx1 %/0x10000%;rxadd;
+			rx1_0;
+			rx0_3;
+			libc_krenel_syscall_exec_copymem_looptop:
+				cbrx0; user_farilda;
+				sc %libc_krenel_exec_region%; 
+				farista;
+				//apush;proc_printbytehex;apop;halt;		//DEBUG
+				rxincr;rxcmp;lb 2;cmp; //++rx0 <= 
+				sc %libc_krenel_syscall_exec_copymem_looptop%; jmpifneq;
+
+			//The memory is copied. We must now find a free PID.
+			lrx1 %/libc_krenel_max_active_tasks%; lb 0; rx0b;
+			libc_krenel_syscall_exec_findfreepid_looptop:
+				arx0;
+				lb 2;mul;ba
+				sc %LIBC_REGION%;
+				lla %libc_krenel_task_isactive_array%;
+				add;ba;
+				farillda;
+				nota;
+				sc %libc_krenel_syscall_exec_found_that_pid%; jmpifeq;
+				rxincr;rxcmp;
+				sc %libc_krenel_syscall_exec_failure%; jmpifeq;
+				sc %libc_krenel_syscall_exec_findfreepid_looptop%; jmp;
+			
+			libc_krenel_syscall_exec_found_that_pid:
+				//First, tell our previous user that we succeeded.
+				la 1;user_seta;
+				la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
+				//It is in RX0.
+				arx0;task_set;
+				farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+				//apush;proc_printbytehex;apop;halt;
+				//Mark it as running.
+				lb 2; mul; ba;
+				sc %LIBC_REGION%;
+				lla %libc_krenel_task_isactive_array%;
+				add;ba;
+				la 1; faristla;
+				//Create a bootloader
+				//We're execing the at *our* assigned location.
+				lrx0 0,libc_krenel_exec_region,0,0
+				farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
+			//We must copy three bytes, so we do 4 for speed's sake.
+				farldrx0 %&0%
+				farstrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
+				sc %0%; la 2; ista; //la
+				adecr;ca;			//put 1 into c.
+				lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
+				emulate;
+			//restore stack integrity.
+				farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
+				farstrx0 %&0%
+				//We have switched task, as commanded. A holds our return value. CHECK IT...
+				sc %libc_krenel_cswitch_looptop%; jmp;
+			libc_krenel_syscall_exec_failure:
+				la 0;user_seta;
+				sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_end:
 			//Syscalls are expensive. Increment an extra time, just to punish them!
 			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
@@ -312,7 +373,9 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		//la 's';putchar;putchar;putchar; //DEBUG
+		//la 'f'; putchar; la '\n'; interrupt; //MORE DEBUG
 		lb 0; rx0b;
+		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks; rx1b;
 	libc_krenel_try_select_task_loop:
 		//Loop from where we are, and around again. If we find a task to execute... execute it!

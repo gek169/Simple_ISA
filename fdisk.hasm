@@ -1,4 +1,6 @@
 
+//These are privileged functions.
+
 //FREAD
 //Arguments:
 //RX0: number of bytes to be read.
