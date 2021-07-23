@@ -12,7 +12,7 @@
 //..(2):
 //..dinclude"libc_pre.bin"
 
-.BENCH_SECONDS:256
+.BENCH_SECONDS:10
 
 //Variable Section.
 section 0xAE0000;
@@ -44,6 +44,8 @@ bytes 0xd, 0xa;
 	lrx0 %/Lbl_clock_start%;
 	llb %0xEEEE%;
 	proc_emulate;
+	la '\n';putchar;
+	la '\r';putchar;
 	la 0xAF;apush;la 0;alpush;
 		proc_puts;
 	pop %3%;
