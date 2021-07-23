@@ -20,6 +20,11 @@ static UU SEGMENT_PAGES=0;
 User mode is pre-empted.
 */
 
+#ifdef NO_EMULATE
+#define NO_PREEMPT
+#define NO_DEVICE_PRIVILEGE
+#endif
+
 static u M_SAVER[2][0x1000000] = {0};
 
 typedef struct {
