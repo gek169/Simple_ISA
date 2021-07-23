@@ -140,6 +140,7 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 int DONT_WANT_TO_INLINE_THIS e()
 {
 	register u *M=M_SAVER[0];
+	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
 	u current_task=1;
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
