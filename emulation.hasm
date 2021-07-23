@@ -131,7 +131,7 @@ bytes 0,0;
 			arx0;lb 2;mul;ba;
 			sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%
 			add;ba;
-			la 1; faristla;
+			la 0; faristla;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_looptop%; jmpifeq;
 
