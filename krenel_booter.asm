@@ -19,7 +19,12 @@ bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
 :STR_my_other_string:
 ..ascii:Krenel shut down...
 bytes '\r' ,'\n', 0;
-..main:
+:STR_yet_other_string:
+..ascii:End of Program.
+bytes '\r' ,'\n', 0;
+
+
+..main(22):
 	lrx0 %/krenel_boot%;
 	proc_krenel;
 	lrx0 0, %&STR_my_other_string%;
@@ -30,9 +35,7 @@ bytes '\r' ,'\n', 0;
 		lrx0 0, %&STR_my_string%;
 		rx0push;
 		proc_puts;
-		proc_puts;
-		proc_puts;
-		proc_puts;
+		la '\n'; syscall;
 		proc_gets_user;
 		la '\r'; putchar;
 		la '\n'; putchar;
@@ -42,8 +45,9 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; syscall;
 		rx0pop;
-		lrx0 0, %&STR_my_other_string%;
+		lrx0 0, %&STR_yet_other_string%;
 		rx0push;
 		proc_puts;
 		rx0pop;
+		lb 0; rx1b; rxidiv
 		halt;

@@ -800,7 +800,8 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			if(
-				loc != -1
+				loc > 0 &&
+				!(line[loc-1] == '\\')
 			){
 				char* line_old = line;
 				line = strcatallocf2(

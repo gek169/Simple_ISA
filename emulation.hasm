@@ -81,6 +81,18 @@ farret;
 
 ..include"printbytehex.hasm"
 
+
+..decl_lproc:libc_lproc_krenel_print_krenel
+	la 'K'; putchar;
+	la 'R'; putchar;
+	la 'E'; putchar;
+	la 'N'; putchar;
+	la 'E'; putchar;
+	la 'L'; putchar;
+	la '\:'; putchar;
+	la '\ '; putchar;
+	ret
+
 //~~~~~~~~~~~~~~~
 //~~K R E N E L~~
 //~~~~~~~~~~~~~~~
@@ -112,10 +124,15 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+		libc_lproc_krenel_print_krenel;
+		la '\n'; putchar;
+		la '\r'; putchar;
+		la '\n'; interrupt;
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
 		lla %0xE000%; interrupt;	//DEBUG--- Blocking input.
+		
 	//Set the active task's info.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
@@ -169,10 +186,7 @@ bytes 0,0;
 		la 'r'; putchar;
 		la 'o'; putchar;
 		la 'r'; putchar;
-		la 'c'; putchar;
-		la 'o'; putchar;
-		la 'd'; putchar;
-		la 'e'; putchar;
+		la '\ '; putchar;
 		bpush;proc_printbytehex;bpop;
 		la '\r'; putchar;
 		la '\n'; putchar;

@@ -126,7 +126,7 @@ farret;
 		ab;bpush;
 		lb '\n';cmp;bpop;sc%libc_gets_user_loopend%;jmpifeq;
 		ab;bpush;
-		//hex 255- polling from nonblocking device?
+		//255- polling from nonblocking device?
 		lb 0xff;cmp;bpop;sc%libc_gets_user_looptop%;jmpifeq;
 		ab;bpush;
 
@@ -222,6 +222,8 @@ farret;
 		lb '\r';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 		lb '\n';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
+		ab;bpush;
+		lb 0xff;cmp;bpop;sc%libc_gets_noecho_looptop%;jmpifeq;
 		ab;
 		lb '~';cmp;lb2;cmp;sc%libc_gets_loopend%;jmpifeq;
 		rx0_3;		rxincr;		rx3_0;

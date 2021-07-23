@@ -4,9 +4,9 @@
 //ATOF~~~~~~~~~~~~~~~
 //Pointer to a string is passed in RX0.
 
-.libc_atof_ld_steps: farldrx0 %~LIBC_REGION%, %@%;
+.libc_atof_ld_steps: 	farldrx0 %~LIBC_REGION%, %@%;
 .libc_atof_ld_stepsrx1: farldrx1 %~LIBC_REGION%, %@%;
-.libc_atof_st_steps: farstrx0 %~LIBC_REGION%, %@%;
+.libc_atof_st_steps: 	farstrx0 %~LIBC_REGION%, %@%;
 bytes 0,0,0,0;
 
 .libc_atof_ld_val: farldrx0 %~LIBC_REGION%, %@%;
