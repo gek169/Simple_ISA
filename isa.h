@@ -809,42 +809,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_ADECR:a--;D
 	G_RX0INCR:RX0++;D
 	G_RX0DECR:RX0--;D
-#if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
-	G_EMULATE:{
-		if(EMULATE_DEPTH >= 1) {
-			R=11; goto G_HALT;
-		}
-		instruction_counter = 0;
-		REG_SAVER[EMULATE_DEPTH].a = a;
-		{
-			STASH_REGS;
-			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
-			UNSTASH_REGS;
-		}
-		SAVE_REGISTER(b, EMULATE_DEPTH);
-		SAVE_REGISTER(c, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
-		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
-		SAVE_REGISTER(RX0, EMULATE_DEPTH);
-		SAVE_REGISTER(RX1, EMULATE_DEPTH);
-		SAVE_REGISTER(RX2, EMULATE_DEPTH);
-		SAVE_REGISTER(RX3, EMULATE_DEPTH);
-		SAVE_REGISTER(SEGMENT, EMULATE_DEPTH);
-		SAVE_REGISTER(SEGMENT_PAGES, EMULATE_DEPTH);
-		REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS = 1; /*Restore the segment upon reloading.*/
-		SEGMENT = NULL;
-		SEGMENT_PAGES = 0;
-		EMULATE_DEPTH++;
-		stack_pointer=0;
-		program_counter_region=0;
-		program_counter=0;
-		RX0=0;RX1=0;RX2=0;RX3=0;
-		a=0;b=0;c=0;
-	}D
-#else
 	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
-#endif
 #if defined(NO_FP)
 	G_ITOF:G_FTOI:R=8;goto G_HALT;
 #else

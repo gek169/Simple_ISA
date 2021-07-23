@@ -295,7 +295,7 @@ faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 
 .B FREE SLOTS: 
 
-priv_drop: Drop privilege after returning from EMULATE or EMULATE_SEG, return to user mode. (4B)
+priv_drop: Drop privilege after returning from emulate, return to user mode. (4B)
 
 	the value of register A will indicate the new shared page with the emulated machine.
 
@@ -545,13 +545,15 @@ emulate: Run a SISA16 sandboxed machine with a single shared page of choice acco
 
 	This machine will execute at a lower privilege level than the current machine and is pre-emptively executed for
 
-	a compiletime-defined number of cycles (Default: 0x20000) at which point it will return. This return 
+	a compiletime-defined number of cycles (Default: 0x20000) at which point it will return. the return value in A
+
+	will be 255 if this happens, otherwise it will be zero for normal termination, or 
 
 rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 
 rxftoi: convert RX0 from float to signed int. (1 byte) (D1)
 
-emulate_seg: Same as Emulate, but the segment is shared with the child. (1 byte) (D2)
+emulate_seg: Duplicate for emulate. (D2)
 
 rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 

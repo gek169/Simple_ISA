@@ -44,30 +44,3 @@ nop;nop;nop;nop;
 	libc_emulate_cswitch_loopout:
 	blpop;
 farret;
-
-..decl_farproc(LIBC_REGION):proc_emulate_seg
-..export"proc_emulate_seg"
-	//We are passed a place to jump to in RX0.
-	farstrx0 %~LIBC_REGION%, %libc_emulate_jumploc%;
-	//copy four bytes from the bottom of the stack for the bootloader.
-	farldrx0 %&0%
-	farstrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
-	sc %0%; la 2; ista; 	//la
-	adecr;ca;				//put 1 into c.
-	lla %~LIBC_REGION%, 0x44; istla;
-	ab;
-	emulate_seg;
-	//restore stack integrity.
-	farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
-	farstrx0 %&0%
-	//a holds the value. CHECK IT.
-	blpush;
-	libc_emulate_seg_cswitch_looptop:
-		lb 0xFF;cmp;
-		sc %libc_emulate_seg_cswitch_loopout%; jmpifneq;
-		alpop;alpush;
-		priv_drop;
-		sc %libc_emulate_seg_cswitch_looptop%; jmp;
-	libc_emulate_seg_cswitch_loopout:
-	blpop;
-farret;

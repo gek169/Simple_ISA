@@ -111,7 +111,7 @@ nop;nop;nop;nop;nop;
 	putchar;
 	la 0xff;
 	//execute the emulator!
-	emulate_seg;
+	emulate;
 	sta %0x1000%;
 					lb 11;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
 	lda %0x1000%;	lb 12;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
