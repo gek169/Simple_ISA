@@ -2,6 +2,7 @@
 //create a whole-memory image.
 
 
+..include"libc.hasm"
 
 .looptop:1,0xf0
 .GOTO_TOP:			sc looptop;jmp;
@@ -102,11 +103,9 @@ section 0x1F0
 	nop;nop;nop;
 :Lbl_Emulator:
 	//print an R.
-	la0x52;
+	la0x52;asm_print;
 	putchar;
 	la 0xff;
-	//execute the emulator!
-	emulate;
 	sta %0x1000%;
 					lb 11;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
 	lda %0x1000%;	lb 12;cmp;sc %Lbl_BROKE_EMU%;jmpifeq;
