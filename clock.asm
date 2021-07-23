@@ -43,7 +43,7 @@ bytes 0xd, 0xa;
 	//containerize execution of the clock.
 	lrx0 %/Lbl_clock_start%;
 	llb %0xEEEE%;
-	proc_krenel;
+	proc_emulate_single
 	la '\n';putchar;
 	la '\r';putchar;
 	la 0xAF;apush;la 0;alpush;

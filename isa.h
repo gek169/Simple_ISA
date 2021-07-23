@@ -442,7 +442,7 @@ U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[current_task][ (((UU)c&255)<<1
 U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[current_task].a=a;D
 G_TASK_SET: /*task_set*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	current_task = a%SISA_MAX_TASKS;
+	current_task = a%SISA_MAX_TASKS + 1;
 D
 U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
