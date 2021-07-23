@@ -138,6 +138,7 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 
 int DONT_WANT_TO_INLINE_THIS e()
 {
+	register u* M=M_SAVER[0];
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
@@ -267,7 +268,7 @@ const void* const goto_table[256] = {
 &&G_HALT
 };
 #endif
-register u* M=M_SAVER[0];
+
 R=0;
 di();
 #ifdef SISA_DEBUGGER
@@ -412,36 +413,28 @@ TB: /**/
 		instruction_counter = 0;
 #endif
 		M=M_SAVER[1];
-		SAVE_REGISTER(a, EMULATE_DEPTH);
-		SAVE_REGISTER(b, EMULATE_DEPTH);
-		SAVE_REGISTER(c, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
-		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
-		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
-		SAVE_REGISTER(RX0, EMULATE_DEPTH);
-		SAVE_REGISTER(RX1, EMULATE_DEPTH);
-		SAVE_REGISTER(RX2, EMULATE_DEPTH);
-		SAVE_REGISTER(RX3, EMULATE_DEPTH);
+		SAVE_REGISTER(a, 0);
+		SAVE_REGISTER(b, 0);
+		SAVE_REGISTER(c, 0);
+		SAVE_REGISTER(program_counter, 0);
+		SAVE_REGISTER(stack_pointer, 0);
+		SAVE_REGISTER(program_counter_region, 0);
+		SAVE_REGISTER(RX0, 0);
+		SAVE_REGISTER(RX1, 0);
+		SAVE_REGISTER(RX2, 0);
+		SAVE_REGISTER(RX3, 0);
 		EMULATE_DEPTH++;
-		{
-			STASH_REGS;
-			memcpy(M_SAVER[1] + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8),
-				 M_SAVER[0] + (((UU)REG_SAVER[EMULATE_DEPTH-1].a)<<8), 
-				 256
-		 	);
-			UNSTASH_REGS;
-		}
 		/*Load on up again! We're continuing where we left off!*/
-		LOAD_REGISTER(a, EMULATE_DEPTH);
-		LOAD_REGISTER(b, EMULATE_DEPTH);
-		LOAD_REGISTER(c, EMULATE_DEPTH);
-		LOAD_REGISTER(program_counter, EMULATE_DEPTH);
-		LOAD_REGISTER(program_counter_region, EMULATE_DEPTH);
-		LOAD_REGISTER(stack_pointer, EMULATE_DEPTH);
-		LOAD_REGISTER(RX0, EMULATE_DEPTH);
-		LOAD_REGISTER(RX1, EMULATE_DEPTH);
-		LOAD_REGISTER(RX2, EMULATE_DEPTH);
-		LOAD_REGISTER(RX3, EMULATE_DEPTH);
+		LOAD_REGISTER(a, 1);
+		LOAD_REGISTER(b, 1);
+		LOAD_REGISTER(c, 1);
+		LOAD_REGISTER(program_counter, 1);
+		LOAD_REGISTER(program_counter_region, 1);
+		LOAD_REGISTER(stack_pointer, 1);
+		LOAD_REGISTER(RX0, 1);
+		LOAD_REGISTER(RX1, 1);
+		LOAD_REGISTER(RX2, 1);
+		LOAD_REGISTER(RX3, 1);
 }
 D
 /*free slots!*/
