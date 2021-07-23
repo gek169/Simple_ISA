@@ -37,10 +37,6 @@ nop;nop;nop;nop;
 	libc_emulate_cswitch_looptop:
 		lb 0xFF;cmp;
 		sc %libc_emulate_cswitch_loopout%; jmpifneq;
-		la 'a'; putchar;
-		la 'a'; putchar;
-		la 'a'; putchar;
-		la 'a'; putchar;
 		apop;apush;
 		priv_drop;
 		sc %libc_emulate_cswitch_looptop%; jmp;
