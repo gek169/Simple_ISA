@@ -125,6 +125,10 @@ bytes 0,0;
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		libc_lproc_krenel_print_krenel;
+		la 'B'; putchar;
+		la 'O'; putchar;
+		la 'O'; putchar;
+		la 'T'; putchar;
 		la '\n'; putchar;
 		la '\r'; putchar;
 		la '\n'; interrupt;
@@ -261,6 +265,7 @@ bytes 0,0;
 		la 'l'; putchar;
 		la 'e'; putchar;
 		la 'd'; putchar;
+		la '\ '; putchar;
 		la 'i'; putchar;
 		la 'n'; putchar;
 		la 't'; putchar;
@@ -282,7 +287,6 @@ bytes 0,0;
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_cswitch_killtask:
-			la 'k';putchar;la 'k';putchar;la 'k';putchar; //DEBUG
 		//Kill the current task.
 			task_kill;
 		//Set active task to be in the "dead" state- 0.
@@ -323,6 +327,5 @@ bytes 0,0;
 
 	libc_krenel_shutdown:
 		//Shut down the system.
-		la 'q';putchar;la 'q';putchar;la 'q';putchar;
 		lla %0xE001%; interrupt; //make IO blocking again.
 		farret;

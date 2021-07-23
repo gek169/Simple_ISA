@@ -49,5 +49,5 @@ bytes '\r' ,'\n', 0;
 		rx0push;
 		proc_puts;
 		rx0pop;
-		lb 0; rx1b; rxidiv
+		//lb 0; rx1b; fltdiv
 		halt;
