@@ -4,8 +4,7 @@
 //This must be placed at a region boundary, so it must be first.
 //Both of the following functions take a jump point in RX0.
 //They take a page to share with the client in the second parameter, so memory can be shared.
-//The return values from the machine are not provided to the client.
-//The memory
+//The return values from the machine are not provided to the caller.
 
 //Copy sh*t.
 farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
