@@ -253,6 +253,7 @@ bytes 0,0;
 		//Try to select a task.
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
+		//la 'a';putchar;la 'a';putchar;la 'a';putchar;
 		lrx0 %/0%;
 		lb libc_krenel_max_active_tasks; rx1b;
 	libc_krenel_try_select_task_loop:
@@ -260,19 +261,19 @@ bytes 0,0;
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			aincr; lb libc_krenel_max_active_tasks; mod;
 			farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			lb 2;mul;ba;
-			sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%;
+			lb 2;mul;
+			sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%;
 			add;ba;
 			farilda;
 		//Did we find it?
 			lb 1; cmp; sc %libc_krenel_cswitch_looptop%; jmpifeq;
 		//We didn't! Should we quit?
-			rxincr;rxcmp;sc %libc_krenel_shutdown%; jmpifeq;
+			rxincr;rxcmp;lb2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;
 
 
 	libc_krenel_shutdown:
-		//Shut down the system- syscall.
+		//Shut down the system.
 		lla %0xE001%; interrupt; //make IO blocking again.
 		farret;
