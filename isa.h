@@ -271,6 +271,13 @@ R=0;di();
 #ifdef SISA_DEBUGGER
 debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3);
 #endif
+
+/*Free slots!*/
+TC:TD:TE:
+TF:U0:U1:U2:
+U3:U4:U5:U6:
+U7:U8:U9:UA:
+
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -419,10 +426,7 @@ TB: /**/
 }
 D
 /*free slots!*/
-TC:TD:TE:
-TF:U0:U1:U2:
-U3:U4:U5:U6:
-U7:U8:U9:UA:goto G_NOP;
+goto G_NOP;
 
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
