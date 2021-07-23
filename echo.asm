@@ -7,6 +7,7 @@
 .looptop:1,0xf0
 .GOTO_TOP:			sc looptop;jmp;
 .IS_A_NEWLINE:		sta%50%;lb0xa;cmp;
+.IS_A_FF:			sta%50%;lb0xff;cmp;
 .IS_A_CR:			sta%50%;lb0xd;cmp;
 .IS_A_Q:			sta%50%;lb0x51;cmp;
 .IS_A_R:			sta%50%;lb0x52;cmp;
@@ -17,6 +18,18 @@ asm_print %/32%;
 
 #right at the beginning.
 section 0
+lrx0 %/true_start%;
+proc_krenel;
+la 'f'; putchar;
+la 'i'; putchar;
+la 'n'; putchar;
+la 'i'; putchar;
+la 's'; putchar;
+la 'h'; putchar;
+la 'e'; putchar;
+la 'd'; putchar;
+halt;
+true_start:
 nop;nop;
 GOTO_TOP;
 #purposefully redefining here.
@@ -30,7 +43,8 @@ section 0x1F0
 	la '\n'; interrupt;
 //Read character from stdin into A and echo it backIgnore newlines.
 	getchar;
-	IS_A_NEWLINE;	jmpifeq;GET_A_BACK;
+	IS_A_NEWLINE;					jmpifeq;GET_A_BACK;
+	IS_A_FF;						jmpifeq;GET_A_BACK;
 	sc %Lbl_BONUSDUCKS%;	IS_A_Q;jmpifeq;GET_A_BACK;
 	sc %Lbl_Emulator%;		IS_A_R;jmpifeq;GET_A_BACK;
 //prepare the loop by preparing our looping variable at 59,
@@ -45,6 +59,8 @@ section 0x1F0
 				lb 1;
 				add;
 			sta %50%;
+		//if it is exactly equal to 0xff, then we go back.
+				lb 0xff;cmp
 		//if this is less than 127, then we go to dont manip.
 				lb 127;cmp;lb0;cmp;sc %dont_manip%;jmpifeq;
 		:still_above_127:
