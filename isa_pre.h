@@ -32,9 +32,10 @@ User mode is pre-empted.
 
 
 typedef struct {
-	UU RX0,RX1,RX2,RX3;
+	UU RX0,RX1,RX2,RX3, SEGMENT_PAGES;
 	U a,b,c,program_counter,stack_pointer;
 	u program_counter_region;
+	u* SEGMENT;
 }sisa_regfile;
 static u M_SAVER[1+SISA_MAX_TASKS][0x1000000] = {0};
 static sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};

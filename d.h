@@ -174,10 +174,10 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									UU RX0,
 									UU RX1,
 									UU RX2,
-									UU RX3
+									UU RX3,
+									u* M
 								)
 {
-	u* M=M_SAVER[0];
 	if(a == 0x80) return a; /*Ignore 80- it is reserved for system calls!*/
 #ifdef USE_SDL2
 	if(a == 0){ /*magic value to display the screen.*/
