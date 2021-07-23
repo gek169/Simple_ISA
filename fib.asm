@@ -34,8 +34,12 @@
 		farret
 
 ..main(1):
+	lrx0 %/0x770000%;
+	proc_krenel;
+	halt;
+..(0x77):
 	la 0xc; apush; la 0; alpush;
-	proc_gets
+	proc_gets_user
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	lrx0 %/0xc0000%
