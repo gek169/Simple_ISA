@@ -96,7 +96,7 @@ farret;
 //~~~~~~~~~~~~~~~
 //~~K R E N E L~~
 //~~~~~~~~~~~~~~~
-//Give it a location to boot to, and it will, in RX0.
+//Give it a location to boot as PID 0, and it will, in RX0.
 
 //krenel constants:
 .libc_krenel_max_active_tasks:8

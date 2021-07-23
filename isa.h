@@ -448,6 +448,8 @@ U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	if(REG_SAVER[current_task].SEGMENT) free(REG_SAVER[current_task].SEGMENT);
 	REG_SAVER[current_task].SEGMENT_PAGES = 0;
+	REG_SAVER[current_task].program_counter_region = 0;
+	REG_SAVER[current_task].program_counter = 0;
 	REG_SAVER[current_task].SEGMENT = NULL;
 D
 UA:
