@@ -130,7 +130,7 @@ k 202:goto G_AA26;k 203:goto G_AINCR;k 204:goto G_ADECR;k 205:goto G_RX0INCR;\
 k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_ITOF;k 209:goto G_FTOI;\
 k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
-k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:k 217:\
+k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -257,7 +257,7 @@ const void* const goto_table[256] = {
 &&G_EMULATE_SEG,
 &&G_RXICMP,
 &&G_LOGOR,&&G_LOGAND,
-&&G_BOOLIFY,&&G_NOTA,&&G_HALT,&&G_HALT,&&G_HALT,
+&&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
@@ -908,6 +908,7 @@ G_AA12:{SUU SRX0, SRX1;
 	G_LOGAND: a = a && b;D
 	G_BOOLIFY: a = (a!=0)D
 	G_NOTA: a=(a==0)D
+	G_USER_FARISTA:if(EMULATE_DEPTH){R=15; goto G_HALT;} M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]=a D
 	/*add more insns here. remember the free slots above!*/
 	G_HALT:
 	if(EMULATE_DEPTH == 0){
