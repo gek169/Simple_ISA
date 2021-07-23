@@ -18,6 +18,24 @@ static UU SEGMENT_PAGES=0, EMULATE_DEPTH=0;
 
 static u M_SAVER[SISA16_MAX_RECURSION_DEPTH][0x1000000];
 
+typedef struct {
+	u* SEGMENT;
+	UU SEGMENT_PAGES;
+	UU RX0,RX1,RX2,RX3;
+	U a,b,c,program_counter,stack_pointer; /*
+	Q: Why do we store the a register? 
+	A: Future plans. ~DMHSW
+	*/
+	U PAGE_TO_SAVE;
+	u program_counter_region;
+	u ACTION_FLAGS;
+	
+}sisa_regfile;
+
+static sisa_regfile REG_SAVER[SISA16_MAX_RECURSION_DEPTH];
+
+#define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
+#define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;
 
 #ifdef ATTRIB_NOINLINE
 #define DONT_WANT_TO_INLINE_THIS __attribute__ ((noinline))

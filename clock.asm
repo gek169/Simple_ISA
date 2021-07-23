@@ -43,7 +43,7 @@ bytes 0xd, 0xa;
 	//containerize execution of the clock.
 	lrx0 %/Lbl_clock_start%;
 	lb 0xEEEE;
-	proc_emulate_seg;
+	proc_emulate;
 	la 0xAF;apush;la 0;alpush;
 		proc_puts;
 	pop %3%;

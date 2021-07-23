@@ -742,38 +742,32 @@ G_AA12:{SUU SRX0, SRX1;
 	G_RX0DECR:RX0--;D
 #if !defined(NO_SEGMENT) && !defined(NO_EMULATE)
 	G_EMULATE:{
-		STASH_REGS;
-			u* M_SAVED = NULL;
-			u* SEG_SAVED = NULL;
-			UU SEG_PAGES_SAVED;
-			UU PAGE_TO_SAVE = a_stash; /*Bad name- should be page*/
 			if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
 				R=11; goto G_HALT;
 			}
-			M_SAVED = M_SAVER[EMULATE_DEPTH];
-			SEG_SAVED = SEGMENT;
-			SEG_PAGES_SAVED = SEGMENT_PAGES;
-			SEGMENT = malloc(0x100);
-			SEGMENT_PAGES = 1;
-			if(!SEGMENT){
-				if(SEGMENT)free(SEGMENT);
-				SEGMENT = SEG_SAVED;
-				SEGMENT_PAGES = SEG_PAGES_SAVED;
-				R=12; goto G_HALT;
-			}
-			memcpy(M_SAVED, M, 0x1000000);
+			REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE = a; /*Bad name- should be page*/
+			memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
+			/*SAVE_REGISTER(a, EMULATE_DEPTH);*/
+			SAVE_REGISTER(b, EMULATE_DEPTH);
+			SAVE_REGISTER(c, EMULATE_DEPTH);
+			SAVE_REGISTER(program_counter, EMULATE_DEPTH);
+			SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
+			SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
+			SAVE_REGISTER(RX0, EMULATE_DEPTH);
+			SAVE_REGISTER(RX1, EMULATE_DEPTH);
+			SAVE_REGISTER(RX2, EMULATE_DEPTH);
+			SAVE_REGISTER(RX3, EMULATE_DEPTH);
+			SAVE_REGISTER(SEGMENT, EMULATE_DEPTH);
+			SAVE_REGISTER(SEGMENT_PAGES, EMULATE_DEPTH);
+			REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS = 1; /*Restore the segment upon reloading.*/
+			SEGMENT = NULL;
+			SEGMENT_PAGES = 0;
 			EMULATE_DEPTH++;
-				e();
-				a_stash=R;
-				R=0;
-			EMULATE_DEPTH--;
-			if(SEGMENT)free(SEGMENT);
-			SEGMENT = SEG_SAVED;
-			SEGMENT_PAGES = SEG_PAGES_SAVED;
-			memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-			memcpy(M, M_SAVED, 0x1000000);
-			memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		UNSTASH_REGS;
+			stack_pointer=0;
+			program_counter_region=0;
+			program_counter=0;
+			RX0=0;RX1=0;RX2=0;RX3=0;
+			a=0;b=0;c=0;
 	}D
 #else
 	G_EMULATE: goto G_EMULATE_SEG; /*emulate_seg.*/
@@ -799,23 +793,27 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE_SEG:{
-		STASH_REGS;
-			u* M_SAVED = NULL;
-			UU PAGE_TO_SAVE = a_stash;
-			if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
-				R=11; goto G_HALT;
-			}
-			M_SAVED = M_SAVER[EMULATE_DEPTH];
-			memcpy(M_SAVED, M, 0x1000000);
-			EMULATE_DEPTH++;
-				e();
-				a_stash=R;
-				R=0;
-			EMULATE_DEPTH--;
-			memcpy(PTEMP, M + (PAGE_TO_SAVE<<8), 256);
-			memcpy(M, M_SAVED, 0x1000000);
-			memcpy(M + (PAGE_TO_SAVE<<8),PTEMP, 256);
-		UNSTASH_REGS;
+		if(EMULATE_DEPTH >= SISA16_MAX_RECURSION_DEPTH) {
+			R=11; goto G_HALT;
+		}
+		REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE = a; /*Bad name- should be page*/
+		memcpy(M_SAVER[EMULATE_DEPTH], M, 0x1000000);
+		SAVE_REGISTER(b, EMULATE_DEPTH);
+		SAVE_REGISTER(c, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter, EMULATE_DEPTH);
+		SAVE_REGISTER(stack_pointer, EMULATE_DEPTH);
+		SAVE_REGISTER(program_counter_region, EMULATE_DEPTH);
+		SAVE_REGISTER(RX0, EMULATE_DEPTH);
+		SAVE_REGISTER(RX1, EMULATE_DEPTH);
+		SAVE_REGISTER(RX2, EMULATE_DEPTH);
+		SAVE_REGISTER(RX3, EMULATE_DEPTH);
+		REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS = 0; /*Do not Restore the segment upon reloading.*/
+		EMULATE_DEPTH++;
+		stack_pointer=0;
+		program_counter_region=0;
+		program_counter=0;
+		RX0=0;RX1=0;RX2=0;RX3=0;
+		a=0;b=0;c=0;
 	}D
 #else
 	G_EMULATE_SEG: R=14; goto G_HALT;
@@ -833,7 +831,32 @@ G_AA12:{SUU SRX0, SRX1;
 	G_BOOLIFY: a = (a!=0)D
 	G_NOTA: a=(a==0)D
 	/*add more insns here. remember the free slots above!*/
-	G_HALT:dcl();return 0;
+	G_HALT:
+	if(EMULATE_DEPTH == 0){
+		dcl();return 0;
+	} else {
+		EMULATE_DEPTH--;
+		LOAD_REGISTER(b, EMULATE_DEPTH);
+		LOAD_REGISTER(c, EMULATE_DEPTH);
+		LOAD_REGISTER(program_counter, EMULATE_DEPTH);
+		LOAD_REGISTER(program_counter_region, EMULATE_DEPTH);
+		LOAD_REGISTER(stack_pointer, EMULATE_DEPTH);
+		LOAD_REGISTER(RX0, EMULATE_DEPTH);
+		LOAD_REGISTER(RX1, EMULATE_DEPTH);
+		LOAD_REGISTER(RX2, EMULATE_DEPTH);
+		LOAD_REGISTER(RX3, EMULATE_DEPTH);
+		a=R;
+		R=0;
+		if(REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS == 1){
+			if(SEGMENT)free(SEGMENT);
+			LOAD_REGISTER(SEGMENT, EMULATE_DEPTH);
+			LOAD_REGISTER(SEGMENT_PAGES, EMULATE_DEPTH);
+		}
+		memcpy(PTEMP, M + (((UU)REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE)<<8), 256);
+		memcpy(M, M_SAVER[EMULATE_DEPTH], 0x1000000);
+		memcpy(M + (((UU)REG_SAVER[EMULATE_DEPTH].PAGE_TO_SAVE)<<8),PTEMP, 256);
+		D
+	}
 }
 #undef D
 #undef k
