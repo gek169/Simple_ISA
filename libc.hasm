@@ -14,7 +14,6 @@
 LIBC_EXPORT_DCL
 asm_begin_region_restriction;
 	..include"emulation.hasm"
-
 	..include"puts.hasm"
 	..include"strlen.hasm"
 	..include"memcpy.hasm"

@@ -173,7 +173,7 @@ bytes 0,0;
 //~~ KRENEL SCHEDULER ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	libc_krenel_cswitch_looptop:
-		alpush;
+		alpush; 													asm_print; //DEBUG
 		lb 19; cmp; blpop; sc %libc_krenel_syscall%; jmpifeq;
 		ab; alpush;
 		lb 18; cmp; blpop; sc %libc_krenel_tried_interrupt%; jmpifeq; //might as well print out an error message.
@@ -329,4 +329,4 @@ bytes 0,0;
 	libc_krenel_shutdown:
 		//Shut down the system.
 		lla %0xE001%; interrupt; //make IO blocking again.
-		farret;
+		farret;													asm_print; //DEBUG

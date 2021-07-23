@@ -35,10 +35,10 @@ bytes '\r' ,'\n', 0;
 	krenel_boot:
 		//Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
 		lrx0 %/0x20000%;
-		lrx1 %/0x20400%;
+		lrx1 %/0x20480%;
 		overwrite_krenel_looptop:
 			cbrx0;
-			la 1;
+			la 0;
 			farista;
 			rxincr;
 			rxcmp;
