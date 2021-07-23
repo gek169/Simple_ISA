@@ -4,7 +4,8 @@
 //This must be placed at a region boundary, so it must be first.
 //Both of the following functions take a jump point in RX0.
 //They take a page to share with the client in the second parameter, so memory can be shared.
-//Register A (upon return) is the return value from the containerized machine, so you can use the error code if there was one.
+//The return values from the machine are not provided to the client.
+//The memory
 
 //Copy sh*t.
 farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
@@ -33,15 +34,15 @@ nop;nop;nop;nop;
 		farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
 		farstrx0 %&0%
 	//a holds the value. CHECK IT.
-	bpush;
+	blpush;
 	libc_emulate_cswitch_looptop:
 		lb 0xFF;cmp;
 		sc %libc_emulate_cswitch_loopout%; jmpifneq;
-		apop;apush;
+		alpop;alpush;
 		priv_drop;
 		sc %libc_emulate_cswitch_looptop%; jmp;
 	libc_emulate_cswitch_loopout:
-	bpop;
+	blpop;
 farret;
 
 ..decl_farproc(LIBC_REGION):proc_emulate_seg
@@ -60,13 +61,13 @@ farret;
 	farldrx0 %~LIBC_REGION%, %libc_emulate_stack_data_store%
 	farstrx0 %&0%
 	//a holds the value. CHECK IT.
-	bpush;
+	blpush;
 	libc_emulate_seg_cswitch_looptop:
 		lb 0xFF;cmp;
 		sc %libc_emulate_seg_cswitch_loopout%; jmpifneq;
-		apop;apush;
+		alpop;alpush;
 		priv_drop;
 		sc %libc_emulate_seg_cswitch_looptop%; jmp;
 	libc_emulate_seg_cswitch_loopout:
-	bpop;
+	blpop;
 farret;
