@@ -26,7 +26,7 @@ User mode is pre-empted.
 #endif
 
 #ifndef SISA_MAX_TASKS
-#define SISA_MAX_TASKS 4
+#define SISA_MAX_TASKS 8
 #endif
 
 

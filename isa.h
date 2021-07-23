@@ -279,7 +279,7 @@ debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&
 
 
 /*Free slots!*/
-UA:
+U9:UA:
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -433,18 +433,11 @@ U2:if(EMULATE_DEPTH){R=15; goto G_HALT;}RX0=REG_SAVER[current_task].RX3;D
 U3:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].stack_pointer;D
 U4:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counter;D
 U5:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].program_counter_region;D
-
-
 U6:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]D
-
 U7:if(EMULATE_DEPTH){R=15; goto G_HALT;}REG_SAVER[current_task].a=a;D
-U8: /*task_ld*/
+U8: /*task_set*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	current_task = a%SISA_MAX_TASKS;
-D
-U9:
-	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	current_task = (a%SISA_MAX_TASKS) + 1;
 D
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
