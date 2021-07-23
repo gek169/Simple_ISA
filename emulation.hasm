@@ -44,7 +44,7 @@ nop;nop;nop;nop;
 		lb 16; cmp; blpop; sc %libc_emulate_getchar%; jmpifeq;
 		ab; alpush;
 		lb 0xff; cmp; blpop; sc %libc_emulate_preempt%; jmpifeq;
-		sc %libc_cswitch_loopout%; jmp;
+		sc %libc_emulate_cswitch_loopout%; jmp;
 	libc_emulate_interrupt:
 		user_getb;ba;
 		user_getc;ca;
