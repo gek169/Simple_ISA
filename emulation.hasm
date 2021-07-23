@@ -112,7 +112,6 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		astp; apush; proc_printbytehex; apop; //DEBUG- stack.
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
@@ -293,5 +292,4 @@ bytes 0,0;
 		//Shut down the system.
 		la 'q';putchar;la 'q';putchar;la 'q';putchar;
 		lla %0xE001%; interrupt; //make IO blocking again.
-		astp; apush; proc_printbytehex; apop; //DEBUG- stack.
 		farret;
