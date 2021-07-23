@@ -6,7 +6,7 @@ MAN_INSTALL_DIR=/usr/share/man/man1
 CCC= g++
 GIT_HASH= $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD || echo no)
 #-O3 -s -march=native seems to be the best, got 10.9 seconds for rxincrmark
-#CFLAGS_PRIVILEGE= -DNO_PREEMPT
+#CFLAGS_PRIVILEGE= -DNO_PREEMPT -DNO_DEVICE_PRIVILEGE
 CFLAGS_PRIVILEGE= 
 OPTLEVEL= -O2 -s -march=native $(CFLAGS_PRIVILEGE) -DSISA_GIT_HASH=\"$(GIT_HASH)\"
 #"

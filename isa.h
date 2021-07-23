@@ -282,13 +282,19 @@ G_OR:a|=b;D
 G_XOR:a^=b;D
 G_GETCHAR:{
 STASH_REGS;
-a_stash=gch();
-UNSTASH_REGS;
+#ifndef NO_DEVICE_PRIVILEGE
+	if(EMULATE_DEPTH){R = 16; goto G_HALT;}
+#endif
+	a_stash=gch();
+	UNSTASH_REGS;
 }D
 G_PUTCHAR:{
 STASH_REGS;
-pch(a_stash);
-UNSTASH_REGS;
+#ifndef NO_DEVICE_PRIVILEGE
+	if(EMULATE_DEPTH){R = 17; goto G_HALT;}
+#endif
+	pch(a_stash);
+	UNSTASH_REGS;
 }D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
@@ -442,6 +448,9 @@ G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
 G_INTERRUPT:
 {
 	STASH_REGS;
+#ifndef NO_DEVICE_PRIVILEGE
+	if(EMULATE_DEPTH){R = 17; goto G_HALT;}
+#endif
 	a_stash=interrupt(
 		a_stash,
 		b_stash,
