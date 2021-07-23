@@ -69,6 +69,7 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; syscall;
 		proc_puts;
+		lla %0xDE00%;lb 1;syscall;
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;
