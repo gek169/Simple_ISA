@@ -320,7 +320,7 @@ farildb: load byte using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 
 faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4A)
 
-.B PRIVILEGED INSTRUCTIONS: 
+.B PRIVILEGED INSTRUCTIONS (All one byte): 
 
 priv_drop: Drop privilege after returning from emulate, return to user mode. (4B)
 
@@ -352,9 +352,11 @@ user_seta: set user mode's A register. (57)
 
 task_set: save a task to the task buffer, using register A to select which task buffer. (58)
 
-.B FREE OPCODES:
-2 free opcodes, behaving as nop duplicates.
-ranging from 59 to 5A. All 1 byte.
+task_kill: delete the segment of the current task and set its number of pages to 0. (59)
+
+syscall: make syscall. Generate error code 19. (5A)
+
+
 
 
 alpush: push short register a onto the stack. (1 byte) (5B)

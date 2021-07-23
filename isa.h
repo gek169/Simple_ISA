@@ -280,7 +280,7 @@ debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&
 
 
 /*Free slots!*/
-U9:UA:
+
 G_NOP:D
 G_AND:a&=b;D
 G_OR:a|=b;D
@@ -444,6 +444,15 @@ G_TASK_SET: /*task_set*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	current_task = a%SISA_MAX_TASKS;
 D
+U9:
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	if(REG_SAVER[current_task].SEGMENT) free(REG_SAVER[current_task].SEGMENT);
+	REG_SAVER[current_task].SEGMENT_PAGES = 0;
+	REG_SAVER[current_task].SEGMENT = NULL;
+D
+UA:
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	else {R=19; goto G_HALT;}
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
