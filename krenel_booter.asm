@@ -37,7 +37,9 @@ bytes '\r' ,'\n', 0;
 	putchar;
 	la '\n'; syscall;
 	la 100; alpush; proc_wait; alpop;
-	sc %side_process_looptop%; jmp;
+	farllda %&0xAABBCC%; 
+	boolify;
+	sc %side_process_looptop%; jmpifneq; //continue looping while zero.
 	lb 0; div;
 	halt;
 ..(8):
@@ -69,7 +71,8 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; syscall;
 		proc_puts;
-		lla %0xDE00%;lb 1;syscall;
+		//lla %0xDE00%;lb 1;syscall;
+		lla %0xDE05%; lb 1; sc %1%; lrx0 %0xAABBCC%; syscall;
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;

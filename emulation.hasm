@@ -7,6 +7,7 @@
 //Both of the following functions take a jump point in RX0.
 //They take a page to share with the client in the second parameter, so memory can be shared.
 //The return values from the machine are not provided to the caller.
+//krenel also uses it.
 
 //Copy sh*t.
 farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
@@ -208,6 +209,7 @@ bytes 0,0;
 		//Disk Read File-			read a file from .dsk by name.
 		//Disk Write File-			write a file to .dsk by name.
 		//Disk Append File-			append to file on disk.
+		//Interprocess Write-		Write to another process's memory.
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
@@ -220,9 +222,22 @@ bytes 0,0;
 			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_syscall_disk_append%; jmpifeq;
 			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
+			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
 		//I don't recognize this syscall. Just ignore it... for now.
 		sc %libc_krenel_syscall_end%; jmp;
-		
+		:libc_krenel_syscall_ipc_write:
+			user_getc; ca; //the machine they want to interact with.
+			ac;	task_set;
+			user_getb; ba; //the value they want to write.
+			user_get0; //The location in memory to write it.
+			ac;task_set;
+			ab;
+			cbrx0;
+			user_farista;	//write it!
+			//Re-set our active task.
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			task_set;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_kill_pid:
 			user_getb;
 			lb libc_krenel_max_active_tasks; mod;

@@ -609,4 +609,4 @@ static char* insn_repl[217] = {
 		/*user_farista*/
 		"bytes216;"
 };
-static const unsigned int n_insns = 216;
+static const unsigned int n_insns = 217;
