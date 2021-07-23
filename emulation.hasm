@@ -121,7 +121,9 @@ bytes 0,0;
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
 	//PID 0 is the initial program...
-		la 1; farstla %~LIBC_REGION%, %libc_krenel_task_isactive_array%;
+		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
+		la 1; 
+		faristla;
 	//Set all tasks to be zero... except the first one.
 		lb1;rx0b; 
 		lb libc_krenel_max_active_tasks; rx1b;
