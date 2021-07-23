@@ -51,6 +51,8 @@ bytes '\r' ,'\n', 0;
 		getchar;
 		getchar;
 		getchar;
+		//Commit sudoku- kill ourselves.
+		//lla %0xDE00%;lb 0;syscall;
 		proc_gets_user;
 		la '\r'; putchar;
 		la '\n'; putchar;
