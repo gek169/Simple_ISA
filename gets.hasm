@@ -111,7 +111,6 @@ farret;
 	rx3_0;
 	lb0;rx2b;
 	:libc_gets_user_looptop:
-		la 'Z'; putchar;
 		rx0_2
 		llb %libc_gets_max_chars%; rx1b
 		rxcmp
@@ -119,7 +118,6 @@ farret;
 		cmp;
 		sc %libc_gets_user_loopend%
 		jmpifneq
-		la 'f'; putchar;
 		getchar; //Hey, user, give me some data!
 		apush;
 		nota;bpop;sc%libc_gets_user_loopend%;jmpifeq;
@@ -164,7 +162,7 @@ farret;
 		sc %libc_gets_user_looptop%;jmp;
 	//Handle ascii DEL and Backspace.
 	:libc_gets_user_handle_del:
-		rx0_2; 		lb0;rx1b;	rxcmp;	sc %libc_gets_zero_chars%; jmpifeq;
+		rx0_2; 		lb0;rx1b;	rxcmp;	sc %libc_gets_user_zero_chars%; jmpifeq;
 		rx0_2;		rxdecr;		rx2_0;
 		rx0_3;		rxdecr;		rx3_0;
 		la 0xd; putchar;
