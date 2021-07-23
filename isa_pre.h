@@ -22,12 +22,9 @@ User mode is pre-empted.
 static u M_SAVER[2][0x1000000] = {0};
 
 typedef struct {
-	u* SEGMENT;
-	UU SEGMENT_PAGES;
 	UU RX0,RX1,RX2,RX3;
 	U a,b,c,program_counter,stack_pointer;
 	u program_counter_region;
-	u ACTION_FLAGS;
 }sisa_regfile;
 
 static sisa_regfile REG_SAVER[2] = {0};

@@ -846,7 +846,6 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, EMULATE_DEPTH);
 		SAVE_REGISTER(RX2, EMULATE_DEPTH);
 		SAVE_REGISTER(RX3, EMULATE_DEPTH);
-		REG_SAVER[EMULATE_DEPTH].ACTION_FLAGS = 0; /*Do not Restore the segment upon reloading.*/
 		EMULATE_DEPTH++;
 		stack_pointer=0;
 		program_counter_region=0;
