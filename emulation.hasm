@@ -256,8 +256,21 @@ bytes 0,0;
 			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
-		//I don't recognize this syscall. Just ignore it... for now.
-		sc %libc_krenel_syscall_end%; jmp;
+			user_geta;	llb %0xDE06%; cmp; sc %libc_krenel_syscall_fork%; jmpifeq;
+			//I don't recognize this syscall. 
+			libc_lproc_krenel_print_krenel;
+			la 'b'; putchar;
+			la 'a'; putchar;
+			la 'd'; putchar;
+			la '\ '; putchar;
+			la 's'; putchar;
+			la 'y'; putchar;
+			la 's'; putchar;
+			la 'c'; putchar;
+			la 'a'; putchar;
+			la 'l'; putchar;
+			la 'l'; putchar;
+			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_ipc_write:
 			user_get0; //The location in memory to write it.
 			cbrx0;
@@ -393,6 +406,60 @@ bytes 0,0;
 			libc_krenel_syscall_exec_failure:
 				la 0;user_seta;
 				sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_fork:
+			//Find a free pid.
+			lrx1 %/libc_krenel_max_active_tasks%; 
+			lb 0; rx0b;
+			libc_krenel_syscall_fork_findfreepid_looptop:
+				arx0;
+				lb 2;mul;ba
+				sc %LIBC_REGION%;
+				lla %libc_krenel_task_isactive_array%;
+				add;ba;
+				farillda;
+				nota;
+				sc %libc_krenel_syscall_fork_found_that_pid%; jmpifeq;
+				rxincr;rxcmp;
+				sc %libc_krenel_syscall_fork_failure%; jmpifeq;
+				sc %libc_krenel_syscall_fork_findfreepid_looptop%; jmp;
+			
+			libc_krenel_syscall_fork_found_that_pid:
+				//First, tell our previous user that we succeeded.
+				la 1; user_seta;
+				la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns.
+				//The new PID is in RX0.
+				arx0;apush;
+				
+				lb 0; rx0b;
+				lrx1 %/0x1000000%; //The end of memory.
+				libc_krenel_syscall_fork_copymem_looptop:
+					cbrx0; user_farilda;        //Load from old memory.
+					rx3a;
+						apop;push %2%;task_set; //Into new user memory.
+					arx3;
+					user_farista;
+					apop;
+					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;task_set;
+					rxincr;rxcmp;nota; 
+					sc %libc_krenel_syscall_fork_copymem_looptop%; jmpifeq; //if(++rx0 < rx1) jmp
+
+				apop; task_set; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+				
+
+				//Mark it as running.
+				lb 2; mul; ba;
+				sc %LIBC_REGION%;
+				lla %libc_krenel_task_isactive_array%;
+				add;ba;
+				la 1; faristla;
+				task_kill; //Reset it.
+				//Unlike exec, we do not need to create a bootloader. Fork assumes that the userland code already did that.
+				priv_drop;
+				//We have switched task and returned, as commanded. A holds our return value. CHECK IT...
+				sc %libc_krenel_cswitch_looptop%; jmp;
+			libc_krenel_syscall_fork_failure:
+				la 0;user_seta;
+				sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_end:
 			//Syscalls are expensive.
 			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
@@ -474,7 +541,8 @@ bytes 0,0;
 	libc_krenel_found_pid_to_run:
 		//Set it as the active PID.
 		arx3;
-		task_set;
+		task_set; 
+		task_ric;
 		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;

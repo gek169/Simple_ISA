@@ -27,7 +27,7 @@ bytes '\r' ,'\n', 0;
 bytes '\r' ,'\n', 0;
 
 
-..main(3): //three actually goes unused.
+..main(3): //three actually goes unused by krenel, so it is safe to put code there.
 	lrx0 %/krenel_boot%;
 	proc_krenel;
 	lrx0 0, %&STR_my_other_string%;
@@ -74,10 +74,18 @@ bytes '\r' ,'\n', 0;
 	proc_puts;
 	rx0pop;
 	la '\n'; interrupt;
-	lb 0; div;
+	//Fork bomb. Uncomment at your own risk.
+	//sc %0%; 
+	//lb 0;la 2; farista;
+	//lb 1; la 55; farista;
+	//lb 2; la 0x44; farista;
+	//lla %0xDE06%; 
+	//syscall;
+	lb 0; mod;
 	halt;
 ..(8):
 	krenel_boot:
+		push %10%; //make some room for that bootloader!
 		//Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
 		lrx0 %/0x20000%;
 		lrx1 %/0x20480%;
@@ -88,7 +96,20 @@ bytes '\r' ,'\n', 0;
 			rxincr;
 			rxcmp;
 			sc %overwrite_krenel_looptop%; jmpifneq;
-		lla %0xDE04%; lb 55; syscall;
+
+		//exec region syscall.
+		//lla %0xDE04%; lb 55; syscall;
+
+		//Instead, fork it!
+		//bootloader written here
+		//This is written at 0: la 55, lfarpc
+		sc %0%; 
+		lb 0;la 2; farista;
+		lb 1; la 55; farista;
+		lb 2; la 0x44; farista;
+		lla %0xDE06%; 
+		syscall;
+		nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
 		rx0push;
 		proc_puts;
