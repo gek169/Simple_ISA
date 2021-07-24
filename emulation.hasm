@@ -474,7 +474,7 @@ bytes 0,0;
 		//Shut down the system.
 		//Loop through all the stuff. Close everything!
 		//Set all tasks to be zero. task_kill everything.
-		lb0;rx0b; 
+		lb 0;rx0b; 
 		lb libc_krenel_max_active_tasks; rx1b;
 		libc_krenel_zero_tasks_shutdown_looptop:
 			arx0;task_kill;
@@ -484,6 +484,5 @@ bytes 0,0;
 			la 0; faristla;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_shutdown_looptop%; jmpifeq;
-		
 		lla %0xE001%; interrupt; //make IO blocking again.
 		farret;													asm_print; //I want information!
