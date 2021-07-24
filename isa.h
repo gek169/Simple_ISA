@@ -464,7 +464,7 @@ U9:
 	REG_SAVER[current_task].instruction_counter = 0; /*So that if we drop back in, the IC doesnt immediately kick in.*/
 #endif
 D
-UA:R=19; goto G_HALT;
+UA:R=19;goto G_HALT;
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
