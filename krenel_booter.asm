@@ -40,7 +40,7 @@ bytes '\r' ,'\n', 0;
 	putchar;
 	la '\n'; syscall;
 //	lla %0xDE02%; syscall; //sleep!
-//	la 100; alpush; proc_wait; alpop;
+	la 100; alpush; proc_wait; alpop;
 	farllda %&0xAABBCC%; 
 	nota;
 	sc %side_process_looptop%; jmpifeq; //continue looping while zero.
