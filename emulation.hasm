@@ -442,8 +442,7 @@ bytes 0,0;
 		//Try to select a task.
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
-		//la 's';putchar;putchar;putchar; //DEBUG
-		//la 'f'; putchar; la '\n'; interrupt; //MORE DEBUG
+		task_ric; //Reset the current task's instruction counter.
 		lb 0; rx0b;
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks; rx1b;
@@ -485,4 +484,13 @@ bytes 0,0;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_shutdown_looptop%; jmpifeq;
 		lla %0xE001%; interrupt; //make IO blocking again.
+		libc_lproc_krenel_print_krenel;
+		la 's'; putchar;
+		la 'h'; putchar;
+		la 'u'; putchar;
+		la 't'; putchar;
+		la 'd'; putchar;
+		la 'o'; putchar;
+		la 'w'; putchar;
+		la 'n'; putchar;
 		farret;													asm_print; //I want information!
