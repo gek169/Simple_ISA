@@ -101,7 +101,7 @@ farret;
 //Give it a location to boot as PID 0, and it will, in RX0.
 
 //krenel constants:
-//MUST BE A POWER OF TWO:
+//MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
 .libc_krenel_max_active_tasks:8
 //Must be one less than that power of two, for an "and" mask:
 .libc_krenel_max_active_tasks_mask:7

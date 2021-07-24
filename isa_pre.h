@@ -25,6 +25,11 @@ User mode is pre-empted.
 #define NO_DEVICE_PRIVILEGE
 #endif
 
+/*
+	HUGE NOTE:
+	you should alter emulation.hasm if you change this constant!!!
+	the libc is designed specifically to work with this!
+*/
 #ifndef SISA_MAX_TASKS
 #define SISA_MAX_TASKS 8
 #endif
