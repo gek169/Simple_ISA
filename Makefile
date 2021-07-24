@@ -3,7 +3,6 @@ CC=gcc
 #CC= tcc
 INSTALL_DIR=/usr/bin
 MAN_INSTALL_DIR=/usr/share/man/man1
-CCC= g++
 GIT_HASH= $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD || echo no)
 #-O3 -s -march=native seems to be the best, got 10.9 seconds for rxincrmark
 #CFLAGS_PRIVILEGE= -DNO_PREEMPT -DNO_DEVICE_PRIVILEGE
@@ -69,9 +68,6 @@ main: sisa16_asm sisa16_emu sisa16_dbg
 asm: sisa16_asm
 	./asm_compile.sh
 
-isa_constexpr:
-	$(CCC) $(CPPFLAGS) *.cpp -o isa_constexpr
-
 #used by github actions.
 check:
 #effectively, a check.
@@ -123,5 +119,5 @@ uninstall:
 	@echo "Note that if you have libraries under /usr/include/sisa16/, they were *not* removed."
 
 clean:
-	rm -f *.exe *.dsk *.out *.o *.bin *.tmp sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg isa_constexpr rbytes
+	rm -f *.exe *.dbg *.out *.o *.bin *.tmp sisa16_emu sisa16_asm sisa16_dbg sisa16_sdl2_emu sisa16_sdl2_asm sisa16_sdl2_dbg rbytes
 	clear || echo "cannot clear?"
