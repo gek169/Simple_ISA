@@ -104,7 +104,7 @@ farret;
 //krenel constants:
 .libc_krenel_max_active_tasks:8
 .libc_krenel_max_returns:20
-.libc_krenel_exec_region:255
+.libc_krenel_exec_region:1
 
 
 //Load user page according to register B.
