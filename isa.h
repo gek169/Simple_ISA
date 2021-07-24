@@ -157,11 +157,9 @@ int DONT_WANT_TO_INLINE_THIS e()
 #ifndef PREEMPT_TIMER
 #define PREEMPT_TIMER 0x100000
 #endif
-#define EXTREME_HIGH_INSN_COST 1000
-#define VERY_HIGH_INSN_COST 500
-#define HIGH_INSN_COST 100
-#define MED_INSN_COST 50
-#define LOW_INSN_COST 10
+#define EXTREME_HIGH_INSN_COST 500
+#define HIGH_INSN_COST 50
+#define MED_INSN_COST 10
 
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
