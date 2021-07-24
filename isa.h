@@ -58,9 +58,9 @@
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
 #define STASH_REGS STASH_REG(a);STASH_REG(b);STASH_REG(c);STASH_REG(stack_pointer);STASH_REG(program_counter);STASH_REG(program_counter_region);\
-		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);u* M_STASH = M;STASH_REG(EMULATE_DEPTH);
+		STASH_REG(RX0);STASH_REG(RX1);STASH_REG(RX2);STASH_REG(RX3);u* M_STASH = M;STASH_REG(instruction_counter);STASH_REG(EMULATE_DEPTH);
 #define UNSTASH_REGS UNSTASH_REG(a);UNSTASH_REG(b);UNSTASH_REG(c);UNSTASH_REG(stack_pointer);UNSTASH_REG(program_counter);UNSTASH_REG(program_counter_region);\
-		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);M = M_STASH;UNSTASH_REG(EMULATE_DEPTH);
+		UNSTASH_REG(RX0);UNSTASH_REG(RX1);UNSTASH_REG(RX2);UNSTASH_REG(RX3);M = M_STASH;UNSTASH_REG(instruction_counter);UNSTASH_REG(EMULATE_DEPTH);
 
 #ifdef SISA_DEBUGGER
 void debugger_hook(	unsigned short *a,
@@ -406,9 +406,6 @@ G_FARISTB:write_byte(b,((((UU)c&255)<<16)|((UU)a)))D
 TB: /**/
 {
 		if(EMULATE_DEPTH > 0) {R=15; goto G_HALT;}
-#ifndef NO_PREEMPT
-		instruction_counter = 0;
-#endif
 		SAVE_REGISTER(a, 0);
 		SAVE_REGISTER(b, 0);
 		SAVE_REGISTER(c, 0);
@@ -459,13 +456,13 @@ D
 U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	if(REG_SAVER[current_task].SEGMENT) free(REG_SAVER[current_task].SEGMENT);
+	REG_SAVER[current_task].SEGMENT = NULL;
 	REG_SAVER[current_task].SEGMENT_PAGES = 0;
 	REG_SAVER[current_task].program_counter_region = 0;
 	REG_SAVER[current_task].program_counter = 0;
 #ifndef NO_PREEMPT
 	REG_SAVER[current_task].instruction_counter = 0; /*So that if we drop back in, the IC doesnt immediately kick in.*/
 #endif
-	REG_SAVER[current_task].SEGMENT = NULL;
 D
 UA:R=19; goto G_HALT;
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
