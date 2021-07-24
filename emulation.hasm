@@ -96,9 +96,9 @@ farret;
 
 
 
-//~~~~~~~~~~~~~~~
-//~~K R E N E L~~
-//~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~K R E N E L~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //Give it a location to boot as PID 0, and it will, in RX0.
 
 //krenel constants:
@@ -107,13 +107,13 @@ farret;
 .libc_krenel_exec_region:255
 
 
+//Load user page according to register B.
 ..decl_lproc:libc_lproc_krenel_load_user_page
 	user_getb;rx0a;
 	lb 8; rx1b; rxlsh;
 	rx2_0;
 	lrx1 %/0x100%;rxadd;
 	rx1_0;
-	
 	//construct the destimation in rx3.
 	lrx3 %libc_krenel_exec_region%,0,0;
 	rx0_2;
@@ -131,6 +131,8 @@ farret;
 //all tasks start out as 0- inactive.
 //these are shorts.
 :libc_krenel_task_isactive_array:
+bytes 0,0,  0,0;
+bytes 0,0,  0,0;
 bytes 0,0,  0,0;
 bytes 0,0,  0,0;
 bytes 0,0,  0,0;
@@ -295,10 +297,27 @@ bytes 0,0;
 		:libc_krenel_syscall_disk_read:
 			//read a single sector from disk.
 			//RX0: source sector in disk.
-			//B: memory page.
-			
-			
-			
+			//B: destination memory page in user memory.
+			user_get0;
+			llb %0xFF00%;
+			lla %0xFF10%;
+			interrupt;
+			user_seta; //Inform the user if the disk read succeeded.
+			//We now have to actually *copy* that stuff over to user memory.
+			user_getb;rx0a;
+			lb 8; rx1b; rxlsh;
+			rx3_0;
+			lrx2 %/0xFF0000%;
+			lrx1 %/0xFF0100%;
+			:libc_krenel_syscall_disk_read_loop:
+				rx0_2;
+				cbrx0;
+				farilda;
+				rx0_3;
+				user_farista;
+				rxincr; rx3_0;
+				rx0_2; rxincr; rx2_0;
+				rxcmp; sc %libc_krenel_syscall_disk_read_loop%; jmpifneq;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_exec:
 			user_getb;			//The region;
