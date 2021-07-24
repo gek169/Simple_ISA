@@ -113,16 +113,6 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
 	textmode driver.
 */
 #include "isa_pre.h"
-
-#ifdef USE_NCURSES
-#include <ncurses.h>
-static void DONT_WANT_TO_INLINE_THIS di(){
-	initscr();
-	setvbuf(stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
- 	return;
-}
-static void DONT_WANT_TO_INLINE_THIS dcl(){endwin();return;}
-#else
 #ifdef USE_TERMIOS
 #include <termios.h>
 #include <unistd.h>
@@ -149,7 +139,6 @@ static void dcl(){}
 #else
 static void di(){return;}
 static void dcl(){return;}
-#endif
 #endif
 
 #endif
