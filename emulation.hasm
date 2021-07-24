@@ -428,7 +428,6 @@ bytes 0,0;
 		aincr;
 		farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
 		llb %libc_krenel_max_returns%; cmp; lb 2; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
-	libc_krenel_really_preempt:
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_cswitch_killtask:
@@ -476,7 +475,8 @@ bytes 0,0;
 		arx3;
 		task_set;
 		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
-		sc %libc_krenel_really_preempt%; jmp;
+		priv_drop;
+		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_shutdown:
 		//Shut down the system.
 		//Loop through all the stuff. Close everything!
