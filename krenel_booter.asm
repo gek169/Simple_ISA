@@ -43,7 +43,7 @@ bytes '\r' ,'\n', 0;
 	la 100; alpush; proc_wait; alpop;
 	farllda %&0xAABBCC%; 
 	nota;
-	//sc %side_process_looptop%; jmpifeq; //continue looping while zero.
+	sc %side_process_looptop%; jmpifeq; //continue looping while zero.
 
 	//Shutdown.
 	//lla %0xDEAD%; syscall;
