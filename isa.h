@@ -163,7 +163,7 @@ int DONT_WANT_TO_INLINE_THIS e()
 register UU instruction_counter = 0;
 #define PREEMPT() if(EMULATE_DEPTH){\
 	instruction_counter++;\
-	if(instruction_counter >= PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
+	if(instruction_counter > PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
 #else
 #define PREEMPT() /*a comment*/
@@ -287,7 +287,7 @@ G_AND:a&=b;D
 G_OR:a|=b;D
 G_XOR:a^=b;D
 G_GETCHAR:{
-STASH_REGS;
+	STASH_REGS;
 #ifndef NO_DEVICE_PRIVILEGE
 	if(EMULATE_DEPTH){R = 16; goto G_HALT;}
 #endif
@@ -295,7 +295,7 @@ STASH_REGS;
 	UNSTASH_REGS;
 }D
 G_PUTCHAR:{
-STASH_REGS;
+	STASH_REGS;
 #ifndef NO_DEVICE_PRIVILEGE
 	if(EMULATE_DEPTH){R = 17; goto G_HALT;}
 #endif
@@ -453,9 +453,7 @@ U9:
 	REG_SAVER[current_task].program_counter = 0;
 	REG_SAVER[current_task].SEGMENT = NULL;
 D
-UA:
-	if(EMULATE_DEPTH){R=19; goto G_HALT;}
-	else {R=15; goto G_HALT;}
+UA:R=19; goto G_HALT;
 G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
 G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
 G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
@@ -491,7 +489,7 @@ G_INTERRUPT:
 D
 G_CLOCK:{
 	size_t q;
-	{	
+	{
 		STASH_REGS;
 		q=clock();
 		UNSTASH_REGS;
@@ -857,9 +855,7 @@ G_AA12:{SUU SRX0, SRX1;
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE:G_EMULATE_SEG:{
-		if(EMULATE_DEPTH > 0) {
-			R=11; goto G_HALT;
-		}
+		if(EMULATE_DEPTH) {R=11; goto G_HALT;}
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
