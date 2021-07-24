@@ -101,10 +101,17 @@ farret;
 //Give it a location to boot as PID 0, and it will, in RX0.
 
 //krenel constants:
+//MUST BE A POWER OF TWO:
 .libc_krenel_max_active_tasks:8
-.libc_krenel_max_returns:20
+//Must be one less than that power of two, for an "and" mask:
+.libc_krenel_max_active_tasks_mask:7
+//Maximum number of times a syscall or interrupt can be made before a context switch occurs.
+.libc_krenel_max_returns:100
+//the region where code to execute is stored.
 .libc_krenel_exec_region:1
-
+//Reserved page for disk IO.
+.libc_krenel_diskio_page:0xFF00
+.libc_krenel_diskio_next_page:0xFF01
 
 //Load user page according to register B.
 ..decl_lproc:libc_lproc_krenel_load_user_page
@@ -115,7 +122,7 @@ farret;
 	rx1_0;
 	//construct the destination in rx3.
 	//page FF is reserved for this specific purpose.
-	lrx3 %0xff%,0,0;
+	lrx3 %&libc_krenel_diskio_page%,0;
 	rx0_2;
 	libc_lproc_krenel_load_user_page_loop:
 		cbrx0; user_farilda;
@@ -264,13 +271,13 @@ bytes 0,0;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_kill_pid:
 			user_getb;
-			lb libc_krenel_max_active_tasks; mod;
+			lb libc_krenel_max_active_tasks_mask; and;
 			lb 2;mul;ba;sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%;
 			add;ba;
 
 			//also set it as killed in the CPU.
 			user_getb;
-			lb libc_krenel_max_active_tasks; mod;
+			lb libc_krenel_max_active_tasks_mask; and;
 			task_set; task_kill;
 
 			//Re-set our active task.
@@ -288,8 +295,8 @@ bytes 0,0;
 			//B: source page.
 			libc_lproc_krenel_load_user_page;
 			user_get0;
-			llb %0xFF00%;
-			lla %0xFF11%;
+			llb %libc_krenel_diskio_page%; 
+			lla %0xFF11%; //Syscall to write 256 bytes to disk.
 			interrupt;
 			user_seta; //Inform the user if the disk write succeeded.
 			sc %libc_krenel_syscall_end%; jmp;
@@ -301,16 +308,16 @@ bytes 0,0;
 			//RX0: source sector in disk. Not aligned!
 			//B: destination memory page in user memory.
 			user_get0;
-			llb %0xFF00%;
-			lla %0xFF10%;
+			llb %libc_krenel_diskio_page%;
+			lla %0xFF10%; //Disk Read magic number.
 			interrupt;
 			user_seta; //Inform the user if the disk read succeeded.
 			//We now have to actually *copy* that stuff over to user memory.
 			user_getb;rx0a;
 			lb 8; rx1b; rxlsh;
 			rx3_0;
-			lrx2 %/0xFF0000%;
-			lrx1 %/0xFF0100%;
+			lrx2 %&libc_krenel_diskio_page%,0;
+			lrx1 %&libc_krenel_diskio_next_page%,0;
 			:libc_krenel_syscall_disk_read_loop:
 				rx0_2;
 					cbrx0;
@@ -333,7 +340,7 @@ bytes 0,0;
 				cbrx0; user_farilda;
 				sc %libc_krenel_exec_region%; 
 				farista;
-				rxincr;rxcmp;lb 0;cmp; //++rx0 < rx1
+				rxincr;rxcmp;nota; //if(++rx0 < rx1) jmp
 				sc %libc_krenel_syscall_exec_copymem_looptop%; jmpifeq;
 
 			//The memory is copied. We must now find a free PID.
@@ -386,9 +393,9 @@ bytes 0,0;
 				la 0;user_seta;
 				sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_end:
-			//Syscalls are expensive. Increment an extra time, just to punish them!
+			//Syscalls are expensive.
 			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
-			aincr;
+			lb 5; add;
 			farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
 			sc %libc_krenel_preempt%; jmp;
 	libc_krenel_getchar:
@@ -429,7 +436,7 @@ bytes 0,0;
 			task_kill;
 		//Set active task to be in the "dead" state- 0.
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			lb libc_krenel_max_active_tasks; mod;
+			lb libc_krenel_max_active_tasks_mask; and;
 			lb 2;mul;ba;
 			sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
@@ -441,17 +448,16 @@ bytes 0,0;
 		task_ric; //Reset the current task's instruction counter.
 		lb 0; rx2b;	//RX2: the number of things we have tried.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
-		lb libc_krenel_max_active_tasks; rx1b;
+		lb libc_krenel_max_active_tasks_mask; rx1b;
 		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 		rx3a;//RX3: our counter.
 	libc_krenel_try_select_task_loop:
 		//Loop from where we are, and around again. If we find a task to execute... execute it!
-			rx0_3; 
-			rxincr; 
-			rxmod;
+			rx0_3;
+			rxincr;
+			rxand; //we're using the mask.
 			rx3_0;
-			arx3;
-			lb 2;mul;ba;
+			arx3;lb 1;lsh;ba;
 			sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
@@ -460,6 +466,8 @@ bytes 0,0;
 			sc %libc_krenel_found_pid_to_run%; jmpifeq;
 		//We didn't! Should we quit?
 			rx0_2;rxincr;rx2_0;
+		//It will always be at LEAST 1 after this... We have to compare with the *mask* which is one less.
+			rxdecr;
 			rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;

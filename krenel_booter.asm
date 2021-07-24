@@ -53,6 +53,8 @@ bytes '\r' ,'\n', 0;
 	//lrx1 %/8%; rxrsh;
 	//brx0;
 	//lla %0xDE03%; //Disk read.
+	//disk write.
+
 	lrx0 %/10%;
 	llb %0x2500%;
 	lla %0xDE01%; //Disk write.
