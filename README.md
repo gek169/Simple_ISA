@@ -1,6 +1,8 @@
 # Simple, Embeddable, Performant Virtual Machine Language
 
-SISA16 is an extremely lightweight virtual machine designed to replace languages like Lua for program extension.
+SISA16 is an extremely lightweight high-performance minimal virtual machine designed to replace languages like Lua for program extension.
+
+In this repository i have provided the assembler, disassembler, debugger, and even a small round-robin kernel.
 
 it executes identically on every major platform and computer architecture. 
 
