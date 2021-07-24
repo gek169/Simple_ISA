@@ -97,7 +97,11 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; syscall;
 		proc_puts;
-		//lla %0xDE00%;lb 1;syscall;
+		la '\r'; putchar;
+		la '\n'; putchar;
+		la '\n'; syscall;
+		//lla %0xDE00%;lb 1;syscall; //Kill the other guy.
+		//Send him a message instead.
 		lla %0xDE05%; 
 		lb 1;
 		sc %1%; 

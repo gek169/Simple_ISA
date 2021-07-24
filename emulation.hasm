@@ -282,7 +282,7 @@ bytes 0,0;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
-			//RX0: Destination sector in disk.
+			//RX0: Destination on disk. Not aligned!
 			//A: source page.
 			libc_lproc_krenel_load_user_page;
 			user_get0;
@@ -296,9 +296,8 @@ bytes 0,0;
 			sc %libc_krenel_try_select_task%; jmp;
 		:libc_krenel_syscall_disk_read:
 			//read a single sector from disk.
-			//RX0: source sector in disk.
+			//RX0: source sector in disk. Not aligned!
 			//B: destination memory page in user memory.
-
 			user_get0;
 			llb %0xFF00%;
 			lla %0xFF10%;
