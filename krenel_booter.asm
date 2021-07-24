@@ -2,7 +2,7 @@
 
 ..include"libc.hasm"
 
-..(25):
+..(0x25):
 	my_page_o_crap:
 	fill 256, '7'
 ..(7):
@@ -49,10 +49,12 @@ bytes '\r' ,'\n', 0;
 	//lla %0xDEAD%; syscall;
 
 	//write to disk! See if it makes it through at all.
-	lrx0 %/my_page_o_crap%;
-	lrx1 %/8%; rxrsh;
-	brx0;
+	//lrx0 %/my_page_o_crap%;
+	//lrx1 %/8%; rxrsh;
+	//brx0;
 	//lla %0xDE03%; //Disk read.
+	lrx0 %/10%;
+	llb %0x2500%;
 	lla %0xDE01%; //Disk write.
 	lrx0 %/10%;
 	syscall;

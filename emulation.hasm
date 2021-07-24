@@ -114,8 +114,9 @@ farret;
 	rx2_0;
 	lrx1 %/0x100%;rxadd;
 	rx1_0;
-	//construct the destimation in rx3.
-	lrx3 %libc_krenel_exec_region%,0,0;
+	//construct the destination in rx3.
+	//page FF is reserved for this specific purpose.
+	lrx3 %0xff%,0,0;
 	rx0_2;
 	libc_lproc_krenel_load_user_page_loop:
 		cbrx0; user_farilda;
@@ -285,7 +286,7 @@ bytes 0,0;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
 			//RX0: Destination on disk. Not aligned!
-			//A: source page.
+			//B: source page.
 			libc_lproc_krenel_load_user_page;
 			user_get0;
 			llb %0xFF00%;
@@ -460,11 +461,7 @@ bytes 0,0;
 		//Did we find it? 1 is already the value for "equals" so we dont need to compare it.
 			sc %libc_krenel_really_preempt%; jmpifeq;
 		//We didn't! Should we quit?
-			rxincr
-			rxcmp
-			lb 2
-			cmp
-			sc %libc_krenel_shutdown%; jmpifeq;
+			rxincr;rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;
 
@@ -493,4 +490,5 @@ bytes 0,0;
 		la 'o'; putchar;
 		la 'w'; putchar;
 		la 'n'; putchar;
+		la '\n'; interrupt;
 		farret;													asm_print; //I want information!
