@@ -2,6 +2,9 @@
 
 ..include"libc.hasm"
 
+..(25):
+	my_page_o_crap:
+	fill 256, '7'
 ..(7):
 :STR_my_string:
 ..ascii:Enter some text:
@@ -36,11 +39,33 @@ bytes '\r' ,'\n', 0;
 	la 'V';
 	putchar;
 	la '\n'; syscall;
+	lla %0xDE02%; syscall;
 	la 100; alpush; proc_wait; alpop;
 	farllda %&0xAABBCC%; 
 	nota;
-	sc %side_process_looptop%; jmpifeq; //continue looping while zero.
+	//sc %side_process_looptop%; jmpifeq; //continue looping while zero.
+
+	//Shutdown.
 	//lla %0xDEAD%; syscall;
+
+	//write to disk! See if it makes it through at all.
+	lrx0 %/my_page_o_crap%;
+	lrx1 %/8%; rxrsh;
+	brx0;
+	lla %0xDE03%; //Disk read.
+	//lla %0xDE01%; //Disk write.
+	lrx0 %/10%;
+	syscall;
+	la 'q'; putchar;
+	la 'q'; putchar;
+	la 'q'; putchar;
+	la 'q'; putchar;
+	
+	lrx0 %/my_page_o_crap%;
+	rx0push;
+	proc_puts;
+	rx0pop;
+	la '\n'; interrupt;
 	lb 0; div;
 	halt;
 ..(8):
