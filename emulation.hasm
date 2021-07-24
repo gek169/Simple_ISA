@@ -236,13 +236,14 @@ bytes 0,0;
 	libc_krenel_syscall:
 		//TODO: provide services based on user registers.
 		//Needed services:
-		//Kill pid-					Kill another process.
-		//Shutdown-					Kill the system.
-		//Exec-						load a single region of code
-		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'.
-		//Disk Read Sector-			Read a 256 byte sector from disk.
-		//Disk Write Sector-		write a 256 byte sector to disk.
-		//Interprocess Write-		Write to another process's memory.
+		//Kill pid-					Kill another process. (DONE)
+		//Shutdown-					Kill the system. (DONE)
+		//Exec-						load a single region of code (DONE)
+		//Fork-						copy an entire program (TODO)
+		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'. (DONE)
+		//Disk Read Sector-			Read a 256 byte sector from disk. (DONE)
+		//Disk Write Sector-		write a 256 byte sector to disk. (DONE)
+		//Interprocess Write-		Write to another process's memory. (DONE)
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
