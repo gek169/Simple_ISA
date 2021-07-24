@@ -201,7 +201,7 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	libc_krenel_cswitch_looptop:
 		alpush; 
-		lb 0xff; cmp; blpop; sc %libc_krenel_was_preempted%; jmpifeq;
+		lb 0xff; cmp; blpop; sc %libc_krenel_try_select_task%; jmpifeq;
 		ab; alpush;
 		lb 19; cmp; blpop; sc %libc_krenel_syscall%; jmpifeq;
 		ab; alpush;
@@ -415,10 +415,6 @@ bytes 0,0;
 		la '\r'; putchar;
 		la '\n'; putchar;interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
-	libc_krenel_was_preempted:
-		lla %libc_krenel_max_returns%;
-		farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
-		//Roll directly into preempt.
 	libc_krenel_preempt:
 		//Check for need of a task switch.
 		farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
@@ -443,28 +439,36 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
-		lb 0; rx0b;
+		lb 0; rx2b;	//RX2: the number of things we have tried.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks; rx1b;
+		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+		rx3a;//RX3: our counter.
 	libc_krenel_try_select_task_loop:
 		//Loop from where we are, and around again. If we find a task to execute... execute it!
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			aincr; lb libc_krenel_max_active_tasks; mod;
-			farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			task_set;
-			lb 2;mul;ba
+			rx0_3; 
+			rxincr; 
+			rxmod;
+			rx3_0;
+			arx3;
+			lb 2;mul;ba;
 			sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
 			farillda;
 		//Did we find it? 1 is already the value for "equals" so we dont need to compare it.
-			sc %libc_krenel_really_preempt%; jmpifeq;
+			sc %libc_krenel_found_pid_to_run%; jmpifeq;
 		//We didn't! Should we quit?
-			rxincr;rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
+			rx0_2;rxincr;rx2_0;
+			rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;
-
-
+	libc_krenel_found_pid_to_run:
+		//Set it as the active PID.
+		arx3;
+		task_set;
+		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
+		sc %libc_krenel_really_preempt%; jmp;
 	libc_krenel_shutdown:
 		//Shut down the system.
 		//Loop through all the stuff. Close everything!

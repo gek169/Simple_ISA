@@ -36,9 +36,9 @@ bytes '\r' ,'\n', 0;
 	halt;
 ..(55):
 	side_process_looptop:
-	la 'V';
-	putchar;
-	la '\n'; syscall;
+//	la 'V';
+//	putchar;
+//	la '\n'; syscall;
 //	lla %0xDE02%; syscall; //sleep!
 	la 100; alpush; proc_wait; alpop;
 	farllda %&0xAABBCC%; 
