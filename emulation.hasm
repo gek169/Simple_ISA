@@ -284,15 +284,20 @@ bytes 0,0;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_kill_pid:
+			//did the user ask us to kill them?
 			user_getb;
-			lb libc_krenel_max_active_tasks_mask; and;
+			lb libc_krenel_max_active_tasks_mask; 
+			and;
+			apush;
+			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			cmp; bpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
+
+			ab;apush;
 			lb 2;mul;ba;sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%;
 			add;ba;
 
 			//also set it as killed in the CPU.
-			user_getb;
-			lb libc_krenel_max_active_tasks_mask; and;
-			task_set; task_kill;
+			apop;task_set; task_kill;
 
 			//Re-set our active task.
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;

@@ -75,12 +75,14 @@ bytes '\r' ,'\n', 0;
 	rx0pop;
 	la '\n'; interrupt;
 	//Fork bomb. Uncomment at your own risk.
-	//sc %0%; 
-	//lb 0;la 2; farista;
-	//lb 1; la 55; farista;
-	//lb 2; la 0x44; farista;
-	//lla %0xDE06%; 
-	//syscall;
+	sc %0%; 
+	lb 0;la 2; farista;
+	lb 1; la 55; farista;
+	lb 2; la 0x44; farista;
+	lla %0xDE06%; 
+	syscall;
+	cpc;
+	jmp;
 	lb 0; mod;
 	halt;
 ..(8):
@@ -149,6 +151,16 @@ bytes '\r' ,'\n', 0;
 		rx0push;
 		proc_puts;
 		rx0pop;
-		//lb 0; rx1b; fltdiv
+		//lla %0xDEAD%; syscall;
+		
+		lla %0xDE00%;lb 1;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 2;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 3;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 4;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 5;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 6;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 7;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 8;syscall; //Kill ourselves. 8 wraps around to 0.
+		lb 0; rx1b; fltdiv
 		main_program_failure:
 		halt;
