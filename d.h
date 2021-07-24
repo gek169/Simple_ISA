@@ -293,6 +293,32 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		fclose(f);
 		return bruh;
 	}
+	if(a == 0xFF10){ /*Read 256 bytes from saved disk.*/
+		RX0 &= 0x7FffFFff;
+		FILE* f = fopen("sisa16.dsk", "rb+");
+		if(!f){
+			UU i = 0;
+			for(i = 0; i < 256; i++){
+				M[((UU)b<<8) + i] = 0;
+			}
+			return 0;
+		}
+		if(fseek(f, RX0, SEEK_SET)){
+			UU i = 0;
+			for(i = 0; i < 256; i++){
+				M[((UU)b<<8) + i] = 0;
+			}
+			return 0;
+		}
+		{
+			UU i = 0;
+			for(i = 0; i < 256; i++){
+				M[((UU)b<<8) + i] = fgetc(f);
+			}
+		}
+		fclose(f);
+		return 1;
+	}
 	if(a == 0xFF01){ /*write char 'b' to saved disk.*/
 		FILE* f = fopen("sisa16.dsk", "rb+");
 		RX0 &= 0x7FffFFff;
@@ -307,9 +333,35 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		}
 		if(fseek(f, RX0, SEEK_SET)){
 			fseek(f, 0, SEEK_END);
-			while((unsigned long)ftell(f) < (unsigned long)RX0) fputc(0, f);
+			while((unsigned long)ftell(f) < (unsigned long)RX0) if(fputc(0, f) == EOF) return 0;
 		}
 		fputc(b&0xff, f);
+		fclose(f);
+		return 1;
+	}
+
+	if(a == 0xFF11){ /*write 256 bytes from 'b' to saved disk.*/
+		FILE* f = fopen("sisa16.dsk", "rb+");
+		RX0 &= 0x7FffFFff;
+		if(!f){
+			f = fopen("sisa16.dsk", "wb");
+			if(!f) return 0;
+			while((unsigned long)ftell(f) < (unsigned long)RX0) if(EOF == fputc(0, f)) return 0;
+			fflush(f);
+			fclose(f);
+			f = fopen("sisa16.dsk", "rb+");
+			if(!f) return 0;
+		}
+		if(fseek(f, RX0, SEEK_SET)){
+			fseek(f, 0, SEEK_END);
+			while((unsigned long)ftell(f) < (unsigned long)RX0) if(EOF == fputc(0, f)) return 0;
+		}
+		{
+			UU i = 0;
+			for(i = 0; i < 256; i++){
+				fputc(M[((UU)b<<8) + i], f);
+			}
+		}
 		fclose(f);
 		return 1;
 	}

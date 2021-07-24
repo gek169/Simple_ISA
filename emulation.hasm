@@ -81,7 +81,7 @@ farret;
 
 
 ..include"printbytehex.hasm"
-
+..include"fdisk.hasm"
 
 ..decl_lproc:libc_lproc_krenel_print_krenel
 	la 'K'; putchar;
@@ -94,6 +94,8 @@ farret;
 	la '\ '; putchar;
 	ret
 
+
+
 //~~~~~~~~~~~~~~~
 //~~K R E N E L~~
 //~~~~~~~~~~~~~~~
@@ -104,6 +106,27 @@ farret;
 .libc_krenel_max_returns:20
 .libc_krenel_exec_region:255
 
+
+..decl_lproc:libc_lproc_krenel_load_user_page
+	user_getb;rx0a;
+	lb 8; rx1b; rxlsh;
+	rx2_0;
+	lrx1 %/0x100%;rxadd;
+	rx1_0;
+	
+	//construct the destimation in rx3.
+	lrx3 %libc_krenel_exec_region%,0,0;
+	rx0_2;
+	libc_lproc_krenel_load_user_page_loop:
+		cbrx0; user_farilda;
+		rx0_3;cbrx0;
+		farista;
+		rx0_3;rxincr;rx3_0;
+		rx0_2;rxincr;rx2_0;
+		rxcmp;
+		nota; //A is zero, meaning that RX0 is less than RX1 throughout the loop.
+		sc %libc_lproc_krenel_load_user_page_loop%; jmpifeq;
+	ret;
 
 //all tasks start out as 0- inactive.
 //these are shorts.
@@ -206,11 +229,9 @@ bytes 0,0;
 		//Shutdown-					Kill the system.
 		//Exec-						load a single region of code
 		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'.
-		//Disk Read File-			read a file from .dsk by name.
-		//Disk Write File-			write a file to .dsk by name.
-		//Disk Append File-			append to file on disk.
+		//Disk Read Sector-			Read a 256 byte sector from disk.
+		//Disk Write Sector-		write a 256 byte sector to disk.
 		//Interprocess Write-		Write to another process's memory.
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -219,14 +240,13 @@ bytes 0,0;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
-			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_syscall_disk_append%; jmpifeq;
+			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_syscall_sleep%; jmpifeq;
 			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
 		//I don't recognize this syscall. Just ignore it... for now.
 		sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
-			
 			user_get0; //The location in memory to write it.
 			cbrx0;
 			user_getb;apush; //the byte you want to write.
@@ -259,13 +279,26 @@ bytes 0,0;
 			la '\n'; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
-			//TODO (complicated)
+			//Write a single sector to disk.
+			//RX0: Destination sector in disk.
+			//A: source page.
+			libc_lproc_krenel_load_user_page;
+			user_get0;
+			llb %0xFF00%;
+			lla %0xFF11%;
+			interrupt;
+			user_seta; //Inform the user if the disk write succeeded.
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_disk_append:
-			//TODO (complicated)
-			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_sleep:
+			//Simply force a task switch.
+			sc %libc_krenel_try_select_task%; jmp;
 		:libc_krenel_syscall_disk_read:
-			//TODO (complicated)
+			//read a single sector from disk.
+			//RX0: source sector in disk.
+			//B: memory page.
+			
+			
+			
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_exec:
 			user_getb;			//The region;

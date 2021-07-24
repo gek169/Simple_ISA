@@ -23,7 +23,7 @@ asm_begin_region_restriction;
 	..include"sqrt.hasm"
 	..include"wait.hasm"
 	..include"termcontrol.hasm"
-	..include"fdisk.hasm"
+	
 	//this should be made the last one. it consumes 16k for a page table.
 	..include"alloc.hasm"
 asm_end_region_restriction;
