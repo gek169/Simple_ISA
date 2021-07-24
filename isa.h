@@ -157,7 +157,11 @@ int DONT_WANT_TO_INLINE_THIS e()
 #ifndef PREEMPT_TIMER
 #define PREEMPT_TIMER 0x100000
 #endif
-
+#define EXTREME_HIGH_INSN_COST 1000
+#define VERY_HIGH_INSN_COST 500
+#define HIGH_INSN_COST 100
+#define MED_INSN_COST 50
+#define LOW_INSN_COST 10
 
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
@@ -371,12 +375,18 @@ G_FARPAGEL:
 	STASH_REGS;
 	memmove(M+(((UU)a_stash)<<8),M+(((UU)c_stash)<<8),256);
 	UNSTASH_REGS;
+#ifndef NO_PREEMPT
+	instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
+#endif
 }
 D
 G_FARPAGEST:{
 	STASH_REGS;
 	memmove(M+(((UU)c_stash)<<8),M+(((UU)a_stash)<<8),256);
 	UNSTASH_REGS;
+#ifndef NO_PREEMPT
+	instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
+#endif
 }D
 G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
@@ -503,6 +513,9 @@ G_CLOCK:{
 	a=((q)/(CLOCKS_PER_SEC/1000));
 	b=q/(CLOCKS_PER_SEC);
 	c=q;
+#ifndef NO_PREEMPT
+	instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
+#endif
 }D
 /*load from RX0*/
 G_ARX0:a=RX0;D
@@ -595,7 +608,6 @@ ZA:
 	if(RX0<RX1)a=0;
 	else if(RX0>RX1)a=2;
 	else a=1;
-	/*a= (RX0>RX1)*2 + (RX0==RX1);*/
 D
 ZB:
 #if !defined(NO_SEGMENT)
@@ -604,6 +616,9 @@ ZB:
 		STASH_REGS;
 		memcpy(M + 0x100 * (RX0&0xffFF), SEGMENT + 0x100 * RX1, 0x100);
 		UNSTASH_REGS;
+#ifndef NO_PREEMPT
+		instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
+#endif
 	}
 	D
 #else
@@ -617,6 +632,9 @@ ZC:
 		STASH_REGS;
 		memcpy(SEGMENT + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
 		UNSTASH_REGS;
+#ifndef NO_PREEMPT
+		instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
+#endif
 	}
 	D
 #else
@@ -627,6 +645,9 @@ ZD:
 {
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
+#ifndef NO_PREEMPT
+	instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
+#endif
 	if(RX0 == 0){
 		STASH_REGS;
 		if(SEGMENT) free(SEGMENT);
@@ -862,12 +883,12 @@ G_AA12:{SUU SRX0, SRX1;
 #if !defined(NO_EMULATE)
 	G_EMULATE:G_EMULATE_SEG:{
 		if(EMULATE_DEPTH) {R=11; goto G_HALT;}
+
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[current_task], M_SAVER[0], 0x1000000);
 			UNSTASH_REGS;
 		}
-		
 		SAVE_REGISTER(a, 0);
 		SAVE_REGISTER(b, 0);
 		SAVE_REGISTER(c, 0);
