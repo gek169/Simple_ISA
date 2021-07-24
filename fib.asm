@@ -33,7 +33,7 @@
 		rx0b;
 		farret
 
-..main(1):
+..main(4):
 	lrx0 %/0x770000%;
 	proc_krenel;
 	halt;
