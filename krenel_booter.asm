@@ -52,8 +52,8 @@ bytes '\r' ,'\n', 0;
 	lrx0 %/my_page_o_crap%;
 	lrx1 %/8%; rxrsh;
 	brx0;
-	lla %0xDE03%; //Disk read.
-	//lla %0xDE01%; //Disk write.
+	//lla %0xDE03%; //Disk read.
+	lla %0xDE01%; //Disk write.
 	lrx0 %/10%;
 	syscall;
 	la 'q'; putchar;
