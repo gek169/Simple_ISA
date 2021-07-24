@@ -151,14 +151,14 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		libc_lproc_krenel_print_krenel;
-		la 'B'; putchar;
-		la 'O'; putchar;
-		la 'O'; putchar;
-		la 'T'; putchar;
-		la '\n'; putchar;
-		la '\r'; putchar;
-		la '\n'; interrupt;
+//		libc_lproc_krenel_print_krenel;
+//		la 'B'; putchar;
+//		la 'O'; putchar;
+//		la 'O'; putchar;
+//		la 'T'; putchar;
+//		la '\n'; putchar;
+//		la '\r'; putchar;
+//		la '\n'; interrupt;
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
@@ -401,6 +401,7 @@ bytes 0,0;
 
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		libc_lproc_krenel_print_krenel;
 		la 'k'; putchar;
 		la 'i'; putchar;
 		la 'l'; putchar;
