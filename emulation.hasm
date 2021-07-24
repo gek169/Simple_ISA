@@ -212,17 +212,19 @@ bytes 0,0;
 		lb 16; cmp; blpop; sc %libc_krenel_getchar%; jmpifeq;
 		ab; alpush;
 		lb 0; cmp; blpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
+		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
+		la 'e'; putchar;
+		la 'x'; putchar;
+		la 'i'; putchar;
+		la 't'; putchar;
+		la '\ '; putchar;
 		la 'e'; putchar;
 		la 'r'; putchar;
 		la 'r'; putchar;
-		la 'o'; putchar;
-		la 'r'; putchar;
 		la '\ '; putchar;
 		bpush;proc_printbytehex;bpop;
-		la '\r'; putchar;
-		la '\n'; putchar;
-		la '\n'; interrupt;
+		la '\r'; putchar; la '\n'; putchar;interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_syscall:
 		//TODO: provide services based on user registers.
@@ -401,6 +403,7 @@ bytes 0,0;
 
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
 		la 'k'; putchar;
 		la 'i'; putchar;
@@ -413,8 +416,7 @@ bytes 0,0;
 		la 'n'; putchar;
 		la 't'; putchar;
 		la '\r'; putchar;
-		la '\n'; putchar;
-		la '\n'; interrupt;
+		la '\n'; putchar;interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_was_preempted:
 		lla %libc_krenel_max_returns%;
