@@ -39,7 +39,7 @@ bytes '\r' ,'\n', 0;
 	la 'V';
 	putchar;
 	la '\n'; syscall;
-	lla %0xDE02%; syscall;
+	lla %0xDE02%; syscall; //sleep!
 	la 100; alpush; proc_wait; alpop;
 	farllda %&0xAABBCC%; 
 	nota;
