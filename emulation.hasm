@@ -239,7 +239,7 @@ bytes 0,0;
 		//Kill pid-					Kill another process. (DONE)
 		//Shutdown-					Kill the system. (DONE)
 		//Exec-						load a single region of code (DONE)
-		//Fork-						copy an entire program (TODO)
+		//Fork-						copy an entire program (DONE)
 		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'. (DONE)
 		//Disk Read Sector-			Read a 256 byte sector from disk. (DONE)
 		//Disk Write Sector-		write a 256 byte sector to disk. (DONE)
@@ -257,6 +257,7 @@ bytes 0,0;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
 			user_geta;	llb %0xDE06%; cmp; sc %libc_krenel_syscall_fork%; jmpifeq;
+			user_geta;	llb %0xDE07%; cmp; sc %libc_krenel_syscall_getpid%; jmpifeq;
 			//I don't recognize this syscall. 
 			libc_lproc_krenel_print_krenel;
 			la 'b'; putchar;
@@ -271,6 +272,10 @@ bytes 0,0;
 			la 'l'; putchar;
 			la 'l'; putchar;
 			sc %libc_krenel_cswitch_killtask%; jmp;
+		:libc_krenel_syscall_getpid:
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			user_seta;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
 			user_get0; //The location in memory to write it.
 			cbrx0;
@@ -295,15 +300,14 @@ bytes 0,0;
 			ab;apush;
 			lb 2;mul;ba;sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%;
 			add;ba;
-
+			la 0; faristla;
+			
 			//also set it as killed in the CPU.
 			apop;task_set; task_kill;
 
 			//Re-set our active task.
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			task_set;
-			
-			la 0; faristla;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
 			la '\n'; interrupt; 
