@@ -33,6 +33,9 @@ User mode is pre-empted.
 
 typedef struct {
 	UU RX0,RX1,RX2,RX3, SEGMENT_PAGES;
+#ifndef NO_PREEMPT
+	UU instruction_counter;
+#endif
 	U a,b,c,program_counter,stack_pointer;
 	u program_counter_region;
 	u* SEGMENT;

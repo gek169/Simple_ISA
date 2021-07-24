@@ -1,4 +1,4 @@
-static char* insns[217] = {
+static char* insns[218] = {
 	"halt", /*0*/
 	"lda",
 	"la",
@@ -237,9 +237,10 @@ static char* insns[217] = {
 	"logand",
 	"boolify",
 	"nota",
-	"user_farista"
+	"user_farista",
+	"task_ric"
 };
-static unsigned char insns_numargs[217] = {
+static unsigned char insns_numargs[218] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -358,9 +359,11 @@ static unsigned char insns_numargs[217] = {
 		/*Boolean ops, logor, logand, boolify, nota*/
 		0,0,0,0,
 		/*user_farista*/
+		0,
+		/*task_ric*/
 		0
 };
-static char* insn_repl[217] = {
+static char* insn_repl[218] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -607,6 +610,8 @@ static char* insn_repl[217] = {
 		"bytes214;",
 		"bytes215;",
 		/*user_farista*/
-		"bytes216;"
+		"bytes216;",
+		/*task_ric*/
+		"bytes217;"
 };
-static const unsigned int n_insns = 217;
+static const unsigned int n_insns = 218;

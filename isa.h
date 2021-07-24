@@ -130,7 +130,7 @@ k 202:goto G_AA26;k 203:goto G_AINCR;k 204:goto G_ADECR;k 205:goto G_RX0INCR;\
 k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_ITOF;k 209:goto G_FTOI;\
 k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
-k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:\
+k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:goto G_TASK_RIC;\
 k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
@@ -258,7 +258,7 @@ const void* const goto_table[256] = {
 &&G_EMULATE_SEG,
 &&G_RXICMP,
 &&G_LOGOR,&&G_LOGAND,
-&&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_HALT,&&G_HALT,
+&&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_TASK_RIC,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
@@ -427,6 +427,9 @@ TB: /**/
 		LOAD_REGISTER(RX3, current_task);
 		LOAD_REGISTER(SEGMENT, current_task);
 		LOAD_REGISTER(SEGMENT_PAGES, current_task);
+#ifndef NO_PREEMPT
+		LOAD_REGISTER(instruction_counter, current_task);
+#endif
 }D
 
 TC:if(EMULATE_DEPTH){R=15; goto G_HALT;}a=REG_SAVER[current_task].a;D
@@ -451,6 +454,9 @@ U9:
 	REG_SAVER[current_task].SEGMENT_PAGES = 0;
 	REG_SAVER[current_task].program_counter_region = 0;
 	REG_SAVER[current_task].program_counter = 0;
+#ifndef NO_PREEMPT
+	REG_SAVER[current_task].instruction_counter = 0; /*So that if we drop back in, the IC doesnt immediately kick in.*/
+#endif
 	REG_SAVER[current_task].SEGMENT = NULL;
 D
 UA:R=19; goto G_HALT;
@@ -856,9 +862,6 @@ G_AA12:{SUU SRX0, SRX1;
 #if !defined(NO_EMULATE)
 	G_EMULATE:G_EMULATE_SEG:{
 		if(EMULATE_DEPTH) {R=11; goto G_HALT;}
-#ifndef NO_PREEMPT
-		instruction_counter = 0;
-#endif
 		{
 			STASH_REGS;
 			memcpy(M_SAVER[current_task], M_SAVER[0], 0x1000000);
@@ -881,12 +884,16 @@ G_AA12:{SUU SRX0, SRX1;
 		M = M_SAVER[current_task];
 		LOAD_REGISTER(SEGMENT, current_task);
 		LOAD_REGISTER(SEGMENT_PAGES, current_task);
+		/*If the segment was not deleted the last time we ran this task, it must be deleted.*/
 		if(SEGMENT)free(SEGMENT);
 		SEGMENT = NULL;
 		SEGMENT_PAGES = 0;
 		stack_pointer=0;
 		program_counter_region=0;
 		program_counter=0;
+#ifndef NO_PREEMPT
+		instruction_counter = 0;
+#endif
 		RX0=0;RX1=0;RX2=0;RX3=0;
 		a=0;b=0;c=0;
 	}D
@@ -907,6 +914,12 @@ G_AA12:{SUU SRX0, SRX1;
 	G_NOTA: a=(a==0)D
 	G_USER_FARISTA:if(EMULATE_DEPTH){R=15; goto G_HALT;} M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]=a D
 	/*add more insns here. remember the free slots above!*/
+	G_TASK_RIC:
+#ifndef NO_PREEMPT
+		if(EMULATE_DEPTH){R=15; goto G_HALT;}
+		REG_SAVER[current_task].instruction_counter = 0;
+#endif
+	D
 	G_HALT:
 	if(EMULATE_DEPTH == 0){
 		dcl();return 0;
@@ -923,6 +936,9 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX3, current_task);
 		SAVE_REGISTER(SEGMENT,       current_task);
 		SAVE_REGISTER(SEGMENT_PAGES, current_task);
+#ifndef NO_PREEMPT
+		SAVE_REGISTER(instruction_counter, current_task);
+#endif
 		M=M_SAVER[0];
 		EMULATE_DEPTH=0;
 		a=R;R=0;
