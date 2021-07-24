@@ -27,7 +27,7 @@ bytes '\r' ,'\n', 0;
 bytes '\r' ,'\n', 0;
 
 
-..main:
+..main(3): //three actually goes unused.
 	lrx0 %/krenel_boot%;
 	proc_krenel;
 	lrx0 0, %&STR_my_other_string%;
