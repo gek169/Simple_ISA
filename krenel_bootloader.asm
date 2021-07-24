@@ -1,5 +1,10 @@
 #!/usr/bin/sisa16_asm -run
-..include"libc.hasm"
+
+
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 
 ..main:

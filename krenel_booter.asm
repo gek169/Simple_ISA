@@ -1,7 +1,9 @@
 #!/usr/bin/sisa16_asm -run
 
-..include"libc.hasm"
-
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 ..(0x25):
 	my_page_o_crap:
 	fill 256, '7'
@@ -27,12 +29,9 @@ bytes '\r' ,'\n', 0;
 bytes '\r' ,'\n', 0;
 
 
-..main(3): //three actually goes unused by krenel, so it is safe to put code there.
+..main(3): //three actually goes unused by krenel, so it is safe to put code there. Dont use 1, or just ..main
 	lrx0 %/krenel_boot%;
 	proc_krenel;
-	lrx0 0, %&STR_my_other_string%;
-	rx0push;
-	proc_puts;
 	halt;
 ..(55):
 	side_process_looptop:

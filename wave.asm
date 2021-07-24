@@ -32,7 +32,7 @@ section 0x40000;
 .num_lines:				20
 .wait_time:				16
 
-..main:
+..main(5):
 	lrx0 %/0x770000%;
 	proc_krenel;
 	halt;

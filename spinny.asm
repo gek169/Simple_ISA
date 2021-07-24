@@ -15,7 +15,10 @@ section 0x40000;
 .ld_iterb: farlldb %&@&%
 .st_iter: farstla %&@&%
 
-..include"libc.hasm"
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 
 .line_length:			90
@@ -25,7 +28,7 @@ section 0x40000;
 
 
 
-..main:
+..main(5):
 	lrx0 %/0x70000%;
 	proc_krenel;
 	halt;
