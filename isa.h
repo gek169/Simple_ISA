@@ -155,7 +155,7 @@ int DONT_WANT_TO_INLINE_THIS e()
 #endif
 
 #ifndef PREEMPT_TIMER
-#define PREEMPT_TIMER 0x80000
+#define PREEMPT_TIMER 0x100000
 #endif
 
 
