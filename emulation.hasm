@@ -260,19 +260,9 @@ bytes 0,0;
 		la '\r'; putchar; la '\n'; putchar;interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_syscall:
-		//TODO: provide services based on user registers.
-		//Needed services:
-		//Kill pid-					Kill another process. (DONE)
-		//Shutdown-					Kill the system. (DONE)
-		//Exec-						load a single region of code (DONE)
-		//Fork-						copy an entire program (DONE)
-		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'. (NEVER FINISHED)
-		//Disk Read Sector-			Read a 256 byte sector from disk. (DONE)
-		//Disk Write Sector-		write a 256 byte sector to disk. (DONE)
-		//Interprocess Write-		Write to another process's memory. (DONE)
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			user_geta;	lb 0xa; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 			user_geta;	lb 0xd; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
@@ -287,7 +277,7 @@ bytes 0,0;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
-			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
+			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_try_select_task%; jmpifeq;		//Sleep.
 			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
@@ -566,15 +556,13 @@ bytes 0,0;
 			farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
 			sc %libc_krenel_preempt%; jmp;
 	libc_krenel_getchar:
-		getchar;
-		user_seta;
-		sc %libc_krenel_preempt%; jmp;
+		getchar;user_seta;sc %libc_krenel_preempt%; jmp;
 	libc_krenel_putchar:
-		user_geta;
-		putchar;
-		sc %libc_krenel_preempt%; jmp;
+		user_geta;putchar;sc %libc_krenel_preempt%; jmp;
 	libc_krenel_tried_interrupt:
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~KRENEL INTERRUPT PASSTHROUGHS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb '\r'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb 0xc; cmp; blpop; sc %libc_krenel_syscall_clear_term%; jmpifeq;
