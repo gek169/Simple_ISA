@@ -10,11 +10,12 @@
 //The return values from the machine are not provided to the caller.
 //krenel also uses it.
 
-//Copy sh*t.
-farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
+//These four nops are very important.
+nop;nop;nop;nop;
+farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%; //HUGE NOTE: upon a boot of the libc, this will load zeroes.
 farstrx0 %&0%
 .libc_krenel_jumploc:@+1+
-lrx0 %/0%; 
+lrx0 %/libc_booter%;
 farjmprx0;
 :libc_krenel_stack_data_store:
 nop;nop;nop;nop;
@@ -78,6 +79,10 @@ nop;nop;nop;nop;
 	libc_emulate_single_cswitch_loopout:
 farret;
 
+
+
+		
+			
 
 ..include"printbytehex.hasm"
 ..include"fdisk.hasm"
@@ -581,3 +586,33 @@ bytes 0,0;
 		la 'n'; putchar;
 		la '\n'; interrupt;
 		farret;													asm_print; //I want information!
+
+
+//If you directly boot the libc, this is what you boot into.
+:libc_booter:
+	//restore the nops at zero.
+	la 0x1E;
+	sta %0%;
+	sta %1%;
+	sta %2%;
+	sta %3%;
+	la 0; rx0a;
+	lla %0x100%; rx1a;
+	llb %~LIBC_REGION%, 0;
+	libc_booter_copy_loop:
+		arx0;  add; ca;
+		arx0;
+		farpagest;
+		rxincr;
+		rxcmp;
+		nota;
+		sc %libc_booter_copy_loop%; jmpifeq;
+	//Indicate that booting succeded.
+	la 'c'; putchar;
+	la 'o'; putchar;
+	la 'p'; putchar;
+	la 'i'; putchar;
+	la 'e'; putchar;
+	la 'd'; putchar;
+	la '.'; putchar;
+	halt;
