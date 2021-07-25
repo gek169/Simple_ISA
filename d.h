@@ -251,7 +251,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		/*
 			B holds the process whose memory we want to use.
 		*/
-		b &= (SISA_MAX_TASKS+1);
+		b %= (SISA_MAX_TASKS+1);
 		screenrect.x = 0;
 		screenrect.y = 0;
 		screenrect.w = 640;
