@@ -49,7 +49,9 @@ static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec = {0};
 static const unsigned int display_scale = 2;
 static unsigned short audio_left = 0;
+#ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 static char blocking_input = 1;
+#endif
 static unsigned short shouldquit = 0;
 static unsigned char active_audio_user = 0;
 static unsigned char FG_color = 15;
@@ -145,10 +147,12 @@ static void pollevents(){
 	}
 }
 static unsigned short gch(){
+#ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 	while(blocking_input && stdin_bufptr == 0){
 		SDL_Delay(16);
 		pollevents();
 	}
+#endif
 	if(stdin_bufptr){
 		stdin_bufptr--;
 		return stdin_buf[stdin_bufptr];
@@ -380,7 +384,9 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 
 	if(a==0xE000){
 #ifdef USE_SDL2
+#ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 		blocking_input = 0;
+#endif
 		return 1;
 #else
 
@@ -393,9 +399,16 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	}
 	if(a==0xE001){
 #ifdef USE_SDL2
+
+#ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 		blocking_input = 1;
 		return 1;
 #else
+		return 0;
+#endif
+
+#else
+
 #ifdef USE_TERMIOS
 		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
 		fcntl(STDIN_FILENO, F_SETFL, 0);return 1;
