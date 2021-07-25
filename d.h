@@ -10,7 +10,7 @@
 /*
 	buffers for stdout and stdin.
 */
-#define SCREEN_WIDTH_CHARS 90
+#define SCREEN_WIDTH_CHARS 80
 #define SCREEN_HEIGHT_CHARS 60
 static unsigned char stdout_buf[(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS) + SCREEN_WIDTH_CHARS] = {0};
 #ifdef USE_SDL2
