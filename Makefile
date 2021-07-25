@@ -26,10 +26,11 @@ q:
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
 	git push || echo "nothing to push"
-	./asmbuild.sh
+#	./asmbuild.sh
 
 d:
-	admin $(MAKE) -B install
+#	admin $(MAKE) -B install
+	admin $(MAKE) install_sdl2 -B
 	admin $(MAKE) libc
 	admin $(MAKE) clean
 	./asmbuild.sh

@@ -20,7 +20,7 @@ static const UU AUDIO_LOC_MEM = (0xffFF + SCREEN_LOC + (SCREEN_WIDTH_CHARS * 64 
 /*
 	The SDL2 driver keeps a "standard in" buffer.
 */
-static unsigned char stdin_buf[(SCREEN_WIDTH_CHARS * 64 * SCREEN_HEIGHT_CHARS))] = {0};
+static unsigned char stdin_buf[(SCREEN_WIDTH_CHARS * 64 * SCREEN_HEIGHT_CHARS)] = {0};
 /*
 	buffer pointer.
 */
@@ -67,7 +67,6 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 }
 
 static void DONT_WANT_TO_INLINE_THIS di(){
-		/*setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));*/
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
 	        printf("SDL2 could not be initialized!\n"
@@ -115,6 +114,7 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 		  exit(-1);
 		}
 		SDL_PauseAudio(0);
+		SDL_StartTextInput();
 }
 static void DONT_WANT_TO_INLINE_THIS dcl(){
 		SDL_DestroyTexture(sdl_tex);
@@ -123,7 +123,6 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
     	SDL_DestroyWindow(sdl_win);
 	    SDL_Quit();
 }
-
 static unsigned short gch(){
 	if(stdin_bufptr){
 		stdin_bufptr--;
@@ -135,14 +134,14 @@ static void renderchar(unsigned char* bitmap, UU p) {
 	UU x, y, i, j, _x, _y;
 	UU set;
 	/*640/8 = 80, 480/8 = 60*/
-	_x = p%80;
-	_y = p/80;
+	_x = p%SCREEN_WIDTH_CHARS;
+	_y = p/SCREEN_WIDTH_CHARS;
 	_x *= 8;
 	_y *= 8;
 	for (x = 0; x < 8; x++) {
 		for (y = 0; y < 8; y++) {
 			set = bitmap[x] & (1 << y);
-			if (set) SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[FG_color];
+			if (set) SDL_targ[(_x+y) + (_y+x) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[FG_color];
 		}
 	}
 }
@@ -166,7 +165,7 @@ static void pch(unsigned short a){
 	}
 	while(curpos>=(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)){
 		curpos -= SCREEN_WIDTH_CHARS;
-		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS);
+		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
 		memset(stdout_buf+(SCREEN_WIDTH_CHARS- 1)*SCREEN_HEIGHT_CHARS, ' ', SCREEN_WIDTH_CHARS);
 	}
 }
@@ -175,9 +174,9 @@ static void pollevents(){
 	SDL_Event ev;
 	while(SDL_PollEvent(&ev)){
 		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
-		if(ev.type == SDL_KEYDOWN){
-			unsigned char b = SDL_GetKeyFromScancode(ev.key.keysym.sym);
-			stdin_buf[stdin_bufptr++] = b;
+		else if(ev.type == SDL_TEXTINPUT){
+			char* b = ev.text.text;
+			while(*b) {stdin_buf[stdin_bufptr++] = *b; b++;}
 		}
 	}
 }
@@ -260,8 +259,8 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 #ifdef USE_SDL2
 	if(a == '\n' || a == '\r'){ /*magic values to display the screen.*/
 		UU i = 0;
-		static SDL_Rect screenrect;
-		static SDL_Rect screenrect2;
+		SDL_Rect screenrect;
+		SDL_Rect screenrect2;
 		/*
 			B holds the process whose memory we want to use.
 		*/

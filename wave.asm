@@ -16,7 +16,7 @@
 
 
 region 0xB0;
-fill 0x100000, 20;
+fill 0x100000, 255;
 
 section 0x40000;
 	:ascii_greyscale:
