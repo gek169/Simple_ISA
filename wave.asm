@@ -30,9 +30,9 @@ section 0x40000;
 ..include"libc.hasm"
 
 
-.line_length:			80
-.line_length_plus_1:	81
-.num_lines:				60
+.line_length:			79
+.line_length_plus_1:	80
+.num_lines:				59
 .wait_time:				16
 
 ..main(5):

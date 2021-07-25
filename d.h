@@ -1,6 +1,11 @@
 /*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef USE_SDL2
+#ifdef USE_TERMIOS
+#undef USE_TERMIOS
+#endif
+#endif
 #include "isa_pre.h"
 /*
 	buffers for stdout and stdin.
@@ -15,7 +20,7 @@ static const UU AUDIO_LOC_MEM = (0xffFF + SCREEN_LOC + (SCREEN_WIDTH_CHARS * 64 
 /*
 	The SDL2 driver keeps a "standard in" buffer.
 */
-static unsigned char stdin_buf[0x10000] = {0};
+static unsigned char stdin_buf[(SCREEN_WIDTH_CHARS * 64 * SCREEN_HEIGHT_CHARS))] = {0};
 /*
 	buffer pointer.
 */
@@ -24,7 +29,7 @@ unsigned short stdin_bufptr = 0;
 /*
 	Cursor position.
 */
-unsigned short curpos = 0;
+UU  curpos = 0;
 /*
 	SDL2 driver, plus simple text mode.
 */
@@ -42,7 +47,7 @@ unsigned short curpos = 0;
 static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
-static SDL_AudioSpec sdl_spec;
+static SDL_AudioSpec sdl_spec = {0};
 static const unsigned int display_scale = 2;
 static unsigned short audio_left = 0;
 static unsigned short shouldquit = 0;
@@ -273,7 +278,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 			SDL_targ[i] = vga_palette[val];
 		}
 		for(i=0;i<(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
-			if(stdout_buf[i] && stdout_buf[i] != ' ' && isprint(stdout-buf[i]))
+			if(stdout_buf[i] && stdout_buf[i] != ' ' && isprint(stdout_buf[i]))
 				renderchar(font8x8_basic[stdout_buf[i]], i);
 		}
 		/*
