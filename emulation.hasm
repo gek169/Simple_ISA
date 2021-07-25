@@ -255,6 +255,8 @@ bytes 0,0;
 			user_geta;	lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 			user_geta;	lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	nota; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
+			user_geta;	lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -326,6 +328,8 @@ bytes 0,0;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_pumpevents:
 			la 1; interrupt;
+			llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq; //handle quit.
+			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_read_gamer_buttons:
 			la 2; interrupt;
@@ -507,6 +511,10 @@ bytes 0,0;
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb '\r'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb 0xc; cmp; blpop; sc %libc_krenel_syscall_clear_term%; jmpifeq;
+		ab; blpush; nota; blpop; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
+		ab; blpush; lb 1; cmp; blpop; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
+		ab; blpush; lb 0x80; cmp; blpop; sc %libc_krenel_try_select_task%; jmpifeq; //Check for interrupt 80h.
+		//BAD INTERRUPT
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
 		la 'i'; putchar;
