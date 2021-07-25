@@ -94,11 +94,11 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp *.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
-install_sdl2: sisa16_asm sisa16_emu sisa16_dbg 
+install_sdl2:
 	$(MAKE) -B install
-	$(MAKE) sisa16_sdl2_asm 
-	$(MAKE) sisa16_sdl2_emu 
-	$(MAKE) sisa16_sdl2_dbg
+	$(MAKE) -B sisa16_sdl2_asm 
+	$(MAKE) -B sisa16_sdl2_emu 
+	$(MAKE) -B sisa16_sdl2_dbg
 	@cp ./sisa16_sdl2_emu $(INSTALL_DIR)/ || cp ./sisa16_sdl2_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_emu"
 	@cp ./sisa16_sdl2_asm $(INSTALL_DIR)/ || cp ./sisa16_sdl2_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_asm"
 	@cp ./sisa16_sdl2_dbg $(INSTALL_DIR)/ || cp ./sisa16_sdl2_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_dbg"

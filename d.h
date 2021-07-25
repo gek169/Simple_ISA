@@ -378,6 +378,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 
 	if(a==0xE000){
 #ifdef USE_SDL2
+		blocking_input = 0;
 		return 1;
 #else
 
@@ -390,6 +391,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	}
 	if(a==0xE001){
 #ifdef USE_SDL2
+		blocking_input = 1;
 		return 1;
 #else
 #ifdef USE_TERMIOS
