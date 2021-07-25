@@ -352,7 +352,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		return 1;
 	}
 	if(a == 6){
-		FG_color = b;
+		
 		return 1;
 	}
 	if(a == 7){ /*They want to set the active user for audio.*/

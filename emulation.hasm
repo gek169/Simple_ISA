@@ -355,16 +355,11 @@ bytes 0,0;
 			la 8; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_play_audio:
-			//first, we need to set the active audio user to the current process.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			aincr; ba;
-			la 7; interrupt;
-			//Now, we play the audio.
 			la 3; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_set_colors:
 			user_getb;ba;
-			la 6; interrupt;
+			la 5; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
