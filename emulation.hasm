@@ -121,11 +121,10 @@ farret;
 .libc_krenel_disk_reserved:0x1000000
 
 //Load user page according to register B.
-..decl_lproc:libc_lproc_krenel_load_user_page
-	user_getb;ca;
-	lla %libc_krenel_diskio_page%;
+.libc_lproc_krenel_load_user_page:\
+	user_getb;ca;\
+	lla %libc_krenel_diskio_page%;\
 	user_farpagel;
-	ret;
 //old implementation.
 //	user_getb;rx0a;
 //	lb 8; rx1b; rxlsh;
