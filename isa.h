@@ -163,8 +163,8 @@ int DONT_WANT_TO_INLINE_THIS e()
 
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
-#define PREEMPT() instruction_counter++;if(EMULATE_DEPTH){\
-	if(instruction_counter > PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
+#define PREEMPT() if(EMULATE_DEPTH){\
+	instruction_counter++;if(instruction_counter > PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
 #else
 #define PREEMPT() /*a comment*/
@@ -373,7 +373,7 @@ G_FARPAGEL:
 	memmove(M+(((UU)a_stash)<<8),M+(((UU)c_stash)<<8),256);
 	UNSTASH_REGS;
 #ifndef NO_PREEMPT
-	instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
+	if(EMULATE_DEPTH) instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 }
 D
@@ -382,7 +382,7 @@ G_FARPAGEST:{
 	memmove(M+(((UU)c_stash)<<8),M+(((UU)a_stash)<<8),256);
 	UNSTASH_REGS;
 #ifndef NO_PREEMPT
-	instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
+	if(EMULATE_DEPTH) instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 }D
 G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
@@ -508,7 +508,7 @@ G_CLOCK:{
 	b=q/(CLOCKS_PER_SEC);
 	c=q;
 #ifndef NO_PREEMPT
-	instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
+	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
 #endif
 }D
 /*load from RX0*/
@@ -611,7 +611,7 @@ ZB:
 		memcpy(M + 0x100 * (RX0&0xffFF), SEGMENT + 0x100 * RX1, 0x100);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
-		instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
+		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 	}
 	D
@@ -627,7 +627,7 @@ ZC:
 		memcpy(SEGMENT + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
-		instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
+		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 	}
 	D
@@ -640,7 +640,7 @@ ZD:
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 #ifndef NO_PREEMPT
-	instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
+	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 	if(RX0 == 0){
 		STASH_REGS;
