@@ -253,13 +253,15 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-			user_geta;	lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	lb 0xa; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
-			user_geta;	lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	lb 0xd; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	nota; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
 			user_geta;	lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
 			user_geta;	lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
 			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
+			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
+			user_geta;	lb 6; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -282,6 +284,8 @@ bytes 0,0;
 			la 'a'; putchar;
 			la 'l'; putchar;
 			la 'l'; putchar;
+			la '\r'; putchar;
+			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_getpid:
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
@@ -339,6 +343,7 @@ bytes 0,0;
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_kill_audio:
+			//Anyone on the system can request to kill the audio.
 			la 4; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_play_audio:
@@ -348,7 +353,11 @@ bytes 0,0;
 			//Now, we play the audio.
 			la 3; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_check_d_h:
+		:libc_krenel_syscall_set_colors:
+			user_getb;ba;
+			la 5; interrupt;
+			user_getc;ba;
+			la 6; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
