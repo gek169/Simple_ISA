@@ -147,9 +147,9 @@ static void pch(unsigned short a){
 	if(a == '\n'){
 		do{
 			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
-		}while(curpos%80);
+		}while(curpos%SCREEN_WIDTH_CHARS);
 	} else if(a == '\r'){
-		while(curpos%80)curpos--;
+		while(curpos%SCREEN_WIDTH_CHARS)curpos--;
 	} else if(a == 8 || a == 0x7f){
 		stdout_buf[curpos-- % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
 	} else if(a == '\t'){
@@ -273,7 +273,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 			SDL_targ[i] = vga_palette[val];
 		}
 		for(i=0;i<(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
-			if(stdout_buf[i] && stdout_buf[i] != ' ')
+			if(stdout_buf[i] && stdout_buf[i] != ' ' && isprint(stdout-buf[i]))
 				renderchar(font8x8_basic[stdout_buf[i]], i);
 		}
 		/*
@@ -289,8 +289,8 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		SDL_RenderCopy(
 			sdl_rend, 
 			sdl_tex,
-			screenrect,
-			screenrect2
+			&screenrect,
+			&screenrect2
 		);
 		SDL_RenderPresent(sdl_rend);
 		return a;

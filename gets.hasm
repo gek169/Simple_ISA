@@ -111,6 +111,7 @@ farret;
 	rx3_0;
 	lb0;rx2b;
 	:libc_gets_user_looptop:
+		la '\n'; interrupt;
 		rx0_2
 		llb %libc_gets_max_chars%; rx1b
 		rxcmp
