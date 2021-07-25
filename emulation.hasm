@@ -532,6 +532,7 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
+		la 0; interrupt;
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
 		lb 0xffFF; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 		lb 0; rx2b;	//RX2: the number of things we have tried.
