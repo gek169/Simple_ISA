@@ -81,8 +81,9 @@ farret;
 
 
 
-		
-			
+
+
+
 
 ..include"printbytehex.hasm"
 ..include"fdisk.hasm"
@@ -95,9 +96,13 @@ farret;
 ..include"sqrt.hasm"
 ..include"wait.hasm"
 ..include"termcontrol.hasm"
-
-//This has its memory in libc.hasm
 ..include"alloc.hasm"
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~K R E N E L~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//Give it a location to boot as PID 0, and it will, in RX0.
 
 ..decl_lproc:libc_lproc_krenel_print_krenel
 	la 'K'; putchar;
@@ -111,11 +116,6 @@ farret;
 	ret
 
 
-
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~K R E N E L~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//Give it a location to boot as PID 0, and it will, in RX0.
 
 //krenel constants:
 //MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS

@@ -87,16 +87,16 @@ bytes '\r' ,'\n', 0;
 ..(8):
 	krenel_boot:
 		push %10%; //make some room for that bootloader!
-		//Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
-		lrx0 %/0x20000%;
-		lrx1 %/0x20480%;
-		overwrite_krenel_looptop:
-			cbrx0;
-			la 0;
-			farista;
-			rxincr;
-			rxcmp;
-			sc %overwrite_krenel_looptop%; jmpifneq;
+		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
+//		lrx0 %/0x20000%;
+//		lrx1 %/0x20480%;
+//		overwrite_krenel_looptop:
+//			cbrx0;
+//			la 0;
+//			farista;
+//			rxincr;
+//			rxcmp;
+//			sc %overwrite_krenel_looptop%; jmpifneq;
 
 		//exec region syscall.
 		//lla %0xDE04%; lb 55; syscall;

@@ -1,5 +1,6 @@
 
 //These are privileged functions.
+//They are also quite slow, don't use them for large memory transfers.
 
 //FREAD
 //Arguments:
