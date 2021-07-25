@@ -177,6 +177,17 @@ static void pollevents(){
 		else if(ev.type == SDL_TEXTINPUT){
 			char* b = ev.text.text;
 			while(*b) {stdin_buf[stdin_bufptr++] = *b; b++;}
+		}else if(ev.type == SDL_KEYDOWN){
+			switch(ev.key.keysym.scancode){
+				default: break;
+				case SDL_SCANCODE_DELETE: stdin_buf[stdin_bufptr++] = 0x7F; break;
+				case SDL_SCANCODE_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
+				case SDL_SCANCODE_KP_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
+				case SDL_SCANCODE_RETURN: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_RETURN2: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_KP_ENTER: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_ESCAPE: stdin_buf[stdin_bufptr++] = '\e';break;
+			}
 		}
 	}
 }
