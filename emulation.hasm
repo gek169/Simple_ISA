@@ -548,11 +548,12 @@ bytes 0,0;
 				libc_krenel_syscall_fork_copymem_looptop:
 					cbrx0; user_farilda;        //Load from old memory.
 					rx3a;
-						apop;push %2%;task_set; //Into new user memory.
+						apop;apush;task_set; //Into new user memory.
 					arx3;
 					user_farista;
-					apop;
-					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;task_set;
+					//apop;apush; //What was I thinking?!?!
+					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+					task_set;
 					rxincr;rxcmp;nota; 
 					sc %libc_krenel_syscall_fork_copymem_looptop%; jmpifeq; //if(++rx0 < rx1) jmp
 
