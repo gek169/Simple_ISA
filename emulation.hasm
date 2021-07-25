@@ -117,7 +117,7 @@ farret;
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
-//We reserve 16 megabytes for the purpose of creating a PID0 program.
+//We reserve 16 megabytes for the purpose of creating a PID0 program. This also protects krenel's initial memory.
 .libc_krenel_disk_reserved:0x1000000
 
 //Load user page according to register B.
@@ -191,7 +191,9 @@ bytes 0,0;
 		lb0;rx0b; 
 		lb libc_krenel_max_active_tasks; rx1b;
 		libc_krenel_zero_tasks_looptop:
-			arx0;lb 2;mul;ba;
+			arx0;task_set; task_kill;
+			arx0;
+			lb 2;mul;ba;
 			sc %LIBC_REGION%;lla %libc_krenel_task_isactive_array%
 			add;ba;
 			la 0; faristla;
@@ -201,6 +203,7 @@ bytes 0,0;
 		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
 		la 1;
 		farstla %~LIBC_REGION%,  %libc_krenel_task_isactive_array%;
+		la 0; task_set;
 	//get that important argument back!
 		rx0pop;
 		farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
