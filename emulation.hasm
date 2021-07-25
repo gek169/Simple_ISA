@@ -534,7 +534,7 @@ bytes 0,0;
 		task_ric; //Reset the current task's instruction counter.
 		la 0; interrupt;
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
-		lb 0xffFF; cmp; sc %libc_krenel_shutdown%; jmpifeq;
+		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 		lb 0; rx2b;	//RX2: the number of things we have tried.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks_mask; rx1b;
