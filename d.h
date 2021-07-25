@@ -345,6 +345,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 0xc){
 #ifdef USE_SDL2
 		memset(stdout_buf, 0, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
+		curpos = 0;
 #endif
 		printf("\e[H\e[2J\e[3J");
 		return a;

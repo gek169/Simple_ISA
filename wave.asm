@@ -15,6 +15,9 @@
 .st_page_count:	farstla %&0x30004%;
 
 
+region 0xB0;
+fill 0x100000, 33;
+
 section 0x40000;
 	:ascii_greyscale:
 	..asciz: .:-=+*#%@%#*+=-:.
