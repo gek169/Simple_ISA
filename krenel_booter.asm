@@ -61,7 +61,7 @@ bytes '\r' ,'\n', 0;
 	lla %0xDE03%; //Disk read.
 	syscall;
 	la '\r'; putchar;
-	la '\n'; putchar; interrupt;
+	la '\n'; putchar; 
 	la 'q'; putchar;
 	la 'u'; putchar;
 	la 'i'; putchar;
@@ -90,7 +90,7 @@ bytes '\r' ,'\n', 0;
 ..(8):
 	krenel_boot:
 		push %10%; //make some room for that bootloader!
-		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
+//		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
 //		lrx0 %/0x20000%;
 //		lrx1 %/0x20480%;
 //		overwrite_krenel_looptop:
