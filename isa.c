@@ -262,7 +262,7 @@ int main(int rc,char**rv){
 #endif
 	R=0;e();
 	for(i=0;i<(1<<24)-31&&rc>2;i+=32)	
-		for(j=i,printf("%s\n%04lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
+		for(j=i,printf("%s\n%06lx|",(i&255)?"":"\n~",(unsigned long)i);j<i+32;j++)
 			printf("%02x%c",M_SAVER[0][j],((j+1)%8)?' ':'|');
 	if(R==1)puts("\n<Errfl, 16 bit div by 0>\n");
 	if(R==2)puts("\n<Errfl, 16 bit mod by 0>\n");

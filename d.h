@@ -373,7 +373,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
 		for(i=0;i<(1<<24)-31;i+=32)
-			for(j=i,printf("%s\r\n%04lx|",(i&255)?"":"\r\n~",i);j<i+32;j++)
+			for(j=i,printf("%s\r\n%06lx|",(i&255)?"":"\r\n~",i);j<i+32;j++)
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 		return a;
 	}
