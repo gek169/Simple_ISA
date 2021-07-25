@@ -131,7 +131,7 @@ k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_ITOF;k 209:goto G_FTOI;\
 k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
 k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:goto G_TASK_RIC;\
-k 218:k 219:k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
+k 218:goto G_FARPAGEL;k 219:goto G_FARPAGEST;k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
@@ -259,8 +259,9 @@ const void* const goto_table[256] = {
 &&G_EMULATE_SEG,
 &&G_RXICMP,
 &&G_LOGOR,&&G_LOGAND,
-&&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_TASK_RIC,&&G_HALT,
-&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
+&&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_TASK_RIC,
+&&G_USER_FARPAGEL,&&G_USER_FARPAGEST,
+&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,
@@ -935,6 +936,28 @@ G_AA12:{SUU SRX0, SRX1;
 		REG_SAVER[current_task].instruction_counter = 0;
 #endif
 	D
+	G_USER_FARPAGEL:
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	{
+		STASH_REGS;
+		memcpy(
+			M_STASH + (a_stash<<8),
+			M_SAVER[current_task] + (c_stash<<8),
+			256
+		);
+		UNSTASH_REGS;
+	}D
+	G_USER_FARPAGEST:
+	if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	{
+		STASH_REGS;
+		memcpy(
+			M_SAVER[current_task] + (c_stash<<8),
+			M_STASH + (a_stash<<8),
+			256
+		);
+		UNSTASH_REGS;
+	}D
 	G_HALT:
 	if(EMULATE_DEPTH == 0){
 		dcl();return 0;

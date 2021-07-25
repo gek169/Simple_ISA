@@ -627,7 +627,11 @@ nota: make a into inverse boolean, a = (a == 0) (D7)
 
 user_farista: store a to user memory location ((c & 255)<<16)+b  (D8)
 
-task_ric: If pre-emption is enabled, reset the current task's instruction counter to zero.  (D9)
+task_ric: If pre-emption is enabled, reset the current task's instruction counter to zero. (PRIVILEGED) (D9)
+
+user_farpagel: load user page c into privileged page a (PRIVILEGED) (DA)
+
+user_farpagest: store privileged page a into user page c (PRIVILEGED) (DB)
 
 The rest: halt duplicates, free for expansion (1 byte)
 
