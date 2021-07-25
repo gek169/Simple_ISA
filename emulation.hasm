@@ -608,11 +608,10 @@ bytes 0,0;
 		nota;
 		sc %libc_booter_copy_loop%; jmpifeq;
 	//Indicate that booting succeded.
-	la 'c'; putchar;
-	la 'o'; putchar;
-	la 'p'; putchar;
-	la 'i'; putchar;
-	la 'e'; putchar;
-	la 'd'; putchar;
-	la '.'; putchar;
+	astp;popa; //Clear the stack pointer.
+	lrx0 %/COMMAND_COM%;
+	proc_krenel;
 	halt;
+
+..include"command_com.hasm"
+

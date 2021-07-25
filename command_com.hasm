@@ -1,0 +1,17 @@
+
+
+:COMMAND_COM:
+	la 'C'; putchar;
+	la 'O'; putchar;
+	la 'M'; putchar;
+	la 'M'; putchar;
+	la 'A'; putchar;
+	la 'N'; putchar;
+	la 'D'; putchar;
+	la '.'; putchar;
+	la 'C'; putchar;
+	la 'O'; putchar;
+	la 'M'; putchar;
+	la '\r'; putchar;
+	la '\n'; putchar;interrupt;
+	halt;
