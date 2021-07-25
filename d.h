@@ -50,6 +50,7 @@ static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec = {0};
 static const unsigned int display_scale = 2;
 static unsigned short audio_left = 0;
+static char blocking_input = 1;
 static unsigned short shouldquit = 0;
 static unsigned char active_audio_user = 0;
 static unsigned char FG_color = 15;
@@ -124,6 +125,9 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
 	    SDL_Quit();
 }
 static unsigned short gch(){
+	while(blocking_input && stdin_bufptr == 0){
+		SDL_Delay(16);
+	}
 	if(stdin_bufptr){
 		stdin_bufptr--;
 		return stdin_buf[stdin_bufptr];
