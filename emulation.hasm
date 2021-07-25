@@ -321,6 +321,16 @@ bytes 0,0;
 		:libc_krenel_syscall_clear_term:
 			la 0xc; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_screenupdate:
+			la 0; interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_pumpevents:
+			la 1; interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_read_gamer_buttons:
+			la 2; interrupt;
+			user_seta;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
 			//RX0: Destination on disk. Not aligned!
@@ -532,7 +542,7 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
-		la 0; interrupt;
+		//la 0; interrupt; //TEMP!!! remove this, it is highly inefficient.
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
 		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 		lb 0; rx2b;	//RX2: the number of things we have tried.

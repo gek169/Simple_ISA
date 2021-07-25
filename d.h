@@ -1,7 +1,7 @@
 /*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "isa_pre.h"
 /*
 	buffers for stdout and stdin.
 */
@@ -9,7 +9,8 @@
 #define SCREEN_HEIGHT_CHARS 60
 
 static unsigned char stdout_buf[SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS + SCREEN_WIDTH_CHARS] = {0};
-
+static const UU SCREEN_LOC = 0xB00000;
+static const UU AUDIO_LOC_MEM = (0xffFF + SCREEN_LOC + (SCREEN_WIDTH_CHARS * 64 * SCREEN_HEIGHT_CHARS)) & 0xFF0000;
 #ifdef USE_SDL2
 /*
 	The SDL2 driver keeps a "standard in" buffer.
@@ -27,7 +28,7 @@ unsigned short curpos = 0;
 /*
 	SDL2 driver, plus simple text mode.
 */
-#include "isa_pre.h"
+
 #define SDL_MAIN_HANDLED
 #ifdef __TINYC__
 #define SDL_DISABLE_IMMINTRIN_H 1
@@ -42,11 +43,11 @@ static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec;
-static unsigned short audio_pos = 0;
 static unsigned short audio_left = 0;
 static unsigned short shouldquit = 0;
-unsigned char FG_color = 15;
-unsigned char BG_color = 0;
+static unsigned char active_audio_user = 0;
+static unsigned char FG_color = 15;
+static unsigned char BG_color = 0;
 static UU SDL_targ[640*480] = {0}; /*Default to all black.*/
 static UU vga_palette[256] = {
 #include "vga_pal.h"
@@ -55,8 +56,7 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
-	SDL_MixAudio(stream, M_SAVER[0] + 0xC00000 + audio_pos, len, SDL_MIX_MAXVOLUME);
-	audio_pos += len;
+	SDL_MixAudio(stream, M_SAVER[active_audio_user] + 0xB50000 + (0xffFF - audio_left), len, SDL_MIX_MAXVOLUME);
 	audio_left -= len;
 }
 
@@ -174,7 +174,6 @@ static void pollevents(){
 /*
 	textmode driver.
 */
-#include "isa_pre.h"
 #ifdef USE_TERMIOS
 #include <termios.h>
 #include <unistd.h>
@@ -246,15 +245,19 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 {
 	if(a == 0x80) return a; /*Ignore 80- it is reserved for system calls!*/
 #ifdef USE_SDL2
-	if(a == 0){ /*magic value to display the screen.*/
+	if(a == '\n' || a == '\r'){ /*magic values to display the screen.*/
 		UU i = 0;
 		static SDL_Rect screenrect;
+		/*
+			B holds the process whose memory we want to use.
+		*/
+		b &= (SISA_MAX_TASKS+1);
 		screenrect.x = 0;
 		screenrect.y = 0;
 		screenrect.w = 640;
 		screenrect.h = 640;
 		for(;i<640*480;i++){
-			unsigned char val = M[0xB00000 + i];
+			unsigned char val = M_SAVER[b][0xB00000 + i];
 			SDL_targ[i] = vga_palette[val];
 		}
 		SDL_UpdateTexture(
@@ -270,7 +273,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 			NULL
 		);
 		SDL_RenderPresent(sdl_rend);
-		return 1;
+		return a;
 	}
 	if(a == 1){ /*Poll events.*/
 		pollevents();
@@ -300,26 +303,25 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	/*TODO: play samples from a buffer.*/
 	if(a == 3){
 		audio_left = 0xffFF;
-		audio_pos = 0;
-		return 0;
+		return 1;
 	}
 	/*kill the audio.*/
 	if(a == 4){
 		audio_left = 0;
-		audio_pos = 0xFFff;
+		return 1;
 	}
 	if(a == 5){
 		BG_color = b;
+		return 1;
 	}
 	if(a == 6){
 		FG_color = b;
+		return 1;
 	}
 #endif
 
 	if(a==0xa||a == 0xd) {
-#ifdef USE_SDL2
-		/*TODO*/
-#else
+#ifndef USE_SDL2
 		fflush(stdout);
 		return a;
 #endif
