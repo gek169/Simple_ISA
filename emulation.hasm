@@ -262,6 +262,7 @@ bytes 0,0;
 			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
 			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
 			user_geta;	lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
+			user_geta;	lb 8; cmp; sc %libc_krenel_syscall_set_palette_color%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -347,6 +348,11 @@ bytes 0,0;
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			aincr; ba;
 			la 7; interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_set_palette_color:
+			user_get0;
+			user_getb; ba;
+			la 8; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_play_audio:
 			//first, we need to set the active audio user to the current process.

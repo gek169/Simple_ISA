@@ -173,9 +173,7 @@ static void renderchar(unsigned char* bitmap, UU p) {
 }
 static void pch(unsigned short a){
 	if(a == '\n'){
-		do{
-			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
-		}while(curpos%SCREEN_WIDTH_CHARS);
+		curpos += SCREEN_WIDTH_CHARS;
 	} else if(a == '\r'){
 		while(curpos%SCREEN_WIDTH_CHARS)curpos--;
 	} else if(a == 8 || a == 0x7f){
@@ -360,6 +358,9 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	}
 	if(a == 7){ /*They want to set the active user for audio.*/
 		active_audio_user = b % (SISA_MAX_TASKS+1);
+	}
+	if(a == 8){
+		vga_palette[b&0xff] = RX0 & 0xFFffFF;
 	}
 #endif
 
