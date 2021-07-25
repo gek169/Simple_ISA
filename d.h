@@ -79,8 +79,8 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 		sdl_win = SDL_CreateWindow("[SISA-16]",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			SCREEN_WIDTH_CHARS * 8, 
-			SCREEN_HEIGHT_CHARS * 8,
+			SCREEN_WIDTH_CHARS * 8 * display_scale, 
+			SCREEN_HEIGHT_CHARS * 8 * display_scale,
 			SDL_WINDOW_SHOWN
 		);
 		if(!sdl_win)
@@ -96,8 +96,8 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 			exit(1);
 		}
 		sdl_tex = SDL_CreateTexture(sdl_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 
-		display_scale * SCREEN_WIDTH_CHARS * 8, 
-		display_scale * SCREEN_HEIGHT_CHARS * 8
+			SCREEN_WIDTH_CHARS * 8,
+			SCREEN_HEIGHT_CHARS * 8
 		);
 		if(!sdl_tex){
 			printf("SDL2 texture creation failed.\n"
