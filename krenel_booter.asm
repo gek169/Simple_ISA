@@ -1,9 +1,9 @@
 #!/usr/bin/sisa16_asm -run
 
-//..include"libc.hasm"
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+..include"libc.hasm"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 ..(0x25):
 	my_page_o_crap:
 	fill 256, '7'
@@ -48,17 +48,14 @@ bytes '\r' ,'\n', 0;
 	//lla %0xDEAD%; syscall;
 
 	//write to disk! See if it makes it through at all.
-	lrx0 %/my_page_o_crap%;
-	lrx1 %/8%; rxrsh;
-	brx0;
-	lrx0 %/14%;
-	//lrx0 %/10%;
-	lla %0xDE03%; //Disk read.
+	llb %0x2500%;
+	//lrx0 %/0x800001%;
+	//lla %0xDE03%; //Disk read.
 
 	
-	//llb %0x2500%;
-	//lla %0xDE01%; //Disk write.
-	//lrx0 %/10%;
+	llb %0x2500%;
+	lla %0xDE01%; //Disk write.
+	lrx0 %/0x800001%;
 	syscall;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;

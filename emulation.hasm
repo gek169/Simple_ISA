@@ -117,6 +117,7 @@ farret;
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
+.libc_krenel_disk_reserved:0x80000
 
 //Load user page according to register B.
 ..decl_lproc:libc_lproc_krenel_load_user_page
@@ -245,7 +246,7 @@ bytes 0,0;
 		//Shutdown-					Kill the system. (DONE)
 		//Exec-						load a single region of code (DONE)
 		//Fork-						copy an entire program (DONE)
-		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'. (DONE)
+		//Interrupt passthroughs-	allow certain interrupts to be called, such as '\n'. (NEVER FINISHED)
 		//Disk Read Sector-			Read a 256 byte sector from disk. (DONE)
 		//Disk Write Sector-		write a 256 byte sector to disk. (DONE)
 		//Interprocess Write-		Write to another process's memory. (DONE)
@@ -257,6 +258,8 @@ bytes 0,0;
 			user_geta;	lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	nota; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
 			user_geta;	lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
+			user_geta;	lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
+			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -335,10 +338,29 @@ bytes 0,0;
 			la 2; interrupt;
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_kill_audio:
+			la 4; interrupt; 
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_play_audio:
+			//first, we need to set the active audio user to the current process.
+			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			la 7; interrupt;
+			//Now, we play the audio.
+			la 3; interrupt; 
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_check_d_h:
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
 			//RX0: Destination on disk. Not aligned!
 			//B: source page.
+			//Check permissions.
+			user_get0;
+			lrx1 %/libc_krenel_disk_reserved%;
+			rxcmp;
+			lb 2;
+			cmp;
+			sc %libc_krenel_bad_disk_write%; jmpifneq; //If they aren't writing past the first 512k, kill them.
 			libc_lproc_krenel_load_user_page;
 			user_get0;
 			llb %libc_krenel_diskio_page%; 
@@ -346,6 +368,26 @@ bytes 0,0;
 			interrupt;
 			user_seta; //Inform the user if the disk write succeeded.
 			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_bad_disk_write:
+			//print an error message.
+			libc_lproc_krenel_print_krenel;
+			la 'b'; putchar;
+			la 'a'; putchar;
+			la 'd'; putchar;
+			la ' '; putchar;
+			la 'd'; putchar;
+			la 'i'; putchar;
+			la 's'; putchar;
+			la 'k'; putchar;
+			la ' '; putchar;
+			la 'w'; putchar;
+			la 'r'; putchar;
+			la 'i'; putchar;
+			la 't'; putchar;
+			la 'e'; putchar;
+			la '\r'; putchar;
+			la '\n'; putchar;interrupt;
+			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_sleep:
 			//Simply force a task switch.
 			sc %libc_krenel_try_select_task%; jmp;
@@ -550,7 +592,6 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
-		//la 0; interrupt; //TEMP!!! remove this, it is highly inefficient.
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
 		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 		lb 0; rx2b;	//RX2: the number of things we have tried.

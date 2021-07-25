@@ -318,6 +318,9 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		FG_color = b;
 		return 1;
 	}
+	if(a == 7){ /*They want to set the active user for audio.*/
+		active_audio_user = b % (SISA_MAX_TASKS+1);
+	}
 #endif
 
 	if(a==0xa||a == 0xd) {
