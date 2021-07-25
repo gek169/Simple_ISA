@@ -146,8 +146,6 @@ static void renderchar(unsigned char* bitmap, UU p) {
 	}
 }
 static void pch(unsigned short a){
-	/*TODO- re-render the entire screen if a new line has been entered.*/
-	putchar_unlocked(a); /*This is done temporarily.*/
 	if(a == '\n'){
 		do{
 			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
