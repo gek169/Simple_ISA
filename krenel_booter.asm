@@ -48,14 +48,17 @@ bytes '\r' ,'\n', 0;
 	//lla %0xDEAD%; syscall;
 
 	//write to disk! See if it makes it through at all.
-	llb %0x2500%;
-	//lrx0 %/0x800001%;
-	//lla %0xDE03%; //Disk read.
+
 
 	
 	llb %0x2500%;
 	lla %0xDE01%; //Disk write.
 	lrx0 %/0x800001%;
+	syscall;
+
+	llb %0x2600%;
+	lrx0 %/0x800001%;
+	lla %0xDE03%; //Disk read.
 	syscall;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;
@@ -65,7 +68,7 @@ bytes '\r' ,'\n', 0;
 	la 't'; putchar;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;
-	lrx0 %/my_page_o_crap%;
+	lrx0 %/0x260000%;
 	rx0push;
 	proc_puts;
 	rx0pop;
