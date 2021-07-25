@@ -95,7 +95,10 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 				"SDL_Error: %s\n", SDL_GetError());
 			exit(1);
 		}
-		sdl_tex = SDL_CreateTexture(sdl_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 640, 480);
+		sdl_tex = SDL_CreateTexture(sdl_rend, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, 
+		display_scale * SCREEN_WIDTH_CHARS * 8, 
+		display_scale * SCREEN_HEIGHT_CHARS * 8
+		);
 		if(!sdl_tex){
 			printf("SDL2 texture creation failed.\n"
 				"SDL_Error: %s\n", SDL_GetError());
@@ -253,14 +256,18 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == '\n' || a == '\r'){ /*magic values to display the screen.*/
 		UU i = 0;
 		static SDL_Rect screenrect;
+		static SDL_Rect screenrect2;
 		/*
 			B holds the process whose memory we want to use.
 		*/
 		b %= (SISA_MAX_TASKS+1);
 		screenrect.x = 0;
 		screenrect.y = 0;
-		screenrect.w = 640;
-		screenrect.h = 640;
+		screenrect.w = 8 * SCREEN_WIDTH_CHARS;
+		screenrect.h = 8 * SCREEN_HEIGHT_CHARS;
+		screenrect2 = screenrect;
+		screenrect2.w *= display_scale;
+		screenrect2.h *= display_scale;
 		for(i=0;i<(64 * SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
 			unsigned char val = M_SAVER[active_audio_user][0xB00000 + i];
 			SDL_targ[i] = vga_palette[val];
