@@ -289,8 +289,8 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		SDL_RenderCopy(
 			sdl_rend, 
 			sdl_tex,
-			NULL,
-			NULL
+			screenrect,
+			screenrect2
 		);
 		SDL_RenderPresent(sdl_rend);
 		return a;
