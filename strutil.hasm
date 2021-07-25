@@ -3,6 +3,9 @@
 //STRDUPE
 //Receives a string to duplicate in RX0.
 
+:libc_strdupe_retval_store:
+bytes %/0%;
+
 ..decl_farproc(LIBC_REGION):proc_strdupe
 ..export"proc_strdupe"
 	rx0push;
@@ -13,10 +16,11 @@
 	proc_alloc;
 	//If alloc failed, we simply abort()
 	lb 0; rx1b; rxcmp; sc %libc_strdupe_abort%; jmpifeq;
+	farstrx0 %&libc_strdupe_retval_store%;
 	rx2pop;		//The number of bytes.
 	rx1pop;		//the source to copy from.
 	proc_memcpy;
-	:libc_strdupe_end:
+	farldrx0 %&libc_strdupe_retval_store%;
 	farret
 	:libc_strdupe_abort:
 	lb 0; div;

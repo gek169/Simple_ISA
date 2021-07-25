@@ -543,15 +543,14 @@ bytes 0,0;
 				arx0;apush;
 				
 				lb 0; rx0b;
-				lrx1 %/0x1000000%; //The end of memory.
-				//TODO: use user_farpagel and user_farpagest
+				lrx1 %/0x10000%; //The end of memory, as a page.
 				libc_krenel_syscall_fork_copymem_looptop:
-					cbrx0; user_farilda;        //Load from old memory.
-					rx3a;
-						apop;apush;task_set; //Into new user memory.
-					arx3;
-					user_farista;
-					//apop;apush; //What was I thinking?!?!
+					lla %libc_krenel_diskio_page%;;
+					crx0;
+					user_farpagel;
+					apop;apush;task_set; //Into new user memory.
+					lla %libc_krenel_diskio_page%;;
+					user_farpagest;
 					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 					task_set;
 					rxincr;rxcmp;nota; 
