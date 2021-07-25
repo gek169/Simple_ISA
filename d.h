@@ -166,6 +166,7 @@ static void pch(unsigned short a){
 		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
 		memset(stdout_buf+(SCREEN_WIDTH_CHARS- 1)*SCREEN_HEIGHT_CHARS, ' ', SCREEN_WIDTH_CHARS);
 	}
+	putchar_unlocked(a); /*for those poor terminal users at home.*/
 }
 
 static void pollevents(){
@@ -377,26 +378,19 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 #else
 
 #ifdef USE_TERMIOS
-		/* set O_NONBLOCK on fd */
-		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
-		return 1;
+		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);return 1;
 #else
 		return 0;
 #endif
-
-
 #endif
-
 	}
 	if(a==0xE001){
 #ifdef USE_SDL2
 		return 1;
 #else
 #ifdef USE_TERMIOS
-		/* set ~O_NONBLOCK on fd */
 		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
-		fcntl(STDIN_FILENO, F_SETFL, 0);
-		return 1;
+		fcntl(STDIN_FILENO, F_SETFL, 0);return 1;
 #else
 		return 0;
 #endif
