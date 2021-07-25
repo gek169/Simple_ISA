@@ -163,8 +163,7 @@ int DONT_WANT_TO_INLINE_THIS e()
 
 #ifndef NO_PREEMPT
 register UU instruction_counter = 0;
-#define PREEMPT() if(EMULATE_DEPTH){\
-	instruction_counter++;\
+#define PREEMPT() instruction_counter++;if(EMULATE_DEPTH){\
 	if(instruction_counter > PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
 #else
