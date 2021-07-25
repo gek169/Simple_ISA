@@ -117,7 +117,7 @@ farret;
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
-//We reserve 8 pages for the purpose of creating a PID0 program.
+//We reserve 8 regions for the purpose of creating a PID0 program.
 .libc_krenel_disk_reserved:0x80000
 
 //Load user page according to register B.
