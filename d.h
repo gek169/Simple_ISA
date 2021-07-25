@@ -12,11 +12,10 @@
 */
 #define SCREEN_WIDTH_CHARS 90
 #define SCREEN_HEIGHT_CHARS 60
-
-static unsigned char stdout_buf[0x10000] = {0};
+static unsigned char stdout_buf[(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS) + SCREEN_WIDTH_CHARS] = {0};
+#ifdef USE_SDL2
 static const UU SCREEN_LOC = 0xB00000;
 static const UU AUDIO_LOC_MEM = (0xffFF + SCREEN_LOC + (SCREEN_WIDTH_CHARS * 64 * SCREEN_HEIGHT_CHARS)) & 0xFF0000;
-#ifdef USE_SDL2
 /*
 	The SDL2 driver keeps a "standard in" buffer.
 */
