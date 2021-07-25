@@ -193,7 +193,7 @@ static void pch(unsigned short a){
 		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
 		memset(stdout_buf+(SCREEN_WIDTH_CHARS- 1)*SCREEN_HEIGHT_CHARS, ' ', SCREEN_WIDTH_CHARS);
 	}
-	putchar_unlocked(a); /*for those poor terminal users at home.*/
+	/*putchar_unlocked(a);*/ /*for those poor terminal users at home.*/
 }
 
 
