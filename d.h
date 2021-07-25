@@ -43,7 +43,7 @@ static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec;
-sattic const unsigned int display_scale = 2;
+static const unsigned int display_scale = 2;
 static unsigned short audio_left = 0;
 static unsigned short shouldquit = 0;
 static unsigned char active_audio_user = 0;
@@ -169,7 +169,7 @@ static void pollevents(){
 		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
 		if(ev.type == SDL_KEYDOWN){
 			unsigned char b = SDL_GetKeyFromScancode(ev.key.keysym.sym);
-			stdin_buf[stdin_bufptr++] = b
+			stdin_buf[stdin_bufptr++] = b;
 		}
 	}
 }
@@ -267,7 +267,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		}
 		for(i=0;i<(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
 			if(stdout_buf[i] && stdout_buf[i] != ' ')
-				renderchar(font8x8_basic[stdout_buf[i]], UU p);
+				renderchar(font8x8_basic[stdout_buf[i]], i);
 		}
 		/*
 			TODO:
