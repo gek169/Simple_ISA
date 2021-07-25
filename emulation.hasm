@@ -86,6 +86,18 @@ farret;
 
 ..include"printbytehex.hasm"
 ..include"fdisk.hasm"
+..include"puts.hasm"
+..include"strlen.hasm"
+..include"memcpy.hasm"
+..include"gets.hasm"
+..include"atoi_dec.hasm"
+..include"atof_dec.hasm"
+..include"sqrt.hasm"
+..include"wait.hasm"
+..include"termcontrol.hasm"
+
+//This has its memory in libc.hasm
+..include"alloc.hasm"
 
 ..decl_lproc:libc_lproc_krenel_print_krenel
 	la 'K'; putchar;

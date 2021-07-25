@@ -14,16 +14,10 @@
 LIBC_EXPORT_DCL
 asm_begin_region_restriction;
 	..include"emulation.hasm"
-	..include"puts.hasm"
-	..include"strlen.hasm"
-	..include"memcpy.hasm"
-	..include"gets.hasm"
-	..include"atoi_dec.hasm"
-	..include"atof_dec.hasm"
-	..include"sqrt.hasm"
-	..include"wait.hasm"
-	..include"termcontrol.hasm"
+
 	
 	//this should be made the last one. it consumes 16k for a page table.
-	..include"alloc.hasm"
+
+	:libc_alloc_page_map:
+	fill 15500,0
 asm_end_region_restriction;

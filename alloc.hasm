@@ -196,6 +196,4 @@ farret
 //2) is it the start of an allocation?
 //they are bit 1 and 2 respectively.
 
-//we actually fill more than is necessary so that the region can be expanded.
-:libc_alloc_page_map:
-fill 15500,0
+//See libc.hasm
