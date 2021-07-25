@@ -253,6 +253,7 @@ bytes 0,0;
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 			user_geta;	lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 			user_geta;	lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
@@ -316,6 +317,9 @@ bytes 0,0;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
 			la '\n'; interrupt; 
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_clear_term:
+			la 0xc; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
@@ -491,7 +495,8 @@ bytes 0,0;
 	libc_krenel_tried_interrupt:
 
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-		ab; lb '\r'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		ab; blpush; lb '\r'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		ab; blpush; lb 0xc; cmp; blpop; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
 		la 'i'; putchar;
@@ -527,6 +532,8 @@ bytes 0,0;
 			//sc %libc_krenel_try_select_task%; jmp;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
+		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
+		lb 0xffFF; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 		lb 0; rx2b;	//RX2: the number of things we have tried.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks_mask; rx1b;

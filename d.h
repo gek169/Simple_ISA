@@ -2,12 +2,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static unsigned char stdout_buf[0x100000];
+/*
+	buffers for stdout and stdin.
+*/
+#define SCREEN_WIDTH_CHARS 80
+#define SCREEN_HEIGHT_CHARS 60
 
-
-
+static unsigned char stdout_buf[SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS + SCREEN_WIDTH_CHARS] = {0};
 
 #ifdef USE_SDL2
+/*
+	The SDL2 driver keeps a "standard in" buffer.
+*/
+static unsigned char stdin_buf[0x10000] = {0};
+/*
+	buffer pointer.
+*/
+unsigned short stdin_bufptr = 0;
+
+/*
+	Cursor position.
+*/
+unsigned short curpos = 0;
 /*
 	SDL2 driver, plus simple text mode.
 */
@@ -16,6 +32,8 @@ static unsigned char stdout_buf[0x100000];
 #ifdef __TINYC__
 #define SDL_DISABLE_IMMINTRIN_H 1
 #endif
+
+#include "font8x8_basic.h"
 #include <SDL2/SDL.h>
 /*
 	TODO- refactor/rewrite av driver, integrate with getchar/putchar to make a "text mode".
@@ -26,36 +44,24 @@ static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec;
 static unsigned short audio_pos = 0;
 static unsigned short audio_left = 0;
-static UU SDL_targ[640*480];
+static unsigned short shouldquit = 0;
+unsigned char FG_color = 15;
+unsigned char BG_color = 0;
+static UU SDL_targ[640*480] = {0}; /*Default to all black.*/
 static UU vga_palette[256] = {
-		0x000000,
-		0x493c2b,
-		0xbe2633,
-		0xe06f8b,
-		0x9d9d9d,
-		0xa46422,
-		0xeb8931,
-		0xf7e26b,
-		0xffffff,
-		0x1b2632,
-		0x2f484e,
-		0x44891a,
-		0xa3ce27,
-		0x005784,
-		0x31a2f2,
-		0xb2dcef
+#include "vga_pal.h"
 };
 static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stream, int len){
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
-	SDL_MixAudio(stream, M_SAVER[0] + 0xB50000 + audio_pos, len, SDL_MIX_MAXVOLUME);
+	SDL_MixAudio(stream, M_SAVER[0] + 0xC00000 + audio_pos, len, SDL_MIX_MAXVOLUME);
 	audio_pos += len;
 	audio_left -= len;
 }
 
 static void DONT_WANT_TO_INLINE_THIS di(){
-		setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
+		/*setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));*/
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
 	        printf("SDL2 could not be initialized!\n"
@@ -63,16 +69,17 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 	        exit(1);
 	    }
 		sdl_spec.freq = 16000;
-		sdl_spec.format = AUDIO_U16MSB; 
+		sdl_spec.format = AUDIO_S16MSB; 
 		sdl_spec.channels = 1;
 		sdl_spec.silence = 0;
 		sdl_spec.samples = 2048;
 		sdl_spec.callback = sdl_audio_callback;
 		sdl_spec.userdata = NULL;
-		sdl_win = SDL_CreateWindow("[Sisa16 Emulation]",
+		sdl_win = SDL_CreateWindow("[SISA-16]",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			640, 480,
+			SCREEN_WIDTH_CHARS * 8, 
+			SCREEN_HEIGHT_CHARS * 8,
 			SDL_WINDOW_SHOWN
 		);
 		if(!sdl_win)
@@ -106,6 +113,60 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
 		SDL_CloseAudio();
     	SDL_DestroyWindow(sdl_win);
 	    SDL_Quit();
+}
+
+static unsigned short gch(){
+	if(stdin_bufptr){
+		return stdin_buf[--stdin_bufptr];
+	}
+	return 255;
+}
+
+static void renderchar(unsigned char* bitmap, SUU _x, SUU _y, UU p) {
+	UU x, y, i, j;
+	UU set;
+	/*640/8 = 80, 480/8 = 60*/
+	_x %= 80;
+	_y %= 60;
+	_x *= 8;
+	_y *= 8;
+	for (x = 0; x < 8; x++) {
+		for (y = 0; y < 8; y++) {
+			set = bitmap[x] & (1 << y);
+			if (set)
+				SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[FG_color];
+			else
+				SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[BG_color];
+		}
+	}
+}
+static void pch(unsigned short a){
+	/*TODO- re-render the entire screen if a new line has been entered.*/
+	if(a == '\n'){
+		do{
+			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
+		}while(curpos%80);
+	} else if(a == '\r'){
+		while(curpos%80)curpos--;
+	} else if(a == '\t'){
+		do{
+			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
+		}while(curpos % 4);
+	} else {
+		stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = a;
+	}
+}
+
+static void pollevents(){
+	SDL_Event ev;
+	while(SDL_PollEvent(&ev)){
+		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
+		if(ev.type == SDL_TEXTINPUT){
+			char* b = ev.text.text;
+			while(*b)
+				stdin_buf[stdin_bufptr++] = *b++;
+		}
+	}
 }
 #else
 
@@ -143,6 +204,12 @@ static void dcl(){return;}
 
 #endif
 
+
+
+/*
+	non-sdl2 variants of 
+*/
+#ifndef USE_SDL2
 static unsigned short gch(){
 #if defined(USE_TERMIOS)
 	return (unsigned short)getchar_unlocked();
@@ -157,6 +224,12 @@ static void pch(unsigned short a){
 	putchar(a);
 #endif
 }
+#endif
+
+
+
+
+
 static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									unsigned short b,
 									unsigned short c,
@@ -180,13 +253,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		screenrect.w = 640;
 		screenrect.h = 640;
 		for(;i<640*480;i++){
-			unsigned char val = M[0xB00000 + (i/2)];
-			if(i%2){
-				val &= 0xf0;
-				val >>= 4;
-			} else {
-				val &= 0xf;
-			}
+			unsigned char val = M[0xB00000 + i];
 			SDL_targ[i] = vga_palette[val];
 		}
 		SDL_UpdateTexture(
@@ -204,14 +271,11 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		SDL_RenderPresent(sdl_rend);
 		return 1;
 	}
-	if(a == 1){ /*check for quit event.*/
-		SDL_Event ev;
-		while(SDL_PollEvent(&ev)){
-			if(ev.type == SDL_QUIT) return 0xFFff; /*Magic value for quit.*/
-		}
-		return 0;
+	if(a == 1){ /*Poll events.*/
+		pollevents();
+		return shouldquit;
 	}
-	if(a == 2){ /*Read the buttons*/
+	if(a == 2){ /*Read gamer buttons!!!!*/
 		unsigned short retval = 0;
 		const unsigned char *state;
 		SDL_PumpEvents();
@@ -238,11 +302,40 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		audio_pos = 0;
 		return 0;
 	}
+	/*kill the audio.*/
+	if(a == 4){
+		audio_left = 0;
+		audio_pos = 0xFFff;
+	}
+	if(a == 5){
+		BG_color = b;
+	}
+	if(a == 6){
+		FG_color = b;
+	}
 #endif
 
-	if(a==0xa||a == 0xd) {fflush(stdout);return a;}
+	if(a==0xa||a == 0xd) {
+#ifdef USE_SDL2
+		/*TODO*/
+#else
+		fflush(stdout);
+		return a;
+#endif
+	}
+	if(a == 0xc){
+#ifdef USE_SDL2
+		/*TODO*/
+#endif
+		printf("\e[H\e[2J\e[3J");
+		return a;
+	}
 
 	if(a==0xE000){
+#ifdef USE_SDL2
+		return 1;
+#else
+
 #ifdef USE_TERMIOS
 		/* set O_NONBLOCK on fd */
 		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
@@ -250,8 +343,15 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 #else
 		return 0;
 #endif
+
+
+#endif
+
 	}
 	if(a==0xE001){
+#ifdef USE_SDL2
+		return 1;
+#else
 #ifdef USE_TERMIOS
 		/* set ~O_NONBLOCK on fd */
 		/*int flags = fcntl(STDIN_FILENO, F_GETFL, 0);*/
@@ -260,6 +360,9 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 #else
 		return 0;
 #endif
+
+#endif
+
 	}
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
