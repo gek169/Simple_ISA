@@ -10,7 +10,7 @@
 /*
 	buffers for stdout and stdin.
 */
-#define SCREEN_WIDTH_CHARS 80
+#define SCREEN_WIDTH_CHARS 90
 #define SCREEN_HEIGHT_CHARS 60
 
 static unsigned char stdout_buf[0x10000] = {0};
@@ -54,7 +54,7 @@ static unsigned short shouldquit = 0;
 static unsigned char active_audio_user = 0;
 static unsigned char FG_color = 15;
 static unsigned char BG_color = 0;
-static UU SDL_targ[640*480] = {0}; /*Default to all black.*/
+static UU SDL_targ[SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS * 64] = {0}; /*Default to all black.*/
 static UU vga_palette[256] = {
 #include "vga_pal.h"
 };
