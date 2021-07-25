@@ -27,7 +27,7 @@ static SDL_AudioSpec sdl_spec;
 static unsigned short audio_pos = 0;
 static unsigned short audio_left = 0;
 static UU SDL_targ[640*480];
-static const UU arne_palette[16] = {
+static UU vga_palette[256] = {
 		0x000000,
 		0x493c2b,
 		0xbe2633,
@@ -187,7 +187,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 			} else {
 				val &= 0xf;
 			}
-			SDL_targ[i] = arne_palette[val];
+			SDL_targ[i] = vga_palette[val];
 		}
 		SDL_UpdateTexture(
 			sdl_tex,
