@@ -122,4 +122,4 @@ bytes %/0%;
 				apop;
 			proc_printbytelchex;
 				apop;
-
+	la '\n'; interrupt;

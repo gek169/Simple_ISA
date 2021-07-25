@@ -344,12 +344,14 @@ bytes 0,0;
 			la 4; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_become_av_provider:
-			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			aincr; ba;
 			la 7; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_play_audio:
 			//first, we need to set the active audio user to the current process.
-			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			aincr; ba;
 			la 7; interrupt;
 			//Now, we play the audio.
 			la 3; interrupt; 

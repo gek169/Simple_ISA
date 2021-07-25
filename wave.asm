@@ -16,7 +16,7 @@
 
 
 region 0xB0;
-fill 0x100000, 255;
+fill 0x100000, 51;
 
 section 0x40000;
 	:ascii_greyscale:
@@ -48,8 +48,22 @@ asm_print @&
 st_iteration_count;
 st_page_count;
 st_line_count;
-nop;
-nop;
+nop;nop;
+la 7;
+syscall;
+//Fill that memory with rolling stuff.
+lrx0 %/0xB00000%;
+lrx1 %/0xC00000%;
+la 0;apush;
+fill_dat_mem_looptop:
+	cbrx0;
+	apop;
+	apush;
+	farista;
+	rxincr;
+	rxcmp;
+	sc %fill_dat_mem_looptop%; jmpifneq;
+
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;

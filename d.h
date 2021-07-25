@@ -187,7 +187,7 @@ static void pch(unsigned short a){
 	} else {
 		stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = a;
 	}
-	while(curpos>=(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)){
+	if(curpos>=(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)){
 		curpos -= SCREEN_WIDTH_CHARS;
 		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
 		memset(stdout_buf+(SCREEN_WIDTH_CHARS- 1)*SCREEN_HEIGHT_CHARS, ' ', SCREEN_WIDTH_CHARS);
