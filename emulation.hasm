@@ -263,7 +263,8 @@ bytes 0,0;
 			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 			user_geta;	lb 0xd; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	nota; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-			user_geta;	lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
+			user_geta;	sc %libc_krenel_syscall_pumpevents%; jmpifeq; 						//Already 1!
+			user_geta;	lb 2; cmp; sc %libc_krenel_syscall_read_gamer_buttons%; jmpifeq;
 			user_geta;	lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
 			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
 			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
