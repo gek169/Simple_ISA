@@ -420,9 +420,6 @@ bytes 0,0;
 			la '\r'; putchar;
 			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
-		:libc_krenel_syscall_sleep:
-			//Simply force a task switch.
-			sc %libc_krenel_try_select_task%; jmp;
 		:libc_krenel_syscall_disk_read:
 			//read a single sector from disk.
 			//RX0: source sector in disk. Not aligned!

@@ -55,7 +55,7 @@ farret;
 ..decl_farproc(LIBC_REGION):proc_strcpy
 ..export"proc_strcpy"
 		rx2_0;	//Destination in RX2.
-		//We just leave 
+		//We just leave RX1 where it is.
 	:libc_strcpy_looptop:
 		//copy it.
 		rx0_1;
