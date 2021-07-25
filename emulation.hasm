@@ -256,16 +256,16 @@ bytes 0,0;
 			user_geta;	lb 0xa; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 			user_geta;	lb 0xd; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-			user_geta;	nota; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
+			user_geta;	nota; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
 			user_geta;	lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
 			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
 			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
-			user_geta;	lb 6; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
+			user_geta;	lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
-			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_syscall_sleep%; jmpifeq;
+			user_geta;	llb %0xDE02%; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
 			user_geta;	llb %0xDE03%; cmp; sc %libc_krenel_syscall_disk_read%; jmpifeq;
 			user_geta;	llb %0xDE04%; cmp; sc %libc_krenel_syscall_exec%; jmpifeq;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
@@ -325,13 +325,10 @@ bytes 0,0;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
-			la '\n'; interrupt; 
+			la '\n'; interrupt; //This also displays the screen.
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_clear_term:
 			la 0xc; interrupt;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_screenupdate:
-			la 0; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_pumpevents:
 			la 1; interrupt;
@@ -346,6 +343,10 @@ bytes 0,0;
 			//Anyone on the system can request to kill the audio.
 			la 4; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_become_av_provider:
+			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			la 7; interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_play_audio:
 			//first, we need to set the active audio user to the current process.
 			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
@@ -355,8 +356,6 @@ bytes 0,0;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_set_colors:
 			user_getb;ba;
-			la 5; interrupt;
-			user_getc;ba;
 			la 6; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
@@ -562,9 +561,8 @@ bytes 0,0;
 		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb '\r'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		ab; blpush; lb 0xc; cmp; blpop; sc %libc_krenel_syscall_clear_term%; jmpifeq;
-		ab; blpush; nota; blpop; sc %libc_krenel_syscall_screenupdate%; jmpifeq;
 		ab; blpush; lb 1; cmp; blpop; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
-		ab; blpush; lb 0x80; cmp; blpop; sc %libc_krenel_try_select_task%; jmpifeq; //Check for interrupt 80h.
+		ab; blpush; lb 0x80; cmp; blpop; sc %libc_krenel_try_select_task%; jmpifeq; //Interrupt 0x80 just selects the next task.
 		//BAD INTERRUPT
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;

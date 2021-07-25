@@ -43,6 +43,7 @@ static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec;
+sattic const unsigned int display_scale = 2;
 static unsigned short audio_left = 0;
 static unsigned short shouldquit = 0;
 static unsigned char active_audio_user = 0;
@@ -117,38 +118,37 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
 
 static unsigned short gch(){
 	if(stdin_bufptr){
-		return stdin_buf[--stdin_bufptr];
-	}
-	return 255;
+		stdin_bufptr--;
+		return stdin_buf[stdin_bufptr];
+	} else return 255;
 }
 
-static void renderchar(unsigned char* bitmap, SUU _x, SUU _y, UU p) {
-	UU x, y, i, j;
+static void renderchar(unsigned char* bitmap, UU p) {
+	UU x, y, i, j, _x, _y;
 	UU set;
 	/*640/8 = 80, 480/8 = 60*/
-	_x %= 80;
-	_y %= 60;
+	_x = p%80;
+	_y = p/80;
 	_x *= 8;
 	_y *= 8;
 	for (x = 0; x < 8; x++) {
 		for (y = 0; y < 8; y++) {
 			set = bitmap[x] & (1 << y);
-			if (set)
-				SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[FG_color];
-			else
-				SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[BG_color];
+			if (set) SDL_targ[(_x+x) + (_y+y) * (SCREEN_WIDTH_CHARS * 8)] = vga_palette[FG_color];
 		}
 	}
 }
 static void pch(unsigned short a){
 	/*TODO- re-render the entire screen if a new line has been entered.*/
-	putchar_unlocked(a);
+	putchar_unlocked(a); /*This is done temporarily.*/
 	if(a == '\n'){
 		do{
 			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
 		}while(curpos%80);
 	} else if(a == '\r'){
 		while(curpos%80)curpos--;
+	} else if(a == 8 || a == 0x7f){
+		stdout_buf[curpos-- % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
 	} else if(a == '\t'){
 		do{
 			stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = ' ';
@@ -156,16 +156,20 @@ static void pch(unsigned short a){
 	} else {
 		stdout_buf[curpos++ % (SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)] = a;
 	}
+	while(curpos >(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS)){
+		curpos -= SCREEN_WIDTH_CHARS;
+		memcpy(stdout_buf, stdout_buf + SCREEN_WIDTH_CHARS, SCREEN_WIDTH_CHARS);
+		memset(stdout_buf+(SCREEN_WIDTH_CHARS- 1)*SCREEN_HEIGHT_CHARS, ' ', SCREEN_WIDTH_CHARS);
+	}
 }
 
 static void pollevents(){
 	SDL_Event ev;
 	while(SDL_PollEvent(&ev)){
 		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
-		if(ev.type == SDL_TEXTINPUT){
-			char* b = ev.text.text;
-			while(*b)
-				stdin_buf[stdin_bufptr++] = *b++;
+		if(ev.type == SDL_KEYDOWN){
+			unsigned char b = SDL_GetKeyFromScancode(ev.key.keysym.sym);
+			stdin_buf[stdin_bufptr++] = b
 		}
 	}
 }
@@ -243,7 +247,8 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									u* M
 								)
 {
-	if(a == 0x80) return a; /*Ignore 80- it is reserved for system calls!*/
+	if(a == 0x80) return 0x80; /*Ignore 80- it is reserved for system calls!*/
+	if(a == 0) return 0;
 #ifdef USE_SDL2
 	if(a == '\n' || a == '\r'){ /*magic values to display the screen.*/
 		UU i = 0;
@@ -256,15 +261,23 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		screenrect.y = 0;
 		screenrect.w = 640;
 		screenrect.h = 640;
-		for(;i<640*480;i++){
-			unsigned char val = M_SAVER[b][0xB00000 + i];
+		for(i=0;i<(64 * SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
+			unsigned char val = M_SAVER[active_audio_user][0xB00000 + i];
 			SDL_targ[i] = vga_palette[val];
 		}
+		for(i=0;i<(SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);i++){
+			if(stdout_buf[i] && stdout_buf[i] != ' ')
+				renderchar(font8x8_basic[stdout_buf[i]], UU p);
+		}
+		/*
+			TODO:
+			render characters.
+		*/
 		SDL_UpdateTexture(
 			sdl_tex,
 			NULL,
 			SDL_targ, 
-			640 * 4
+			(SCREEN_WIDTH_CHARS*8) * 4
 		);
 		SDL_RenderCopy(
 			sdl_rend, 
@@ -311,7 +324,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		return 1;
 	}
 	if(a == 5){
-		BG_color = b;
+		FG_color = b;
 		return 1;
 	}
 	if(a == 6){
