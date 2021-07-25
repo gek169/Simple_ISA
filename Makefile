@@ -19,7 +19,7 @@ CPPFLAGS= $(MORECFLAGS) $(OPTLEVEL) -lm -Wno-unused-function -Wno-absolute-value
 all: main asm_programs
 
 q:
-	admin $(MAKE) -B install
+#	admin $(MAKE) -B install
 	admin $(MAKE) install_sdl2
 	admin $(MAKE) libc
 	admin $(MAKE) clean
