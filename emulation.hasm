@@ -117,29 +117,35 @@ farret;
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
+//We reserve 8 pages for the purpose of creating a PID0 program.
 .libc_krenel_disk_reserved:0x80000
 
 //Load user page according to register B.
 ..decl_lproc:libc_lproc_krenel_load_user_page
-	user_getb;rx0a;
-	lb 8; rx1b; rxlsh;
-	rx2_0;
-	lrx1 %/0x100%;rxadd;
-	rx1_0;
-	//construct the destination in rx3.
-	//page FF is reserved for this specific purpose.
-	lrx3 %&libc_krenel_diskio_page%,0;
-	rx0_2;
-	libc_lproc_krenel_load_user_page_loop:
-		cbrx0; user_farilda;
-		rx0_3;cbrx0;
-		farista;
-		rx0_3;rxincr;rx3_0;
-		rx0_2;rxincr;rx2_0;
-		rxcmp;
-		nota; //A is zero, meaning that RX0 is less than RX1 throughout the loop.
-		sc %libc_lproc_krenel_load_user_page_loop%; jmpifeq;
+	user_getb;ca;
+	lla %libc_krenel_diskio_page%;
+	user_farpagel;
 	ret;
+//old implementation.
+//	user_getb;rx0a;
+//	lb 8; rx1b; rxlsh;
+//	rx2_0;
+//	lrx1 %/0x100%;rxadd;
+//	rx1_0;
+//	//construct the destination in rx3.
+//	//page FF is reserved for this specific purpose.
+//	lrx3 %&libc_krenel_diskio_page%,0;
+//	rx0_2;
+//	libc_lproc_krenel_load_user_page_loop:
+//		cbrx0; user_farilda;
+//		rx0_3;cbrx0;
+//		farista;
+//		rx0_3;rxincr;rx3_0;
+//		rx0_2;rxincr;rx2_0;
+//		rxcmp;
+//		nota; //A is zero, meaning that RX0 is less than RX1 throughout the loop.
+//		sc %libc_lproc_krenel_load_user_page_loop%; jmpifeq;
+//	ret;
 
 //all tasks start out as 0- inactive.
 //these are shorts.
@@ -412,21 +418,26 @@ bytes 0,0;
 			interrupt;
 			user_seta; //Inform the user if the disk read succeeded.
 			//We now have to actually *copy* that stuff over to user memory.
-			user_getb;rx0a;
-			lb 8; rx1b; rxlsh;
-			rx3_0;
-			lrx2 %&libc_krenel_diskio_page%,0;
-			lrx1 %&libc_krenel_diskio_next_page%,0;
-			:libc_krenel_syscall_disk_read_loop:
-				rx0_2;
-					cbrx0;
-					farilda;
-				rx0_3;cbrx0;
-					user_farista;
-				rxincr; rx3_0;
-				rx0_2; rxincr; rx2_0;
-				rxcmp; sc %libc_krenel_syscall_disk_read_loop%; jmpifneq;
+			user_getb; ca;
+			lla %libc_krenel_diskio_page%;
+			user_farpagest;
 			sc %libc_krenel_syscall_end%; jmp;
+			//Old implementation of the copy.
+//			user_getb;rx0a;
+//			lb 8; rx1b; rxlsh;
+//			rx3_0;
+//			lrx2 %&libc_krenel_diskio_page%,0;
+//			lrx1 %&libc_krenel_diskio_next_page%,0;
+//			:libc_krenel_syscall_disk_read_loop:
+//				rx0_2;
+//					cbrx0;
+//					farilda;
+//				rx0_3;cbrx0;
+//					user_farista;
+//				rxincr; rx3_0;
+//				rx0_2; rxincr; rx2_0;
+//				rxcmp; sc %libc_krenel_syscall_disk_read_loop%; jmpifneq;
+//			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_exec:
 			user_getb;			//The region;
 			

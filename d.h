@@ -493,7 +493,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		if(!f){
 			f = fopen("sisa16.dsk", "wb");
 			if(!f) return 0;
-			while((unsigned long)ftell(f) < (unsigned long)RX0) if(EOF == fputc(0, f)) return 0;
+			if((unsigned long)ftell(f) < (unsigned long)RX0) if(EOF == fputc(0, f)) return 0;
 			fflush(f);
 			fclose(f);
 			f = fopen("sisa16.dsk", "rb+");
