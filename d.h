@@ -124,9 +124,31 @@ static void DONT_WANT_TO_INLINE_THIS dcl(){
     	SDL_DestroyWindow(sdl_win);
 	    SDL_Quit();
 }
+static void pollevents(){
+	SDL_Event ev;
+	while(SDL_PollEvent(&ev)){
+		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
+		else if(ev.type == SDL_TEXTINPUT){
+			char* b = ev.text.text;
+			while(*b) {stdin_buf[stdin_bufptr++] = *b; b++;}
+		}else if(ev.type == SDL_KEYDOWN){
+			switch(ev.key.keysym.scancode){
+				default: break;
+				case SDL_SCANCODE_DELETE: stdin_buf[stdin_bufptr++] = 0x7F; break;
+				case SDL_SCANCODE_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
+				case SDL_SCANCODE_KP_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
+				case SDL_SCANCODE_RETURN: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_RETURN2: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_KP_ENTER: stdin_buf[stdin_bufptr++] = 0xa;break;
+				case SDL_SCANCODE_ESCAPE: stdin_buf[stdin_bufptr++] = '\e';break;
+			}
+		}
+	}
+}
 static unsigned short gch(){
 	while(blocking_input && stdin_bufptr == 0){
 		SDL_Delay(16);
+		pollevents();
 	}
 	if(stdin_bufptr){
 		stdin_bufptr--;
@@ -173,27 +195,7 @@ static void pch(unsigned short a){
 	putchar_unlocked(a); /*for those poor terminal users at home.*/
 }
 
-static void pollevents(){
-	SDL_Event ev;
-	while(SDL_PollEvent(&ev)){
-		if(ev.type == SDL_QUIT) shouldquit = 0xFFff; /*Magic value for quit.*/
-		else if(ev.type == SDL_TEXTINPUT){
-			char* b = ev.text.text;
-			while(*b) {stdin_buf[stdin_bufptr++] = *b; b++;}
-		}else if(ev.type == SDL_KEYDOWN){
-			switch(ev.key.keysym.scancode){
-				default: break;
-				case SDL_SCANCODE_DELETE: stdin_buf[stdin_bufptr++] = 0x7F; break;
-				case SDL_SCANCODE_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
-				case SDL_SCANCODE_KP_BACKSPACE: stdin_buf[stdin_bufptr++] = 0x7F;break;
-				case SDL_SCANCODE_RETURN: stdin_buf[stdin_bufptr++] = 0xa;break;
-				case SDL_SCANCODE_RETURN2: stdin_buf[stdin_bufptr++] = 0xa;break;
-				case SDL_SCANCODE_KP_ENTER: stdin_buf[stdin_bufptr++] = 0xa;break;
-				case SDL_SCANCODE_ESCAPE: stdin_buf[stdin_bufptr++] = '\e';break;
-			}
-		}
-	}
-}
+
 #else
 
 /*
