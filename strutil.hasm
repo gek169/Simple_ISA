@@ -1,0 +1,23 @@
+
+
+//STRDUPE
+//Receives a string to duplicate in RX0.
+
+..decl_farproc(LIBC_REGION):proc_strdupe
+..export"proc_strdupe"
+	rx0push;
+	rx0push;
+	proc_strlen;
+	rx0pop; rxincr; rx0push; //We also need a null terminator...
+	//fetch us some memory!
+	proc_alloc;
+	//If alloc failed, we simply abort()
+	lb 0; rx1b; rxcmp; sc %libc_strdupe_abort%; jmpifeq;
+	rx2pop;		//The number of bytes.
+	rx1pop;		//the source to copy from.
+	proc_memcpy;
+	:libc_strdupe_end:
+	farret
+	:libc_strdupe_abort:
+	lb 0; div;
+	halt;

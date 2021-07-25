@@ -97,7 +97,7 @@ farret;
 ..include"wait.hasm"
 ..include"termcontrol.hasm"
 ..include"alloc.hasm"
-
+..include"strutil.hasm"
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~K R E N E L~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -461,6 +461,7 @@ bytes 0,0;
 			lrx1 %/0x10000%;rxadd;
 			rx1_0;
 			rx0_3;
+			//TODO: use user_farpagel and user_farpagest
 			libc_krenel_syscall_exec_copymem_looptop:
 				cbrx0; user_farilda;
 				sc %libc_krenel_exec_region%; 
@@ -543,6 +544,7 @@ bytes 0,0;
 				
 				lb 0; rx0b;
 				lrx1 %/0x1000000%; //The end of memory.
+				//TODO: use user_farpagel and user_farpagest
 				libc_krenel_syscall_fork_copymem_looptop:
 					cbrx0; user_farilda;        //Load from old memory.
 					rx3a;
