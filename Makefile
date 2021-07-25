@@ -20,6 +20,7 @@ all: main asm_programs
 
 q:
 	admin $(MAKE) -B install
+	admin $(MAKE) install_sdl2
 	admin $(MAKE) libc
 	admin $(MAKE) clean
 	git add .
@@ -92,10 +93,11 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp *.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
-install_sdl2: sisa16_asm sisa16_emu sisa16_dbg sisa16_sdl2_asm sisa16_sdl2_emu sisa16_sdl2_dbg
-	@cp ./sisa16_emu $(INSTALL_DIR)/ || cp ./sisa16_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_emu"
-	@cp ./sisa16_dbg $(INSTALL_DIR)/ || cp ./sisa16_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_dbg"
-	@cp ./sisa16_asm $(INSTALL_DIR)/ || cp ./sisa16_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_asm"
+install_sdl2: sisa16_asm sisa16_emu sisa16_dbg 
+	$(MAKE) -B install
+	$(MAKE) sisa16_sdl2_asm 
+	$(MAKE) sisa16_sdl2_emu 
+	$(MAKE) sisa16_sdl2_dbg
 	@cp ./sisa16_sdl2_emu $(INSTALL_DIR)/ || cp ./sisa16_sdl2_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_emu"
 	@cp ./sisa16_sdl2_asm $(INSTALL_DIR)/ || cp ./sisa16_sdl2_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_asm"
 	@cp ./sisa16_sdl2_dbg $(INSTALL_DIR)/ || cp ./sisa16_sdl2_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_dbg"
