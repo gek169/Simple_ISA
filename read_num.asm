@@ -3,12 +3,12 @@
 
 
 //use a separately compiled libc.
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 
 //use the normal libc.
-//..include"libc.hasm"
+..include"libc.hasm"
 
 ..(5):
 length_of_input_string:
@@ -18,7 +18,7 @@ bytes %/0%;
 	la '\n'; interrupt;
 	
 	la 0xc; apush; la 0; alpush;
-	proc_gets
+	proc_gets_user
 	la '\n'; putchar; la '\r'; putchar;
 	proc_strlen;
 	//we now have the length of the string stored, we have to get it into RX0.
