@@ -519,14 +519,6 @@ int main(int argc, char** argv){
 			&& line[strlen(line)-1] == '\\'
 		)
 		{
-			/*
-			char* line_temp;
-			line[strlen(line)-1] = '\0';
-			line_temp = read_until_terminator_alloced_modified(infile, &linesize, '\n');
-			line = strcatallocfb(line,line_temp);
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			linesize = strlen(line);
-			*/
 			line[strlen((char*)line)-1] = '\0';
 			rut_append_to_me = line;
 			line = (unsigned char*)read_until_terminator_alloced_modified(infile, &linesize, '\n');
@@ -541,10 +533,17 @@ int main(int argc, char** argv){
 		*/
 		/*section0;la 1;lfarpc;*/
 		if(strprefix("..zero:", line)){
+			/*
 			char* line_old = line;
-			line = strcatalloc("section0;", line+strlen("..zero:"));/*TODO*/
+			line = strcatalloc("section0;", line+strlen("..zero:"));
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
+			*/
+			perform_inplace_repl(
+				line,
+				"..zero:",
+				"section0;"
+			);
 		}else if(strprefix("..z:", line)){
 			char* line_old = line;
 			line = strcatalloc("section0;", line+strlen("..z:"));/*TODO*/
