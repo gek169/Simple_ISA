@@ -54,7 +54,7 @@ static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* leno
 }
 
 #ifndef SISA16_MAX_MACROS
-#define SISA16_MAX_MACROS 0x80000
+#define SISA16_MAX_MACROS 0x10000
 #endif
 static char* variable_names[SISA16_MAX_MACROS] = {0};
 static char* variable_expansions[SISA16_MAX_MACROS] = {0};
