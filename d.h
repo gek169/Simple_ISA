@@ -48,7 +48,7 @@ static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec = {0};
 static const unsigned int display_scale = 2;
-static unsigned short audio_left = 0;
+static UU audio_left = 0;
 #ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 static char blocking_input = 1;
 #endif
@@ -64,7 +64,7 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 	SDL_memset(stream, 0, len);
 	if(audio_left == 0){return;}
 	len = (len < audio_left) ? len : audio_left;
-	SDL_MixAudio(stream, M_SAVER[active_audio_user] + 0xB50000 + (0xffFF - audio_left), len, SDL_MIX_MAXVOLUME);
+	SDL_MixAudio(stream, M_SAVER[active_audio_user] + 0xB50000 + (0xB0000 - audio_left), len, SDL_MIX_MAXVOLUME);
 	audio_left -= len;
 }
 
@@ -343,7 +343,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	}
 	/*TODO: play samples from a buffer.*/
 	if(a == 3){
-		audio_left = 0xffFF;
+		audio_left = 0xB0000;
 		return 1;
 	}
 	/*kill the audio.*/
