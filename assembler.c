@@ -21,6 +21,7 @@ static char read_until_terminator_alloced_modified_mode = 0;
 
 void my_strcpy(char* dest, char* src){
 	while(*src) *dest++ = *src++;
+	*dest = 0;
 }
 
 static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
@@ -586,10 +587,6 @@ int main(int argc, char** argv){
 			}
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
-			/*
-			line = strcatalloc("!", line+strlen("..ascii:"));
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			*/
 			my_strcpy(line+1, line+strlen("..ascii:"));
 			line[0] = '!';
 			using_asciz = 0;
