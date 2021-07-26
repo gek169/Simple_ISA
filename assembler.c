@@ -14,7 +14,7 @@ static const char* warn_pref = "<ASM WARNING>";
 static char run_sisa16 = 0;
 static char enable_dis_comments = 1;
 static char clear_output = 0;
-static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
+static void ASM_PUTS(const unsigned char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
 
 static char read_until_terminator_alloced_modified_mode = 0;
@@ -24,14 +24,34 @@ void my_strcpy(unsigned char* dest, unsigned char* src){
 	*dest = 0;
 }
 
-unsigned char line_copy[0x10000]; /*line_copy*/
+static unsigned char line_copy[0x10000]; /*line_copy*/
+static unsigned char buf1[0x10000]; /*buffer for working with strings.*/
+static unsigned char buf2[0x10000]; /*another buffer for working with strings.*/
+static unsigned char buf_repl[0x10000]; /*another buffer for working with strings, specifically for the following function:*/
+
+int perform_inplace_repl( /*returns whether or not it actually did a replacement.*/
+	unsigned char* workbuf,
+	unsigned char* replaceme,
+	unsigned char* replacewith
+){
+	long loc = strfind((char*)workbuf, (char*)replaceme);
+	if(loc == -1) return 0;
+	memcpy(buf_repl, workbuf, loc);
+	my_strcpy(buf_repl + loc, replacewith);
+	my_strcpy(
+		buf_repl + loc + strlen((char*)replacewith),
+		workbuf + loc + strlen((char*)replaceme)
+	);
+	return 1;
+}
+
 
 static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
 	char* buf;
-	unsigned long bcap = 0x20000;
+	unsigned long bcap = 0x10000;
 	unsigned long blen = 0;
-	buf = STRUTIL_ALLOC(0x20000);
+	buf = STRUTIL_ALLOC(0x10000);
 	if(!buf){
 		printf(general_fail_pref); 
 		printf("Failed Malloc."); 
@@ -474,18 +494,13 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		line = read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
+		line = (unsigned char*)read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		while(
-				strprefix(" ",line) 
+				strprefix(" ",line)
 				|| strprefix("\t",line)
 				|| (isspace(line[0]) && line[0] != '\0')
 		){ /*Remove preceding whitespace... we do this twice, actually...*/
-			char* line_old = line;
-			line = strcatalloc(line+1,""); /*TODO*/
-			if(!line){
-				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
-			}
-			free(line_old);
+			my_strcpy(line, line+1);
 		}
 
 		/*if this line ends in a backslash...*/
@@ -721,9 +736,9 @@ int main(int argc, char** argv){
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 			free(procedure_name);
-		} else if(strprefix("..decl_farproc(" /*)*/, line)){
+		} else if(strprefix("..decl_farproc(" /*)*/, (char*)line)){
 			char buf[2048];
-			char* line_old = line;
+			unsigned char* line_old = line;
 			long loc_colon = -1;
 			unsigned long regioncode;
 			char* procedure_name;
