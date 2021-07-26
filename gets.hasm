@@ -7,12 +7,7 @@
 .libc_gets_max_chars:0xffFD
 
 
-
-
-
-..decl_farproc(LIBC_REGION):proc_gets_user
-.proc_gets:proc_gets_user
-..export"proc_gets_user"
+..decl_farproc(LIBC_REGION):proc_gets
 ..export"proc_gets"
 	//Grab the far pointer.
 	astp; lb 6; sub; ca; ildb;

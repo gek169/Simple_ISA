@@ -16,7 +16,7 @@
 	halt;
 ..(7):
 	la 0xc; apush; la 0; alpush;
-	proc_gets_user
+	proc_gets
 	la '\n'; putchar; la '\r'; putchar;
 	proc_strlen;
 	//we now have the length of the string stored, we have to get it into RX0.
