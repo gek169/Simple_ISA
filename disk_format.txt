@@ -1,0 +1,31 @@
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~Sisa16 Disk Layout~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+0x000000 - 0x200000: Reserved for OS. Put your CLI here.
+0x200000 - 0x300000: Diskmap. File entries.
+0x300000 - <onward>: Files.
+
+Files are of a fixed size determined at their creation time. 
+
+They are a number of "pages" with a name at a starting location.
+
+Each entry is 128 bytes in size
+0-4: number of pages
+4-8: start page
+8-128: null terminated filename.
+
+there is a theoretical maximum of 8192 files on the system at once.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~FINDING FREE SPACE~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Since there is a maximum of 8192 files on the system, it is trivial to simply try repeatedly to place
+the file.
+
+The file is attempted to be placed at 0, but file 0 would intersect it, so it is shifted to the end of file zero.
+
+This intersection check is done over and over, until the intersection check reaches the end of disk (4 gigs)

@@ -14,7 +14,11 @@
 length_of_input_string:
 bytes %/0%;
 
-..main:
+..main(3):
+	lrx0 %/what%
+	proc_krenel
+	halt;
+	what:
 	la '\n'; interrupt;
 	
 	la 0xc; apush; la 0; alpush;
@@ -40,14 +44,12 @@ bytes %/0%;
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	//We would now like to write to disk.
-	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
-	lrx1 %/200%							//the destination.
-	lrx2 %/0xd0000%						//the source in memory.
+	lrx0 %/0x10001%						//location in file.
+	llb %0xd00%						//the source in memory.
 	proc_fwrite
 
-	farldrx0 %&length_of_input_string%;	//The number of bytes to be read.
-	lrx2 %/200%							//the source in file.
-	lrx1 %/0xe0000%						//the destination in memory.
+	lrx0 %/0x10001%						//the source in file.
+	llb %0xe00%						//the destination in memory.
 	proc_fread
 	
 	lrx0 %/0xe0000%
@@ -89,7 +91,8 @@ bytes %/0%;
 	rx0_2;
 	//lrx1 %/256%;rxadd;
 	proc_free;
-	la '\n'; putchar; la '\r'; putchar;
+	la '\n'; putchar; 
+	la '\r'; putchar;
 	lrx0 %/0xF00%;
 		proc_alloc;
 		rx2_0
@@ -106,7 +109,8 @@ bytes %/0%;
 			apop;
 		proc_printbytelchex;
 			apop;
-	la '\n'; putchar; la '\r'; putchar;
+	la '\n'; putchar; 
+	la '\r'; putchar;
 	lrx0 %/0xBAFF00%;
 			proc_alloc;
 			rx2_0
@@ -124,3 +128,4 @@ bytes %/0%;
 			proc_printbytelchex;
 				apop;
 	la '\n'; interrupt;
+	halt;

@@ -126,37 +126,38 @@ farret;
 .libc_krenel_max_returns:100
 //the region where code to execute is stored.
 .libc_krenel_exec_region:1
+
+//the region which is used for file descriptors.
+.libc_krenel_fd_table_region:0xFEFF
+
+//1 megabyte is needed for the diskmap.
+.libc_krenel_diskmap_super_region:0x40
+
+//200 megabytes. Don't spam GH
+.libc_krenel_max_disk_usage:0x100000
+
+
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
-//We reserve 16 megabytes for the purpose of creating a PID0 program. This also protects krenel's initial memory.
-.libc_krenel_disk_reserved:0x1000000
+//We reserve 2 megabytes for creating a PID0 program.
+//we reserve an additional megabyte for the FAT.
+//The rest is available and free.
+//This is by *page*.
+.libc_krenel_disk_reserved:0x3000
+
+
+//Given a file size in RX0, find a start page. If none can be found, return 0xffFFffFF, which is erroneous.
+.decl_lproc:libc_lproc_krenel_find_free:
+	//TODO
+	lrx0 %/0xffFFffFF%;
+	ret;
 
 //Load user page according to register B.
 .libc_lproc_krenel_load_user_page:\
 	user_getb;ca;\
 	lla %libc_krenel_diskio_page%;\
 	user_farpagel;
-//old implementation.
-//	user_getb;rx0a;
-//	lb 8; rx1b; rxlsh;
-//	rx2_0;
-//	lrx1 %/0x100%;rxadd;
-//	rx1_0;
-//	//construct the destination in rx3.
-//	//page FF is reserved for this specific purpose.
-//	lrx3 %&libc_krenel_diskio_page%,0;
-//	rx0_2;
-//	libc_lproc_krenel_load_user_page_loop:
-//		cbrx0; user_farilda;
-//		rx0_3;cbrx0;
-//		farista;
-//		rx0_3;rxincr;rx3_0;
-//		rx0_2;rxincr;rx2_0;
-//		rxcmp;
-//		nota; //A is zero, meaning that RX0 is less than RX1 throughout the loop.
-//		sc %libc_lproc_krenel_load_user_page_loop%; jmpifeq;
-//	ret;
 
 //all tasks start out as 0- inactive.
 //these are shorts.
