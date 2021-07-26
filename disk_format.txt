@@ -28,4 +28,6 @@ the file.
 
 The file is attempted to be placed at 0, but file 0 would intersect it, so it is shifted to the end of file zero.
 
-This intersection check is done over and over, until the intersection check reaches the end of disk (4 gigs)
+This intersection check is done over and over, until the intersection check succeeds reaches the end of disk (200 meg)
+
+if it reaches the end of disk, the magic value 0xffFFffFF is returned, which is obviously erroneous.
