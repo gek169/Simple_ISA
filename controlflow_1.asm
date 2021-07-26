@@ -1,7 +1,7 @@
 #!/usr/bin/sisa16_asm -run
 //Example program from the manual to demonstrate basic control flow.
 
-..main:
+..zero:
 getchar; 
 putchar;
 lb '1'; cmp;

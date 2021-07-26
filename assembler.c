@@ -545,20 +545,20 @@ int main(int argc, char** argv){
 				"section0;"
 			);
 		}else if(strprefix("..z:", line)){
-			char* line_old = line;
-			line = strcatalloc("section0;", line+strlen("..z:"));/*TODO*/
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+			perform_inplace_repl(
+				line,
+				"..z:",
+				"section0;"
+			);
 		}else if(strprefix("..main:", line)){
-			char* line_old = line;
-			line = strcatalloc("section0;la1;lfarpc;region1;", line+strlen("..main:"));/*TODO*/
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+			perform_inplace_repl(
+				line,
+				"..main:",
+				"section0;la1;lfarpc;region1;"
+			);
 		}else if(strprefix("..main(", line)){
-			char buf[40];
 			char have_expanded = 0;
 			unsigned long secnum = 0;
-			char* line_old = line;
 			long loc_eparen = -1;
 			const long len_command = strlen("..main(");
 			/*
@@ -574,9 +574,7 @@ int main(int argc, char** argv){
 						line[len_command+strlen(variable_names[i])] == /*(*/')'
 						)
 					{
-						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]); /*TODO*/
-						line_old = line;
-						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						perform_inplace_repl(line, variable_names[i], variable_expansions[i]);
 						have_expanded = 1;
 						break;
 					}
@@ -596,24 +594,30 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			loc_eparen += 2;
-			sprintf(buf, "%lu", secnum);
-			line = strcatallocfb( /*TODO*/
-				strcatalloc(/*TODO*/
+			sprintf(buf1, "%lu", secnum);
+			buf2[0] = '\0';
+			strcat(buf2, "section0;la");
+			strcat(buf2, buf1);
+			strcat(buf2, ";lfarpc;region");
+			strcat(buf2, buf1);
+			strcat(buf2, ";");
+			strcat(buf2, line + loc_eparen);
+			my_strcpy(line, buf2);
+			/*
+			line = strcatallocfb(
+				strcatalloc(
 					"section0;la",
-					buf
+					buf1
 				),
-				strcatallocf1(/*TODO*/
-					strcatallocf1(/*TODO*/
-						strcatalloc(";lfarpc;region", buf),/*TODO*/
+				strcatallocf1(
+					strcatallocf1(
+						strcatalloc(";lfarpc;region", buf1),
 						";"
 					),
 					line + loc_eparen
 				)
 			);
-			if(!line){
-				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
-			}
-			free(line_old);
+			*/
 		}else if(strprefix("..ascii:", line)){
 			my_strcpy(line+1, line+strlen("..ascii:"));
 			line[0] = '!';
@@ -623,11 +627,10 @@ int main(int argc, char** argv){
 			line[0] = '!';
 			using_asciz = 1;
 		} else if(strprefix("..(", line)){
-			char buf[40];
 			char have_expanded = 0;
 			unsigned long secnum = 0;
-			char* line_old = line;
 			long loc_eparen = -1;
+			const unsigned long len_command = strlen("..(");
 			/*
 				attempt to find a macro to expand here.
 			*/
@@ -636,14 +639,12 @@ int main(int argc, char** argv){
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
 					if(
-						strfind(line,variable_names[i]) ==3
+						strfind(line,variable_names[i]) == len_command
 						&&
-						line[3+strlen(variable_names[i])] == /*(*/')'
-					)
+						line[len_command+strlen(variable_names[i])] == /*(*/')'
+						)
 					{
-						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]); /*TODO*/
-						line_old = line;
-						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						perform_inplace_repl(line, variable_names[i], variable_expansions[i]);
 						have_expanded = 1;
 						break;
 					}
@@ -654,7 +655,7 @@ int main(int argc, char** argv){
 				printf("Bad integer constant inside of region select syntactic sugar.\n");
 				goto error;
 			}
-			secnum = strtoul(line + 3, 0,0);
+			secnum = strtoul(line + len_command, 0,0);
 			loc_eparen = strfind(line, /*(*/"):");
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for region selection is missing ending \"):\"");
@@ -663,21 +664,29 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			loc_eparen += 2;
-			sprintf(buf, "%lu", secnum * 256 * 256);
-			line = strcatallocfb(/*TODO*/
-				strcatalloc(/*TODO*/
+			sprintf(buf1, "%lu", secnum * 256 * 256);
+
+			/*
+				this huge mess replaced by...
+			*/
+			buf2[0] = '\0';
+			strcat(buf2, "section ");
+			strcat(buf2, buf1);
+			strcat(buf2, ";");
+			strcat(buf2, line + loc_eparen);
+			my_strcpy(line, buf2);
+			/*
+			line = strcatallocfb(
+				strcatalloc(
 					"section",
 					buf
 				),
-				strcatalloc(/*TODO*/
+				strcatalloc(
 					";",
 					line + loc_eparen
 				)
 			);
-			if(!line){
-				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
-			}
-			free(line_old);
+			*/
 		} else if(strprefix("..include\"", line)){
 			char* line_old = line;
 			long loc_eparen = strfind(line + strlen("..include\""), "\"");
@@ -687,12 +696,24 @@ int main(int argc, char** argv){
 				puts((char*)line_copy);
 				goto error;
 			}
-			line = strcatallocf2(/*TODO*/
-				"ASM_header ",
-				str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)/*TODO*/
-			);
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+
+			buf2[0] = '\0';
+			strcat(buf2, "ASM_header ");
+			line[strlen("..include\"") + loc_eparen] = '\0';
+			strcat(buf2, line + strlen("..include\""));
+			my_strcpy(line, buf2);
+			/*
+				This trash replaced...
+			*/
+			/*
+				line = strcatallocf2(
+					"ASM_header ",
+					str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)
+				);
+				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				free(line_old);
+			*/
+			
 		} else if(strprefix("..dinclude\"", line)){
 			char* line_old = line;
 			long loc_eparen = strfind(line+ strlen("..dinclude\""), "\"");
