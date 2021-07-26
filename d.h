@@ -76,7 +76,7 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 	        exit(1);
 	    }
 		sdl_spec.freq = 16000;
-		sdl_spec.format = AUDIO_S16MSB; 
+		sdl_spec.format = AUDIO_S16MSB;
 		sdl_spec.channels = 1;
 		sdl_spec.silence = 0;
 		sdl_spec.samples = 2048;
