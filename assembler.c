@@ -45,19 +45,26 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 	return 1;
 }
 
-
+static unsigned char* rut_append_to_me = NULL;
 static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
 	char* buf;
 	unsigned long bcap = 0x10000;
 	unsigned long blen = 0;
-	buf = STRUTIL_ALLOC(0x10000);
-	if(!buf){
-		printf(general_fail_pref); 
-		printf("Failed Malloc."); 
-		exit(1);
-		return NULL; /*unreachable.*/
+	if(!rut_append_to_me){
+		buf = STRUTIL_ALLOC(0x10000);
+		if(!buf){
+			printf(general_fail_pref); 
+			printf("Failed Malloc."); 
+			exit(1);
+			return NULL; /*unreachable.*/
+		}
+	}else {
+		buf = (char*)rut_append_to_me;
+		blen = strlen((char*)rut_append_to_me);
+		rut_append_to_me = NULL;
 	}
+
 	while(1){
 		if(feof(f)){break;}
 		c = fgetc(f);
@@ -512,12 +519,17 @@ int main(int argc, char** argv){
 			&& line[strlen(line)-1] == '\\'
 		)
 		{
+			/*
 			char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced_modified(infile, &linesize, '\n');
-			line = strcatallocfb(line,line_temp);/*TODO*/
+			line = strcatallocfb(line,line_temp);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			linesize = strlen(line);
+			*/
+			line[strlen((char*)line)-1] = '\0';
+			rut_append_to_me = line;
+			line = (unsigned char*)read_until_terminator_alloced_modified(infile, &linesize, '\n');
 		}
 		/*line_copy = strcatalloc(line,"");*/
 		my_strcpy(line_copy, (unsigned char*)line);
