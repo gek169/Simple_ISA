@@ -1,9 +1,9 @@
 #!/usr/bin/sisa16_asm -run
 
-..include"libc.hasm"
-//..include"libc_pre.hasm"
-//..(2):
-//..dinclude"libc_pre.bin"
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 ..(0x25):
 	my_page_o_crap:
 	fill 256, '7'

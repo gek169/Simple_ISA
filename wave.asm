@@ -27,7 +27,10 @@ section 0x40000;
 ..(ITER_REGION):
 	bytes 0,0,0,0;
 
-..include"libc.hasm"
+//..include"libc.hasm"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 
 .line_length:			79

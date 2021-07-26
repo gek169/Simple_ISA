@@ -714,7 +714,7 @@ int main(int argc, char** argv){
 			*/
 			
 		} else if(strprefix("..dinclude\"", line)){
-			long loc_eparen = strfind(line + strlen("..include\""), "\"");
+			long loc_eparen = strfind(line + strlen("..dinclude\""), "\"");
 			if(loc_eparen == -1){
 				puts("<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
 				puts("Line:");
@@ -727,6 +727,7 @@ int main(int argc, char** argv){
 			line[strlen("..dinclude\"") + loc_eparen] = '\0';
 			strcat(buf2, line + strlen("..dinclude\""));
 			my_strcpy(line, buf2);
+			
 		}else if(strprefix("..export\"", line)){
 			char* variable_name;
 			char found = 0;
