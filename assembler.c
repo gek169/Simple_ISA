@@ -18,6 +18,11 @@ static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
 
 static char read_until_terminator_alloced_modified_mode = 0;
+
+void my_strcpy(char* dest, char* src){
+	while(*src) *dest++ = *src++;
+}
+
 static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
 	char* buf;
@@ -466,16 +471,17 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		line = read_until_terminator_alloced_modified(infile, &linesize, '\n');
-		if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+		line = read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		while(
 				strprefix(" ",line) 
 				|| strprefix("\t",line)
 				|| (isspace(line[0]) && line[0] != '\0')
-				){ /*Remove preceding whitespace... we do this twice, actually...*/
+		){ /*Remove preceding whitespace... we do this twice, actually...*/
 			char* line_old = line;
-			line = strcatalloc(line+1,"");
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			line = strcatalloc(line+1,""); /*TODO*/
+			if(!line){
+				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
+			}
 			free(line_old);
 		}
 
@@ -491,12 +497,11 @@ int main(int argc, char** argv){
 			char* line_temp;
 			line[strlen(line)-1] = '\0';
 			line_temp = read_until_terminator_alloced_modified(infile, &linesize, '\n');
-			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			line = strcatallocfb(line,line_temp);
+			line = strcatallocfb(line,line_temp);/*TODO*/
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			linesize = strlen(line);
 		}
-		line_copy = strcatalloc(line,"");
+		line_copy = strcatalloc(line,"");/*TODO*/
 		
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
@@ -507,17 +512,17 @@ int main(int argc, char** argv){
 		/*section0;la 1;lfarpc;*/
 		if(strprefix("..zero:", line)){
 			char* line_old = line;
-			line = strcatalloc("section0;", line+strlen("..zero:"));
+			line = strcatalloc("section0;", line+strlen("..zero:"));/*TODO*/
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..z:", line)){
 			char* line_old = line;
-			line = strcatalloc("section0;", line+strlen("..z:"));
+			line = strcatalloc("section0;", line+strlen("..z:"));/*TODO*/
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..main:", line)){
 			char* line_old = line;
-			line = strcatalloc("section0;la1;lfarpc;region1;", line+strlen("..main:"));
+			line = strcatalloc("section0;la1;lfarpc;region1;", line+strlen("..main:"));/*TODO*/
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 		}else if(strprefix("..main(", line)){
@@ -540,7 +545,7 @@ int main(int argc, char** argv){
 						line[len_command+strlen(variable_names[i])] == /*(*/')'
 						)
 					{
-						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);
+						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]); /*TODO*/
 						line_old = line;
 						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 						have_expanded = 1;
@@ -563,7 +568,7 @@ int main(int argc, char** argv){
 			}
 			loc_eparen += 2;
 			sprintf(buf, "%lu", secnum);
-			line = strcatallocfb(
+			line = strcatallocfb( /*TODO*/
 				strcatalloc(
 					"section0;la",
 					buf
@@ -581,16 +586,16 @@ int main(int argc, char** argv){
 			}
 			free(line_old);
 		}else if(strprefix("..ascii:", line)){
-			char* line_old = line;
+			/*
 			line = strcatalloc("!", line+strlen("..ascii:"));
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			*/
+			my_strcpy(line+1, line+strlen("..ascii:"));
+			line[0] = '!';
 			using_asciz = 0;
-			free(line_old);
 		} else if(strprefix("..asciz:", line)){
-			char* line_old = line;
-			line = strcatalloc("!", line+strlen("..asciz:"));
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+			my_strcpy(line+1, line+strlen("..asciz:"));
+			line[0] = '!';
 			using_asciz = 1;
 		} else if(strprefix("..(", line)){
 			char buf[40];
