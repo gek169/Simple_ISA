@@ -36,19 +36,19 @@ d:
 	./asmbuild.sh
 
 assembler2: 
-	$(CC) $(CFLAGS) assembler2.c -o s16asm2
+	$(CC) $(CFLAGS) -static assembler2.c -o s16asm2
 	@echo "~~Built assembler2"
 
 sisa16_emu:
-	$(CC) $(CFLAGS) isa.c -o sisa16_emu 
+	$(CC) $(CFLAGS) -static isa.c -o sisa16_emu 
 	@echo "~~Built emulator."
 
 sisa16_asm:
-	$(CC) $(CFLAGS) assembler.c -o sisa16_asm 
+	$(CC) $(CFLAGS) -static assembler.c -o sisa16_asm 
 	@echo "~~Built assembler (Which has an emulator built into it.)"
 
 sisa16_dbg:
-	$(CC) $(CFLAGS) debugger.c -o sisa16_dbg
+	$(CC) $(CFLAGS) -static debugger.c -o sisa16_dbg
 	@echo "~~Built debugger."
 
 # SDL2 versions, if you want to mess with graphics and audio
