@@ -17,37 +17,37 @@
 	//It's in RX0.
 	rx3_0;
 	lb0;rx2b;
-	:libc_gets_user_looptop:
+	:libc_gets_looptop:
 		la '\n'; interrupt;		//Refresh display.
 		rx0_2
 		llb %libc_gets_max_chars%; rx1b
 		rxcmp
 		lb 0;
 		cmp;
-		sc %libc_gets_user_loopend%
+		sc %libc_gets_loopend%
 		jmpifneq
 		getchar; //Hey, user, give me some data!
 		apush;
-		nota;bpop;sc%libc_gets_user_loopend%;jmpifeq;
+		nota;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
-		lb '\r';cmp;bpop;sc%libc_gets_user_loopend%;jmpifeq;
+		lb '\r';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
-		lb '\n';cmp;bpop;sc%libc_gets_user_loopend%;jmpifeq;
+		lb '\n';cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 		ab;bpush;
 		//255- polling from nonblocking device?
-		lb 0xff;cmp;bpop;sc%libc_gets_user_looptop%;jmpifeq;
+		lb 0xff;cmp;bpop;sc%libc_gets_looptop%;jmpifeq;
 		ab;bpush;
 
 		//ascii del chars.
-		lb 0x7f;cmp;bpop;sc%libc_gets_user_handle_del%;jmpifeq;
+		lb 0x7f;cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
 		ab;bpush;
-		lb '\b';cmp;bpop;sc%libc_gets_user_handle_del%;jmpifeq;
+		lb '\b';cmp;bpop;sc%libc_gets_handle_del%;jmpifeq;
 		
 
 
 		//greater than 126?
 		ab;bpush;
-		lb '~';cmp;lb2;cmp;bpop;sc%libc_gets_user_loopend%;jmpifeq;
+		lb '~';cmp;lb2;cmp;bpop;sc%libc_gets_loopend%;jmpifeq;
 
 		//If This is what we do if its not a delete character.
 		ab;
@@ -65,12 +65,12 @@
 			proc_puts;
 		pop %3%;
 		la 0xd; putchar;
-	libc_gets_user_zero_chars:
+	libc_gets_zero_chars:
 		la '\n'; interrupt;
-		sc %libc_gets_user_looptop%;jmp;
+		sc %libc_gets_looptop%;jmp;
 	//Handle ascii DEL and Backspace.
-	:libc_gets_user_handle_del:
-		rx0_2; 		lb0;rx1b;	rxcmp;	sc %libc_gets_user_zero_chars%; jmpifeq;
+	:libc_gets_handle_del:
+		rx0_2; 		lb0;rx1b;	rxcmp;	sc %libc_gets_zero_chars%; jmpifeq;
 		rx0_2;		rxdecr;		rx2_0;
 		rx0_3;		rxdecr;		rx3_0;
 		la 0xd; putchar;
@@ -91,9 +91,9 @@
 		la 32; putchar;
 		la '\r'; putchar;
 		la '\n'; interrupt;
-		sc %libc_gets_user_looptop%;jmp;
+		sc %libc_gets_looptop%;jmp;
 	//ending: we must write a zero out. This actually overwrites the last character... See, we don't actually want it.
-	:libc_gets_user_loopend:
+	:libc_gets_loopend:
 		rx0_3;
 		cbrx0; 
 		la 0; 
