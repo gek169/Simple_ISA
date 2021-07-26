@@ -36,12 +36,15 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 ){
 	long loc = strfind((char*)workbuf, (char*)replaceme);
 	if(loc == -1) return 0;
+	/*printf("\r\nASKED TO REPLACE %s WITH %s IN %s", replaceme, replacewith, workbuf);*/
 	memcpy(buf_repl, workbuf, loc);
 	my_strcpy(buf_repl + loc, replacewith);
 	my_strcpy(
 		buf_repl + loc + strlen((char*)replacewith),
 		workbuf + loc + strlen((char*)replaceme)
 	);
+	my_strcpy(workbuf, buf_repl);
+	/*printf("\r\nIS NOW:%s\r\n", workbuf);*/
 	return 1;
 }
 
@@ -533,12 +536,6 @@ int main(int argc, char** argv){
 		*/
 		/*section0;la 1;lfarpc;*/
 		if(strprefix("..zero:", line)){
-			/*
-			char* line_old = line;
-			line = strcatalloc("section0;", line+strlen("..zero:"));
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
-			*/
 			perform_inplace_repl(
 				line,
 				"..zero:",
@@ -611,7 +608,10 @@ int main(int argc, char** argv){
 				),
 				strcatallocf1(
 					strcatallocf1(
-						strcatalloc(";lfarpc;region", buf1),
+						strcatalloc(
+						";lfarpc;region", 
+						buf1
+						),
 						";"
 					),
 					line + loc_eparen
@@ -675,7 +675,6 @@ int main(int argc, char** argv){
 			strcat((char*)buf2, ";");
 			strcat((char*)buf2, (char*)line + loc_eparen);
 			my_strcpy(line, buf2);
-			printf("line is now '%s' was '%s'",line, line_copy );
 			/*
 			line = strcatallocfb(
 				strcatalloc(
@@ -689,7 +688,6 @@ int main(int argc, char** argv){
 			);
 			*/
 		} else if(strprefix("..include\"", line)){
-			char* line_old = line;
 			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
 				puts("<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
@@ -716,20 +714,19 @@ int main(int argc, char** argv){
 			*/
 			
 		} else if(strprefix("..dinclude\"", line)){
-			char* line_old = line;
-			long loc_eparen = strfind(line+ strlen("..dinclude\""), "\"");
+			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
-				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
+				puts("<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
 				puts("Line:");
 				puts((char*)line_copy);
 				goto error;
 			}
-			line = strcatallocf2(/*TODO*/
-				"ASM_data_include ",
-				str_null_terminated_alloc(line + strlen("..include \""), loc_eparen)/*TODO*/
-			);
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+
+			buf2[0] = '\0';
+			strcat(buf2, "ASM_data_include ");
+			line[strlen("..dinclude\"") + loc_eparen] = '\0';
+			strcat(buf2, line + strlen("..dinclude\""));
+			my_strcpy(line, buf2);
 		}else if(strprefix("..export\"", line)){
 			char* variable_name;
 			char found = 0;

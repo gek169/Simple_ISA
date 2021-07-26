@@ -17,7 +17,9 @@
 asm_print %/32%;
 
 #right at the beginning.
-section 0
+//..z:
+section 0;
+push %5000%;
 lrx0 %/true_start%;
 proc_krenel;
 la 'f'; putchar;
