@@ -664,17 +664,18 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			loc_eparen += 2;
-			sprintf(buf1, "%lu", secnum * 256 * 256);
+			sprintf((char*)buf1, "%lu", secnum * 256 * 256);
 
 			/*
 				this huge mess replaced by...
 			*/
 			buf2[0] = '\0';
-			strcat(buf2, "section ");
-			strcat(buf2, buf1);
-			strcat(buf2, ";");
-			strcat(buf2, line + loc_eparen);
+			strcat((char*)buf2, "section ");
+			strcat((char*)buf2, (char*)buf1);
+			strcat((char*)buf2, ";");
+			strcat((char*)buf2, (char*)line + loc_eparen);
 			my_strcpy(line, buf2);
+			printf("line is now '%s' was '%s'",line, line_copy );
 			/*
 			line = strcatallocfb(
 				strcatalloc(
@@ -691,7 +692,7 @@ int main(int argc, char** argv){
 			char* line_old = line;
 			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
-				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts("<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
 				puts((char*)line_copy);
 				goto error;
