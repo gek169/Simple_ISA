@@ -19,10 +19,12 @@ static char* infilename = NULL;
 
 static char read_until_terminator_alloced_modified_mode = 0;
 
-void my_strcpy(char* dest, char* src){
+void my_strcpy(unsigned char* dest, unsigned char* src){
 	while(*src) *dest++ = *src++;
 	*dest = 0;
 }
+
+unsigned char line_copy[0x10000]; /*line_copy*/
 
 static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
@@ -56,12 +58,12 @@ static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* leno
 #ifndef SISA16_MAX_MACROS
 #define SISA16_MAX_MACROS 0x10000
 #endif
-static char* variable_names[SISA16_MAX_MACROS] = {0};
-static char* variable_expansions[SISA16_MAX_MACROS] = {0};
-static char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
+static unsigned char* variable_names[SISA16_MAX_MACROS] = {0};
+static unsigned char* variable_expansions[SISA16_MAX_MACROS] = {0};
+static unsigned char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
 static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
-static char DONT_WANT_TO_INLINE_THIS int_checker(char* proc){
+static char DONT_WANT_TO_INLINE_THIS int_checker(unsigned char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
 	unsigned long chars_read = 0;
 	if(!isdigit(proc[0])) return 1;
@@ -105,7 +107,7 @@ static char debugging = 0;
 static unsigned long npasses = 0;
 static char printlines = 0;
 static unsigned long linesize = 0;
-static char* line = NULL, *line_copy = NULL;
+static unsigned char* line = NULL;
 static unsigned long region_restriction = 0;
 static char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 static void DONT_WANT_TO_INLINE_THIS fputbyte(unsigned char b, FILE* f){
@@ -502,8 +504,8 @@ int main(int argc, char** argv){
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			linesize = strlen(line);
 		}
-		line_copy = strcatalloc(line,"");/*TODO*/
-		
+		/*line_copy = strcatalloc(line,"");*/
+		my_strcpy(line_copy, (unsigned char*)line);
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 
@@ -564,7 +566,7 @@ int main(int argc, char** argv){
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for main with region selection is missing ending \"):\"");
 				puts("Line:");
-				puts(line_copy);
+				puts((char*)line_copy);
 				goto error;
 			}
 			loc_eparen += 2;
@@ -631,7 +633,7 @@ int main(int argc, char** argv){
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntax sugar for region selection is missing ending \"):\"");
 				puts("Line:");
-				puts(line_copy);
+				puts((char*)line_copy);
 				goto error;
 			}
 			loc_eparen += 2;
@@ -656,7 +658,7 @@ int main(int argc, char** argv){
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
-				puts(line_copy);
+				puts((char*)line_copy);
 				goto error;
 			}
 			line = strcatallocf2(/*TODO*/
@@ -671,7 +673,7 @@ int main(int argc, char** argv){
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
 				puts("Line:");
-				puts(line_copy);
+				puts((char*)line_copy);
 				goto error;
 			}
 			line = strcatallocf2(/*TODO*/
@@ -690,7 +692,7 @@ int main(int argc, char** argv){
 			if(loc_eparen == -1){
 				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
-				puts(line_copy);
+				puts((char*)line_copy);
 				goto error;
 			}
 			loc_eparen += strlen("..export\"");
@@ -1973,14 +1975,19 @@ int main(int argc, char** argv){
 		} while(1);
 		/*if this is a line with vertical bars, start processing the stuff after the next vertical bar. */
 		if(strfind(line, "|")!=-1){
-			char* line_temp = strcatalloc(line+strfind(line, "|")+1,"");/*TODO*/
+			long loc = strfind(line, "|")+1;
+			/*
+			char* line_temp = strcatalloc(line+strfind(line, "|")+1,"");
 			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line);line = line_temp;
+			free(line);
+			line = line_temp;
+			*/
+			my_strcpy(line_copy, (unsigned char*)line + loc);
 			goto pre_pre_processing;
 		}
 		end:
 		free(line);
-		free(line_copy);
+/*		free(line_copy);*/
 		continue;
 		error:
 		puts(fail_msg);
@@ -1992,6 +1999,7 @@ int main(int argc, char** argv){
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		UU i=0, j=~(UU)0;
 		SUU q_test=(SUU)-1;
+		if(SEGMENT) free(SEGMENT);
 		SEGMENT = NULL;
 		SEGMENT_PAGES = 0;
 		if(
