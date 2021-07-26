@@ -59,15 +59,17 @@ lrx0 %/0xB00000%;
 lrx1 %/0xC00000%;
 la 0;apush;
 fill_dat_mem_looptop:
-	cbrx0;
 	apop;
 	aincr;
+	lb 80;
+	mod;
 	apush;
+	cbrx0;
 	farista;
 	rxincr;
 	rxcmp;
 	sc %fill_dat_mem_looptop%; jmpifneq;
-
+la 3; syscall; //Play that memory as audio.
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;

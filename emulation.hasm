@@ -563,11 +563,16 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~KRENEL INTERRUPT PASSTHROUGHS~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-		user_geta; alpush; lb '\n'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-		ab; blpush; lb '\r'; cmp; blpop; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
-		ab; blpush; lb 0xc; cmp; blpop; sc %libc_krenel_syscall_clear_term%; jmpifeq;
-		ab; blpush; lb 1; cmp; blpop; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
-		ab; blpush; lb 0x80; cmp; blpop; sc %libc_krenel_try_select_task%; jmpifeq; //Interrupt 0x80 just selects the next task.
+		user_geta; lb '\n'; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		user_geta; lb '\r'; cmp;  sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
+		user_geta; lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
+		user_geta; lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
+		user_geta; lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
+		user_geta; lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
+		user_geta; lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
+		user_geta; lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
+		user_geta; lb 8; cmp; sc %libc_krenel_syscall_set_palette_color%; jmpifeq;
+		user_geta; lb 0x80; cmp;  sc %libc_krenel_try_select_task%; jmpifeq; //Interrupt 0x80 just selects the next task.
 		//BAD INTERRUPT
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
