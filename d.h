@@ -370,15 +370,16 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a==0xa||a == 0xd) {
 #ifndef USE_SDL2
 		fflush(stdout);
-		return a;
 #endif
+		return a;
 	}
 	if(a == 0xc){
 #ifdef USE_SDL2
 		memset(stdout_buf, 0, SCREEN_WIDTH_CHARS * SCREEN_HEIGHT_CHARS);
 		curpos = 0;
-#endif
+#else
 		printf("\e[H\e[2J\e[3J");
+#endif
 		return a;
 	}
 
