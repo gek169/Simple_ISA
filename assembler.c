@@ -18,27 +18,27 @@ static void ASM_PUTS(const char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
 
 static char read_until_terminator_alloced_modified_mode = 0;
-static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator, unsigned long initsize){
+static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
 	char* buf;
-	unsigned long bcap = initsize;
+	unsigned long bcap = 0x20000;
 	unsigned long blen = 0;
-	buf = STRUTIL_ALLOC(initsize);
-	if(!buf) return NULL;
+	buf = STRUTIL_ALLOC(0x20000);
+	if(!buf){
+		printf(general_fail_pref); 
+		printf("Failed Malloc."); 
+		exit(1);
+		return NULL; /*unreachable.*/
+	}
 	while(1){
 		if(feof(f)){break;}
 		c = fgetc(f);
 		if(c == terminator) {break;}
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
-				bcap<<=1;
-				buf = STRUTIL_REALLOC(buf, bcap);
-				if(!buf){
-					printf(general_fail_pref); 
-					printf("Failed Malloc."); 
-					exit(1);
-					return NULL; /*unreachable.*/
-				}
+				printf(general_fail_pref);
+				printf("Oversized line exceeds 128k limit for a line.");
+				exit(1);
 			}
 		buf[blen++] = c;
 	}
@@ -466,7 +466,7 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		line = read_until_terminator_alloced_modified(infile, &linesize, '\n', 180);
+		line = read_until_terminator_alloced_modified(infile, &linesize, '\n');
 		if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 		while(
 				strprefix(" ",line) 
@@ -490,18 +490,12 @@ int main(int argc, char** argv){
 		{
 			char* line_temp;
 			line[strlen(line)-1] = '\0';
-			line_temp = read_until_terminator_alloced_modified(infile, &linesize, '\n', 1);
+			line_temp = read_until_terminator_alloced_modified(infile, &linesize, '\n');
 			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			line = strcatallocfb(line,line_temp);
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			linesize = strlen(line);
 		}
-		/*
-		if(strlen(line) > 0xffFF){
-			printf(general_fail_pref);
-			printf("Oversized line %s would not compile on a real machine.", line);
-		}
-		*/
 		line_copy = strcatalloc(line,"");
 		
 		if(strprefix("#",line)) goto end;
