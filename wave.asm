@@ -69,7 +69,8 @@ fill_dat_mem_looptop:
 	rxincr;
 	rxcmp;
 	sc %fill_dat_mem_looptop%; jmpifneq;
-la 3; syscall; //Play that memory as audio.
+la 3; 
+interrupt; //Play that memory as audio.
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;
@@ -102,10 +103,12 @@ asciifun_looptop: //Comment.
 		adecr;
 		st_page_count;
 		st_iteration_count;
+//		la 3; interrupt;
 		la %~wait_time%;
 		alpush;
 			proc_wait;
 		alpop;
+//		la 4; interrupt;
 		sc %asciifun_looptop%;jmp;
 	
 	iter_is_not_endval:
