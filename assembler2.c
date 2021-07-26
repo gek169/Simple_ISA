@@ -67,13 +67,13 @@ void pushToken(){
 	}
 	SEG_REALLOC(SEGMENT_PAGES + needed_space);
 	memcpy(
-		SEGMENT+(SEGMENT_PAGES-1)*256, 
+		SEGMENT+((SEGMENT_PAGES-needed_space)<<8),
 		STRBUF, 
 		needed_space * 256
 	);
 	N_TOKENS++;
 	CUR_TOKEN_LEN = 0;
-	printf("<token %u, identification %u> %s\r\n", (unsigned int)N_TOKENS, (unsigned int)TOKEN_IDENT, STRBUF);
+	printf("<token %u, identification %u> %s\r\n", (unsigned int)N_TOKENS, (unsigned int)TOKEN_IDENT, SEGMENT+(SEGMENT_PAGES-needed_space)*256);
 	TOKEN_IDENT = 0;
 }
 
