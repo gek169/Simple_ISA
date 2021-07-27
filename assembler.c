@@ -847,15 +847,10 @@ int main(int argc, char** argv){
 				printf("Syntactic sugar label declaration without second colon! Line:\n%s\n", line_copy);
 				goto error;
 			}
-			line = strcatallocf2(/*TODO*/
-				"VAR#",
-				strcatallocf1(/*TODO*/
-					str_null_terminated_alloc(line+1, loc_colon2),
-					"#@"
-				)
-			);
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+			line[1+loc_colon1] = '\0';
+			my_strcpy(buf1, line + 1);
+			sprintf(buf2, "VAR#%s#@", buf1);
+			my_strcpy(line, buf2);
 		} else if(!strprefix("!",line) && !strprefix("VAR#",line) && !strprefix("ASM_",line) && !strprefix("asm_", line)){ /*Additional syntactic sugar for labels.*/
 			long loc = strfind(line, "//");
 			/*We must remove line comments.*/
