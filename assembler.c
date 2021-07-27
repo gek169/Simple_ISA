@@ -1955,21 +1955,17 @@ int main(int argc, char** argv){
 				*/
 				if(!run_sisa16)
 				if(npasses == 1){
-					char* hfilename;
+					char* const hfilename = buf1;
 					unsigned long i;
 					FILE* f;
-					hfilename = strcatalloc(outfilename, ".hasm.tmp");/*TODO*/
-					if(!hfilename){
-						printf(general_fail_pref);
-						printf("Failed Malloc");
-						exit(1);
-					}
-					f = fopen(hfilename, "w");
+					/*hfilename = strcatalloc(outfilename, ".hasm.tmp");TODO*/
+					my_strcpy(buf1, outfilename);
+					strcat(buf1, ".hasm.tmp");
+					f = fopen(buf1, "w");
 					if(f){
 						for(i = nbuiltin_macros; i < nmacros; i++){
 							if( variable_is_redefining_flag[i]&2 ){
 								if(!(variable_is_redefining_flag[i]&1) ){
-									
 										fprintf(f, "VAR#%s#%s\n", variable_names[i], variable_expansions[i]);
 								} else {
 									printf(compil_fail_pref);
@@ -1980,11 +1976,9 @@ int main(int argc, char** argv){
 						}
 					}else{
 						printf(general_fail_pref);
-						printf("Cannot open file %s", hfilename);
-						free(hfilename);
+						printf("Cannot open file %s", buf1);
 						exit(1);
 					}
-					free(hfilename);
 				}
 			} else if(strprefix("asm_quit", metaproc)){
 				if(npasses == 1)
