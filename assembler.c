@@ -1413,13 +1413,9 @@ int main(int argc, char** argv){
 			/*Conditional Declaration.*/
 			if(macro_name[0] == '?'){
 				unsigned long i;
-				char* mn_old = macro_name;
-				macro_name = strcatalloc(macro_name+1,"");/*TODO*/
-				if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				free(mn_old);
-				
+				my_strcpy(macro_name, macro_name+1);
 				for(i = nbuiltin_macros; i < nmacros; i++)
-					if(streq(macro_name, variable_names[i])){
+					if(streq(macro_name, variable_names[i])){ /*Conditional declaration no longer accepted.*/
 						free(macro_name);
 						goto end;
 					}
@@ -1554,35 +1550,25 @@ int main(int argc, char** argv){
 				}
 				variable_names[nmacros] = macro_name;
 				variable_expansions[nmacros++] = 
-				str_null_terminated_alloc(/*TODO*/
+				str_null_terminated_alloc(/*TODO- use sgment.*/
 						line+loc_pound+loc_pound2,
 						strlen(line+loc_pound+loc_pound2)
 				);
 				if(!variable_expansions[nmacros-1]){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			} else {char* temp;
+			} else {
 				if(npasses == 0)
-					{
-						variable_is_redefining_flag[index] |= 1;
-					}
-				if(variable_names[index]) free(variable_names[index]);
-				variable_names[index] = macro_name;
-				temp = str_null_terminated_alloc(/*TODO*/
-						line+loc_pound+loc_pound2,
-						strlen(line+loc_pound+loc_pound2)
-				);
-				if(!temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				{
+					printf(general_fail_pref);
+					printf("Cannot redefine already made macro.");
+				}
+				free(macro_name);
+				my_strcpy(buf1, line+loc_pound+loc_pound2);
 				if(npasses == 1 && !(variable_is_redefining_flag[index]&1))
 				{/*Ensure that the macro evaluates to the exact same piece of text as the last time.*/
-					if(!streq(temp, variable_expansions[index])){
-						printf("\r\n\r\n<ASM BIG WARNING>\r\n\r\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
-						free(variable_expansions[index]);
-						variable_expansions[index] = temp;
+					if(!streq(buf1, variable_expansions[index])){
+						printf("\r\n\r\n<ASM HUGE ERROR>\r\n\r\nConfirmed!!! Macro Desynchronization between passes Line:\n%s\nInternally:\n%s\n",line_copy,line);
+						goto error;
 					}
-					free(variable_expansions[index]);
-					variable_expansions[index] = temp;
-				} else {
-					free(variable_expansions[index]);
-					variable_expansions[index] = temp;
 				}
 			}
 			if(debugging){
