@@ -847,9 +847,11 @@ int main(int argc, char** argv){
 				printf("Syntactic sugar label declaration without second colon! Line:\n%s\n", line_copy);
 				goto error;
 			}
-			line[1+loc_colon1] = '\0';
-			my_strcpy(buf1, line + 1);
-			sprintf(buf2, "VAR#%s#@", buf1);
+			line[1+loc_colon2] = '\0';
+			buf2[0] = 0;
+			strcat(buf2, "VAR#");
+			strcat(buf2, line + 1);
+			strcat(buf2, "#@");
 			my_strcpy(line, buf2);
 		} else if(!strprefix("!",line) && !strprefix("VAR#",line) && !strprefix("ASM_",line) && !strprefix("asm_", line)){ /*Additional syntactic sugar for labels.*/
 			long loc = strfind(line, "//");
@@ -873,16 +875,12 @@ int main(int argc, char** argv){
 				loc > 0 &&
 				!(line[loc-1] == '\\')
 			){
-				char* line_old = line;
-				line = strcatallocf2(/*TODO*/
-					"VAR#",
-					strcatallocf1(/*TODO*/
-						str_null_terminated_alloc(line, loc),/*TODO*/
-						"#@"
-					)
-				);
-				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				free(line_old);
+				line[loc] = '\0';
+				buf2[0] = 0;
+				strcat(buf2, "VAR#");
+				strcat(buf2, line);
+				strcat(buf2, "#@");
+				my_strcpy(line, buf2);
 			}
 		}
 		if(strprefix("!",line)) {unsigned long i;
