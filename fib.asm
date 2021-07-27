@@ -39,7 +39,7 @@
 	halt;
 ..(0x77):
 	la 0xc; apush; la 0; alpush;
-	proc_gets_user
+	proc_gets
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	lrx0 %/0xc0000%
