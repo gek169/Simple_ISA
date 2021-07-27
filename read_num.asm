@@ -55,20 +55,10 @@ bytes %/0%;
 	lrx0 %/0xe0000%
 	proc_atoi_dec
 	proc_rxsqrt
-	rx2_0
-		//print the number!
-	rx0_2;arx0;apush;
-	lb8; rx1b;rxrsh;arx0;apush;
-	rx0_2;lb16;rx1b;rxrsh;arx0;apush;
-	rx0_2;lb24;rx1b;rxrsh;arx0;apush;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
+	lrx1 %/0xc0000%;rx1push;
+	proc_itoa_dec
+	proc_puts
+	rx1pop;
 	la '\n'; putchar;
 	la '\r'; putchar;
 	lrx0 %/0x1000%;

@@ -1,4 +1,6 @@
 
+
+
 ..decl_farproc(LIBC_REGION):proc_printbytehex
 ..export"proc_printbytehex"
 	//retrieve our argument.

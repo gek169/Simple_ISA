@@ -25,3 +25,118 @@ bytes %/0%;
 	:libc_strdupe_abort:
 	lb 0; div;
 	halt;
+
+
+//RX0: the number
+//RX1: the destination.
+..decl_farproc(LIBC_REGION):proc_utoa_dec
+..export"proc_utoa_dec"
+	rx2_0;
+	rx3_1;
+
+	//Billions digit.
+	lrx1 %/1000000000%; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Hundred Millions Digit.
+	rx0_2;
+	lrx1 %/100000000%; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Ten Millions Digit.
+	rx0_2;
+	lrx1 %/10000000%; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Millions Digit.
+	rx0_2;
+	lrx1 %/1000000%; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;	
+	//Hundred Thousands
+	rx0_2;
+	lrx1 %/100000%; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;	
+	//Ten Thousands
+	rx0_2;
+	llb %10000%;rx1b; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Thousands
+	rx0_2;
+	llb %1000%;rx1b; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Hundreds
+	rx0_2;
+	lb 100;rx1b; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Tens
+	rx0_2;
+	lb 10;rx1b; rxdiv;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+		rxincr; 
+	rx3_0;
+	//Ones.
+	rx0_2;
+	arx0; lb 10; mod; lb 0x30; add;
+	rx0_3;
+		cbrx0;
+		farista;
+	rxincr; cbrx0;la 0; farista;
+	farret
+
+//RX0: the number
+//RX1: the destination.
+
+..decl_farproc(LIBC_REGION):proc_itoa_dec
+..export"proc_itoa_dec"
+	rx2_0;
+	rx3_1;
+	lb 31; rx1b; rxrsh; arx0; nota; sc %libc_itoa_dec_noneg%; jmpifeq;
+	rx0_3;cbrx0; 
+	la '-'; farista; //it is a negative number. Put a negative sign in front!
+	rxincr; rx3_0;
+	rx0_2; rxcompl; rxincr; rx2_0;
+	:libc_itoa_dec_noneg:
+		rx0_2;
+		rx1_3;
+		proc_utoa_dec
+	farret
