@@ -756,27 +756,30 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			goto end;
-		} else if(strprefix("..decl_farproc:", line)){
+		} else if(strprefix("..decl_farproc:", (char*) line)){
+			my_strcpy(buf1, line + strlen("..decl_farproc:"));
+			sprintf((char*)buf2, "VAR#%s#sc%%%lu%%;la%lu;farcall;", buf1, outputcounter & 0xFFff, outputcounter >>16);
+			my_strcpy(line, buf2);
+			/*
 			char buf[2048];
 			char* line_old = line;
-			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");/*TODO*/
+			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
 			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			buf[2047] = 0;
 			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
-			line = strcatalloc(buf,"");/*TODO*/
+			line = strcatalloc(buf,"");
 			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			free(line_old);
 			free(procedure_name);
+
+			*/
 		} else if(strprefix("..decl_farproc(" /*)*/, (char*)line)){
-			char buf[2048];
-			unsigned char* line_old = line;
 			long loc_colon = -1;
 			unsigned long regioncode;
-			char* procedure_name;
 			char have_expanded;
-			const long len_decl = strlen("..decl_farproc(" /*)*/);
+			const long len_command = strlen("..decl_farproc(" /*)*/);
 			regioncode = outputcounter >>16;
-			loc_colon = strfind(line, /*(*/"):");
+			loc_colon = strfind((char*)line, /*(*/"):");
 			if(loc_colon == -1)
 			{
 				printf(syntax_fail_pref);
@@ -784,9 +787,12 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			loc_colon += 2;
-			procedure_name = strcatalloc(line + loc_colon, "");/*TODO*/
-			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+			/*procedure_name = strcatalloc(line + loc_colon, "");*/
+			my_strcpy(buf1, line + loc_colon);
 			/*Construct the name.*/
+						/*
+				attempt to find a macro to expand here.
+			*/
 						/*
 				attempt to find a macro to expand here.
 			*/
@@ -795,38 +801,25 @@ int main(int argc, char** argv){
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
 					if(
-						strfind(line,variable_names[i]) == len_decl
+						strfind((char*)line,(char*)variable_names[i]) == len_command
 						&&
-						line[len_decl+strlen(variable_names[i])] == /*(*/')'
-					)
+						line[len_command+strlen((char*)(variable_names[i]))] == /*(*/')'
+						)
 					{
-						line = str_repl_allocf(line, variable_names[i], variable_expansions[i]);/*TODO*/
-						line_old = line;
-						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						perform_inplace_repl(line, variable_names[i], variable_expansions[i]);
 						have_expanded = 1;
 						break;
 					}
 				}
 			}while(have_expanded == 1);
-			regioncode = strtoul(line + len_decl, 0,0);
-			buf[2047] = 0;
-			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, regioncode);
-			line = strcatalloc(buf,"");/*TODO*/
-			if(!line){
-				printf(general_fail_pref); printf("Failed Malloc."); exit(1);
-			}
-			free(line_old);
-			free(procedure_name);
+			regioncode = strtoul((char*)line + len_command, 0,0);
+			sprintf((char*)buf2, "VAR#%s#sc%%%lu%%;la%lu;farcall;", (char*)buf1, outputcounter & 0xFFff, regioncode);
+
+			my_strcpy(line, buf2);
 		} else if(strprefix("..decl_lproc:", line)){
-			char buf[900];
-			char* line_old = line;
-			char* procedure_name = strcatalloc(line + strlen("..decl_lproc:"), "");/*TODO*/
-			buf[899] = 0;
-			sprintf(buf, "VAR#%s#sc%%%lu%%;call;", procedure_name, outputcounter & 0xFFff);
-			line = strcatalloc(buf,"");/*TODO*/
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
-			free(procedure_name);
+			my_strcpy(buf1,line + strlen("..decl_lproc:"));
+			sprintf(buf2, "VAR#%s#sc%%%lu%%;call;", buf1, outputcounter & 0xFFff);
+			my_strcpy(line, buf2);
 		}
 		/*syntactic sugar for VAR*/
 		else if(line[0] == '.'){
@@ -837,10 +830,8 @@ int main(int argc, char** argv){
 				goto error;
 			}
 			if(loc_colon != -1){
-				line = str_repl_allocf(line, ".", "VAR#");/*TODO*/
-				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				line = str_repl_allocf(line, ":", "#");/*TODO*/
-				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+				perform_inplace_repl(line, ".", "VAR#");/*TODO*/
+				perform_inplace_repl(line, ":", "#");/*TODO*/
 			} else {
 				printf(syntax_fail_pref);
 				printf("Syntactic sugar macro declaration without colon! Line:\n%s\n", line_copy);
