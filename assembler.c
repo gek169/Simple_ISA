@@ -1388,7 +1388,7 @@ int main(int argc, char** argv){
 				printf(syntax_fail_pref);printf("missing second # in macro declaration. Line:\n%s\n", line_copy); 
 				goto error;
 			}
-			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);/*TODO*/
+			macro_name = str_null_terminated_alloc(macro_name, loc_pound2);/*TODO- use segment.*/
 			if(!macro_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 			if(debugging){
 				if(!clear_output)printf("\nMacro Name is identified as %s\n", macro_name);
