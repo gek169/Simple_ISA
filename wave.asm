@@ -35,7 +35,7 @@ section 0x40000;
 
 .line_length:			79
 .line_length_plus_1:	80
-.num_lines:				59
+.num_lines:				30
 .wait_time:				16
 
 ..main(5):

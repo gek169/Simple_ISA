@@ -1985,12 +1985,6 @@ int main(int argc, char** argv){
 		/*if this is a line with vertical bars, start processing the stuff after the next vertical bar. */
 		if(strfind(line, "|")!=-1){
 			long loc = strfind(line, "|")+1;
-			/*
-			char* line_temp = strcatalloc(line+strfind(line, "|")+1,"");
-			if(!line_temp){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line);
-			line = line_temp;
-			*/
 			my_strcpy(line_copy, (unsigned char*)line + loc);
 			goto pre_pre_processing;
 		}
@@ -2096,8 +2090,7 @@ int main(int argc, char** argv){
 		}
 		if(R==15 || R==16 || R==17 || R==18 || R==19){
 			puts("\n<Errfl, Privileged opcode executed underprivileged.>");
-		}
-		
+		}		
 	}
 	return 0;
 }
