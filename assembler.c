@@ -17,7 +17,25 @@ static char clear_output = 0;
 static void ASM_PUTS(const unsigned char* s){if(!clear_output)puts(s);}
 static char* infilename = NULL;
 
+
+
+
 static char read_until_terminator_alloced_modified_mode = 0;
+
+static char my_isdigit(char c){
+	return (
+		c == '0'
+		|| c == '1'
+		|| c == '2'
+		|| c == '3'
+		|| c == '4'
+		|| c == '5'
+		|| c == '6'
+		|| c == '7'
+		|| c == '8'
+		|| c == '9'
+	);
+}
 
 void my_strcpy(unsigned char* dest, unsigned char* src){
 	while(*src) *dest++ = *src++;
@@ -88,9 +106,10 @@ static const unsigned long max_lines_disassembler = 0x1ffFFff;
 static char DONT_WANT_TO_INLINE_THIS int_checker(unsigned char* proc){
 	char int_mode = 0; /*starting with 0x means hexidecimal*/
 	unsigned long chars_read = 0;
-	if(!isdigit(proc[0])) return 1;
+	if(!my_isdigit(proc[0])) return 1;
 	if(proc[0] == '0') {
-		int_mode = 1;proc++;
+		int_mode = 1;
+		proc++;
 		chars_read++;
 	} /*octal*/
 	if(*proc && int_mode == 1) {
