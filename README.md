@@ -1,10 +1,12 @@
 # Simple, Embeddable, Performant Virtual Machine Language
 
-SISA16 is an extremely lightweight high-performance minimal virtual machine designed to replace languages like Lua for program extension.
+SISA16 is an extremely lightweight high-performance minimal virtual machine designed not only
+to replace languages like Lua and WebAssembly for program extension, but also to provide a common
+high-performance computing platform on new architectures.
 
-In this repository i have provided the assembler, disassembler, debugger, and even a small round-robin kernel.
+In this repository i have provided the assembler, emulator, disassembler, debugger, and an example kernel and standard library.
 
-it executes identically on every major platform and computer architecture. 
+The assembler has the emulator built-in so that programs can be executed as scripts.
 
 Platforms Tested and confirmed for 100% compliance:
 
@@ -54,8 +56,7 @@ Platforms planned to be tested:
 
 	* Hackable- More instructions can be added at a whim. Compiler flags allow for altering the emulator's behavior.
 
-	* Fast. a 2.2 GHZ Ryzen 7 will execute code with branches at ~1.09 Giga-IPS. 
-		a 4.0 ghz i7-6700 will execute that same code at ~1.15 Giga-IPS.
+	* Fast. Gets about a billion instructions per second on a 4 ghz processor.
 
 * Trivially embeddable. Implement five small and easy-to-understand functions in a single header file
 	to add SISA16 scripting to any system.
