@@ -1359,7 +1359,8 @@ int main(int argc, char** argv){
 			if(!clear_output)printf("\n~~Is this a macro?~~\n");
 		}
 		/*MACRO_DEFINITION_STAGE*/
-		if(strprefix("VAR",line)){ long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
+		if(strprefix("VAR",line)){ 
+			long loc_pound, loc_pound2; char* macro_name;char is_overwriting; /*It's show time!*/
 			unsigned long index;
 			if(debugging){
 				if(!clear_output)printf("\nThis is a macro!\n");
@@ -1635,11 +1636,10 @@ int main(int argc, char** argv){
 					if(!clear_output)printf("\n~~Insn Expansion Stage~~, iteration %lu\nLine:\n%s", iteration, line);
 				}
 				{unsigned long i;for(i = 0; i<n_insns; i++){
-					char* line_old; long loc, linesize; unsigned long j;
+					long loc, linesize; unsigned long j;
 					char found_longer_match; int num_commas_needed;
 					linesize = strlen(line);
 					loc = strfind(line, insns[i]);					
-					line_old = line;
 					if(loc == -1) continue;
 					if(strfind(line, "|")!= -1 &&
 						strfind(line, "|") < loc) continue;
@@ -1735,19 +1735,14 @@ int main(int argc, char** argv){
 					}
 					/**/
 					have_expanded = 1;
-					{char* before; char* after; long len_to_replace;
+					{
+						long len_to_replace;
 						len_to_replace = strlen(insns[i]);
-						
-						before = str_null_terminated_alloc(line_old, loc);/*TODO*/
-						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-						before = strcatallocf1(before, insn_repl[i]);/*TODO*/
-						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-						after = str_null_terminated_alloc(line_old+loc+len_to_replace, /*TODO*/
-										linesize-loc-len_to_replace);
-						if(!after){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-						line = strcatallocfb(before, after);/*TODO*/
-						if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-						free(line_old);
+						memcpy(buf1, line, loc);
+						buf1[loc] = '\0';
+						strcat((char*)buf1, insn_repl[i]);
+						strcat(buf1, line+loc+len_to_replace);
+						my_strcpy(line, buf1);
 					}
 				}}
 			}while(have_expanded && (iteration++ < 0x100000)); /*Probably safe right?*/
