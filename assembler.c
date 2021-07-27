@@ -904,13 +904,16 @@ int main(int argc, char** argv){
 			}
 			tmp = fopen(metaproc, "r");
 			if(!tmp) {
-				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);/*TODO*/
-				tmp = fopen(bruh, "r");
-				free(bruh);
+				buf2[0] = '\0';
+				strcat(buf2, "/usr/include/sisa16/");
+				strcat(buf2, metaproc);
+				tmp = fopen(buf2, "r");
 			}
-			if(!tmp) { char* bruh = strcatalloc("C:\\SISA16\\", metaproc);/*TODO*/
-				tmp = fopen(bruh, "r");
-				free(bruh);
+			if(!tmp) { 
+				buf2[0] = '\0';
+				strcat(buf2, "C:\\SISA16\\");
+				strcat(buf2, metaproc);
+				tmp = fopen(buf2, "r");
 			}
 			if(!tmp) {
 				printf(compil_fail_pref);
@@ -931,14 +934,16 @@ int main(int argc, char** argv){
 			
 			tmp = fopen(metaproc, "rb");
 			if(!tmp) {
-				char* bruh = strcatalloc("/usr/include/sisa16/", metaproc);/*TODO*/
-				tmp = fopen(bruh, "rb");
-				free(bruh);
+				buf2[0] = '\0';
+				strcat(buf2, "/usr/include/sisa16/");
+				strcat(buf2, metaproc);
+				tmp = fopen(buf2, "r");
 			}
 			if(!tmp) { 
-				char* bruh = strcatalloc("C:\\SISA16\\", metaproc);/*TODO*/
-				tmp = fopen(bruh, "rb");
-				free(bruh);
+				buf2[0] = '\0';
+				strcat(buf2, "C:\\SISA16\\");
+				strcat(buf2, metaproc);
+				tmp = fopen(buf2, "r");
 			}
 			if(!tmp) {
 				printf(compil_fail_pref);
@@ -970,10 +975,7 @@ int main(int argc, char** argv){
 				|| strprefix("\t",line)
 				|| (isspace(line[0]) && line[0] != '\0')
 		){ /*Remove preceding whitespace... we do this twice, actually...*/
-			char* line_old = line;
-			line = strcatalloc(line+1,"");/*TODO*/
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
+			my_strcpy(line, line+1);
 		}
 		/*Find line comments... but only on non-VAR lines!*/
 		/*Note that even though we already did this, we must do it again!*/
@@ -1034,10 +1036,13 @@ int main(int argc, char** argv){
 					(have_reached_builtins?(was_macro?nmacrodef_macros:nbuiltin_macros):(was_macro?nmacrodef_macros:nmacros))-1; 
 					i>=0; i--)
 				{ /*Only check builtin macros when writing a macro. */
-					char* line_old; long loc; long linesize; char found_longer_match;
-					long len_to_replace; char* before;char* after;
+					long loc; long linesize; char found_longer_match;
+					long len_to_replace; 
+					char* before;
+					char* after;
 					long j, loc_vbar = 0;;
-
+					buf1[0] = '\0';
+					buf2[0] = '\0';
 					loc_vbar = strfind(line, "|");
 					linesize = strlen(line);
 					if((loc_vbar == -1)) loc_vbar = linesize;
@@ -1048,7 +1053,6 @@ int main(int argc, char** argv){
 					if(was_macro && (i > 1)){
 						continue; /*Do not parse any other macros excepts dollar sign and at inside of a macro.*/
 					}
-					line_old = line;
 					if(debugging) printf("\nDiscovered possible Macro \"%s\"!\n", variable_names[i]);
 										/*Check to make sure that this isn't some other, longer macro.*/
 					found_longer_match = 0;
@@ -1088,18 +1092,24 @@ int main(int argc, char** argv){
 					have_expanded = 1;
 					
 					len_to_replace = strlen(variable_names[i]);
-					before = str_null_terminated_alloc(line_old, loc);/*TODO*/
-					if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+					/*before = str_null_terminated_alloc(line_old, loc); -- old, shit*/
+					before = buf1; /*DO NOT REUSE BUF1!!!!*/
+					memcpy(buf1, line, loc);
+					buf1[loc] = '\0';
+					/*if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}*/
 					if(i > 3) /*0,1,2,3 are special cases. 4,5,X are not.*/
-						before = strcatallocf1(before, variable_expansions[i]);/*TODO*/
+					{
+						/*before = strcatallocf1(before, variable_expansions[i]);*/
+						strcat(buf1, variable_expansions[i]);
+					}/*TODO*/
 					else if (i == 0){ /*SYNTAX: @+7+ or @ alone*/
 						char expansion[1024];
 						unsigned long addval = 0;
 						/*We need to check if there is a plus sign immediately after the at sign. */
-						if(strprefix("+",line_old+loc+1)){
-							char* add_text = line_old+loc+2;
+						if(strprefix("+",line+loc+1)){
+							char* add_text = line+loc+2;
 							/*Find the next plus*/
-							long loc_eparen = strfind(line_old+loc+2,"+");
+							long loc_eparen = strfind(line+loc+2,"+");
 							if(loc_eparen == -1){
 								printf(syntax_fail_pref);
 								printf("@ with no ending plus. Line:\n%s\n", line_copy);
@@ -1121,22 +1131,23 @@ int main(int argc, char** argv){
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						if(strprefix("&",line_old+loc+1)){
+						if(strprefix("&",line+loc+1)){
 							addval >>= 16;
 							len_to_replace++;
 						}
 						sprintf(expansion, "%lu", addval);
 						expansion[1023] = '\0'; /*Just in case...*/
-						before = strcatallocf1(before, expansion);/*TODO*/
+						/*before = strcatallocf1(before, expansion);*/
+						strcat(buf1, expansion);
 						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
 					} else if (i==1){
 						char expansion[1024]; 
 						unsigned long addval;
 						addval = 0;
-						if(strprefix("+",line_old+loc+1)){char* add_text; long loc_eparen;
-							add_text = line_old+loc+2;
+						if(strprefix("+",line+loc+1)){char* add_text; long loc_eparen;
+							add_text = line+loc+2;
 							/*Find the next plus*/
-							loc_eparen = strfind(line_old+loc+2,"+");
+							loc_eparen = strfind(line+loc+2,"+");
 							if(loc_eparen == -1){
 								printf(syntax_fail_pref);
 								printf("$ with no ending plus. Line:\n%s\n", line_copy);
@@ -1159,8 +1170,7 @@ int main(int argc, char** argv){
 
 						sprintf(expansion, "%lu,%lu", (unsigned long)(addval/256),(unsigned long)(addval&0xff));
 						expansion[1023] = '\0'; /*Just in case...*/
-						before = strcatallocf1(before, expansion);/*TODO*/
-						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						strcat(buf1, expansion);
 					} else if (i==2){
 						long loc_qmark=		-1;
 						long loc_slash=		-1;
@@ -1173,26 +1183,26 @@ int main(int argc, char** argv){
 						char expansion[1024];
 						unsigned long res=0; /*Split directive.*/
 						/*Locate the next ending one*/
-						if(strlen(line_old+loc) == 0){
+						if(strlen(line+loc) == 0){
 							printf(syntax_fail_pref);
 							printf("SPLIT (%%) is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
-						loc_eparen = strfind(line_old+loc+1,"%");
-						loc_slash = strfind(line_old+loc+1,"/");
-						loc_qmark = strfind(line_old+loc+1,"?");
-						loc_dash_mark = strfind(line_old+loc+1,"-");
-						loc_tilde = strfind(line_old+loc+1,"~");
-						loc_ampersand = strfind(line_old+loc+1,"&");
+						loc_eparen = strfind(line+loc+1,"%");
+						loc_slash = strfind(line+loc+1,"/");
+						loc_qmark = strfind(line+loc+1,"?");
+						loc_dash_mark = strfind(line+loc+1,"-");
+						loc_tilde = strfind(line+loc+1,"~");
+						loc_ampersand = strfind(line+loc+1,"&");
 						if(loc_eparen == -1){
 							printf(syntax_fail_pref);
-							printf("SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+							printf("SPLIT (%%) without ending %%. At location:\n%s\nLine:\n%s\n",line+loc,line_copy);
 							goto error;
 						}
 						if(loc_eparen == 0){
 							if(!clear_output){
 								printf(warn_pref);
-								printf("SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line_old+loc,line_copy);
+								printf("SPLIT (%%) is empty. At location:\n%s\nLine:\n%s\n",line+loc,line_copy);
 							}
 						}
 						if(loc_slash==0) do_32bit = 1;
@@ -1205,15 +1215,15 @@ int main(int argc, char** argv){
 						the length of the stuff inbetween, plus the */
 						len_to_replace+=(loc_eparen-len_to_replace+2);
 						if(do_8bit != 0)
-							res = strtoul(line_old+loc+2, NULL, 0);
+							res = strtoul(line+loc+2, NULL, 0);
 						else if(do_32bit == 0)
-							res = strtoul(line_old+loc+1, NULL, 0);
+							res = strtoul(line+loc+1, NULL, 0);
 						else if(do_32bit == 1 || do_32bit == 3) /*Skip the forward slash or ampersand*/
-							res = strtoul(line_old+loc+2, NULL, 0);
+							res = strtoul(line+loc+2, NULL, 0);
 						else if(do_32bit == 4){
 							UU d1;
 							/*Two's complement.*/
-							d1 = strtoul(line_old+loc+2, NULL, 0); /*Skip the dash.*/
+							d1 = strtoul(line+loc+2, NULL, 0); /*Skip the dash.*/
 							d1 = ~d1; 	/*ones compl*/
 							d1++; 		/*twos compl*/
 							res = d1;
@@ -1224,7 +1234,7 @@ int main(int argc, char** argv){
 #else
 							float a;UU d1;
 							if(sizeof(a) != 4){puts("<ASM ENV ERROR> Floating point environment INCOMPATIBLE.");exit(1);}
-							a = atof(line_old+loc+2);
+							a = atof(line+loc+2);
 							memcpy(&d1, &a, 4);
 							if(sizeof(UU) == 4)
 								res = d1;
@@ -1237,18 +1247,18 @@ int main(int argc, char** argv){
 						{
 							const char* error_fmt = "Unusual SPLIT (%%) evaluates to zero. Line:\n%s\nValue:\n%s\nInternal:\n%s\n";
 							if(!do_32bit && !do_8bit){
-								if(res == 0  && npasses == 1 && line_old[loc+1] != '%' && line_old[loc+1] != '0')
+								if(res == 0  && npasses == 1 && line[loc+1] != '%' && line[loc+1] != '0')
 									if(!clear_output){
 										printf(warn_pref);
-										printf(error_fmt, line_copy, line_old+loc+1, line_old);
+										printf(error_fmt, line_copy, line+loc+1, line);
 									}
 							} else {
 								
-								if(res == 0  && npasses == 1 && line_old[loc+2] != '%' && line_old[loc+2] != '0')
+								if(res == 0  && npasses == 1 && line[loc+2] != '%' && line[loc+2] != '0')
 									if(!clear_output)
 									{
 										printf(warn_pref);
-										printf(error_fmt, line_copy, line_old+loc+2, line_old);
+										printf(error_fmt, line_copy, line+loc+2, line);
 									}
 							}
 						}
@@ -1275,25 +1285,24 @@ int main(int argc, char** argv){
 							printf(internal_fail_pref);puts("Invalid do_32bit mode in a split directive.");
 							exit(1);
 						}
-						before = strcatallocf1(before, expansion);/*TODO*/
-						if(!before){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
+						strcat(buf1, expansion);
 					} else if (i==3){
 						char expansion[30];
 						unsigned char character_literal = ' '; /*It was probably the space character.*/
-						if(strlen(line_old+loc) == 0){
+						if(strlen(line+loc) == 0){
 							printf(syntax_fail_pref);
 							printf("character literal is at end of line. Line:\n%s\n", line_copy);
 							goto error;
 						}
 						expansion[29] = '\0';
-						for(;line_old[loc+len_to_replace] && line_old[loc+len_to_replace] != '\'';len_to_replace++){
-							if(line_old[loc+len_to_replace] == '\\'){
+						for(;line[loc+len_to_replace] && line[loc+len_to_replace] != '\'';len_to_replace++){
+							if(line[loc+len_to_replace] == '\\'){
 								len_to_replace++;
-								if(line_old[loc+len_to_replace] == '\0'){
+								if(line[loc+len_to_replace] == '\0'){
 									printf(syntax_fail_pref);
 									printf("character literal escapes the end of line??? Line:\n%s\n", line_copy);
 								}
-								character_literal = ((unsigned char*)line_old)[loc+len_to_replace];
+								character_literal = ((unsigned char*)line)[loc+len_to_replace];
 								if(character_literal == 'n') character_literal = '\n';
 								else if(character_literal == 'r') character_literal = '\r';
 								else if(character_literal == 'a') character_literal = '\a';
@@ -1309,25 +1318,29 @@ int main(int argc, char** argv){
 									goto error;
 								}
 							} else {
-								character_literal = ((unsigned char*)line_old)[loc+len_to_replace];
+								character_literal = ((unsigned char*)line)[loc+len_to_replace];
 							}
 						}
-						if(line_old[loc+len_to_replace] != '\''){
+						if(line[loc+len_to_replace] != '\''){
 							printf(syntax_fail_pref);
 							printf("Character literal missing ending single quote! Line:\n%s\n", line_copy);
 							goto error;
 						}
 						len_to_replace++;
 						sprintf(expansion, "%lu", (unsigned long)character_literal);
-						before = strcatallocf1(before, expansion);/*TODO*/
+						strcat(buf1, expansion);
 					}
-					after = str_null_terminated_alloc(line_old+loc+len_to_replace, /*TODO*/
-									linesize-loc-len_to_replace);
+					strcat(buf1, line+loc+len_to_replace);
+					my_strcpy(line, buf1);
+					break;
+					/*after = str_null_terminated_alloc(line+loc+len_to_replace,
+									linesize-loc-len_to_replace);*/
+					/*
 					if(!after){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-					line = strcatallocfb(before, after);/*TODO*/
+					line = strcatallocfb(before, after);
 					if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-					free(line_old);
-					break; /*we have expanded something.*/
+					free(line);
+					break; we have expanded something.*/
 				}
 			}while(have_expanded && (iteration++ < 32768));
 		}
