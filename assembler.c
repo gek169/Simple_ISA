@@ -24,10 +24,11 @@ void my_strcpy(unsigned char* dest, unsigned char* src){
 	*dest = 0;
 }
 
-static unsigned char line_copy[0x10000]; /*line_copy*/
-static unsigned char buf1[0x10000]; /*buffer for working with strings.*/
-static unsigned char buf2[0x10000]; /*another buffer for working with strings.*/
-static unsigned char buf_repl[0x10000]; /*another buffer for working with strings, specifically for the following function:*/
+static unsigned char line_copy[0x10000] = {0}; /*line_copy*/
+static unsigned char line[0x10000] = {0}; /*line_copy*/
+static unsigned char buf1[0x10000] = {0}; /*buffer for working with strings.*/
+static unsigned char buf2[0x10000] = {0}; /*another buffer for working with strings.*/
+static unsigned char buf_repl[0x10000] = {0}; /*another buffer for working with strings, specifically for the following function:*/
 
 int perform_inplace_repl( /*returns whether or not it actually did a replacement.*/
 	unsigned char* workbuf,
@@ -49,22 +50,13 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 }
 
 static unsigned char* rut_append_to_me = NULL;
-static char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
+static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
-	char* buf;
+	unsigned char* const buf = line;
 	unsigned long bcap = 0x10000;
 	unsigned long blen = 0;
-	if(!rut_append_to_me){
-		buf = STRUTIL_ALLOC(0x10000);
-		if(!buf){
-			printf(general_fail_pref); 
-			printf("Failed Malloc."); 
-			exit(1);
-			return NULL; /*unreachable.*/
-		}
-	}else {
-		buf = (char*)rut_append_to_me;
-		blen = strlen((char*)rut_append_to_me);
+	if(rut_append_to_me){
+		blen = strlen((char*)line);
 		rut_append_to_me = NULL;
 	}
 
@@ -137,7 +129,6 @@ static char debugging = 0;
 static unsigned long npasses = 0;
 static char printlines = 0;
 static unsigned long linesize = 0;
-static unsigned char* line = NULL;
 static unsigned long region_restriction = 0;
 static char region_restriction_mode = 0; /*0 = off, 1 = block, 2 = region*/
 static void DONT_WANT_TO_INLINE_THIS fputbyte(unsigned char b, FILE* f){
@@ -504,7 +495,7 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		line = (unsigned char*)read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
+		read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		while(
 				strprefix(" ",line)
 				|| strprefix("\t",line)
@@ -524,7 +515,7 @@ int main(int argc, char** argv){
 		{
 			line[strlen((char*)line)-1] = '\0';
 			rut_append_to_me = line;
-			line = (unsigned char*)read_until_terminator_alloced_modified(infile, &linesize, '\n');
+			read_until_terminator_alloced_modified(infile, &linesize, '\n');
 		}
 		/*line_copy = strcatalloc(line,"");*/
 		my_strcpy(line_copy, (unsigned char*)line);
@@ -2004,7 +1995,7 @@ int main(int argc, char** argv){
 			goto pre_pre_processing;
 		}
 		end:
-		free(line);
+/*		free(line);*/
 /*		free(line_copy);*/
 		continue;
 		error:
