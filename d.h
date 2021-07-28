@@ -6,6 +6,13 @@ static const size_t DISK_ACCESS_MASK = 0x3FffFFff;
 
 static unsigned short shouldquit = 0;
 
+/*RPI bug fix.
+
+*/
+#if defined(__arm__) && defined(USE_TERMIOS)
+#undef USE_TERMIOS
+#endif
+
 #ifndef NO_SIGNAL
 #include <signal.h>
 #define TRAP_CTRLC signal(SIGINT, emu_respond);
