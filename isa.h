@@ -640,6 +640,7 @@ ZD:
 {
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
+	SEGMENT_PAGES = RX0;
 #ifndef NO_PREEMPT
 	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
@@ -652,7 +653,7 @@ ZD:
 	} else {
 		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
 			STASH_REGS;
-			SEGMENT_PAGES = RX0;
+			
 			if(!SEGMENT)
 				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
 			else
