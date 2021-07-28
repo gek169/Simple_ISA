@@ -654,9 +654,9 @@ ZD:
 		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
 			STASH_REGS;
 			if(!SEGMENT)
-				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
+				SEGMENT = calloc(1, 0x100 * (size_t)SEGMENT_PAGES);
 			else
-				SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
+				SEGMENT = realloc(SEGMENT, 0x100 *(size_t)SEGMENT_PAGES);
 			UNSTASH_REGS;
 		}
 		if(!SEGMENT){

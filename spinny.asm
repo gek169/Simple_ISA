@@ -28,7 +28,7 @@ section 0x40000;
 
 
 
-..main(5):
+..main(3):
 	lrx0 %/0x70000%;
 	proc_krenel;
 	halt;
@@ -40,6 +40,9 @@ st_iter;
 alpush;
 	//our loop!
 	asciifun_looptop: 
+		seg_pages; rxincr;
+		lb 2; rx1b; rxmul;
+		seg_realloc;
 		la ' '; putchar;
 		alpop; 
 			aincr; 
