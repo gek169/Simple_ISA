@@ -19,7 +19,7 @@ all: main asm_programs
 
 q:
 #	admin $(MAKE) -B install
-	admin $(MAKE) install_sdl2 -B
+	admin $(MAKE) -B install_sdl2
 	admin $(MAKE) libc
 	admin $(MAKE) clean
 	git add .
