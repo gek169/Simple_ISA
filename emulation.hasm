@@ -1,14 +1,13 @@
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//~~~ P R I V I L E G E D C O D E ~~~~~~~~~~~~~~~~~~
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-//~~~~~~~~~~~~~~~~~~
-//~~emulate_single~~
-//~~~~~~~~~~~~~~~~~~
-//Do you want to run user code in a single process with zero overhead?
-//This must be placed at a region boundary, so it must be first.
-//Both of the following functions take a jump point in RX0.
-//They take a page to share with the client in the second parameter, so memory can be shared.
-//The return values from the machine are not provided to the caller.
-//krenel also uses it.
+//This file contains code that is meant to be executed at the privileged level. I.E. you would boot
+//the system into this.
+
+//User-mode code should be executed by a privileged kernel such as KRENEL.
+//
 
 //These four nops are very important.
 nop;nop;nop;nop;
@@ -19,69 +18,6 @@ lrx0 %/libc_booter%;
 farjmprx0;
 :libc_krenel_stack_data_store:
 nop;nop;nop;nop;
-
-//Both of these functions use register B to store the page that 
-
-..decl_farproc(LIBC_REGION):proc_emulate_single
-..export"proc_emulate_single"
-	//We are passed a place to jump to in RX0.
-	farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
-	//We must memcpy three bytes, so we memcpy 4.
-	farldrx0 %&0%
-	farstrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
-	sc %0%; la 2; ista; //la
-	adecr;ca;			//put 1 into c.
-	lla %~LIBC_REGION%, 0x44; istla;
-	ab;
-	emulate;
-	//restore stack integrity.
-		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
-		farstrx0 %&0%
-	//a holds the value. CHECK IT.
-	libc_emulate_single_cswitch_looptop:
-		alpush;
-		lb 19; cmp; blpop; sc %libc_emulate_single_syscall%; jmpifeq;
-		ab; alpush;
-		lb 18; cmp; blpop; sc %libc_emulate_single_interrupt%; jmpifeq;
-		ab; alpush;
-		lb 17; cmp; blpop; sc %libc_emulate_single_putchar%; jmpifeq;
-		ab; alpush;
-		lb 16; cmp; blpop; sc %libc_emulate_single_getchar%; jmpifeq;
-		ab; alpush;
-		lb 0xff; cmp; blpop; sc %libc_emulate_single_preempt%; jmpifeq;
-		sc %libc_emulate_single_cswitch_loopout%; jmp;
-	libc_emulate_single_syscall:
-		//TODO: provide services.
-		sc %libc_emulate_single_preempt%; jmp;
-	libc_emulate_single_interrupt:
-		user_getb;ba;
-		user_getc;ca;
-		user_geta;
-		user_get1;rx1_0;
-		user_get2;rx2_0;
-		user_get3;rx3_0;
-		user_get0;
-		interrupt;
-		user_seta;
-		sc %libc_emulate_single_preempt%; jmp;
-	libc_emulate_single_getchar:
-		getchar;
-		user_seta;
-		sc %libc_emulate_single_preempt%; jmp;
-	libc_emulate_single_putchar:
-		user_geta;
-		putchar;
-//		sc %libc_emulate_single_preempt%; jmp;
-	libc_emulate_single_preempt:
-		task_ric;
-		priv_drop;
-		sc %libc_emulate_single_cswitch_looptop%; jmp;
-	libc_emulate_single_cswitch_loopout:
-farret;
-
-
-
-
 
 
 
