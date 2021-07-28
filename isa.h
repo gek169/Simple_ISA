@@ -162,10 +162,14 @@ int DONT_WANT_TO_INLINE_THIS e()
 #define MED_INSN_COST 10
 
 #ifndef NO_PREEMPT
+
+#ifndef PREEMPT
 register UU instruction_counter = 0;
 #define PREEMPT() if(EMULATE_DEPTH){\
 	instruction_counter++;if(instruction_counter > PREEMPT_TIMER) {R=0xFF;goto G_HALT;}\
 }
+#endif
+
 #else
 #define PREEMPT() /*a comment*/
 #endif
