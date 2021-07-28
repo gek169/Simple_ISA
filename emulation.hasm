@@ -6,8 +6,7 @@
 //This file contains code that is meant to be executed at the privileged level. I.E. you would boot
 //the system into this.
 
-//User-mode code should be executed by a privileged kernel such as KRENEL.
-//
+//User-mode code should be exec'd by a privileged kernel such as KRENEL.
 
 //These four nops are very important.
 nop;nop;nop;nop;
@@ -19,6 +18,36 @@ farjmprx0;
 :libc_krenel_stack_data_store:
 nop;nop;nop;nop;
 
+
+
+//krenel constants:
+//MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
+.libc_krenel_max_active_tasks:8
+//Must be one less than that power of two, for an "and" mask:
+.libc_krenel_max_active_tasks_mask:7
+//Maximum number of times a syscall or interrupt can be made before a context switch occurs.
+.libc_krenel_max_returns:100
+//the region where code to execute is stored.
+.libc_krenel_exec_region:1
+
+//the region which is used for file descriptors.
+.libc_krenel_fd_table_region:0xFEFF
+
+//1 megabyte is needed for the diskmap.
+.libc_krenel_diskmap_super_region:0x40
+
+//200 megabytes. Don't spam GH
+.libc_krenel_max_disk_usage:0x100000
+
+
+//Reserved page for disk IO.
+.libc_krenel_diskio_page:0xFF00
+.libc_krenel_diskio_next_page:0xFF01
+//We reserve 2 megabytes for creating a PID0 program.
+//we reserve an additional megabyte for the FAT.
+//The rest is available and free.
+//This is by *page*.
+.libc_krenel_disk_reserved:0x3000
 
 
 ..include"printbytehex.hasm"
@@ -55,34 +84,7 @@ nop;nop;nop;nop;
 
 
 
-//krenel constants:
-//MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
-.libc_krenel_max_active_tasks:8
-//Must be one less than that power of two, for an "and" mask:
-.libc_krenel_max_active_tasks_mask:7
-//Maximum number of times a syscall or interrupt can be made before a context switch occurs.
-.libc_krenel_max_returns:100
-//the region where code to execute is stored.
-.libc_krenel_exec_region:1
 
-//the region which is used for file descriptors.
-.libc_krenel_fd_table_region:0xFEFF
-
-//1 megabyte is needed for the diskmap.
-.libc_krenel_diskmap_super_region:0x40
-
-//200 megabytes. Don't spam GH
-.libc_krenel_max_disk_usage:0x100000
-
-
-//Reserved page for disk IO.
-.libc_krenel_diskio_page:0xFF00
-.libc_krenel_diskio_next_page:0xFF01
-//We reserve 2 megabytes for creating a PID0 program.
-//we reserve an additional megabyte for the FAT.
-//The rest is available and free.
-//This is by *page*.
-.libc_krenel_disk_reserved:0x3000
 
 
 //Given a file size in RX0, find a start page. If none can be found, return 0xffFFffFF, which is erroneous.
