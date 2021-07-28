@@ -53,10 +53,10 @@ bytes '\r' ,'\n', 0;
 	
 	llb %0x2500%;
 	lla %0xDE01%; //Disk write.
-	lrx0 %/0x10001%;
+	lrx0 %/0x3001%;
 	syscall;
 
-	lrx0 %/0x10001%;
+	lrx0 %/0x3001%;
 	llb %0x2600%;
 	lla %0xDE03%; //Disk read.
 	syscall;
