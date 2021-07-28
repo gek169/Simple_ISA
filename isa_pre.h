@@ -11,7 +11,7 @@ typedef long SUU;
 #endif
 static u R=0, *SEGMENT = NULL;
 static UU SEGMENT_PAGES=0;
-static const UU SEG_REALLOC_MASK = 0xffFFff; /*A maximum of four gigs! wow!*/
+static const UU SEG_REALLOC_MASK = 0x7fFFff; /*A maximum of 2 gigs! wow!*/
 
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode
