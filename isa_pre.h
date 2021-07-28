@@ -9,7 +9,7 @@ typedef signed int SUU;
 typedef unsigned long UU;
 typedef long SUU;
 #endif
-static u R=0, *SEGMENT = NULL;
+static u R=0;
 
 #define SEGMENT_PAGES 0x40000
 
