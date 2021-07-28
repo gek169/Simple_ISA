@@ -11,7 +11,7 @@ typedef long SUU;
 #endif
 static u R=0;
 
-#define SEGMENT_PAGES 0x40000
+#define SEGMENT_PAGES 0x30000
 
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode
