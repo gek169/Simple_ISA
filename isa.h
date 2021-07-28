@@ -276,6 +276,7 @@ const void* const goto_table[256] = {
 
 R=0;
 di();
+SEGMENT = SEGS[0];
 #ifdef SISA_DEBUGGER
 debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3,&EMULATE_DEPTH,M);
 #endif
@@ -416,8 +417,7 @@ TB: /**/
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
-		SAVE_REGISTER(SEGMENT, 0);
-		SAVE_REGISTER(SEGMENT_PAGES, 0);
+		SEGMENT = SEGS[current_task];
 		EMULATE_DEPTH = 1;M=M_SAVER[current_task];
 		/*Load on up again! We're continuing where we left off!*/
 		LOAD_REGISTER(a, current_task);
@@ -430,8 +430,6 @@ TB: /**/
 		LOAD_REGISTER(RX1, current_task);
 		LOAD_REGISTER(RX2, current_task);
 		LOAD_REGISTER(RX3, current_task);
-		LOAD_REGISTER(SEGMENT, current_task);
-		LOAD_REGISTER(SEGMENT_PAGES, current_task);
 #ifndef NO_PREEMPT
 		LOAD_REGISTER(instruction_counter, current_task);
 #endif
@@ -455,9 +453,6 @@ G_TASK_SET: /*task_set*/
 D
 U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
-	if(REG_SAVER[current_task].SEGMENT) free(REG_SAVER[current_task].SEGMENT);
-	REG_SAVER[current_task].SEGMENT = NULL;
-	REG_SAVER[current_task].SEGMENT_PAGES = 0;
 	REG_SAVER[current_task].program_counter_region = 0;
 	REG_SAVER[current_task].program_counter = 0;
 #ifndef NO_PREEMPT
@@ -635,49 +630,7 @@ ZC:
 #else
 	R=14; goto G_HALT;
 #endif
-ZD:
-#if !defined(NO_SEGMENT)
-{
-	u* SEGMENT_OLD = SEGMENT;
-	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
-	SEGMENT_PAGES = RX0;
-	SEGMENT_PAGES &= SEG_REALLOC_MASK;
-#ifndef NO_PREEMPT
-	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
-#endif
-	if(SEGMENT_PAGES == 0){
-		STASH_REGS;
-		if(SEGMENT) free(SEGMENT);
-		SEGMENT = NULL;
-		SEGMENT_PAGES = 0;
-		UNSTASH_REGS;
-	} else {
-		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
-			STASH_REGS;
-			if(!SEGMENT)
-				SEGMENT = calloc(1, 0x100 * (size_t)SEGMENT_PAGES);
-			else
-				SEGMENT = realloc(SEGMENT, 0x100 *(size_t)SEGMENT_PAGES);
-			UNSTASH_REGS;
-		}
-		if(!SEGMENT){
-			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
-			SEGMENT = SEGMENT_OLD;R=7;goto G_HALT;
-		}
-		if(SEGMENT_OLD)
-			if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
-				/*Must initialize memory to zero.*/
-				size_t end, i;
-				i = ((size_t)SEGMENT_PAGES_OLD) * 256;
-				end = ((size_t)SEGMENT_PAGES) * 256;
-				for(;i<end;i++)SEGMENT[i] = 0;
-			}
-		
-	}
-}D
-#else
-	R=14; goto G_HALT;
-#endif
+ZD: R=14; goto G_HALT;
 
 
 #ifdef NO_FP
@@ -895,16 +848,9 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);		
-		SAVE_REGISTER(SEGMENT,       0);
-		SAVE_REGISTER(SEGMENT_PAGES, 0);
+		SEGMENT = SEGS[current_task];
 		EMULATE_DEPTH = 1;
 		M = M_SAVER[current_task];
-		LOAD_REGISTER(SEGMENT, current_task);
-		LOAD_REGISTER(SEGMENT_PAGES, current_task);
-		/*If the segment was not deleted the last time we ran this task, it must be deleted.*/
-		if(SEGMENT)free(SEGMENT);
-		SEGMENT = NULL;
-		SEGMENT_PAGES = 0;
 		stack_pointer=0;
 		program_counter_region=0;
 		program_counter=0;
@@ -973,8 +919,7 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, current_task);
 		SAVE_REGISTER(RX2, current_task);
 		SAVE_REGISTER(RX3, current_task);
-		SAVE_REGISTER(SEGMENT,       current_task);
-		SAVE_REGISTER(SEGMENT_PAGES, current_task);
+		SEGMENT = SEGS[0];
 #ifndef NO_PREEMPT
 		SAVE_REGISTER(instruction_counter, current_task);
 #endif
@@ -990,8 +935,6 @@ G_AA12:{SUU SRX0, SRX1;
 		LOAD_REGISTER(RX1, 0);
 		LOAD_REGISTER(RX2, 0);
 		LOAD_REGISTER(RX3, 0);
-		LOAD_REGISTER(SEGMENT,       0);
-		LOAD_REGISTER(SEGMENT_PAGES, 0);
 		D
 	}
 }

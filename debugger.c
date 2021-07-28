@@ -1456,8 +1456,8 @@ void debugger_hook(unsigned short *a,
 			 		break;
 			 		case 'g':
 			 		case 'G':
-			 			perform_surgery(SEGMENT_PAGES);
-			 			printf(error_fmt);
+			 			printf("<ERROR> segment pages is a compiletime constant.");
+			 			exit(1);
 			 		break;
 			 		default:
 			 			puts("\r\n<Error, no such register conforming to this name. the names are A,B,C,S,P,R,0,1,2,3");
@@ -1497,16 +1497,6 @@ void debugger_hook(unsigned short *a,
 				*RX1 = 0;
 				*RX2 = 0;
 				*RX3 = 0;
-#if !defined(NO_SEGMENT)
-				if(SEGMENT)free(SEGMENT);
-				SEGMENT = calloc(1, 256);
-				if(!SEGMENT) {printf("\r\n Failed Malloc.\r\n");
-				dcl();exit(1);
-				}
-				SEGMENT_PAGES = 1;
-#else
-				SEGMENT_PAGES = 0;
-#endif
 			goto repl_start;
 		}
 		repl_end: return;
@@ -1849,13 +1839,6 @@ int main(int rc,char**rv){
 		for(i=0;i<0x1000000 && !feof(F);){M_SAVER[0][i++]=fgetc(F);}
 		memcpy(M2, M_SAVER[0], 0x1000000);
 	fclose(F);
-#if !defined(NO_SEGMENT)
-	{
-		SEGMENT = calloc(1,256);
-		SEGMENT_PAGES = 1;
-	}
-	if(!SEGMENT){puts("Segment Allocation Failed.");return 1;}
-#endif
 	R=0;
 
 	/*

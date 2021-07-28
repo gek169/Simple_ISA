@@ -192,7 +192,7 @@ static char* insns[220] = {
 	"rxcmp",
 	"seg_ld",
 	"seg_st",
-	"seg_realloc",
+	"ASM_FREE_INSN_SEG_REALLOC",
 	"fltadd",
 	"fltsub",
 	"fltmul",

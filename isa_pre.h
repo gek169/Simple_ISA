@@ -10,8 +10,8 @@ typedef unsigned long UU;
 typedef long SUU;
 #endif
 static u R=0, *SEGMENT = NULL;
-static UU SEGMENT_PAGES=0;
-static const UU SEG_REALLOC_MASK = 0x7fFFff; /*A maximum of 2 gigs! wow!*/
+
+#define SEGMENT_PAGES 0x80000
 
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode
@@ -37,7 +37,7 @@ User mode is pre-empted.
 
 
 typedef struct {
-	UU RX0,RX1,RX2,RX3, SEGMENT_PAGES;
+	UU RX0,RX1,RX2,RX3;
 #ifndef NO_PREEMPT
 	UU instruction_counter;
 #endif
@@ -46,6 +46,7 @@ typedef struct {
 	u* SEGMENT;
 }sisa_regfile;
 static u M_SAVER[1+SISA_MAX_TASKS][0x1000000] = {0};
+static u SEGS[1+SISA_MAX_TASKS][SEGMENT_PAGES * 256];
 #define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
 #define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;
 

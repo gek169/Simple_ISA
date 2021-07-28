@@ -40,9 +40,6 @@ st_iter;
 alpush;
 	//our loop!
 	asciifun_looptop: 
-		seg_pages; rxincr;
-		lb 2; rx1b; rxmul;
-		seg_realloc;
 		la ' '; putchar;
 		alpop; 
 			aincr; 

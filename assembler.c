@@ -2021,9 +2021,6 @@ int main(int argc, char** argv){
 	if(run_sisa16 && !quit_after_macros && !debugging){
 		UU i=0, j=~(UU)0;
 		SUU q_test=(SUU)-1;
-		if(SEGMENT) free(SEGMENT);
-		SEGMENT = NULL;
-		SEGMENT_PAGES = 0;
 		if(
 			(sizeof(U) != 2) ||
 			(sizeof(u) != 1) ||

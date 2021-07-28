@@ -70,7 +70,6 @@ section 0
 	la 0x41
 	putchar;putchar;putchar;
 	//transfer code from the segment.
-	lrx0 %/20%;seg_realloc;
 	lrx0 %/0x0%;
 	lrx1 %/0%;
 	seg_st;
