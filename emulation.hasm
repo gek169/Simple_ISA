@@ -41,6 +41,8 @@ nop;nop;nop;nop;
 //Give it a location to boot as PID 0, and it will, in RX0.
 
 ..decl_lproc:libc_lproc_krenel_print_krenel
+	la '\r'; putchar;
+	la '\n'; putchar;
 	la 'K'; putchar;
 	la 'R'; putchar;
 	la 'E'; putchar;
