@@ -141,17 +141,19 @@ int DONT_WANT_TO_INLINE_THIS e()
 {
 	register u *M=M_SAVER[0];
 	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
-	u current_task=1;
+	
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
 	U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	UU RX0=0,RX1=0,RX2=0,RX3=0;
 	u EMULATE_DEPTH=0;
+	u current_task=1;
 #else
 	register u program_counter_region=0;
 	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
 	register UU RX0=0,RX1=0,RX2=0,RX3=0;
 	register u EMULATE_DEPTH=0;
+	register u current_task=1;
 #endif
 	
 #ifndef PREEMPT_TIMER
@@ -606,7 +608,11 @@ ZB:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
 		STASH_REGS;
-		memcpy(M + 0x100 * (RX0&0xffFF), SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, 0x100);
+		memcpy(
+			M + 0x100 * (RX0&0xffFF),
+			SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, 
+			0x100
+		);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
 		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
