@@ -150,10 +150,17 @@ int DONT_WANT_TO_INLINE_THIS e()
 	u current_task=1;
 #else
 	register u program_counter_region=0;
-	register U a=0,b=0,c=0,program_counter=0,stack_pointer=0;
-	register UU RX0=0,RX1=0,RX2=0,RX3=0;
+	register U a=0,
+				b=0,
+				c=0,
+				program_counter=0,
+				stack_pointer=0;
+	register UU RX0=0,
+				RX1=0,
+				RX2=0,
+				RX3=0;
 	register u EMULATE_DEPTH=0;
-	register u current_task=1;
+	u current_task=1;
 #endif
 	
 #ifndef PREEMPT_TIMER
