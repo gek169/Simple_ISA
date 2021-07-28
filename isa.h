@@ -140,7 +140,6 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 int DONT_WANT_TO_INLINE_THIS e()
 {
 	register u *M=M_SAVER[0];
-	u* SEGMENT = SEGS[0];
 	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
 	u current_task=1;
 #ifdef SISA_DEBUGGER
@@ -277,7 +276,6 @@ const void* const goto_table[256] = {
 
 R=0;
 di();
-SEGMENT = SEGS[0];
 #ifdef SISA_DEBUGGER
 debugger_hook(&a,&b,&c,&stack_pointer,&program_counter,&program_counter_region,&RX0,&RX1,&RX2,&RX3,&EMULATE_DEPTH,M);
 #endif
@@ -418,7 +416,6 @@ TB: /**/
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);
-		SEGMENT = SEGS[current_task];
 		EMULATE_DEPTH = 1;M=M_SAVER[current_task];
 		/*Load on up again! We're continuing where we left off!*/
 		LOAD_REGISTER(a, current_task);
@@ -605,7 +602,7 @@ ZB:
 	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
 		STASH_REGS;
-		memcpy(M + 0x100 * (RX0&0xffFF), SEGMENT + 0x100 * RX1, 0x100);
+		memcpy(M + 0x100 * (RX0&0xffFF), SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, 0x100);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
 		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
@@ -621,7 +618,7 @@ ZC:
 	else
 	{
 		STASH_REGS;
-		memcpy(SEGMENT + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
+		memcpy(SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
 		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
@@ -849,7 +846,6 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, 0);
 		SAVE_REGISTER(RX2, 0);
 		SAVE_REGISTER(RX3, 0);		
-		SEGMENT = SEGS[current_task];
 		EMULATE_DEPTH = 1;
 		M = M_SAVER[current_task];
 		stack_pointer=0;
@@ -920,7 +916,6 @@ G_AA12:{SUU SRX0, SRX1;
 		SAVE_REGISTER(RX1, current_task);
 		SAVE_REGISTER(RX2, current_task);
 		SAVE_REGISTER(RX3, current_task);
-		SEGMENT = SEGS[0];
 #ifndef NO_PREEMPT
 		SAVE_REGISTER(instruction_counter, current_task);
 #endif
