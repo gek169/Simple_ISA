@@ -458,7 +458,6 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 #endif
 
 #endif
-
 	}
 	if(a == 0xffFF){ /*Perform a memory dump.*/
 		unsigned long i,j;
