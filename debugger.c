@@ -14,7 +14,9 @@ static unsigned long max_lines_disassembler = 30;
 #include "instructions.h"
 #include "stringutil.h"
 #include "disassembler.h"
+#ifndef NO_SIGNAL
 #include <signal.h>
+#endif
 
 static unsigned long debugger_run_insns = 0; /*if this is less than one, the debugger is not */
 static char is_fresh_start = 1;
@@ -518,9 +520,11 @@ void debugger_hook(unsigned short *a,
 		else
 			printf(N "[START]" N);
 		is_fresh_start = 0;
+#ifndef NO_SIGNAL
 		signal(SIGINT, respond);
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
 		signal(SIGSEGV, segmentation_violation);
+#endif
 #endif
 	}
 	repl_pre:

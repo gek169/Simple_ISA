@@ -1,6 +1,23 @@
 /*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
+
+
+
+static unsigned short shouldquit = 0;
+
+#ifndef NO_SIGNAL
+#include <signal.h>
+#define TRAP_CTRLC signal(SIGINT, emu_respond);
+void emu_respond(int bruh){
+	(void)bruh;
+	shouldquit = 0xffFF;
+	return;
+}
+#else
+#define TRAP_CTRLC /*a comment.*/
+#endif
+
 #ifdef USE_SDL2
 #ifdef USE_TERMIOS
 #undef USE_TERMIOS
@@ -52,7 +69,7 @@ static UU audio_left = 0;
 #ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 static char blocking_input = 1;
 #endif
-static unsigned short shouldquit = 0;
+
 static unsigned char active_audio_user = 0;
 static unsigned char FG_color = 15;
 static unsigned char BG_color = 0;
@@ -117,6 +134,9 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 		}
 		SDL_PauseAudio(0);
 		SDL_StartTextInput();
+#ifndef SISA_DEBUGGER
+		TRAP_CTRLC
+#endif
 }
 static void DONT_WANT_TO_INLINE_THIS dcl(){
 		SDL_DestroyTexture(sdl_tex);
@@ -222,11 +242,19 @@ static void dieTermios(){
 static void DONT_WANT_TO_INLINE_THIS di(){
 	initTermios(0);
 	atexit(dieTermios);
+#ifndef SISA_DEBUGGER
+		TRAP_CTRLC
+#endif
 	setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 }
 static void dcl(){}
 #else
-static void di(){return;}
+static void di(){
+#ifndef SISA_DEBUGGER
+		TRAP_CTRLC
+#endif
+	return;
+}
 static void dcl(){return;}
 #endif
 
@@ -364,6 +392,10 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	}
 	if(a == 8){
 		vga_palette[b&0xff] = RX0 & 0xFFffFF;
+	}
+#else
+	if(a == 1){
+		return shouldquit;
 	}
 #endif
 
