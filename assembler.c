@@ -14,7 +14,7 @@ static const char* warn_pref = "<ASM WARNING>";
 static char run_sisa16 = 0;
 static char enable_dis_comments = 1;
 static char clear_output = 0;
-static void ASM_PUTS(const unsigned char* s){if(!clear_output)puts(s);}
+static void ASM_PUTS(const unsigned char* s){if(!clear_output)puts((const char*)s);}
 static char* infilename = NULL;
 
 
