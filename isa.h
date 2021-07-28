@@ -644,7 +644,7 @@ ZD:
 #ifndef NO_PREEMPT
 	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
-	if(RX0 == 0){
+	if(SEGMENT_PAGES == 0){
 		STASH_REGS;
 		if(SEGMENT) free(SEGMENT);
 		SEGMENT = NULL;
@@ -653,7 +653,6 @@ ZD:
 	} else {
 		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
 			STASH_REGS;
-			
 			if(!SEGMENT)
 				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
 			else
