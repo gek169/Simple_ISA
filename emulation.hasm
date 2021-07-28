@@ -36,9 +36,9 @@ nop;nop;nop;nop;
 //1 megabyte is needed for the diskmap.
 .libc_krenel_diskmap_super_region:0x40
 
-//512 megs of disk. Same as d.h DISK_ACCESS_MASK
-.libc_krenel_max_disk_usage:0x20000000
-.libc_krenel_max_disk_mask: 0x1fffffff
+//1 gig of disk. Same as d.h DISK_ACCESS_MASK, but shifted right by 8.
+.libc_krenel_max_disk_usage:0x400000
+.libc_krenel_max_disk_mask: 0x3fffff
 
 
 //Reserved page for disk IO.
@@ -319,8 +319,7 @@ bytes 0,0;
 			//RX0: Destination on disk. Not aligned!
 			//B: source page.
 			//Check permissions.
-			user_get0;
-			lrx1 %/libc_krenel_max_disk_mask%; rxand;
+			user_get0; lrx1 %/libc_krenel_max_disk_mask%; rxand;
 			lrx1 %/libc_krenel_disk_reserved%;
 			rxcmp;
 			lb 2;

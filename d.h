@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static const size_t DISK_ACCESS_MASK = 0x1FffFFff;
+static const size_t DISK_ACCESS_MASK = 0x3FffFFff;
 
 static unsigned short shouldquit = 0;
 
