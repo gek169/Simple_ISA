@@ -36,8 +36,9 @@ nop;nop;nop;nop;
 //1 megabyte is needed for the diskmap.
 .libc_krenel_diskmap_super_region:0x40
 
-//200 megabytes. Don't spam GH
-.libc_krenel_max_disk_usage:0x100000
+//512 megs of disk. Same as d.h DISK_ACCESS_MASK
+.libc_krenel_max_disk_usage:0x20000000
+.libc_krenel_max_disk_mask: 0x1fffffff
 
 
 //Reserved page for disk IO.
@@ -319,6 +320,7 @@ bytes 0,0;
 			//B: source page.
 			//Check permissions.
 			user_get0;
+			lrx1 %/libc_krenel_max_disk_mask%; rxand;
 			lrx1 %/libc_krenel_disk_reserved%;
 			rxcmp;
 			lb 2;
@@ -355,7 +357,7 @@ bytes 0,0;
 			//read a single sector from disk.
 			//RX0: source sector in disk. Not aligned!
 			//B: destination memory page in user memory.
-			user_get0;
+			user_get0; lrx1 %/libc_krenel_max_disk_mask%; rxand;
 			llb %libc_krenel_diskio_page%;
 			lla %0xFF10%; //Disk Read magic number.
 			interrupt;
@@ -365,7 +367,6 @@ bytes 0,0;
 			lla %libc_krenel_diskio_page%;
 			user_farpagest;
 			sc %libc_krenel_syscall_end%; jmp;
-			//Old implementation of the copy.
 		:libc_krenel_syscall_exec:
 			user_getb;			//The region;
 			lb 8; lsh;			//times 256.

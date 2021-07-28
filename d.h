@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+static const size_t DISK_ACCESS_MASK = 0x1FffFFff;
 
 static unsigned short shouldquit = 0;
 
@@ -46,6 +46,7 @@ unsigned short stdin_bufptr = 0;
 	Cursor position.
 */
 UU  curpos = 0;
+
 /*
 	SDL2 driver, plus simple text mode.
 */
@@ -462,6 +463,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 0xFF10){ /*Read 256 bytes from saved disk.*/
 		size_t location_on_disk = ((size_t)RX0) << 8;
 		FILE* f = fopen("sisa16.dsk", "rb+");
+		location_on_disk &= DISK_ACCESS_MASK;
 		if(!f){
 			UU i = 0;
 			for(i = 0; i < 256; i++){
@@ -489,6 +491,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 0xFF11){ /*write 256 bytes from 'b' to saved disk.*/
 		size_t location_on_disk = ((size_t)RX0) << 8;
 		FILE* f = fopen("sisa16.dsk", "rb+");
+		location_on_disk &= DISK_ACCESS_MASK;
 		if(!f){
 			f = fopen("sisa16.dsk", "wb");
 			if(!f) return 0;
