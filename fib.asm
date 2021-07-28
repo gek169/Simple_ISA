@@ -10,7 +10,7 @@
 //use the normal libc.
 //..include"libc.hasm"
 
-..(3):
+..(4):
 ..decl_farproc:proc_fib
 	//if it is less than two...
 	lb2; rx1b;
@@ -33,7 +33,7 @@
 		rx0b;
 		farret
 
-..main(4):
+..main(3):
 	lrx0 %/0x770000%;
 	proc_krenel;
 	halt;
@@ -45,20 +45,10 @@
 	lrx0 %/0xc0000%
 	proc_atoi_dec
 	proc_fib
-	rx2_0
-		//print the number!
-	rx0_2;arx0;apush;
-	lb8; rx1b;rxrsh;arx0;apush;
-	rx0_2;lb16;rx1b;rxrsh;arx0;apush;
-	rx0_2;lb24;rx1b;rxrsh;arx0;apush;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
+	lrx1 %/0xd0000%;
+	proc_utoa_dec
+	la 0xd; apush; la 0; alpush;
+	proc_puts;
 	la '\n'; putchar;
 	la '\r'; putchar;
 	halt;
