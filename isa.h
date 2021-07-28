@@ -139,8 +139,6 @@ k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
 
 int DONT_WANT_TO_INLINE_THIS e()
 {
-	register u *M=M_SAVER[0];
-	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
 	
 #ifdef SISA_DEBUGGER
 	u program_counter_region=0;
@@ -148,6 +146,7 @@ int DONT_WANT_TO_INLINE_THIS e()
 	UU RX0=0,RX1=0,RX2=0,RX3=0;
 	u EMULATE_DEPTH=0;
 	u current_task=1;
+	register u *M=M_SAVER[0];
 #else
 	register u program_counter_region=0;
 	register U a=0,
@@ -160,9 +159,10 @@ int DONT_WANT_TO_INLINE_THIS e()
 				RX2=0,
 				RX3=0;
 	register u EMULATE_DEPTH=0;
+	register u *M=M_SAVER[0];
 	u current_task=1;
 #endif
-	
+	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
 #ifndef PREEMPT_TIMER
 #define PREEMPT_TIMER 0x100000
 #endif
