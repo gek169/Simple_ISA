@@ -641,6 +641,7 @@ ZD:
 	u* SEGMENT_OLD = SEGMENT;
 	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
 	SEGMENT_PAGES = RX0;
+	SEGMENT_PAGES &= SEG_REALLOC_MASK;
 #ifndef NO_PREEMPT
 	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
