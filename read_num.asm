@@ -23,7 +23,7 @@ bytes %/0%;
 	
 	la 0xc; apush; la 0; alpush;
 	proc_gets
-	//proc_gets_noecho
+	proc_puts
 	la '\n'; putchar; la '\r'; putchar;
 	proc_strlen;
 	//we now have the length of the string stored, we have to get it into RX0.
@@ -44,11 +44,11 @@ bytes %/0%;
 	la '\n'; putchar; la '\r'; putchar;
 	pop %3%;
 	//We would now like to write to disk.
-	lrx0 %/0x10001%						//location in file.
+	lrx0 %/0x3001%						//location in file.
 	llb %0xd00%						//the source in memory.
 	proc_fwrite
 
-	lrx0 %/0x10001%						//the source in file.
+	lrx0 %/0x3001%						//the source in file.
 	llb %0xe00%						//the destination in memory.
 	proc_fread
 	
