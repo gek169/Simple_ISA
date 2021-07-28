@@ -43,7 +43,6 @@ typedef struct {
 #endif
 	U a,b,c,program_counter,stack_pointer;
 	u program_counter_region;
-	u* SEGMENT;
 }sisa_regfile;
 static u M_SAVER[1+SISA_MAX_TASKS][0x1000000] = {0};
 static u SEGS[1+SISA_MAX_TASKS][SEGMENT_PAGES * 256];
