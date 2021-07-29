@@ -33,7 +33,7 @@ nop;nop;nop;nop;
 .libc_krenel_exec_region:1
 
 //the region which is used for file descriptors.
-.libc_krenel_fd_table_region:0xFEFF
+.libc_krenel_fd_table_region:0xFE
 
 //1 megabyte is needed for the diskmap.
 .libc_krenel_diskmap_super_region:0x40
