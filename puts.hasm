@@ -1,4 +1,4 @@
-//PUTS~~~~~~~~~~~~~~~
+//PRINTS~~~~~~~~~~~~~~~ (no newline)
 //CLOBBERS: A, B, C, RX0, RX1
 
 ..decl_farproc(LIBC_REGION):proc_prints

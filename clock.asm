@@ -46,9 +46,8 @@ bytes 0xd, 0xa;
 	proc_krenel;
 	la '\n';putchar;
 	la '\r';putchar;
-	la 0xAF;apush;la 0;alpush;
-		proc_puts;
-	pop %3%;
+	lrx0 %/0xaf0000%;
+		proc_prints;
 	halt;
 
 	
@@ -107,11 +106,10 @@ bytes 0xd, 0xa;
 	astp;apush;proc_printbytehex;apop;
 	//print the length of string string.
 	//print the length of that very same string.
-//	la 0xAF;apush;lla %LENGTH_OF_STRING_STRING%;alpush;
 	lrx0 %0xAF%, %LENGTH_OF_STRING_STRING%
 	proc_prints;
 	lrx0 %0xAF%, %LENGTH_OF_STRING_STRING%
-	proc_stringlen;
+	proc_strlen;
 	rx0push;
 	proc_printbytehex;
 	pop %4%;
