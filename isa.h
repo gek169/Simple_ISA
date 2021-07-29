@@ -8,26 +8,32 @@
 
 #define k case
 /*Would require edit if you wanted a 32 bit PC*/
-#define PP (((UU)program_counter_region)<<16)
 
 #define SET_PCR(val) (program_counter_region = val)
 #define GET_PCR() (program_counter_region)
+#define SET_PC(val) (program_counter = val)
+#define ADD_PC(val) (program_counter += val)
+#define INCR_PC() (program_counter++)
+#define GET_PC() (program_counter)
+#define GET_EFF_PC() ( (((UU)program_counter_region)<<16) | program_counter  )
+#define GET_EFF_PC_MINUS(val) ( (((UU)program_counter_region)<<16) | ((program_counter-val)&0xffFF))
+#define GET_EFF_PC_AND_INCR() ( (((UU)program_counter_region)<<16) | program_counter++)
 /*Would require edit if you wanted a 32 bit PC*/
-#define CONSUME_BYTE M[PP | ((U)(program_counter++))]
+#define CONSUME_BYTE M[GET_EFF_PC_AND_INCR()]
 /*Would require edit if you wanted a 32 bit PC*/
-#define CONSUME_TWO_BYTES (program_counter+=2,\
-						((((U)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
-						(U)M[PP | (0xffFF&(program_counter-1))])
+#define CONSUME_TWO_BYTES (ADD_PC(2),\
+						((((U)M[GET_EFF_PC_MINUS(2)]))<<8) |\
+						(U)M[GET_EFF_PC_MINUS(1)])
 /*Would require edit if you wanted a 32 bit PC*/
-#define CONSUME_FOUR_BYTES (program_counter+=4,\
-						((((UU)M[PP | (0xffFF&(program_counter-4))]))<<24) |\
-						((((UU)M[PP | (0xffFF&(program_counter-3))]))<<16) |\
-						((((UU)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
-						(UU)M[PP|(0xffFF&(program_counter-1))])
-#define CONSUME_THREE_BYTES (program_counter+=3,\
-						((((UU)M[PP | (0xffFF&(program_counter-3))]))<<16) |\
-						((((UU)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
-						(UU)M[PP | (0xffFF&(program_counter-1))])
+#define CONSUME_FOUR_BYTES (ADD_PC(4),\
+						((((UU)M[GET_EFF_PC_MINUS(4)]))<<24) |\
+						((((UU)M[GET_EFF_PC_MINUS(3)]))<<16) |\
+						((((UU)M[GET_EFF_PC_MINUS(2)]))<<8) |\
+						(UU)M[GET_EFF_PC_MINUS(1)])
+#define CONSUME_THREE_BYTES (ADD_PC(3),\
+						((((UU)M[GET_EFF_PC_MINUS(3)]))<<16) |\
+						((((UU)M[GET_EFF_PC_MINUS(2)]))<<8) |\
+						(UU)M[GET_EFF_PC_MINUS(1)])
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8) | (U)M[c+1])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8) | (U)M[a+1])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8) | (U)M[b+1])
@@ -356,7 +362,7 @@ G_POPA:stack_pointer-=a;D
 G_ASTP:a=stack_pointer;D
 G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
-G_CPC:c=program_counter;D
+G_CPC:c=GET_PC();D
 G_LDA:a=M[CONSUME_TWO_BYTES]D
 G_LA:a=CONSUME_BYTE;D
 G_LDB:b=M[CONSUME_TWO_BYTES]D
@@ -364,8 +370,8 @@ G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
 G_STA:write_byte(a,CONSUME_TWO_BYTES)D
 G_STB:write_byte(b,CONSUME_TWO_BYTES)D
-G_JMPIFEQ:if(a==1)program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
-G_JMPIFNEQ:if(a!=1)program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
+G_JMPIFEQ:if(a==1)SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
+G_JMPIFNEQ:if(a!=1)SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
@@ -402,24 +408,23 @@ G_FARPAGEST:{
 #endif
 }D
 G_LFARPC:
-/*program_counter_region=a;*/
 SET_PCR(a);
-program_counter=0;
+SET_PC(0);
 D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
-write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
-program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
-G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D/*Would require edit if you wanted a 32 bit PC*/
+write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
+SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
+G_RET:SET_PC(Z_POP_TWO_BYTES_FROM_STACK);D/*Would require edit if you wanted a 32 bit PC*/
 G_FARCALL:
-	write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
+	write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
 	write_byte(GET_PCR(),stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
 	SET_PCR(a);/*Would require edit if you wanted a 32 bit PC*/
-	program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
+	SET_PC(c);/*Would require edit if you wanted a 32 bit PC*/
 D
 G_FARRET:
 	stack_pointer-=1;
 	SET_PCR(M[stack_pointer]);
-	program_counter=Z_POP_TWO_BYTES_FROM_STACK;
+	SET_PC(Z_POP_TWO_BYTES_FROM_STACK);
 D
 G_FARILDA:a=M[ (((UU)c&255)<<16) |  ((UU)b)]D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)|((UU)b)))D
@@ -737,7 +742,7 @@ G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) |
 			(((UU)M[(RX0+1)&0xffFFff])<<16) |
 			(((UU)M[(RX0+2)&0xffFFff])<<8) |
 			(((UU)M[(RX0+3)&0xffFFff]))D
-G_AA6:SET_PCR(RX0>>16);program_counter=RX0;D
+G_AA6:SET_PCR(RX0>>16);SET_PC(RX0 & 0xffFF);D
 G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
@@ -877,7 +882,7 @@ G_AA12:{SUU SRX0, SRX1;
 		M = M_SAVER[current_task];
 		stack_pointer=0;
 		SET_PCR(0);
-		program_counter=0;
+		SET_PC(0);
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
 #endif
@@ -963,6 +968,4 @@ G_AA12:{SUU SRX0, SRX1;
 }
 #undef D
 #undef k
-#undef PP
-#undef r
 
