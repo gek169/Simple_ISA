@@ -660,8 +660,9 @@ ZC:
 #else
 	R=14; goto G_HALT;
 #endif
-ZD: R=14; goto G_HALT;
 
+
+ZD: goto G_NOP; /*FREE INSTRUCTION!!!*/
 
 #ifdef NO_FP
 /*no floating point unit.*/
