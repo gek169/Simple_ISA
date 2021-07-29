@@ -1,13 +1,6 @@
 //PUTS~~~~~~~~~~~~~~~
 //CLOBBERS: A, B, C, RX0, RX1
-..decl_farproc(LIBC_REGION):proc_puts
-..export"proc_puts"
-	//Grab the far pointer.
-	astp; lb 6; sub; ca; ildb;
-	rx0b; lb16; rx1b; rxlsh;
-	aincr; ca; illdb; 
-	rx1b; rxadd;
-//We declare a separate function for prints, which does not use the stack.
+
 ..decl_farproc(LIBC_REGION):proc_prints
 ..export"proc_prints"
 	:libc_puts_looptop:

@@ -59,11 +59,7 @@
 		cbrx0;		la 0;	farista;
 		rx1_2;		rxsub;	
 		la 0xd; putchar;
-		cbrx0;
-		ac;
-		apush;blpush;
-			proc_puts;
-		pop %3%;
+			proc_prints;
 		la 0xd; putchar;
 	libc_gets_zero_chars:
 		la '\n'; interrupt;
@@ -81,11 +77,7 @@
 		rx1_2;		
 		rxsub;	
 		la 0xd; putchar;
-		cbrx0;
-		ac;
-		apush;blpush;
-			proc_puts;
-		pop %3%;
+			proc_prints;
 		la 32; putchar;
 		la 32; putchar;
 		la 32; putchar;

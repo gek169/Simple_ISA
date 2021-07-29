@@ -20,18 +20,14 @@ bytes %/0%;
 	halt;
 	what:
 	la '\n'; interrupt;
-	
-	la 0xc; apush; la 0; alpush;
+	lrx0 %0xc%,%0%;
 	proc_gets
-	proc_puts
+	lrx0 %0xc%,%0%;
+	proc_prints
 	la '\n'; putchar; la '\r'; putchar;
-	proc_strlen;
+	lrx0 %0xc%,%0%;
+	proc_stringlen;
 	//we now have the length of the string stored, we have to get it into RX0.
-	alpop; rx2a;
-	apop; rx0a;
-	lrx1 %/16%; rxlsh;
-	rx1_2;
-	rxadd;
 	rxincr;
 	farstrx0 %&length_of_input_string%;
 	rx2_0;
@@ -39,10 +35,9 @@ bytes %/0%;
 	lrx0 %/0xd0000%
 	lrx1 %/0xc0000%
 	proc_memcpy;
-	la 0xd; apush; la 0; alpush;
-	proc_puts;
+	lrx0 %0xd%,%0%;
+	proc_prints;
 	la '\n'; putchar; la '\r'; putchar;
-	pop %3%;
 	//We would now like to write to disk.
 	lrx0 %/0x3001%						//location in file.
 	llb %0xd00%						//the source in memory.
@@ -55,10 +50,10 @@ bytes %/0%;
 	lrx0 %/0xe0000%
 	proc_atoi_dec
 	proc_rxsqrt
-	lrx1 %/0xc0000%;rx1push;
+	lrx1 %/0xc0000%;
 	proc_itoa_dec
-	proc_puts
-	rx1pop;
+	lrx0 %0xc%,%0%;
+	proc_prints
 	la '\n'; putchar;
 	la '\r'; putchar;
 	lrx0 %/0x1000%;
