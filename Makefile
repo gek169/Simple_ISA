@@ -8,6 +8,7 @@ GIT_HASH = $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD 
 #-O3 -s -march=native seems to be the best, got 10.9 seconds for rxincrmark
 CFLAGS_PRIV = # -DNO_PREEMPT -DNO_DEVICE_PRIVILEGE
 OPTLEVEL    = -O3 -march=native $(CFLAGS_PRIV) -DSISA_GIT_HASH=\"$(GIT_HASH)\"
+#" dont remove this it fixes syntax highlighting in my editor
 MORECFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE
 SDL2CFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
 CFLAGS_TODO = -Wno-pointer-sign -Wno-format-security # <-- fix?
