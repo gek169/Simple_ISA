@@ -1139,7 +1139,7 @@ int main(int argc, char** argv){
 							len_to_replace += (loc_eparen-len_to_replace+3);
 						}
 						addval += outputcounter;
-						if(strprefix("&",line+loc+1)){
+						if(strprefix("&",line+loc+len_to_replace)){
 							addval >>= 16;
 							len_to_replace++;
 						}
