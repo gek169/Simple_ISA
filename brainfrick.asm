@@ -4,16 +4,19 @@
 ..include"libc_pre.hasm"
 ..(2):
 ..dinclude"libc_pre.bin"
+
+
 ..(0x40):
 :brainfrick_prompt:
 bytes '\r', '\n';
 ..ascii:Enter BF:
 bytes '\r', '\n', 0;
-
 :brainfrick_error_prompt:
 bytes '\r', '\n';
 ..ascii:<BF PARSING ERROR>
 bytes '\r', '\n', 0;
+asm_print; //TEXT SECTION
+
 ..(0x10): 
 	:brainfrick_program_memory:
 
@@ -193,6 +196,9 @@ bytes %/0%;
 		sc %bf_LEXER_failure%; jmpifneq
 	lrx0 %/0%; //success.	
 	farret;
+asm_print; //CODE SECTION 1
+
+
 
 ..main(3): 
 	lrx0 %/krenel_boot%;
@@ -218,3 +224,4 @@ bytes %/0%;
 		interpret_bf;
 		sc %krenel_boot%; jmp;
 		halt;
+asm_print; //CODE SECTION 2
