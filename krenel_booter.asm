@@ -14,12 +14,6 @@ bytes '\r' ,'\n', 0;
 
 bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
 bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
-bytes 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0;
 
 :STR_my_other_string:
 ..ascii:Krenel shut down...
@@ -69,9 +63,7 @@ bytes '\r' ,'\n', 0;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;
 	lrx0 %/0x260000%;
-	rx0push;
 	proc_prints;
-	rx0pop;
 	la '\n'; interrupt;
 	//Fork bomb. Uncomment at your own risk.
 	sc %0%; 
