@@ -466,7 +466,7 @@ bytes 0,0;
 					crx0;
 					user_farpagel;
 					apop;apush;task_set; //Into new user memory.
-					lla %libc_krenel_diskio_page%;;
+					lla %libc_krenel_diskio_page%;
 					user_farpagest;
 					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 					task_set;
@@ -493,7 +493,7 @@ bytes 0,0;
 		:libc_krenel_syscall_end:
 			//Syscalls are expensive.
 			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
-			lb 5; add;
+			lb 3; add;
 			farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
 			sc %libc_krenel_preempt%; jmp;
 	libc_krenel_getchar:
