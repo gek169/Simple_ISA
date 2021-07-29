@@ -9,6 +9,9 @@
 #define k case
 /*Would require edit if you wanted a 32 bit PC*/
 #define PP (((UU)program_counter_region)<<16)
+
+#define SET_PCR(val) (program_counter_region = val)
+#define GET_PCR() (program_counter_region)
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_BYTE M[PP | ((U)(program_counter++))]
 /*Would require edit if you wanted a 32 bit PC*/
@@ -399,7 +402,8 @@ G_FARPAGEST:{
 #endif
 }D
 G_LFARPC:
-program_counter_region=a;
+/*program_counter_region=a;*/
+SET_PCR(a);
 program_counter=0;
 D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
@@ -408,11 +412,15 @@ program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
 G_RET:program_counter=Z_POP_TWO_BYTES_FROM_STACK;D/*Would require edit if you wanted a 32 bit PC*/
 G_FARCALL:
 	write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
-	write_byte(program_counter_region,stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
-	program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
+	write_byte(GET_PCR(),stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
+	SET_PCR(a);/*Would require edit if you wanted a 32 bit PC*/
 	program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
 D
-G_FARRET:stack_pointer-=1;program_counter_region=M[stack_pointer];program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
+G_FARRET:
+	stack_pointer-=1;
+	SET_PCR(M[stack_pointer]);
+	program_counter=Z_POP_TWO_BYTES_FROM_STACK;
+D
 G_FARILDA:a=M[ (((UU)c&255)<<16) |  ((UU)b)]D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)|((UU)b)))D
 G_FARILDB:b=M[(((UU)c&255)<<16)|((UU)a)]D
@@ -729,7 +737,7 @@ G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) |
 			(((UU)M[(RX0+1)&0xffFFff])<<16) |
 			(((UU)M[(RX0+2)&0xffFFff])<<8) |
 			(((UU)M[(RX0+3)&0xffFFff]))D
-G_AA6:program_counter_region=RX0>>16;program_counter=RX0;D
+G_AA6:SET_PCR(RX0>>16);program_counter=RX0;D
 G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
 G_AA9:c=(RX0>>16);b=RX0;D
@@ -868,7 +876,7 @@ G_AA12:{SUU SRX0, SRX1;
 		EMULATE_DEPTH = 1;
 		M = M_SAVER[current_task];
 		stack_pointer=0;
-		program_counter_region=0;
+		SET_PCR(0);
 		program_counter=0;
 #ifndef NO_PREEMPT
 		instruction_counter = 0;
