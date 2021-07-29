@@ -18,7 +18,9 @@ farjmprx0;
 :libc_krenel_stack_data_store:
 nop;nop;nop;nop;
 
-
+//		TODO- make this work somehow.
+//		:libc_krenel_jumploc:
+//		bytes %/libc_booter%;
 
 //krenel constants:
 //MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
