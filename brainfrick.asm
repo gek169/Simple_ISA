@@ -10,6 +10,10 @@ bytes '\r', '\n';
 ..ascii:Enter BF:
 bytes '\r', '\n', 0;
 
+:brainfrick_error_prompt:
+bytes '\r', '\n';
+..ascii:<BF PARSING ERROR>
+bytes '\r', '\n', 0;
 ..(0x10): 
 	:brainfrick_program_memory:
 
@@ -46,7 +50,16 @@ bytes %/0%;
 			rx0_2; rxincr; rx2_0;
 			sc %bf_interpreter_looptop%; jmp;
 		bf_input:
-			rx0_3; cbrx0; getchar; farista;
+			rx0_3; cbrx0; 
+			getchar; 
+			apush;
+				lb 255
+				and
+				cmp
+			bpop;
+			sc %bf_input%; 
+			jmpifeq;
+			ab; rx0_3;cbrx0;farista;
 			rx0_2; rxincr; rx2_0;
 			sc %bf_interpreter_looptop%; jmp;
 		bf_incr:
@@ -133,13 +146,51 @@ bytes %/0%;
 			bf_rightbracket_loopend:
 			rx0_2; rxincr; rx2_0; //The one after the left bracket.
 			sc %bf_interpreter_looptop%; jmp;
-:bf_lexer_lbracket_count:
+:bf_LEXER_lbracket_count:
 bytes %/0%;
-:bf_lexer_rbracket_count:
+:bf_LEXER_rbracket_count:
 bytes %/0%;
-..decl_farproc:bf_lex
+..decl_farproc:proc_bf_lex
+	lrx0 %/0%;
+	farstrx0 %&bf_LEXER_rbracket_count%;
+	farstrx0 %&bf_LEXER_lbracket_count%;
 	lrx0 %/brainfrick_program_memory%;
-	
+	rx2_0;
+	bf_LEXER_looptop:
+		rx0_2;
+		cbrx0; farilda;
+			apush; lb '['; cmp; bpop;
+			sc %bf_LEXER_found_lbracket%; 
+			jmpifeq;
+		ab;	apush; lb ']'; cmp; bpop; 
+		sc %bf_LEXER_found_rbracket%; jmpifeq;
+		ab;	apush; lb ','; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb '.'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb '<'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb '>'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb '+'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb '-'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
+		ab;	apush; lb 0; cmp; bpop; sc %bf_LEXER_final%; jmpifeq;
+		bf_LEXER_failure:
+		lrx0 %/1%; farret;
+		:bf_LEXER_found_lbracket:
+			farldrx0 %&bf_LEXER_lbracket_count%
+			rxincr
+			farstrx0 %&bf_LEXER_lbracket_count%
+			rx0_2; rxincr; rx2_0;
+			sc %bf_LEXER_looptop%; jmp;
+		bf_LEXER_found_rbracket:
+			farldrx0 %&bf_LEXER_rbracket_count%
+			rxincr
+			farstrx0 %&bf_LEXER_rbracket_count%
+			rx0_2; rxincr; rx2_0;sc %bf_LEXER_looptop%; jmp;
+		bf_LEXER_approved_character:
+			rx0_2; rxincr; rx2_0;sc %bf_LEXER_looptop%; jmp;
+	bf_LEXER_final:
+		farldrx0 %&bf_LEXER_lbracket_count%
+		farldrx1 %&bf_LEXER_rbracket_count%
+		rxcmp
+		sc %bf_LEXER_failure%; jmpifneq
 	lrx0 %/0%; //success.	
 	farret;
 
@@ -147,15 +198,23 @@ bytes %/0%;
 	lrx0 %/krenel_boot%;
 	proc_krenel;
 	halt;
+
+	bf_errorprint:
+		lrx0 %/brainfrick_error_prompt%;
+		proc_prints; la '\n'; interrupt;
 	krenel_boot:
-	lrx0 %/brainfrick_prompt%;
-	proc_prints; la '\n'; interrupt;
-	lrx0 %/brainfrick_program_memory%;
-	proc_gets;
-	//interpret the code entered.
-	lrx2 %/brainfrick_program_memory%;
-	lrx3 %/brainfrick_cells%;
-	//TODO: lex the brainfrick
-	interpret_bf;
-	sc %krenel_boot%; jmp;
-	halt;
+		lrx0 %/brainfrick_prompt%;
+		proc_prints; la '\n'; interrupt;
+		lrx0 %/brainfrick_program_memory%;
+		proc_gets;
+		proc_bf_lex; //lex the brainfuck.
+
+		lrx1 %/0%; rxcmp;
+		sc %bf_errorprint%; 
+		jmpifneq;
+		//interpret the code entered.
+		lrx2 %/brainfrick_program_memory%;
+		lrx3 %/brainfrick_cells%;
+		interpret_bf;
+		sc %krenel_boot%; jmp;
+		halt;
