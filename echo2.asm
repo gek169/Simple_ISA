@@ -69,8 +69,10 @@ cbrx0;la0;
 farista;
 
 
-la4;apush;lla%0%;alpush;
-proc_puts;
+la4;apush;
+lla%0%;alpush;
+lrx0 %/0x40000%;
+proc_prints;
 halt;
 asm_end_region_restriction;
 //|

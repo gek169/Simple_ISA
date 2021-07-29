@@ -7,10 +7,10 @@
 
 
 
-//..include"libc.hasm"
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+..include"libc.hasm"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 
 .BENCH_SECONDS:255
 
@@ -54,7 +54,7 @@ bytes 0xd, 0xa;
 	
 	:Lbl_clock_start:
 	la '\n'; interrupt;
-	push %10%;
+	push %5%;
 	clock;
 	st_secs_b;
 	rx3b;
@@ -70,9 +70,8 @@ bytes 0xd, 0xa;
 	//the time elapsed is different! it is still in b.
 	st_secs_b
 //print seconds string.
-	la 0xAF;apush;lla %seconds_strings%;alpush;
-		proc_puts;
-	pop %3%;
+	lrx0 %0xAF%, %seconds_strings%
+	proc_prints;
 	ld_secs
 	apush
 	//testing 8 bit split syntax
@@ -85,9 +84,8 @@ bytes 0xd, 0xa;
 	proc_printbytehex;
 	apop;
 	//print the iterations string.
-	la 0xAF;apush;lla %iterations_strings%;alpush;
-		proc_puts;
-	pop %3%;
+	lrx0 %0xAF%, %iterations_strings%
+	proc_prints;
 	//print the number of iterations.
 	ld_iter;arx0;apush;
 			lb8; rx1b;rxrsh;arx0;apush;
@@ -104,17 +102,19 @@ bytes 0xd, 0xa;
 
 	
 //print the stack pointer.
-	la 0xAF;apush;lla %STP_STRING%;alpush;
-	proc_puts;
-	pop %3%;
+	lrx0 %0xAF%, %STP_STRING%;
+	proc_prints;
 	astp;apush;proc_printbytehex;apop;
 	//print the length of string string.
 	//print the length of that very same string.
-	la 0xAF;apush;lla %LENGTH_OF_STRING_STRING%;alpush;
-	proc_puts;
-	proc_strlen;
+//	la 0xAF;apush;lla %LENGTH_OF_STRING_STRING%;alpush;
+	lrx0 %0xAF%, %LENGTH_OF_STRING_STRING%
+	proc_prints;
+	lrx0 %0xAF%, %LENGTH_OF_STRING_STRING%
+	proc_stringlen;
+	rx0push;
 	proc_printbytehex;
-	pop %3%;
+	pop %4%;
 		//Reset iteration counter.
 	la0
 	rx0a

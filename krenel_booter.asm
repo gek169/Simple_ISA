@@ -70,7 +70,7 @@ bytes '\r' ,'\n', 0;
 	la '\n'; putchar; interrupt;
 	lrx0 %/0x260000%;
 	rx0push;
-	proc_puts;
+	proc_prints;
 	rx0pop;
 	la '\n'; interrupt;
 	//Fork bomb. Uncomment at your own risk.
@@ -115,21 +115,18 @@ bytes '\r' ,'\n', 0;
 		//syscall;
 		nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
-		rx0push;
-		proc_puts;
+		proc_prints;
 		la '\n'; syscall;
 		nota; sc %main_program_failure%; jmpifeq;
-		getchar;
-		getchar;
-		getchar;
-		getchar;
 		//Commit sudoku- kill ourselves.
 		//lla %0xDE00%;lb 0;syscall;
+		lrx0 0, %&STR_my_string%;
 		proc_gets;
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;
-		proc_puts;
+		lrx0 0, %&STR_my_string%;
+		proc_prints;
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;
@@ -140,19 +137,18 @@ bytes '\r' ,'\n', 0;
 		sc %1%; 
 		lrx0 %/0xAABBCC%; 
 		syscall;
+		lrx0 0, %&STR_my_string%;
 		proc_gets
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;
-		proc_puts;
+		lrx0 0, %&STR_my_string%;
+		proc_prints;
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; syscall;
-		rx0pop;
 		lrx0 0, %&STR_yet_other_string%;
-		rx0push;
-		proc_puts;
-		rx0pop;
+		proc_prints;
 		//lla %0xDEAD%; syscall;
 		
 		lla %0xDE00%;lb 1;syscall; //Kill the other guy.

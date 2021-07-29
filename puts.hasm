@@ -7,6 +7,9 @@
 	rx0b; lb16; rx1b; rxlsh;
 	aincr; ca; illdb; 
 	rx1b; rxadd;
+//We declare a separate function for prints, which does not use the stack.
+..decl_farproc(LIBC_REGION):proc_prints
+..export"proc_prints"
 	:libc_puts_looptop:
 		cbrx0;
 		farilda;
@@ -14,7 +17,10 @@
 		nota;bpop;sc%libc_puts_loopend%;jmpifeq;
 		ab
 		putchar
-		rxincr;
+		rxincr
 	sc %libc_puts_looptop%;jmp;
 	:libc_puts_loopend:
 farret;
+
+
+

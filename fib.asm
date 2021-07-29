@@ -3,12 +3,12 @@
 
 
 //use a separately compiled libc.
-..include"libc_pre.hasm"
-..(2):
-..dinclude"libc_pre.bin"
+//..include"libc_pre.hasm"
+//..(2):
+//..dinclude"libc_pre.bin"
 
 //use the normal libc.
-//..include"libc.hasm"
+..include"libc.hasm"
 
 ..(4):
 ..decl_farproc:proc_fib
@@ -38,18 +38,16 @@
 	proc_krenel;
 	halt;
 ..(0x77):
-	la 0xc; apush; la 0; alpush;
+	lrx0 %/0xc0000%
 	proc_gets
-	la '\n'; putchar; la '\r'; putchar;
-	pop %3%;
+	la '\r'; putchar;la '\n'; putchar;
 	lrx0 %/0xc0000%
 	proc_atoi_dec
 	proc_fib
 	lrx1 %/0xd0000%;
 	proc_utoa_dec
-	la 0xd; apush; la 0; alpush;
-	proc_puts;
-	la '\n'; putchar;
-	la '\r'; putchar;
+	lrx0 %/0xd0000%;
+	proc_prints;
+	la '\r'; putchar;la '\n'; putchar;
 	halt;
 
