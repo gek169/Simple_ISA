@@ -54,8 +54,7 @@ bytes %/0%;
 			la 0;
 			getchar; 
 			apush;
-				lb 255
-				and
+				lb 0xff
 				cmp
 			bpop;
 			sc %bf_input%; 

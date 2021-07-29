@@ -274,9 +274,9 @@ static void dcl(){return;}
 #ifndef USE_SDL2
 static unsigned short gch(){
 #if defined(USE_TERMIOS)
-	return (unsigned short)getchar_unlocked();
+	return 0xff & getchar_unlocked();
 #else
-	return (unsigned short)getchar();
+	return 0xff & getchar();
 #endif
 }
 static void pch(unsigned short a){
