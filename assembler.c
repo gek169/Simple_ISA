@@ -208,7 +208,6 @@ static void parse_bas(){ /* gets redirected here. */
 	while(perform_inplace_repl(line, "  ", " "));
 	if(strprefix("var ", line)){ /*Variable declaration.*/
 		unsigned char variable_type = 0; /*0=byte, 1=short, 2=u32, 3=i32, 4=f32*/
-		unsigned char v
 	}
 	my_strcpy(line, buf2);
 	return;
@@ -567,7 +566,7 @@ int main(int argc, char** argv){
 		/*
 			syntactic sugars. Only one may be used on a single line!
 		*/
-		if(strprefix("..BAS"), line){
+		if(strprefix("..BAS", line)){
 			is_parsing_bas = 1;
 			goto end;
 		}else if(strprefix("..ENDBAS", line)){
