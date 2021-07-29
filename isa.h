@@ -11,7 +11,6 @@
 #define PP (((UU)program_counter_region)<<16)
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_BYTE M[PP | ((U)(program_counter++))]
-#define r(d) M[d]
 /*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_TWO_BYTES (program_counter+=2,\
 						((((U)M[PP | (0xffFF&(program_counter-2))]))<<8) |\
@@ -319,8 +318,8 @@ G_PUTCHAR:{
 }D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
-G_ILDA:a=r(c)D
-G_ILDB:b=r(c)D
+G_ILDA:a=M[c]D
+G_ILDB:b=M[c]D
 G_CAB:c=(a<<8)|(b&255)D
 G_AB:a=b;D
 G_BA:b=a;D
@@ -355,9 +354,9 @@ G_ASTP:a=stack_pointer;D
 G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
 G_CPC:c=program_counter;D
-G_LDA:a=r(CONSUME_TWO_BYTES)D
+G_LDA:a=M[CONSUME_TWO_BYTES]D
 G_LA:a=CONSUME_BYTE;D
-G_LDB:b=r(CONSUME_TWO_BYTES)D
+G_LDB:b=M[CONSUME_TWO_BYTES]D
 G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
 G_STA:write_byte(a,CONSUME_TWO_BYTES)D
@@ -399,7 +398,10 @@ G_FARPAGEST:{
 	if(EMULATE_DEPTH) instruction_counter += HIGH_INSN_COST; /*This is a very expensive instruction.*/
 #endif
 }D
-G_LFARPC:program_counter_region=a;program_counter=0;D/*Would require edit if you wanted a 32 bit PC*/
+G_LFARPC:
+program_counter_region=a;
+program_counter=0;
+D/*Would require edit if you wanted a 32 bit PC*/
 G_CALL:
 write_2bytes(program_counter,stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
 program_counter=c;D/*Would require edit if you wanted a 32 bit PC*/
@@ -410,10 +412,10 @@ G_FARCALL:
 	program_counter_region=a;/*Would require edit if you wanted a 32 bit PC*/
 	program_counter=c;/*Would require edit if you wanted a 32 bit PC*/
 D
-G_FARRET:stack_pointer-=1;program_counter_region=r(stack_pointer);program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
-G_FARILDA:a=r((((UU)c&255)<<16)|((UU)b))D
+G_FARRET:stack_pointer-=1;program_counter_region=M[stack_pointer];program_counter=Z_POP_TWO_BYTES_FROM_STACK;D
+G_FARILDA:a=M[ (((UU)c&255)<<16) |  ((UU)b)]D
 G_FARISTA:write_byte(a,((((UU)c&255)<<16)|((UU)b)))D
-G_FARILDB:b=r((((UU)c&255)<<16)|((UU)a))D
+G_FARILDB:b=M[(((UU)c&255)<<16)|((UU)a)]D
 G_FARISTB:write_byte(b,((((UU)c&255)<<16)|((UU)a)))D
 
 TB: /**/
@@ -479,8 +481,8 @@ G_BPUSH:	write_byte(b,stack_pointer);	stack_pointer+=1;D
 G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
 G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
-G_APOP:stack_pointer-=1;a=r(stack_pointer)D
-G_BPOP:stack_pointer-=1;b=r(stack_pointer)D
+G_APOP:stack_pointer-=1;a=M[stack_pointer]D
+G_BPOP:stack_pointer-=1;b=M[stack_pointer]D
 /*Would require edit if you wanted a 32 bit PC*/
 G_INTERRUPT:
 {
