@@ -16,7 +16,7 @@ static char enable_dis_comments = 1;
 static char clear_output = 0;
 static void ASM_PUTS(const unsigned char* s){if(!clear_output)puts((const char*)s);}
 static char* infilename = NULL;
-
+static char is_parsing_bas = 0;
 
 
 
@@ -195,6 +195,25 @@ static void putshort(unsigned short sh, FILE* f){fputbyte(sh/256, f);fputbyte(sh
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 /*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
+
+
+static void parse_bas(){ /* gets redirected here. */
+	if(strprefix(".", line)) {return;} /*Pre-processing directive.*/
+	buf2[0] = '\0'; /*this is our */
+	buf1[0] = '\0';
+	/*
+		perform sanitization of 
+	*/
+	while(perform_inplace_repl(line, "\t", " "));
+	while(perform_inplace_repl(line, "  ", " "));
+	if(strprefix("var ", line)){ /*Variable declaration.*/
+		unsigned char variable_type = 0; /*0=byte, 1=short, 2=u32, 3=i32, 4=f32*/
+		unsigned char v
+	}
+	my_strcpy(line, buf2);
+	return;
+}
+
 
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
@@ -538,12 +557,23 @@ int main(int argc, char** argv){
 		my_strcpy(line_copy, (unsigned char*)line);
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
+		/*
 
+			if we are in basic mode, go to basic mode.
+		*/
+		if(is_parsing_bas){
+			parse_bas();
+		}
 		/*
 			syntactic sugars. Only one may be used on a single line!
 		*/
-		/*section0;la 1;lfarpc;*/
-		if(strprefix("..zero:", line)){
+		if(strprefix("..BAS"), line){
+			is_parsing_bas = 1;
+			goto end;
+		}else if(strprefix("..ENDBAS", line)){
+			is_parsing_bas = 0;
+			goto end;
+		}else if(strprefix("..zero:", line)){
 			perform_inplace_repl(
 				line,
 				"..zero:",
