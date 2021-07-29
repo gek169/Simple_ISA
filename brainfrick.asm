@@ -51,6 +51,7 @@ bytes %/0%;
 			sc %bf_interpreter_looptop%; jmp;
 		bf_input:
 			rx0_3; cbrx0; 
+			la 0;
 			getchar; 
 			apush;
 				lb 255
