@@ -213,7 +213,11 @@ static void bas_delayed_action(){
 			my_strcpy(line, "bytes %?0%;");
 		}else if(delayed_variable_type >= 2) {
 			my_strcpy(line, "bytes 0,0,0,0;");
+		}else {
+			printf(internal_fail_pref);
+			printf("Bad variable declaration.");
 		}
+		return;
 	}
 }
 
@@ -590,10 +594,12 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		if(!bas_require_delay)
+		if(bas_require_delay == 0)
 			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		else
 			bas_delayed_action();
+
+	
 		while(
 				strprefix(" ",line)
 				|| strprefix("\t",line)
