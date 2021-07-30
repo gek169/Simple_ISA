@@ -197,7 +197,7 @@ static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 #include "disassembler.h"
 
 
-
+/*
 static unsigned char is_declaring_delayed_variable = 0;
 static unsigned char delayed_variable_type = 0;
 static unsigned char bas_require_delay = 0;
@@ -222,8 +222,6 @@ static void bas_delayed_action(){
 		return;
 	}
 }
-
-
 
 static void parse_bas(){
 	buf2[0] = '\0'; 
@@ -285,7 +283,7 @@ static void parse_bas(){
 	my_strcpy(line, buf2);
 	return;
 }
-
+*/
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
 	char* metaproc;
@@ -603,14 +601,14 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		if(bas_require_delay == 0)
+		/*if(bas_require_delay == 0)*/
 			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
-		else
+		/*else
 		{
 			bas_delayed_action();
 			linesize = strlen(line);
 		}
-	
+		*/
 		while(
 				strprefix(" ",line)
 				|| strprefix("\t",line)
@@ -637,20 +635,25 @@ int main(int argc, char** argv){
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
 
-			if(is_parsing_bas){
-				parse_bas();
-			}
-		
+/*
+		if(is_parsing_bas){
+			parse_bas();
+		}
+*/
 		/*
 			syntactic sugars. Only one may be used on a single line!
 		*/
+
+/*
 		if(strprefix("..BAS", line)){
 			is_parsing_bas = 1;
 			goto end;
 		}else if(strprefix("..ENDBAS", line)){
 			is_parsing_bas = 0;
 			goto end;
-		}else if(strprefix("..zero:", line)){
+		}else 
+*/
+		if(strprefix("..zero:", line)){
 			perform_inplace_repl(
 				line,
 				"..zero:",
