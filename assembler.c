@@ -206,19 +206,14 @@ static void bas_delayed_action(){
 	if(is_declaring_delayed_variable){
 		is_declaring_delayed_variable = 0;
 		if(delayed_variable_type == 0) {
-
-			my_strcpy(line, "bytes 0");
-			printf("byte variable declaration.");
+			my_strcpy(line, "..ASM:bytes 0");
 		} else if(delayed_variable_type == 1) {
-			my_strcpy(line, "bytes 0,0");
-			printf("short variable declaration.");
+			my_strcpy(line, "..ASM:bytes 0,0");
 		}else if(delayed_variable_type == 4) {
-			my_strcpy(line, "bytes %?0%");
-			printf("float variable declaration.");
+			my_strcpy(line, "..ASM:bytes %?0%");
 
 		}else if(delayed_variable_type >= 2) {
-			my_strcpy(line, "bytes %/0%");
-			printf("4byte variable declaration.");
+			my_strcpy(line, "..ASM:bytes %/0%");
 		}else {
 			printf(internal_fail_pref);
 			printf("Bad variable declaration.");
@@ -232,6 +227,13 @@ static void parse_bas(){ /* gets redirected here. */
 	if(strprefix(".", line)) {return;} /*Pre-processing directive.*/
 	buf2[0] = '\0'; /*this is our */
 	buf1[0] = '\0';
+	/*
+		Check for ..ASM: prefix,
+	*/
+	if(strprefix("..ASM:", line)){
+		my_strcpy(line, line + 6);
+		return;
+	}
 	/*
 		perform sanitization of input.
 	*/

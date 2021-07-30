@@ -30,10 +30,6 @@ asm_print; //TEXT SECTION
       var 	u32		 brainfrick_bracket_parsing_depth
 
 ..ENDBAS
-nop;
-nop;
-nop;
-nop;
 ..decl_farproc:interpret_bf
 	bf_interpreter_looptop:
 		//fetch a character from the array.
