@@ -5,29 +5,22 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 0x000000 - 0x200000: Reserved for OS. Put your CLI here.
-0x200000 - 0x300000: Diskmap. File entries.
+0x200000 - 0x300000: Disk bitmap.
 0x300000 - <onward>: Files.
 
 Files are of a fixed size determined at their creation time. 
 
 They are a number of "pages" with a name at a starting location.
 
-Each entry is 128 bytes in size
-0-4: number of pages
-4-8: start page
-8-128: null terminated filename.
+File entries are a linked list starting at 0, pointing to "next" file entries.
 
-there is a theoretical maximum of 8192 files on the system at once.
+This is file entry format:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~FINDING FREE SPACE~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+typedef struct __attribute__((__packed__)) {
+	uint8_t identification; /*identification- is this a directory? Is this a file?*/
+	uint32_t filesize; /*Number of sectors in this file. Zero means it is the last file!*/
+	uint32_t next_file_addr; /*Linked list entry to next file.*/
+	unsigned char fname[247]; /*Null-terminated filename.*/
+} filenode;
 
-Since there is a maximum of 8192 files on the system, it is trivial to simply try repeatedly to place
-the file.
-
-The file is attempted to be placed at 0, but file 0 would intersect it, so it is shifted to the end of file zero.
-
-This intersection check is done over and over, until the intersection check succeeds reaches the end of disk (200 meg)
-
-if it reaches the end of disk, the magic value 0xffFFffFF is returned, which is obviously erroneous.
+a file entry takes up exactly 256 bytes, the sector size of the sisa16 disk.
