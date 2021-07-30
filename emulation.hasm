@@ -32,11 +32,7 @@ nop;nop;nop;nop;
 //the region where code to execute is stored.
 .libc_krenel_exec_region:1
 
-//the region which is used for file descriptors.
-.libc_krenel_fd_table_region:0xFE
 
-//1 megabyte is needed for the diskmap.
-.libc_krenel_diskmap_super_region:0x40
 
 //1 gig of disk. Same as d.h DISK_ACCESS_MASK, but shifted right by 8.
 .libc_krenel_max_disk_usage:0x400000
@@ -47,10 +43,8 @@ nop;nop;nop;nop;
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
 //We reserve 2 megabytes for creating a PID0 program.
-//we reserve an additional megabyte for the FAT.
-//The rest is available and free.
-//This is by *page*.
-.libc_krenel_disk_reserved:0x3000
+//The rest of the disk can be written to and read from, freaely.
+.libc_krenel_disk_reserved:0x2000
 
 
 ..include"printbytehex.hasm"
