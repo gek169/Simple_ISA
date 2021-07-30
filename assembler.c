@@ -202,7 +202,6 @@ unsigned char bas_require_delay = 0;
 static void bas_delayed_action(){
 	line[0] = '\0';
 	bas_require_delay = 0;
-	printf("BEING CALLED");
 	if(is_declaring_delayed_variable){
 		is_declaring_delayed_variable = 0;
 		if(delayed_variable_type == 0) {
@@ -211,13 +210,13 @@ static void bas_delayed_action(){
 			my_strcpy(line, "..ASM:bytes 0,0");
 		}else if(delayed_variable_type == 4) {
 			my_strcpy(line, "..ASM:bytes %?0%");
-
 		}else if(delayed_variable_type >= 2) {
 			my_strcpy(line, "..ASM:bytes %/0%");
 		}else {
 			printf(internal_fail_pref);
 			printf("Bad variable declaration.");
 		}
+		delayed_variable_type = 0;
 		return;
 	}
 }

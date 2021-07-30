@@ -26,7 +26,6 @@ asm_print; //TEXT SECTION
 ..(0x30):
 //    brainfrick_bracket_parsing_depth
 ..BAS
-//    bytes %/0%;
       var 	u32		 brainfrick_bracket_parsing_depth
 
 ..ENDBAS
