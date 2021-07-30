@@ -206,13 +206,19 @@ static void bas_delayed_action(){
 	if(is_declaring_delayed_variable){
 		is_declaring_delayed_variable = 0;
 		if(delayed_variable_type == 0) {
-			my_strcpy(line, "bytes 0;");
+
+			my_strcpy(line, "bytes 0");
+			printf("byte variable declaration.");
 		} else if(delayed_variable_type == 1) {
-			my_strcpy(line, "bytes 0,0;");
+			my_strcpy(line, "bytes 0,0");
+			printf("short variable declaration.");
 		}else if(delayed_variable_type == 4) {
-			my_strcpy(line, "bytes %?0%;");
+			my_strcpy(line, "bytes %?0%");
+			printf("float variable declaration.");
+
 		}else if(delayed_variable_type >= 2) {
-			my_strcpy(line, "bytes 0,0,0,0;");
+			my_strcpy(line, "bytes %/0%");
+			printf("4byte variable declaration.");
 		}else {
 			printf(internal_fail_pref);
 			printf("Bad variable declaration.");
@@ -597,7 +603,10 @@ int main(int argc, char** argv){
 		if(bas_require_delay == 0)
 			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		else
+		{
 			bas_delayed_action();
+			linesize = strlen(line);
+		}
 
 	
 		while(
