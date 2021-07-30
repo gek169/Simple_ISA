@@ -85,7 +85,7 @@ static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned l
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				printf(general_fail_pref);
-				printf("Oversized line exceeds 128k limit for a line.");
+				printf("Oversized line exceeds 64k limit for a line.");
 				exit(1);
 			}
 		buf[blen++] = c;
@@ -197,7 +197,7 @@ static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 #include "disassembler.h"
 
 
-/*
+
 static unsigned char is_declaring_delayed_variable = 0;
 static unsigned char delayed_variable_type = 0;
 static unsigned char bas_require_delay = 0;
@@ -222,10 +222,10 @@ static void bas_delayed_action(){
 		return;
 	}
 }
-*/
 
-/*
-static void parse_bas(){ 
+
+
+static void parse_bas(){
 	buf2[0] = '\0'; 
 	buf1[0] = '\0';
 	if(strprefix("..ENDBAS", line)){
@@ -243,7 +243,7 @@ static void parse_bas(){
 	while(perform_inplace_repl(line, "\f", " "));
 	while(perform_inplace_repl(line, "\r", " "));
 	while(perform_inplace_repl(line, "  ", " "));
-	if(strprefix("var ", line)){ 
+	if(strprefix("var ", line)){
 		unsigned char variable_type = 0; 
 		unsigned long stepper = 4; 
 		if(strprefix("u32 ", line+stepper)){
@@ -285,8 +285,6 @@ static void parse_bas(){
 	my_strcpy(line, buf2);
 	return;
 }
-
-*/
 
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
@@ -605,14 +603,13 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		/*if(bas_require_delay == 0)*/
+		if(bas_require_delay == 0)
 			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
-		/*else
+		else
 		{
 			bas_delayed_action();
 			linesize = strlen(line);
 		}
-		*/
 	
 		while(
 				strprefix(" ",line)
@@ -639,13 +636,10 @@ int main(int argc, char** argv){
 		my_strcpy(line_copy, (unsigned char*)line);
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-		/*
 
-			if we are in basic mode, go to basic mode.
 			if(is_parsing_bas){
 				parse_bas();
 			}
-		*/
 		
 		/*
 			syntactic sugars. Only one may be used on a single line!
