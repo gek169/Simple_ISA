@@ -17,7 +17,8 @@ const UU TOKEN_NUM = 2;
 const UU TOKEN_UNU = 3; /*Preserved in case we decide to ever have any multi-character things.*/
 const UU TOKEN_FORWARDSLASH = 4;
 const UU TOKEN_STRING = 5; /*A string can be at most 64k characters. Is that a huge limitation?*/
-
+static UU ALLOCATED_PAGES = 0;
+u* SEGMENT = SEGS[0];
 /*
 	standin for SISA16's SEG_REALLOC.
 */
@@ -26,54 +27,28 @@ char istext(unsigned char c){
 	return isalpha(c) || (c == '_') || (c == '.');
 }
 
-void SEG_REALLOC(UU RX0){
-	u* SEGMENT_OLD = SEGMENT;
-	UU SEGMENT_PAGES_OLD = SEGMENT_PAGES;
-	SEGMENT_PAGES = RX0;
-	if(RX0 == 0){
-		if(SEGMENT) free(SEGMENT);
-		SEGMENT = NULL;
-		SEGMENT_PAGES = 0;
-	} else {
-		if(SEGMENT_PAGES_OLD != SEGMENT_PAGES){
-			if(!SEGMENT)
-				SEGMENT = calloc(1, 0x100 * SEGMENT_PAGES);
-			else
-				SEGMENT = realloc(SEGMENT, 0x100 * SEGMENT_PAGES);
-		}
-		if(!SEGMENT){
-			SEGMENT_PAGES = SEGMENT_PAGES_OLD;
-			SEGMENT = SEGMENT_OLD;
-			printf("\r\n<ERROR> failed malloc.\r\n");
-			exit(1);
-		}
-		if(SEGMENT_OLD)
-			if(SEGMENT_PAGES_OLD < SEGMENT_PAGES){
-				/*Must initialize memory to zero.*/
-				size_t end, i;
-				i = ((size_t)SEGMENT_PAGES_OLD) * 256;
-				end = ((size_t)SEGMENT_PAGES) * 256;
-				for(;i<end;i++)SEGMENT[i] = 0;
-			}
-		
-	}
-}
-
 void pushToken(){
 	UU needed_space = (CUR_TOKEN_LEN + 255)>>8;
 	if(needed_space == 0) {
 		printf("<ERROR> empty token?\r\n");
 		exit(1);
 	}
-	SEG_REALLOC(SEGMENT_PAGES + needed_space);
+	if(ALLOCATED_PAGES + needed_space > SEGMENT_PAGES){
+		printf("<Memory allocation error>");
+		exit(1);
+	}
 	memcpy(
-		SEGMENT+((SEGMENT_PAGES-needed_space)<<8),
+		SEGMENT+((ALLOCATED_PAGES)<<8),
 		STRBUF, 
 		needed_space * 256
 	);
+	ALLOCATED_PAGES += needed_space;
 	N_TOKENS++;
 	CUR_TOKEN_LEN = 0;
 	printf("<token %u, identification %u> %s\r\n", (unsigned int)N_TOKENS, (unsigned int)TOKEN_IDENT, SEGMENT+(SEGMENT_PAGES-needed_space)*256);
+	if(TOKEN_IDENT == TOKEN_TEXT || TOKEN_IDENT == TOKEN_STRING){
+		printf("%s\r\n", STRBUF);
+	}
 	TOKEN_IDENT = 0;
 }
 
@@ -106,7 +81,7 @@ int main(){
 			STRBUF[CUR_TOKEN_LEN++] = '\0';
 			pushToken();
 		} else if(TOKEN_IDENT == TOKEN_TEXT){
-			if(!istext(c)){
+			if(!istext(c) && !isdigit(c)){
 				STRBUF[CUR_TOKEN_LEN++] = '\0';
 				pushToken();
 			} else {
