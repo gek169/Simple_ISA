@@ -91,16 +91,17 @@ nop;nop;nop;nop;
 
 
 //Given a file size in RX0, find a start page. If none can be found, return 0xffFFffFF, which is erroneous.
-.decl_lproc:libc_lproc_krenel_find_free:
+..decl_lproc:libc_lproc_krenel_find_free
 	//TODO
 	lrx0 %/0xffFFffFF%;
 	ret;
 
 //Load user page according to register B.
-.libc_lproc_krenel_load_user_page:\
-	user_getb;ca;\
-	lla %libc_krenel_diskio_page%;\
+..decl_lproc:libc_lproc_krenel_load_user_page
+	user_getb;ca;
+	lla %libc_krenel_diskio_page%;
 	user_farpagel;
+	ret
 
 //all tasks start out as 0- inactive.
 //these are shorts.
@@ -125,14 +126,6 @@ bytes 0,0;
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//		libc_lproc_krenel_print_krenel;
-//		la 'B'; putchar;
-//		la 'O'; putchar;
-//		la 'O'; putchar;
-//		la 'T'; putchar;
-//		la '\n'; putchar;
-//		la '\r'; putchar;
-//		la '\n'; interrupt;
 	//We are passed a place to jump to in RX0. Store it away while we set up the krenel.
 		rx0push;
 	//Set input mode to be non-blocking.
@@ -324,9 +317,7 @@ bytes 0,0;
 			user_get0; lrx1 %/libc_krenel_max_disk_mask%; rxand;
 			lrx1 %/libc_krenel_disk_reserved%;
 			rxcmp;
-			lb 2;
-			cmp;
-			sc %libc_krenel_bad_disk_write%; jmpifneq; //If they aren't writing past the first 512k, kill them.
+			lb 2;cmp; sc %libc_krenel_bad_disk_write%; jmpifneq; 
 			libc_lproc_krenel_load_user_page;
 			user_get0;
 			llb %libc_krenel_diskio_page%; 
