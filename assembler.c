@@ -1218,7 +1218,7 @@ int main(int argc, char** argv){
 
 					if(i >= (long)nbuiltin_macros){
 						char q = line[loc + len_to_replace];
-						if( isalpha(q) || isdigit(q) || (q == '_')){ /*This cannot possibly be the correct macro.*/
+						if( isalpha(q) || my_isdigit(q) || (q == '_')){ /*This cannot possibly be the correct macro.*/
 							continue;
 						}
 					}
