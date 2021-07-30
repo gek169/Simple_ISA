@@ -1211,9 +1211,18 @@ int main(int argc, char** argv){
 					}
 					/*We know the location of a macro to be expanded and it is at loc.*/
 					/*This also quit conveniently defines the recursion limit for a macro.*/
-					have_expanded = 1;
+					
+					
 					
 					len_to_replace = strlen(variable_names[i]);
+
+					if(i >= (long)nbuiltin_macros){
+						char q = line[loc + len_to_replace];
+						if( isalpha(q) || isdigit(q) || (q == '_')){ /*This cannot possibly be the correct macro.*/
+							continue;
+						}
+					}
+					have_expanded = 1;
 					/*before = str_null_terminated_alloc(line_old, loc); -- old, shit*/
 					before = buf1; /*DO NOT REUSE BUF1!!!!*/
 					memcpy(buf1, line, loc);
