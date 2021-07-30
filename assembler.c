@@ -202,6 +202,7 @@ unsigned char bas_require_delay = 0;
 static void bas_delayed_action(){
 	line[0] = '\0';
 	bas_require_delay = 0;
+	printf("BEING CALLED");
 	if(is_declaring_delayed_variable){
 		is_declaring_delayed_variable = 0;
 		if(delayed_variable_type == 0) {
