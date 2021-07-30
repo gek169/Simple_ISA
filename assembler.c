@@ -224,7 +224,6 @@ static void bas_delayed_action(){
 
 
 static void parse_bas(){ /* gets redirected here. */
-	if(strprefix(".", line)) {return;} /*Pre-processing directive.*/
 	buf2[0] = '\0'; /*this is our */
 	buf1[0] = '\0';
 	/*
