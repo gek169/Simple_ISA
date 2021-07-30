@@ -24,7 +24,7 @@ u* SEGMENT = SEGS[0];
 */
 
 char istext(unsigned char c){
-	return isalpha(c) || (c == '_') || (c == '.');
+	return isalpha(c) || (c == '_');
 }
 
 void pushToken(){
@@ -33,7 +33,7 @@ void pushToken(){
 		printf("<ERROR> empty token?\r\n");
 		exit(1);
 	}
-	if(ALLOCATED_PAGES + needed_space > SEGMENT_PAGES){
+	if(ALLOCATED_PAGES + needed_space >= SEGMENT_PAGES){
 		printf("<Memory allocation error>");
 		exit(1);
 	}
