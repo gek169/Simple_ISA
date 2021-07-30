@@ -621,7 +621,7 @@ bytes 0,0;
 		sc %libc_booter_copy_loop%; jmpifeq;
 	//Indicate that booting succeded.
 	astp;popa; //Clear the stack pointer.
-	lrx0 %/COMMAND_COM%;
+	lrx0 %/libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
 

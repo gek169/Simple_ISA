@@ -1,3 +1,84 @@
+//STRCMP
+//RX0: string 1
+//RX1: string 2
+
+:libc_strcmp_charstore_1:
+bytes %0%;
+:libc_strcmp_charstore_2:
+bytes %0%;
+
+..decl_farproc(LIBC_REGION):proc_strcmp
+..export"proc_strcmp"
+	rx2_0;
+
+	libc_strcmp_looptop:
+		rx0_2; cbrx0;
+		farilda; farstla %~LIBC_REGION%, %libc_strcmp_charstore_1%
+		rx0_1; cbrx0;
+		farilda; farstla %~LIBC_REGION%, %libc_strcmp_charstore_2%
+
+		//see if they are different.
+		farllda %~LIBC_REGION%, %libc_strcmp_charstore_1%
+		farlldb %~LIBC_REGION%, %libc_strcmp_charstore_2%
+		cmp;sc %libc_strcmp_loopfail%; jmpifneq;
+
+		//Check if B is zero.
+		ab; nota; sc %libc_strcmp_loopsucc%; jmpifeq;
+
+		//increment both pointers and jump.
+		rxincr; rx1_0;
+		rx0_2; rxincr; rx2_0;
+		sc %libc_strcmp_looptop%; jmp;
+	libc_strcmp_loopsucc:
+		la 0;
+		farret;
+	libc_strcmp_loopfail:
+		//return the subtraction of the two.
+		farllda %~LIBC_REGION%, %libc_strcmp_charstore_1%
+		farlldb %~LIBC_REGION%, %libc_strcmp_charstore_2%
+		sub;
+		farret
+
+//STRPREFIX
+//rx0: the string to prefix with.
+//rx1: the string that should be prefixed with the string at [rx0]
+
+..decl_farproc(LIBC_REGION):proc_strprefix
+..export"proc_strprefix"
+	rx2_0;
+
+	libc_strprefix_looptop:
+		rx0_2; cbrx0;
+		farilda; farstla %~LIBC_REGION%, %libc_strcmp_charstore_1%
+		rx0_1; cbrx0;
+		farilda; farstla %~LIBC_REGION%, %libc_strcmp_charstore_2%
+
+		//see if we have reached a success or failure condition.
+		farllda %~LIBC_REGION%, %libc_strcmp_charstore_1%; 
+			nota; 
+			sc %libc_strprefix_loopsucc%; 
+			jmpifeq;
+		farllda %~LIBC_REGION%, %libc_strcmp_charstore_2%; 
+			nota; 
+			sc %libc_strprefix_loopfail%; 
+			jmpifeq;
+
+		//see if they are different.
+		farllda %~LIBC_REGION%, %libc_strcmp_charstore_1%
+		farlldb %~LIBC_REGION%, %libc_strcmp_charstore_2%
+		cmp;sc %libc_strprefix_loopfail%; jmpifneq;
+
+		//increment both pointers and jump.
+		rxincr; rx1_0;
+		rx0_2; rxincr; rx2_0;
+		sc %libc_strprefix_looptop%; jmp;
+
+	libc_strprefix_loopsucc:
+		la 1;
+		farret;
+	libc_strprefix_loopfail:
+		la 0;
+		farret
 
 
 //STRDUPE
@@ -9,9 +90,8 @@ bytes %/0%;
 ..decl_farproc(LIBC_REGION):proc_strdupe
 ..export"proc_strdupe"
 	rx0push;
-	rx0push;
 	proc_strlen;
-	rx0pop; rxincr; rx0push; //We also need a null terminator...
+	rxincr; rx0push;  //We also need a null terminator...
 	//fetch us some memory!
 	proc_alloc;
 	//If alloc failed, we simply abort()
@@ -22,6 +102,8 @@ bytes %/0%;
 	proc_memcpy;
 	farldrx0 %&libc_strdupe_retval_store%;
 	farret
+
+	
 	:libc_strdupe_abort:
 	lb 0; div;
 	halt;

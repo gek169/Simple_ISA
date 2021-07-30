@@ -1,6 +1,41 @@
 
 
-:COMMAND_COM:
+
+
+
+
+
+:libc_command_com_prompt:
+..asciz:$
+
+:libc_command_com_help_printout:
+..ascii:help- display this help
+bytes '\r', '\n';
+..ascii:exec- execute region from disk
+bytes '\r', '\n';
+..ascii:quit- shutdown the commandline.
+bytes '\r', '\n';
+..ascii:dump- dump a page from disk.
+bytes '\r', '\n', 0;
+
+
+:libc_command_com_help:
+..asciz:help
+:libc_command_com_exec:
+..asciz:exec 
+:libc_command_com_quit:
+..asciz:quit
+:libc_command_com_dump:
+..asciz:dump 
+
+
+
+
+.libc_command_com_command_string_region:0x4
+.libc_command_com_exec_region:0x1
+
+
+:libc_COMMAND_COM:
 	la 'C'; putchar;
 	la 'O'; putchar;
 	la 'M'; putchar;
@@ -14,4 +49,87 @@
 	la 'M'; putchar;
 	la '\r'; putchar;
 	la '\n'; putchar;interrupt;
+	push %5%;
+//TODO: parse command line.
+
+	:libc_command_com_looptop:
+		la '\r'; putchar;
+		la '\n'; putchar;interrupt;	
+		lrx0 0, %~LIBC_REGION%, %libc_command_com_prompt%;
+		proc_prints
+		la '\r'; putchar;
+		la '\n'; putchar;interrupt;
+		lrx0 0,%~libc_command_com_command_string_region%,0,0;
+		proc_gets;
+	//Now we check for some things.
+	lrx1 0,%~libc_command_com_command_string_region%,0,0;
+	lrx0 0,%~LIBC_REGION%,  %libc_command_com_help%
+	proc_strprefix;	//this returns 1 in A if it is strprefixing.
+	sc %libc_lproc_ccom_help%; jmpifeq;
+
+	//Now we check for some things.
+	lrx1 0,%~libc_command_com_command_string_region%,0,0;
+	lrx0 0,%~LIBC_REGION%,  %libc_command_com_quit%
+	proc_strprefix;	//this returns 1 in A if it is strprefixing.
+	sc %libc_ccom_do_halt%; jmpifeq;
+
+
+	//Now we check for some things.
+	lrx1 0,%~libc_command_com_command_string_region%,0,0;
+	lrx0 0,%~LIBC_REGION%,  %libc_command_com_dump%
+	proc_strprefix;	//this returns 1 in A if it is strprefixing.
+	sc %libc_lproc_ccom_dump%; jmpifeq;
+
+	
+	sc %libc_command_com_looptop%; jmp;
+
+	libc_ccom_do_halt:
 	halt;
+
+
+libc_lproc_ccom_help:
+	lrx0 0, LIBC_REGION, %libc_command_com_help_printout%;
+	proc_prints;
+sc %libc_command_com_looptop%; jmp;
+
+libc_lproc_ccom_dump:
+	lrx0 0,%~libc_command_com_command_string_region%,0,5;
+	proc_atou_dec;
+	//RX0 contains the page on disk we want to read from.
+	llb %~libc_command_com_exec_region%,0;
+	lla %0xDE03%; //Disk read.
+	syscall;
+
+	lrx2 0,libc_command_com_exec_region,0,0;
+	libc_ccom_dump_looptop:
+		rx0_2
+		cbrx0
+		farilda
+		apush
+		proc_printbytelchex
+		apop
+		la '\ '; putchar;
+		//check if this is divisible by 8.
+		arx0; lb 15; and; lb 15; cmp;
+		sc %libc_ccom_dump_do_newline%; jmpifeq;
+		
+		rx0_2
+		rxincr;
+		rx2_0;
+		lrx1 0,libc_command_com_exec_region,1,0;
+		rxcmp;
+		sc %libc_ccom_dump_looptop%; jmpifneq;
+	sc %libc_command_com_looptop%; jmp;
+
+
+		libc_ccom_dump_do_newline:
+		la '\r'; putchar;
+		la '\n'; putchar; interrupt;
+		rx0_2
+		rxincr;
+		rx2_0;
+		lrx1 0,libc_command_com_exec_region,1,0;
+		rxcmp;
+		sc %libc_ccom_dump_looptop%; jmpifneq;
+
+	sc %libc_command_com_looptop%; jmp;
