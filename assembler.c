@@ -247,6 +247,10 @@ static void parse_bas(){ /* gets redirected here. */
 		}else if(strprefix("short ", line+stepper)){
 			stepper += 6;
 			variable_type = 1;			
+		} else {
+			printf(syntax_fail_pref);
+			printf("Variable declaration missing type.");
+			exit(1);
 		}
 		while(perform_inplace_repl(line+stepper, " ", ""));
 		if(strfind(line, "//") != -1){
@@ -256,7 +260,6 @@ static void parse_bas(){ /* gets redirected here. */
 			line[strfind(line, "#")] = '\0';
 		}
 		my_strcpy(buf2, "VAR#");
-
 		strcat(buf2, line+stepper);
 		strcat(buf2, "#@");
 		my_strcpy(line, buf2);
