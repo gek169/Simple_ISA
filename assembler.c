@@ -228,6 +228,11 @@ static void parse_bas(){ /* gets redirected here. */
 	/*
 		Check for ..ASM: prefix,
 	*/
+	if(strprefix("..ENDBAS", line)){
+		is_parsing_bas = 0;
+		my_strcpy(line, "");
+		return;
+	}
 	if(strprefix("..ASM:", line)){
 		strcat(buf2, line + 6);
 		my_strcpy(line, buf2);
