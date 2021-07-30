@@ -196,9 +196,11 @@ static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 /*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
 
-unsigned char is_declaring_delayed_variable = 0;
-unsigned char delayed_variable_type = 0;
-unsigned char bas_require_delay = 0;
+
+/*
+static unsigned char is_declaring_delayed_variable = 0;
+static unsigned char delayed_variable_type = 0;
+static unsigned char bas_require_delay = 0;
 static void bas_delayed_action(){
 	line[0] = '\0';
 	bas_require_delay = 0;
@@ -220,14 +222,12 @@ static void bas_delayed_action(){
 		return;
 	}
 }
+*/
 
-
-static void parse_bas(){ /* gets redirected here. */
-	buf2[0] = '\0'; /*this is our */
+/*
+static void parse_bas(){ 
+	buf2[0] = '\0'; 
 	buf1[0] = '\0';
-	/*
-		Check for ..ASM: prefix,
-	*/
 	if(strprefix("..ENDBAS", line)){
 		is_parsing_bas = 0;
 		my_strcpy(line, "");
@@ -238,17 +238,14 @@ static void parse_bas(){ /* gets redirected here. */
 		my_strcpy(line, buf2);
 		return;
 	}
-	/*
-		perform sanitization of input.
-	*/
 	while(perform_inplace_repl(line, "\t", " "));
 	while(perform_inplace_repl(line, "\v", " "));
 	while(perform_inplace_repl(line, "\f", " "));
 	while(perform_inplace_repl(line, "\r", " "));
 	while(perform_inplace_repl(line, "  ", " "));
-	if(strprefix("var ", line)){ /*Variable declaration.*/
-		unsigned char variable_type = 0; /*0=byte, 1=short, 2=u32, 3=i32, 4=f32*/
-		unsigned long stepper = 4; /*after the var.*/
+	if(strprefix("var ", line)){ 
+		unsigned char variable_type = 0; 
+		unsigned long stepper = 4; 
 		if(strprefix("u32 ", line+stepper)){
 			stepper += 4;
 			variable_type = 2;
@@ -289,6 +286,7 @@ static void parse_bas(){ /* gets redirected here. */
 	return;
 }
 
+*/
 
 int main(int argc, char** argv){
 	FILE *infile,*ofile; 
@@ -607,14 +605,14 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		if(bas_require_delay == 0)
+		/*if(bas_require_delay == 0)*/
 			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
-		else
+		/*else
 		{
 			bas_delayed_action();
 			linesize = strlen(line);
 		}
-
+		*/
 	
 		while(
 				strprefix(" ",line)
@@ -644,10 +642,11 @@ int main(int argc, char** argv){
 		/*
 
 			if we are in basic mode, go to basic mode.
+			if(is_parsing_bas){
+				parse_bas();
+			}
 		*/
-		if(is_parsing_bas){
-			parse_bas();
-		}
+		
 		/*
 			syntactic sugars. Only one may be used on a single line!
 		*/
@@ -1215,7 +1214,6 @@ int main(int argc, char** argv){
 					
 					
 					len_to_replace = strlen(variable_names[i]);
-
 					if(i >= (long)nbuiltin_macros){
 						char q = line[loc + len_to_replace];
 						if( isalpha(q) || my_isdigit(q) || (q == '_')){ /*This cannot possibly be the correct macro.*/

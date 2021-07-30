@@ -24,11 +24,8 @@ asm_print; //TEXT SECTION
 	:brainfrick_cells:
 
 ..(0x30):
-//    brainfrick_bracket_parsing_depth
-..BAS
-      var 	u32		 brainfrick_bracket_parsing_depth
-
-..ENDBAS
+brainfrick_bracket_parsing_depth:
+bytes %/0%;
 ..decl_farproc:interpret_bf
 	bf_interpreter_looptop:
 		//fetch a character from the array.
