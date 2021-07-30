@@ -590,7 +590,8 @@ int main(int argc, char** argv){
 			return 1;
 		}
 	/*Second pass to allow goto labels*/
-	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET), outputcounter=0)
+	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET),
+	 (outputcounter=0), (is_parsing_bas=0))
 	while(1){
 		char was_macro = 0;	
 		char using_asciz = 0;
