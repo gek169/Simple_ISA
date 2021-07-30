@@ -196,18 +196,74 @@ static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
 /*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
 
+unsigned char is_declaring_delayed_variable = 0;
+unsigned char delayed_variable_type = 0;
+unsigned char bas_require_delay = 0;
+static void bas_delayed_action(){
+	line[0] = '\0';
+	bas_require_delay = 0;
+	if(is_declaring_delayed_variable){
+		is_declaring_delayed_variable = 0;
+		if(delayed_variable_type == 0) {
+			my_strcpy(line, "bytes 0;");
+		} else if(delayed_variable_type == 1) {
+			my_strcpy(line, "bytes 0,0;");
+		}else if(delayed_variable_type == 4) {
+			my_strcpy(line, "bytes %?0%;");
+		}else if(delayed_variable_type >= 2) {
+			my_strcpy(line, "bytes 0,0,0,0;");
+		}
+	}
+}
+
 
 static void parse_bas(){ /* gets redirected here. */
 	if(strprefix(".", line)) {return;} /*Pre-processing directive.*/
 	buf2[0] = '\0'; /*this is our */
 	buf1[0] = '\0';
 	/*
-		perform sanitization of 
+		perform sanitization of input.
 	*/
 	while(perform_inplace_repl(line, "\t", " "));
+	while(perform_inplace_repl(line, "\v", " "));
+	while(perform_inplace_repl(line, "\f", " "));
+	while(perform_inplace_repl(line, "\r", " "));
 	while(perform_inplace_repl(line, "  ", " "));
 	if(strprefix("var ", line)){ /*Variable declaration.*/
 		unsigned char variable_type = 0; /*0=byte, 1=short, 2=u32, 3=i32, 4=f32*/
+		unsigned long stepper = 4; /*after the var.*/
+		if(strprefix("u32 ", line+stepper)){
+			stepper += 4;
+			variable_type = 2;
+		} else if(strprefix("i32 ", line+stepper)){
+			stepper += 4;
+			variable_type = 3;
+		} else if(strprefix("f32 ", line+stepper)){
+			stepper += 4;
+			variable_type = 4;
+		}else if(strprefix("byte ", line+stepper)){
+			stepper += 5;
+			variable_type = 0;
+		}else if(strprefix("short ", line+stepper)){
+			stepper += 6;
+			variable_type = 1;			
+		}
+		while(perform_inplace_repl(line+stepper, " ", ""));
+		if(strfind(line, "//") != -1){
+			line[strfind(line, "//")] = '\0';
+		}
+		if(strfind(line, "#") != -1){
+			line[strfind(line, "#")] = '\0';
+		}
+		my_strcpy(buf2, "VAR#");
+
+		strcat(buf2, line+stepper);
+		strcat(buf2, "#@");
+		my_strcpy(line, buf2);
+		bas_require_delay = 1;
+		is_declaring_delayed_variable = 1;
+		delayed_variable_type = variable_type;
+		return;	
 	}
 	my_strcpy(line, buf2);
 	return;
@@ -530,7 +586,10 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
+		if(!bas_require_delay)
+			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
+		else
+			bas_delayed_action();
 		while(
 				strprefix(" ",line)
 				|| strprefix("\t",line)
