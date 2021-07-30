@@ -231,7 +231,8 @@ static void parse_bas(){ /* gets redirected here. */
 		Check for ..ASM: prefix,
 	*/
 	if(strprefix("..ASM:", line)){
-		my_strcpy(line, line + 6);
+		strcat(buf2, line + 6);
+		my_strcpy(line, buf2);
 		return;
 	}
 	/*
