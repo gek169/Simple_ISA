@@ -36,6 +36,7 @@ bytes '\r', '\n', 0;
 
 
 :libc_COMMAND_COM:
+..export"libc_COMMAND_COM"
 	la 'C'; putchar;
 	la 'O'; putchar;
 	la 'M'; putchar;
