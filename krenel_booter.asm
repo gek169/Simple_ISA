@@ -24,7 +24,7 @@ bytes '\r' ,'\n', 0;
 
 
 ..main(3): //three actually goes unused by krenel, so it is safe to put code there. Dont use 1, or just ..main
-	lrx0 %/libc_COMMAND_COM%;
+	lrx0 0, %~LIBC_REGION%, %libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
 ..(55):
@@ -81,7 +81,13 @@ bytes '\r' ,'\n', 0;
 	halt;
 ..(8):
 	krenel_boot:
+		la 'f'; putchar;
+		la '\r'; putchar;
+		la '\n'; putchar;
+		la '\n'; interrupt;
 		push %10%; //make some room for that bootloader!
+
+
 //		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
 //		lrx0 %/0x20000%;
 //		lrx1 %/0x20480%;
@@ -105,7 +111,7 @@ bytes '\r' ,'\n', 0;
 		//lb 2; la 0x44; farista;
 		//lla %0xDE06%; 
 		//syscall;
-		nota; sc %main_program_failure%; jmpifeq;
+		//nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
 		proc_prints;
 		la '\n'; syscall;
@@ -153,4 +159,5 @@ bytes '\r' ,'\n', 0;
 		lla %0xDE00%;lb 8;syscall; //Kill ourselves. 8 wraps around to 0.
 		lb 0; rx1b; fltdiv
 		main_program_failure:
+		la 'f'; putchar;
 		halt;
