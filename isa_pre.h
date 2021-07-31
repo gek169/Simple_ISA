@@ -11,7 +11,7 @@ typedef long SUU;
 #endif
 static u R=0;
 
-#define SEGMENT_PAGES 0x30000
+#define SEGMENT_PAGES 0x40000
 
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode
@@ -45,7 +45,7 @@ typedef struct {
 	u program_counter_region;
 }sisa_regfile;
 static u M_SAVER[1+SISA_MAX_TASKS][0x1000000] = {0};
-static u SEGS[1+SISA_MAX_TASKS][SEGMENT_PAGES * 256];
+static u SEGMENT[SEGMENT_PAGES * 256];
 #define SAVE_REGISTER(XX, d) REG_SAVER[d].XX = XX;
 #define LOAD_REGISTER(XX, d) XX = REG_SAVER[d].XX;
 

@@ -192,7 +192,7 @@ static char* insns[220] = {
 	"rxcmp",
 	"seg_ld",
 	"seg_st",
-	"ASM_FREE_INSN_SEG_REALLOC",
+	"seg_config",
 	"fltadd",
 	"fltsub",
 	"fltmul",
@@ -230,7 +230,7 @@ static char* insns[220] = {
 	"emulate",
 	"rxitof",
 	"rxftoi",
-	"emulate_seg",
+	"seg_getconfig",
 	"rxicmp",
 	/*Boolean logic*/
 	"logor",

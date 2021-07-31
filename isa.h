@@ -137,7 +137,7 @@ k 198:goto G_AA22;k 199:goto G_AA23;k 200:goto G_AA24;k 201:goto G_AA25;\
 k 202:goto G_AA26;k 203:goto G_AINCR;k 204:goto G_ADECR;k 205:goto G_RX0INCR;\
 k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_ITOF;k 209:goto G_FTOI;\
-k 210:goto G_EMULATE_SEG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
+k 210:goto G_SEG_GETCONFIG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
 k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:goto G_TASK_RIC;\
 k 218:goto G_USER_FARPAGEL;k 219:goto G_USER_FARPAGEST;k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
@@ -171,6 +171,8 @@ int DONT_WANT_TO_INLINE_THIS e()
 	u current_task=1;
 #endif
 	sisa_regfile REG_SAVER[1 + SISA_MAX_TASKS] = {0};
+	UU seg_access_mask = (SEGMENT_PAGES-1);
+	UU seg_access_offset = 0;
 #ifndef PREEMPT_TIMER
 #define PREEMPT_TIMER 0x100000
 #endif
@@ -277,7 +279,7 @@ const void* const goto_table[256] = {
 &&G_EMULATE,
 &&G_ITOF,
 &&G_FTOI,
-&&G_EMULATE_SEG,
+&&G_SEG_GETCONFIG,
 &&G_RXICMP,
 &&G_LOGOR,&&G_LOGAND,
 &&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_TASK_RIC,
@@ -627,12 +629,13 @@ ZA:
 D
 ZB:
 #if !defined(NO_SEGMENT)
-	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
+	if((seg_access_offset +	(RX1 & seg_access_mask))>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
 		STASH_REGS;
 		memcpy(
 			M + 0x100 * (RX0&0xffFF),
-			SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, 
+
+			SEGMENT + 0x100 * (seg_access_offset +	(RX1 & seg_access_mask)),
 			0x100
 		);
 		UNSTASH_REGS;
@@ -646,11 +649,14 @@ ZB:
 #endif
 ZC:
 #if !defined(NO_SEGMENT)
-	if(RX1>=SEGMENT_PAGES){R=5;goto G_HALT;}
+	if((seg_access_offset +	(RX1 & seg_access_mask))>=SEGMENT_PAGES){R=5;goto G_HALT;}
 	else
 	{
 		STASH_REGS;
-		memcpy(SEGS[EMULATE_DEPTH * current_task] + 0x100 * RX1, M + 0x100 * (RX0&0xffFF), 0x100);
+		memcpy(
+			SEGMENT + 0x100 *  (seg_access_offset +	(RX1 & seg_access_mask)),
+			M + 0x100 * (RX0&0xffFF),
+			0x100);
 		UNSTASH_REGS;
 #ifndef NO_PREEMPT
 		if(EMULATE_DEPTH) instruction_counter += MED_INSN_COST; /*This is a very expensive instruction.*/
@@ -661,8 +667,15 @@ ZC:
 	R=14; goto G_HALT;
 #endif
 
-
-ZD: goto G_NOP; /*FREE INSTRUCTION!!!*/
+ZD: 
+#if !defined(NO_SEGMENT)
+	if(EMULATE_DEPTH) {R = 15; goto G_HALT;}
+	seg_access_offset = RX0;
+	seg_access_mask = RX1;
+D
+#else
+	R=14; goto G_HALT;
+#endif
 
 #ifdef NO_FP
 /*no floating point unit.*/
@@ -860,8 +873,18 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = lRX0;
 	}D
 #endif
+
+	G_SEG_GETCONFIG:
+#if !defined(NO_SEGMENT)
+	{
+		RX1 = seg_access_mask;
+		RX0 = seg_access_offset;
+	}D
+#else
+	R=14; goto G_HALT;
+#endif
 #if !defined(NO_EMULATE)
-	G_EMULATE:G_EMULATE_SEG:{
+	G_EMULATE:{
 		if(EMULATE_DEPTH) {R=11; goto G_HALT;}
 
 		{
@@ -891,7 +914,7 @@ G_AA12:{SUU SRX0, SRX1;
 		a=0;b=0;c=0;
 	}D
 #else
-	G_EMULATE:G_EMULATE_SEG: R=14; goto G_HALT;
+	G_EMULATE: R=14; goto G_HALT;
 #endif
 	G_RXICMP:
 	{

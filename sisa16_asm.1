@@ -528,7 +528,7 @@ seg_st: store segment RX0 from main memory into page RX1 in the segment. (1 byte
 
 .B Free Instruction 
 
-that behaves as a NOP duplicate. (1 byte) (AD)
+seg_config: Set the segment access offset and mask, from RX0 and RX1, respectively. (PRIVILEGED) (1 byte) (AD)
 
 fltadd: floating point addition, RX0 += RX1, disabled with -DNO_FP (1 byte) (AE)
 
@@ -618,7 +618,7 @@ rxitof: convert RX0 from signed int to float. (1 byte) (D0)
 
 rxftoi: convert RX0 from float to signed int. (1 byte) (D1)
 
-emulate_seg: Duplicate for emulate. (D2)
+seg_getconfig: Get the segment's configuration.  (D2)
 
 rxicmp: comparison like rxcmp, but for signed 32 bit integers. (1 byte) (D3)
 
