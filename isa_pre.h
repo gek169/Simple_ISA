@@ -11,7 +11,11 @@ typedef long SUU;
 #endif
 static u R=0;
 
-#define SEGMENT_PAGES 0x40000
+/*
+	MUST BE POWER OF TWO!!!!
+	that means the lead digit must be 1, 2, 4, or 8, followed entirely by zeroes.
+*/
+#define SEGMENT_PAGES 0x400000
 
 /*This is important later!!! Only two privilege levels.
 0:		Kernel mode

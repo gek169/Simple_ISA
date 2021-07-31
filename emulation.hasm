@@ -132,8 +132,8 @@ bytes 0,1;
 		cmp;
 		sc %libc_krenel_configure_segment_make_own_segment%; jmpifeq;
 			//we don't own it! The mask and offset should be configured to prevent any form of segment access, it should always generate an error.
-			seg_pages; rxdecr; rx1_0;
-			seg_pages;
+			lb 0; rx1b;
+			seg_pages
 			seg_config;
 			ret;
 		libc_krenel_configure_segment_make_own_segment:
