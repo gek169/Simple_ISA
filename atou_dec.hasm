@@ -6,6 +6,7 @@
 ..decl_farproc(LIBC_REGION):proc_atou_dec
 ..export"proc_atou_dec"
 	//the passed string is in RX0.
+	proc_skipwhitespace;
 	rx3_0;
 	lb 0; rx2b;					//happens to be a very fast way of transferring zero into a register.
 	:libc_atou_dec_looptop:

@@ -17,6 +17,7 @@ bytes 0,0,0,0;
 ..decl_farproc(LIBC_REGION):proc_atof_dec
 ..export"proc_atof_dec"
 	//the passed string is in RX0.
+		proc_skipwhitespace
 		rx3_0;
 		lb0; rx0b; rxitof; rx2_0; //lrx2 %?0%;
 		rx0_3;

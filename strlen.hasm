@@ -18,3 +18,14 @@
 	:libc_strlen_registers_loopend:
 		rx0_2;								//move RX2 to RX0 so we can keep it.
 farret;
+
+..decl_farproc(LIBC_REGION):proc_skipwhitespace
+	libc_skipwhitespace_looptop:
+		cbrx0; farilda; apush;
+		lb '\ '; cmp; bpop; sc %libc_skipwhitespace_is_whitespace_char%; jmpifeq;
+		ab; apush; lb '\t'; cmp; bpop; sc %libc_skipwhitespace_is_whitespace_char%; jmpifeq;
+		ab; apush; lb '\v'; cmp; bpop; sc %libc_skipwhitespace_is_whitespace_char%; jmpifeq;
+		ab; apush; lb '\f'; cmp; bpop; sc %libc_skipwhitespace_is_whitespace_char%; jmpifeq;
+		farret;
+	libc_skipwhitespace_is_whitespace_char:
+		rxincr; sc %libc_skipwhitespace_looptop%; jmp;

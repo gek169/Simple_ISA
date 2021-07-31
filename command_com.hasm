@@ -85,7 +85,7 @@ bytes '\r', '\n', 0;
 	lrx1 0,%~libc_command_com_command_string_region%,0,0;
 	lrx0 0,%~LIBC_REGION%,  %libc_command_com_exec%
 	proc_strprefix;	//this returns 1 in A if it is strprefixing.
-	sc %libc_lproc_ccom_help%; jmpifeq;
+	sc %libc_lproc_ccom_exec%; jmpifeq;
 
 
 	
@@ -124,7 +124,7 @@ libc_lproc_ccom_exec:
 	lb libc_command_com_exec_region;
 	lla %0xDE04%;  //exec region.
 	syscall;
-sc %libc_command_com_looptop%; jmp;
+	halt;
 
 libc_lproc_ccom_dump:
 	lrx0 0,%~libc_command_com_command_string_region%,0,5;

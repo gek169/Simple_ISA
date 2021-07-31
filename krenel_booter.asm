@@ -24,6 +24,8 @@ bytes '\r' ,'\n', 0;
 
 
 ..main(3): //three actually goes unused by krenel, so it is safe to put code there. Dont use 1, or just ..main
+
+	//ENTER: exec 2048 on the command line!!!
 	lrx0 0, %~LIBC_REGION%, %libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
@@ -81,7 +83,7 @@ bytes '\r' ,'\n', 0;
 	halt;
 ..(8):
 	krenel_boot:
-		la 'f'; putchar;
+		lla %0xDE02%; syscall; //sleep!
 		la '\r'; putchar;
 		la '\n'; putchar;
 		la '\n'; interrupt;
@@ -111,12 +113,12 @@ bytes '\r' ,'\n', 0;
 		//lb 2; la 0x44; farista;
 		//lla %0xDE06%; 
 		//syscall;
-		//nota; sc %main_program_failure%; jmpifeq;
+		nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
 		proc_prints;
 		la '\n'; syscall;
 		nota; sc %main_program_failure%; jmpifeq;
-		//Commit sudoku- kill ourselves.
+		//Send a KILL to pid0
 		//lla %0xDE00%;lb 0;syscall;
 		lrx0 0, %&STR_my_string%;
 		proc_gets;
@@ -129,10 +131,38 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; syscall;
 		//lla %0xDE00%;lb 1;syscall; //Kill the other guy.
-		//Send him a message instead.
+		//Send a message to all processes!
+		lla %0xDE05%; 
+		lb 1;
+		sc %0%; 
+		lrx0 %/0xAABBCC%; 
+		syscall;
 		lla %0xDE05%; 
 		lb 1;
 		sc %1%; 
+		lrx0 %/0xAABBCC%; 
+		syscall;		
+
+		lla %0xDE05%; 
+		lb 1;
+		sc %2%; 
+		lrx0 %/0xAABBCC%; 
+		syscall;
+
+		lla %0xDE05%; 
+		lb 1;
+		sc %2%; 
+		lrx0 %/0xAABBCC%; 
+		syscall;
+
+		lla %0xDE05%; 
+		lb 1;
+		sc %3%; 
+		lrx0 %/0xAABBCC%; 
+		syscall;
+		lla %0xDE05%; 
+		lb 1;
+		sc %4%; 
 		lrx0 %/0xAABBCC%; 
 		syscall;
 		lrx0 0, %&STR_my_string%;
@@ -149,7 +179,7 @@ bytes '\r' ,'\n', 0;
 		proc_prints;
 		//lla %0xDEAD%; syscall;
 		
-		lla %0xDE00%;lb 1;syscall; //Kill the other guy.
+		lla %0xDE00%;lb 0;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 2;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 3;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 4;syscall; //Kill the other guy.

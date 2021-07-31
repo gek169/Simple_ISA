@@ -10,6 +10,7 @@
 ..decl_farproc(LIBC_REGION):proc_atoi_dec
 ..export"proc_atoi_dec"
 	//the passed string is in RX0.
+		proc_skipwhitespace
 		lb 0; rx2b;
 		rx3_0;
 	//before anything else, we need to test if the first character is NULL.
