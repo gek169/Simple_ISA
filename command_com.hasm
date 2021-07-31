@@ -80,6 +80,11 @@ bytes '\r', '\n', 0;
 	proc_strprefix;	//this returns 1 in A if it is strprefixing.
 	sc %libc_lproc_ccom_dump%; jmpifeq;
 
+	//Now we check for some things.
+	lrx1 0,%~libc_command_com_command_string_region%,0,0;
+	lrx0 0,%~LIBC_REGION%,  %libc_command_com_exec%
+	proc_strprefix;	//this returns 1 in A if it is strprefixing.
+	sc %libc_lproc_ccom_exec%; jmpifeq;
 	
 	sc %libc_command_com_looptop%; jmp;
 
@@ -91,6 +96,31 @@ libc_lproc_ccom_help:
 	lrx0 0, LIBC_REGION, %libc_command_com_help_printout%;
 	proc_prints;
 sc %libc_command_com_looptop%; jmp;
+
+libc_lproc_ccom_exec:
+	lrx2 0,%~libc_command_com_command_string_region%,0,5;
+	lrx1 %/256%;
+	rxadd;
+	rx3_0;
+	proc_atou_dec;
+	llb %~libc_command_com_exec_region%,0;
+	blpush;
+	libc_ccom_exec_looptop:
+		rx0_2;
+		blpop;
+		lla %0xDE03%;
+		syscall;
+		ab; aincr; alpush;
+		rxincr;rx2_0;
+		rx1_3;
+		rxcmp
+		sc %libc_ccom_exec_looptop%; jmpifneq;
+	blpop;
+	la 0xc; syscall;
+	lla %0xDE04%; 
+	lb %~libc_command_com_exec_region%; 
+	syscall;
+halt;
 
 libc_lproc_ccom_dump:
 	lrx0 0,%~libc_command_com_command_string_region%,0,5;

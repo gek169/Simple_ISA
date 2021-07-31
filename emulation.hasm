@@ -34,7 +34,7 @@ nop;nop;nop;nop;
 
 
 
-//1 gig of disk. Same as d.h DISK_ACCESS_MASK, but shifted right by 8.
+//Maximum amount of disk allowed to be used.
 .libc_krenel_max_disk_usage:0x400000
 .libc_krenel_max_disk_mask: 0x3fffff
 
@@ -42,8 +42,10 @@ nop;nop;nop;nop;
 //Reserved page for disk IO.
 .libc_krenel_diskio_page:0xFF00
 .libc_krenel_diskio_next_page:0xFF01
+
 //We reserve 2 megabytes for creating a PID0 program.
-//The rest of the disk can be written to and read from, freaely.
+//The rest of the disk can be written to and read from, by any program.
+
 .libc_krenel_disk_reserved:0x2000
 
 
