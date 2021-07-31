@@ -58,14 +58,14 @@ bytes '\r' ,'\n', 0;
 	syscall;
 	la '\r'; putchar;
 	la '\n'; putchar; 
-	la 'q'; putchar;
-	la 'u'; putchar;
-	la 'i'; putchar;
-	la 't'; putchar;
+	la 'h'; putchar;
+	la 'm'; putchar;
+	la 'm'; putchar;
+	la '?'; putchar;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;
 	lrx0 %/0x260000%;
-	proc_prints;
+	//proc_prints;
 	la '\n'; interrupt;
 	//Fork bomb. Uncomment at your own risk.
 	sc %0%; 
@@ -78,12 +78,13 @@ bytes '\r' ,'\n', 0;
 	lla %0xDE06%; 
 	syscall;
 	lrx2 %/0x50000%;
-	lrx1 %/0%;
-	cpc;
-	rx0_2;
-	seg_ld;
-	rx0_1; rxincr; rx1_0;
-	jmp;
+	lrx1 %/0x90000%;
+	bruhtop:
+		rx0_2;
+		seg_ld;
+		rx0_1; rxincr; rx1_0;
+		sc %bruhtop%; jmp;
+	
 	lb 0; mod;
 	halt;
 ..(8):

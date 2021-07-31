@@ -629,7 +629,7 @@ ZA:
 D
 ZB:
 #if !defined(NO_SEGMENT)
-	if((seg_access_offset)==SEGMENT_PAGES){R=5;goto G_HALT;}
+	if(seg_access_offset==SEGMENT_PAGES){R=5;goto G_HALT;}
 	{
 		STASH_REGS;
 		memcpy(
@@ -649,7 +649,7 @@ ZB:
 #endif
 ZC:
 #if !defined(NO_SEGMENT)
-	if((seg_access_offset)==SEGMENT_PAGES){R=5;goto G_HALT;}
+	if(seg_access_offset==SEGMENT_PAGES){R=5;goto G_HALT;}
 	else
 	{
 		STASH_REGS;

@@ -128,11 +128,12 @@ bytes 0,1;
 
 ..decl_lproc:libc_lproc_krenel_configure_segment
 		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%
-		farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%
+		farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%
 		cmp;
 		sc %libc_krenel_configure_segment_make_own_segment%; jmpifeq;
 			//we don't own it! The mask and offset should be configured to prevent any form of segment access, it should always generate an error.
-			lb 0; rx1b;
+			lb 0; 
+			rx1b
 			seg_pages
 			seg_config;
 			ret;
@@ -202,7 +203,7 @@ bytes 0,1;
 		ab; alpush;
 		lb 19; cmp; blpop; sc %libc_krenel_syscall%; jmpifeq;
 		ab; alpush;
-		lb 18; cmp; blpop; sc %libc_krenel_tried_interrupt%; jmpifeq; //might as well print out an error message.
+		lb 18; cmp; blpop; sc %libc_krenel_tried_interrupt%; jmpifeq;
 		ab; alpush;
 		lb 17; cmp; blpop; sc %libc_krenel_putchar%; jmpifeq;
 		ab; alpush;
