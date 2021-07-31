@@ -24,7 +24,7 @@ bytes '\r' ,'\n', 0;
 
 
 ..main(3): //three actually goes unused by krenel, so it is safe to put code there. Dont use 1, or just ..main
-	lrx0 %/krenel_boot%;
+	lrx0 %/libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
 ..(55):
