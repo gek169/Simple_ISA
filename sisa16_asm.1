@@ -526,9 +526,13 @@ seg_ld: load segment RX1 into page RX0 of Main Memory. (1 byte) (AB)
 
 seg_st: store segment RX0 from main memory into page RX1 in the segment. (1 byte) (AC)
 
-.B Free Instruction 
+seg_config: Set the segment access offset and mask, from RX0 and RX1, respectively. This should be set with care,
 
-seg_config: Set the segment access offset and mask, from RX0 and RX1, respectively. (PRIVILEGED) (1 byte) (AD)
+invalid values cause undefined behavior.
+
+an offset equal to the return value of seg_pages means that segment access is disabled.
+
+(PRIVILEGED) (1 byte) (AD)
 
 fltadd: floating point addition, RX0 += RX1, disabled with -DNO_FP (1 byte) (AE)
 
