@@ -1,14 +1,11 @@
-
-
-
-
-
-
-
 :libc_command_com_prompt:
 ..asciz:$
 
 :libc_command_com_help_printout:
+..ascii:SISA16 COMMAND.COM- the world's smallest operating system
+bytes '\r', '\n';
+..ascii:~~Let all that you do be done with love~~
+bytes '\r', '\n';
 ..ascii:help- display this help
 bytes '\r', '\n';
 ..ascii:exec- execute region from disk
@@ -22,11 +19,11 @@ bytes '\r', '\n', 0;
 :libc_command_com_help:
 ..asciz:help
 :libc_command_com_exec:
-..asciz:exec 
+..asciz:exec
 :libc_command_com_quit:
 ..asciz:quit
 :libc_command_com_dump:
-..asciz:dump 
+..asciz:dump
 
 
 
@@ -101,7 +98,7 @@ libc_lproc_ccom_help:
 sc %libc_command_com_looptop%; jmp;
 
 libc_lproc_ccom_exec:
-	lrx0 0,%~libc_command_com_command_string_region%,0,5;
+	lrx0 0,%~libc_command_com_command_string_region%,0,4;
 	proc_atou_dec;
 	//rx0 contains the page from disk which is the beginning of a 64k program to launch
 	rx2_0;
@@ -127,7 +124,7 @@ libc_lproc_ccom_exec:
 	halt;
 
 libc_lproc_ccom_dump:
-	lrx0 0,%~libc_command_com_command_string_region%,0,5;
+	lrx0 0,%~libc_command_com_command_string_region%,0,4;
 	proc_atou_dec;
 	//RX0 contains the page on disk we want to read from.
 	llb %~libc_command_com_exec_region%,0;
