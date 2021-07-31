@@ -117,6 +117,29 @@ bytes 0,0;
 :libc_krenel_active_task_index:
 bytes 0,0;
 
+
+//TODO: implement some sort of BRK implementation
+//PID 0 owns the entire segment to begin with.
+:libc_krenel_owns_segment_index:
+bytes 0,0;
+
+..decl_lproc:libc_lproc_krenel_configure_segment
+
+		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%
+		farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%
+		cmp;
+		sc %libc_krenel_configure_segment_make_own_segment%; jmpifeq;
+
+			lb 0; rx0b; rx1b; seg_config;
+			ret;
+		libc_krenel_configure_segment_make_own_segment:
+			//we do own it!
+			seg_pages; rxdecr; rx1_0;
+			lb 0; rx0b;
+			seg_config;
+			ret;
+
+
 ..decl_farproc(LIBC_REGION):proc_krenel
 ..export"proc_krenel"
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -143,6 +166,7 @@ bytes 0,0;
 			la 0; faristla;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_looptop%; jmpifeq;
+	//
 	//PID 0 is the initial program... make it 1.
 		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
 		la 1;
@@ -157,6 +181,7 @@ bytes 0,0;
 		sc %0%; la 2; ista; //la
 		adecr;ca;			//put 1 into c.
 		lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
+		push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 		emulate;
 	//restore stack integrity.
 		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
@@ -216,6 +241,7 @@ bytes 0,0;
 			user_geta;	llb %0xDE05%; cmp; sc %libc_krenel_syscall_ipc_write%; jmpifeq;
 			user_geta;	llb %0xDE06%; cmp; sc %libc_krenel_syscall_fork%; jmpifeq;
 			user_geta;	llb %0xDE07%; cmp; sc %libc_krenel_syscall_getpid%; jmpifeq;
+			user_geta;	llb %0xDE08%; cmp; sc %libc_krenel_syscall_ownsegment%; jmpifeq;
 			//I don't recognize this syscall. 
 			libc_lproc_krenel_print_krenel;
 			la 'b'; putchar;
@@ -292,6 +318,11 @@ bytes 0,0;
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			aincr; ba;
 			la 7; interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_ownsegment:
+			//Ask to own the segment.
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farstla %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_set_palette_color:
 			user_get0;
@@ -415,6 +446,7 @@ bytes 0,0;
 				sc %0%; la 2; ista; //la
 				adecr;ca;			//put 1 into c.
 				lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
+				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				emulate;
 			//restore stack integrity.
 				farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
@@ -473,6 +505,7 @@ bytes 0,0;
 				la 1; faristla;
 				task_kill; //Reset it.
 				//Unlike exec, we do not need to create a bootloader. Fork assumes that the userland code already did that.
+				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				priv_drop;
 				//We have switched task and returned, as commanded. A holds our return value. CHECK IT...
 				sc %libc_krenel_cswitch_looptop%; jmp;
@@ -522,6 +555,7 @@ bytes 0,0;
 		aincr;
 		farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
 		llb %libc_krenel_max_returns%; cmp; lb 2; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
+		//We already configured the segment.
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_cswitch_killtask:
@@ -572,7 +606,9 @@ bytes 0,0;
 		task_set; 
 		task_ric;
 		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
+		libc_lproc_krenel_configure_segment;
 		priv_drop;
+		//We have some 
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_shutdown:
 		//Shut down the system.
