@@ -123,8 +123,10 @@ bytes 0,0;
 :libc_krenel_owns_segment_index:
 bytes 0,0;
 
-..decl_lproc:libc_lproc_krenel_configure_segment
+:libc_krenel_segment_lock:
+bytes 0,1;
 
+..decl_lproc:libc_lproc_krenel_configure_segment
 		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%
 		farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%
 		cmp;
@@ -153,6 +155,8 @@ bytes 0,0;
 	//Set the active task's info.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+		la 0; farstla %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+		la 1; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
 
 	//Set all tasks to be zero
 		lb0;rx0b; 
@@ -242,6 +246,7 @@ bytes 0,0;
 			user_geta;	llb %0xDE06%; cmp; sc %libc_krenel_syscall_fork%; jmpifeq;
 			user_geta;	llb %0xDE07%; cmp; sc %libc_krenel_syscall_getpid%; jmpifeq;
 			user_geta;	llb %0xDE08%; cmp; sc %libc_krenel_syscall_ownsegment%; jmpifeq;
+			user_geta;	llb %0xDE09%; cmp; sc %libc_krenel_syscall_releasesegment%; jmpifeq;
 			//I don't recognize this syscall. 
 			libc_lproc_krenel_print_krenel;
 			la 'b'; putchar;
@@ -319,10 +324,39 @@ bytes 0,0;
 			aincr; ba;
 			la 7; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_releasesegment:
+			//Do we already own the segment? If not, then, don't unlock it.
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			cmp;
+			sc %libc_krenel_syscall_ret0_failure%; 
+			jmpifneq;
+			//We own the segment. Unlock it.
+			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ownsegment:
-			//Ask to own the segment.
+			//Do we already own the segment? If so, lock it.
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			cmp;
+			sc %libc_krenel_syscall_ownsegment_already_own_pleaselock%; jmpifeq;
+			
+			//is the segment locked?
+			farllda %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			lb 1; cmp;
+			sc %libc_krenel_syscall_ret0_failure%; jmpifeq;
+
+			//We can own the segment!
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			farstla %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			libc_lproc_krenel_configure_segment;
+		:libc_krenel_syscall_ownsegment_already_own_pleaselock:
+			la 1; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			la 1; user_seta; //success!
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_ret0_failure:
+			la 0; 
+			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_set_palette_color:
 			user_get0;
@@ -569,12 +603,16 @@ bytes 0,0;
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
 			la 0; faristla;
-		//Try to select a task.
-			//sc %libc_krenel_try_select_task%; jmp;
+		//Does this dead task own the segment? If not, then, don't unlock it.
+			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			cmp; sc %libc_krenel_try_select_task%; jmpifneq;
+		//It owns the segment. Unlock it.
+			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
-		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
+		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq; //quit if we should!
 		lb 0; rx2b;	//RX2: the number of things we have tried.
 		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks_mask; rx1b;
