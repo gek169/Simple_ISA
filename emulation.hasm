@@ -337,6 +337,7 @@ bytes 0,1;
 			jmpifneq;
 			//We own the segment. Unlock it.
 			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			la 1; user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ownsegment:
 			//Do we already own the segment? If so, lock it.
@@ -610,7 +611,9 @@ bytes 0,1;
 		//Does this dead task own the segment? If not, then, don't unlock it.
 			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
 			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
-			cmp; sc %libc_krenel_try_select_task%; jmpifneq;
+			cmp; 
+			sc %libc_krenel_try_select_task%; 
+			jmpifneq;
 		//It owns the segment. Unlock it.
 			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
 	libc_krenel_try_select_task:
