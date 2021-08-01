@@ -2,31 +2,23 @@
 
 //..include"libc.hasm"
 ..include"libc_pre.hasm"
-..(2):
+..zero:
 ..dinclude"libc_pre.bin"
+.brainfrick_program_memory:0x100000
+//You have quite a bit of freedom with the cells.
+.brainfrick_cells:0x600000
 
 
-..(0x40):
-:brainfrick_prompt:
-bytes '\r', '\n';
-..ascii:Enter BF:
-bytes '\r', '\n', 0;
-:brainfrick_error_prompt:
-bytes '\r', '\n';
-..ascii:<BF PARSING ERROR>
-bytes '\r', '\n', 0;
-asm_print; //TEXT SECTION
 
-..(0x10): 
-	:brainfrick_program_memory:
-
-..(0x60): //You have quite a bit of freedom with the cells.
-	:brainfrick_cells:
-
-..(0x30):
-brainfrick_bracket_parsing_depth:
-bytes %/0%;
-..decl_farproc:interpret_bf
+..(3): 
+	sc %krenel_boot%; jmp;
+	brainfrick_bracket_parsing_depth:
+	bytes %/0%;
+	:bf_LEXER_lbracket_count:
+	bytes %/0%;
+	:bf_LEXER_rbracket_count:
+	bytes %/0%;
+..decl_lproc:interpret_bf
 	bf_interpreter_looptop:
 		//fetch a character from the array.
 		rx0_2; cbrx0; farilda; 
@@ -38,7 +30,7 @@ bytes %/0%;
 			ab;	apush;lb ','; cmp; bpop; sc %bf_input%; jmpifeq;
 			ab;	apush;lb '['; cmp; bpop; sc %bf_leftbracket%; jmpifeq;
 			ab;	apush;lb ']'; cmp; bpop; sc %bf_rightbracket%; jmpifeq;
-			farret;
+			ret;
 		bf_ptr_right:
 			rx0_3; rxincr; rx3_0;
 			rx0_2; rxincr; rx2_0;
@@ -149,11 +141,8 @@ bytes %/0%;
 			bf_rightbracket_loopend:
 			rx0_2; rxincr; rx2_0; //The one after the left bracket.
 			sc %bf_interpreter_looptop%; jmp;
-:bf_LEXER_lbracket_count:
-bytes %/0%;
-:bf_LEXER_rbracket_count:
-bytes %/0%;
-..decl_farproc:proc_bf_lex
+
+..decl_lproc:proc_bf_lex
 	lrx0 %/0%;
 	farstrx0 %&bf_LEXER_rbracket_count%;
 	farstrx0 %&bf_LEXER_lbracket_count%;
@@ -175,7 +164,9 @@ bytes %/0%;
 		ab;	apush; lb '-'; cmp; bpop; sc %bf_LEXER_approved_character%; jmpifeq;
 		ab;	apush; lb 0; cmp; bpop; sc %bf_LEXER_final%; jmpifeq;
 		bf_LEXER_failure:
-		lrx0 %/1%; farret;
+		lb 1; 
+		rx0b;
+		ret;
 		:bf_LEXER_found_lbracket:
 			farldrx0 %&bf_LEXER_lbracket_count%
 			rxincr
@@ -194,17 +185,11 @@ bytes %/0%;
 		farldrx1 %&bf_LEXER_rbracket_count%
 		rxcmp
 		sc %bf_LEXER_failure%; jmpifneq
-	lrx0 %/0%; //success.	
-	farret;
-asm_print; //CODE SECTION 1
+	lb 0; rx0b; //success.	
+	ret;
 
 
-
-..main(3): 
-	lrx0 %/krenel_boot%;
-	proc_krenel;
-	halt;
-
+	
 	bf_errorprint:
 		lrx0 %/brainfrick_error_prompt%;
 		proc_prints; la '\n'; interrupt;
@@ -223,5 +208,13 @@ asm_print; //CODE SECTION 1
 		lrx3 %/brainfrick_cells%;
 		interpret_bf;
 		sc %krenel_boot%; jmp;
-		halt;
-asm_print; //CODE SECTION 2
+		halt
+:brainfrick_prompt:
+bytes '\r', '\n';
+..ascii:Enter BF:
+bytes '\r', '\n', 0;
+:brainfrick_error_prompt:
+bytes '\r', '\n';
+..ascii:<BF PARSING ERROR>
+bytes '\r', '\n', 0;
+asm_print; //Program size.
