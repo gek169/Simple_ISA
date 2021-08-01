@@ -65,7 +65,7 @@ bytes '\r' ,'\n', 0;
 	la '\r'; putchar;
 	la '\n'; putchar; interrupt;
 	lrx0 %/0x260000%;
-	//proc_prints;
+	proc_prints;
 	la '\n'; interrupt;
 	//Fork bomb. Uncomment at your own risk.
 	sc %0%; 
@@ -81,7 +81,7 @@ bytes '\r' ,'\n', 0;
 	lrx1 %/0x90000%;
 	bruhtop:
 		rx0_2;
-		seg_ld;
+//		seg_ld;
 		rx0_1; rxincr; rx1_0;
 		sc %bruhtop%; jmp;
 	
