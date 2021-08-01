@@ -4,9 +4,7 @@
 
 
 section 0x40000;
-	:ascii_spinny:
-	..asciz:-\|/
-	.ascii_spinny_len:4
+
 
 .ITER_REGION:3
 ..(ITER_REGION):
@@ -19,33 +17,30 @@ section 0x40000;
 ..include"libc_pre.hasm"
 ..(2):
 ..dinclude"libc_pre.bin"
-
-
 .line_length:			90
 .line_length_plus_1:	91
 .num_lines:				20
 .wait_time:				50
-
-
-
 ..main(3):
-	lrx0 %/0x70000%;
+	lrx0 0, %~LIBC_REGION%, %libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
-..(7):
+..(4):
 asm_begin_region_restriction;
 la '\r'; putchar; 
 la 0;
 st_iter;
 alpush;
 	//our loop!
+	.ascii_spinny_len:4
 	asciifun_looptop: 
 		la ' '; putchar;
 		alpop; 
 			aincr; 
 		alpush;
+		
 		lb ascii_spinny_len;mod; 
-		sc %4%; lb %~ascii_spinny%; 
+		sc %1%; lb %~ascii_spinny%; 
 		add; ba;
 		farilda;
 		putchar;
@@ -54,10 +49,7 @@ alpush;
 		la %~wait_time%;
 		alpush; proc_wait; alpop;
 		sc %asciifun_looptop%;jmp;
-	asciifun_loopout:
-	la 7; putchar;
-	halt;
-
-
-
+	:ascii_spinny:
+	..asciz:-\|/
+	
 asm_end_restriction;
