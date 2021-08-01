@@ -4,20 +4,25 @@
 ..include"libc_pre.hasm"
 ..zero:
 ..dinclude"libc_pre.bin"
-.brainfrick_program_memory:0x100000
-//You have quite a bit of freedom with the cells.
-.brainfrick_cells:0x600000
 
+//we write the entire program in a single region, so that it can be executed just using 
 
-
-..(3): 
-	sc %krenel_boot%; jmp;
+..(1): 
+	.brainfrick_program_memory:0x100000
+	//You have quite a bit of freedom with the cells.
+	.brainfrick_cells:0x600000
 	brainfrick_bracket_parsing_depth:
 	bytes %/0%;
 	:bf_LEXER_lbracket_count:
 	bytes %/0%;
 	:bf_LEXER_rbracket_count:
 	bytes %/0%;
+..(3):
+
+sc %krenel_boot%; jmp;
+bytes %/0%;
+bytes %/0%;
+bytes %/0%;
 ..decl_lproc:interpret_bf
 	bf_interpreter_looptop:
 		//fetch a character from the array.
