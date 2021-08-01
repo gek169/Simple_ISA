@@ -18,13 +18,10 @@
 #define GET_EFF_PC() ( (((UU)program_counter_region)<<16) | program_counter  )
 #define GET_EFF_PC_MINUS(val) ( (((UU)program_counter_region)<<16) | ((program_counter-val)&0xffFF))
 #define GET_EFF_PC_AND_INCR() ( (((UU)program_counter_region)<<16) | program_counter++)
-/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_BYTE M[GET_EFF_PC_AND_INCR()]
-/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_TWO_BYTES (ADD_PC(2),\
 						((((U)M[GET_EFF_PC_MINUS(2)]))<<8) |\
 						(U)M[GET_EFF_PC_MINUS(1)])
-/*Would require edit if you wanted a 32 bit PC*/
 #define CONSUME_FOUR_BYTES (ADD_PC(4),\
 						((((UU)M[GET_EFF_PC_MINUS(4)]))<<24) |\
 						((((UU)M[GET_EFF_PC_MINUS(3)]))<<16) |\
@@ -44,24 +41,23 @@
 										(((UU)M[stack_pointer+2])<<8)|\
 										(UU)M[stack_pointer+3]\
 									)
-#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)b)])<<8) | (U)M[(((UU)c&255)<<16) | (UU)(0xffFF&(b+1))])
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)a)])<<8) | (U)M[(((UU)c&255)<<16) | (UU)(0xffFF&(a+1))])
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)b)])<<8) \
+										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)b))+1) ])
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)a)])<<8) \
+										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ]   )
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 (\
-											(((UU)M[(((UU)c&255)<<16)|((UU)a)])<<24)|\
-											(((UU)M[(((UU)c&255)<<16)|(UU)((U)(a+1))])<<16)|\
-											(((UU)M[(((UU)c&255)<<16)|(UU)((U)(a+2))])<<8)|\
-											((UU)M[(((UU)c&255)<<16)|(UU)((U)(a+3))])\
+											(((UU)M[(((UU)c&255)<<16)|((UU)a)])          <<24)|\
+											(((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ])   <<16)|\
+											(((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+2) ])   <<8)|\
+											((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
 											)
 #define write_byte(v,d)		M[d]=v;
-
 #define write_2bytes(v,d)	{UU tmp = d; U vuv = v; M[tmp]=					(vuv)>>8;\
 													M[(tmp+1)&0xFFffFF]=	vuv;}
-							
 #define write_4bytes(v,d)	{UU tmp = d;UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
 													M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
 													M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
 													M[(tmp+3)&0xFFffFF]=	(vuv);}
-
 
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
@@ -388,9 +384,9 @@ else a=1;
 
 D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
-G_FARISTLA:write_2bytes(a,((((UU)c&255)<<16)|((UU)b)))D
+G_FARISTLA:write_2bytes(a,  ((((UU)c)<<16)|((UU)b))  )D
 G_FARILLDB:b=Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16;D
-G_FARISTLB:write_2bytes(b,((((UU)c&255)<<16)|((UU)a)))D
+G_FARISTLB:write_2bytes(b,  ((((UU)c)<<16)|((UU)a))  )D
 G_FARPAGEL:
 {
 	STASH_REGS;
