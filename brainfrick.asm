@@ -7,22 +7,18 @@
 
 //we write the entire program in a single region, so that it can be executed just using 
 
-..(1): 
+..(3): 
+	sc %krenel_boot%; jmp;
 	.brainfrick_program_memory:0x100000
 	//You have quite a bit of freedom with the cells.
 	.brainfrick_cells:0x600000
+	//these variables really do exist at 3, even though our code is loaded at 1.
 	brainfrick_bracket_parsing_depth:
 	bytes %/0%;
 	:bf_LEXER_lbracket_count:
 	bytes %/0%;
 	:bf_LEXER_rbracket_count:
 	bytes %/0%;
-..(3):
-
-sc %krenel_boot%; jmp;
-bytes %/0%;
-bytes %/0%;
-bytes %/0%;
 ..decl_lproc:interpret_bf
 	bf_interpreter_looptop:
 		//fetch a character from the array.
