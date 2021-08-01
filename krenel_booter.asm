@@ -1,8 +1,7 @@
 #!/usr/bin/sisa16_asm -run
 
-//..include"libc.hasm"
 ..include"libc_pre.hasm"
-..(2):
+..zero:
 ..dinclude"libc_pre.bin"
 ..(0x25):
 	my_page_o_crap:
@@ -23,12 +22,7 @@ bytes '\r' ,'\n', 0;
 bytes '\r' ,'\n', 0;
 
 
-..main(3): //three actually goes unused by krenel, so it is safe to put code there. Dont use 1, or just ..main
-
-	//ENTER: exec 2048 on the command line!!!
-	lrx0 0, %~LIBC_REGION%, %libc_COMMAND_COM%;
-	proc_krenel;
-	halt;
+//ENTER: exec 2048 on the command line!!!
 ..(55):
 	side_process_looptop:
 	la 'V';
