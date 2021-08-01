@@ -15,21 +15,8 @@
 .st_page_count:	farstla %&0x30004%;
 
 
-region 0xB0;
-fill 0x100000, 51;
-
-section 0x40000;
-	:ascii_greyscale:
-	..asciz: .:-=+*#%@%#*+=-:.
-	.ascii_greyscale_len:18
-
-.ITER_REGION:3
-..(ITER_REGION):
-	bytes 0,0,0,0;
-
-//..include"libc.hasm"
 ..include"libc_pre.hasm"
-..(2):
+..zero:
 ..dinclude"libc_pre.bin"
 
 
@@ -38,12 +25,9 @@ section 0x40000;
 .num_lines:				30
 .wait_time:				16
 
-..main(5):
-	lrx0 %/0x770000%;
-	proc_krenel;
-	halt;
 
-..(0x77):
+
+..(0x4):
 asm_begin_region_restriction;
 la line_length;
 alpush;
@@ -121,7 +105,7 @@ asciifun_looptop: //Comment.
 		lb %~ascii_greyscale_len%;
 		mod;
 		//we now have the offset calculated in register a.
-		sc %0x4%; 
+		sc %0x1%; 
 		lb %~ascii_greyscale%;
 		add;
 		ba;
@@ -132,3 +116,6 @@ asciifun_loopout:
 	la 7; putchar;
 	halt;
 	asm_end_restriction;
+	:ascii_greyscale:
+	..asciz: .:-=+*#%@%#*+=-:.
+	.ascii_greyscale_len:18	
