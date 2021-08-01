@@ -41,15 +41,15 @@
 										(((UU)M[stack_pointer+2])<<8)|\
 										(UU)M[stack_pointer+3]\
 									)
-#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)b)])<<8) \
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[0xffFFff & ((((UU)c)<<16)|((UU)b)) ])<<8) \
 										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)b))+1) ])
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[(((UU)c&255)<<16) | ((UU)a)])<<8) \
-										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ]   )
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[0xffFFff & ((((UU)c)<<16)|((UU)a))])<<8) \
+										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1)  ]   )
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 (\
-											(((UU)M[(((UU)c&255)<<16)|((UU)a)])          <<24)|\
-											(((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ])   <<16)|\
-											(((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+2) ])   <<8)|\
-											((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
+											(  ((UU)M[0xffFFff & ((((UU)c)<<16)|((UU)a))  ])          <<24)|\
+											(  ((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ])   <<16)|\
+											(  ((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+2) ])   <<8)|\
+											(  (UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
 											)
 #define write_byte(v,d)		M[d]=v;
 #define write_2bytes(v,d)	{UU tmp = d; U vuv = v; M[tmp]=					(vuv)>>8;\
