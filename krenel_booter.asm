@@ -94,6 +94,12 @@ bytes '\r' ,'\n', 0;
 		la '\n'; putchar;
 		la '\n'; interrupt;
 		push %10%; //make some room for that bootloader!
+		//Attempt to get a lock on the segment.
+		cpc;
+		la 'f'; putchar;
+		la '\n'; putchar; interrupt;
+		lla %0xDE08%; syscall;
+		jmpifneq;
 
 
 //		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
