@@ -653,7 +653,7 @@ bytes 0,1;
 		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
 		libc_lproc_krenel_configure_segment;
 		priv_drop;
-		//We have some 
+		//We have a return argument to respond to!
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_shutdown:
 		//Shut down the system.
