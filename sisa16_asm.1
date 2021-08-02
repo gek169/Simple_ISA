@@ -1182,11 +1182,7 @@ type `h` for help.
 
 4) The stack pointer is sixteen bit and trapped in the home region, 0x0000 to 0xFFFF.
 
-5) most memory reads and writes wrap around inside of regions. if you try to far indirect load on a
-
-region boundary, it will wrap around inside that region. Direct loads do not obey this rule, and instead wrap around
-
-the address space. farlldrx0 does not wrap around inside of a region, but farildrx0 does.
+5) Memory loads wrap around the entire address space- if a load or store would read or write past the edge of memory, it reads or writes to the beginning of memory.
 
 6) Program execution begins at 0. It is best practice to immediately set the A register to some region number
 and lfarpc into a main routine as a bootloader.
