@@ -11,11 +11,18 @@
 
 #define SET_PCR(val) (program_counter_region = val)
 #define GET_PCR() (program_counter_region)
+#define GET_LOCAL_ADDR(val) ( (((UU)program_counter_region)<<16) | val  )
 #define SET_PC(val) (program_counter = val)
 #define ADD_PC(val) (program_counter += val)
 #define INCR_PC() (program_counter++)
 #define GET_PC() (program_counter)
 #define GET_EFF_PC() ( (((UU)program_counter_region)<<16) | program_counter  )
+#define GET_EFF_C()  ( (((UU)program_counter_region)<<16) | c  )
+#define GET_EFF_A()  ( (((UU)program_counter_region)<<16) | a  )
+#define GET_EFF_B()  ( (((UU)program_counter_region)<<16) | b  )
+#define GET_EFF_C_PLUS(val) ( 0xffFFff & (GET_EFF_C()+val))
+#define GET_EFF_A_PLUS(val) ( 0xffFFff & (GET_EFF_A()+val))
+#define GET_EFF_B_PLUS(val) ( 0xffFFff & (GET_EFF_B()+val))
 #define GET_EFF_PC_MINUS(val) ( (((UU)program_counter_region)<<16) | ((program_counter-val)&0xffFF))
 #define GET_EFF_PC_AND_INCR() ( (((UU)program_counter_region)<<16) | program_counter++)
 #define CONSUME_BYTE M[GET_EFF_PC_AND_INCR()]
@@ -31,9 +38,9 @@
 						((((UU)M[GET_EFF_PC_MINUS(3)]))<<16) |\
 						((((UU)M[GET_EFF_PC_MINUS(2)]))<<8) |\
 						(UU)M[GET_EFF_PC_MINUS(1)])
-#define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[c])<<8) | (U)M[c+1])
-#define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[a])<<8) | (U)M[a+1])
-#define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[b])<<8) | (U)M[b+1])
+#define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[GET_EFF_C()])<<8) | (U)M[GET_EFF_C_PLUS(1)])
+#define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[GET_EFF_A()])<<8) | (U)M[GET_EFF_A_PLUS(1)])
+#define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[GET_EFF_B()])<<8) | (U)M[GET_EFF_B_PLUS(1)])
 #define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8) | (U)M[stack_pointer+1])
 #define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
 										(((UU)M[stack_pointer])<<24)|\
@@ -325,8 +332,8 @@ G_PUTCHAR:{
 }D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
-G_ILDA:a=M[c]D
-G_ILDB:b=M[c]D
+G_ILDA:a=M[GET_EFF_C()]D
+G_ILDB:b=M[GET_EFF_C()]D
 G_CAB:c=(a<<8)|(b&255)D
 G_AB:a=b;D
 G_BA:b=a;D
@@ -361,13 +368,13 @@ G_ASTP:a=stack_pointer;D
 G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
 G_CPC:c=GET_PC();D
-G_LDA:a=M[CONSUME_TWO_BYTES]D
+G_LDA:a=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES) ]D
 G_LA:a=CONSUME_BYTE;D
-G_LDB:b=M[CONSUME_TWO_BYTES]D
+G_LDB:b=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES)]D
 G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
-G_STA:write_byte(a,CONSUME_TWO_BYTES)D
-G_STB:write_byte(b,CONSUME_TWO_BYTES)D
+G_STA:write_byte(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
+G_STB:write_byte(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
 G_JMPIFEQ:if(a==1)SET_PC(c);D
 G_JMPIFNEQ:if(a!=1)SET_PC(c);D
 G_ADD:a+=b;D

@@ -120,8 +120,12 @@ CPU variables of a constant size and location.
 
 0x0 is a region, because when fully written out: 0x000000 its lowest two bytes are all zeroes.
 
+The "Current Region" is the region where the program counter currently resides, and 
+
+the region where 16-bit addressing mode operations (such as lda, llda, illdb...) operate.
+
 .B Zero 'Home' or 'Stack' Region: 
-the topmost region, where the stack pointer is stuck and where normal non-far loads and stores happen.
+the topmost region, where the stack pointer is stuck
 
 region 0.
 
