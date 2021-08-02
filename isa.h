@@ -92,7 +92,7 @@ k 0:goto G_HALT;k 1:goto G_LDA;k 2:goto G_LA;k 3:goto G_LDB;k 4:goto G_LB;k 5:go
 k 8:goto G_ADD;k 9:goto G_SUB;k 10:goto G_MUL;k 11:goto G_DIV;k 12:goto G_MOD;k 13:goto G_CMP;k 14:goto G_JMPIFEQ;k 15:goto G_JMPIFNEQ;\
 k 16:goto G_GETCHAR;k 17:goto G_PUTCHAR;k 18:goto G_AND;k 19:goto G_OR;k 20:goto G_XOR;k 21:goto G_LSHIFT;k 22:goto G_RSHIFT;k 23:goto G_ILDA;\
 k 24:goto G_ILDB;k 25:goto G_CAB;k 26:goto G_AB;k 27:goto G_BA;k 28:goto G_ALC;k 29:goto G_AHC;k 30:goto G_NOP;k 31:goto G_CBA;\
-k 32:goto G_LLA;k 33:goto G_ILLDA;k 34:goto G_LLB;k 35:goto G_ILLDB;k 36:goto G_ILLDAA;k 37:goto G_ILLDBB;k 38:goto G_ILLDAB;k 39:goto G_ILLDBA;\
+k 32:goto G_LLA;k 33:goto G_ILLDA;k 34:goto G_LLB;k 35:goto G_ILLDB;k 36:goto G_ILLDAA;k 37:goto G_CPCR;k 38:goto G_ILLDAB;k 39:goto G_ILLDBA;\
 k 40:goto G_CA;k 41:goto G_CB;k 42:goto G_AC;k 43:goto G_BC;k 44:goto G_ISTA;k 45:goto G_ISTB;k 46:goto G_ISTLA;k 47:goto G_ISTLB;\
 k 48:goto G_JMP;k 49:goto G_STLA;k 50:goto G_STLB;k 51:goto G_STC;k 52:goto G_PUSH;k 53:goto G_POP;k 54:goto G_PUSHA;k 55:goto G_POPA;\
 k 56:goto G_ASTP;k 57:goto G_BSTP;k 58:goto G_COMPL;k 59:goto G_CPC;k 60:goto G_CALL;k 61:goto G_RET;k 62:goto G_FARILLDA;k 63:goto G_FARISTLA;\
@@ -200,7 +200,7 @@ const void* const goto_table[256] = {
 &&G_ALC,&&G_AHC,
 &&G_NOP,&&G_CBA,&&G_LLA,&&G_ILLDA,&&G_LLB,
 &&G_ILLDB,
-&&G_ILLDAA,&&G_ILLDBB,&&G_ILLDAB,&&G_ILLDBA,
+&&G_ILLDAA,&&G_CPCR,&&G_ILLDAB,&&G_ILLDBA,
 &&G_CA,&&G_CB,&&G_AC,&&G_BC,
 &&G_ISTA,&&G_ISTB,&&G_ISTLA,&&G_ISTLB,&&G_JMP,&&G_STLA,&&G_STLB,
 &&G_STC,&&G_PUSH,&&G_POP,&&G_PUSHA,&&G_POPA,&&G_ASTP,
@@ -332,13 +332,13 @@ G_AB:a=b;D
 G_BA:b=a;D
 G_ALC:a=c&0xff;D
 G_AHC:a=(c>>8);D
-G_CBA:c=(b<<8)|(a&0xff)D
+G_CBA:c=(b<<8)|(a&255)D
 G_LLA:a=CONSUME_TWO_BYTES;D
 G_ILLDA:a=Z_READ_TWO_BYTES_THROUGH_C;D
 G_LLB:b=CONSUME_TWO_BYTES;D
 G_ILLDB:b=Z_READ_TWO_BYTES_THROUGH_C;D
 G_ILLDAA:a=Z_READ_TWO_BYTES_THROUGH_A;D
-G_ILLDBB:b=Z_READ_TWO_BYTES_THROUGH_B;D
+G_CPCR:c=GET_PCR();D
 G_ILLDAB:a=Z_READ_TWO_BYTES_THROUGH_B;D
 G_ILLDBA:b=Z_READ_TWO_BYTES_THROUGH_A;D
 G_CA:c=a;D
@@ -380,7 +380,6 @@ G_CMP:
 if(a<b)a=0;
 else if(a>b) a=2;
 else a=1;
-/*a = ((a>b)*2) + (a==b)*1;*/
 
 D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D

@@ -38,7 +38,7 @@ static char* insns[220] = {
 	"illdb",
 	/*Self-Indirecting access mode.*/
 	"illdaa",
-	"illdbb",
+	"cpcr", /*CHANGED INSTRUCTION*/
 	"illdab",
 	"illdba",
 	"ca",
