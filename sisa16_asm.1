@@ -772,7 +772,16 @@ where "region" is not literally placed, but rather the integer associated with t
 is syntactically identical to above, but "region" will always be 3.
 You can also use a macro:
 
-"..decl_farproc(3):myProcedure"
+"..decl_farproc(MY_MACRO_EXPANDING_TO_3):myProcedure"
+
+You may not use a builtin macro for this purpose
+
+"..decl_lfarproc:myProcedure"
+
+Will define a macro that calls a procedure in the program counter's current region.
+
+This is useful when you're writing a library that needs to call its own far procedures, but doesn't know what region it resides in.
+
 
 "..decl_lproc:myProcedure"
 

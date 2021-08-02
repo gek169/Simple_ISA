@@ -878,19 +878,10 @@ int main(int argc, char** argv){
 			my_strcpy(buf1, line + strlen("..decl_farproc:"));
 			sprintf((char*)buf2, "VAR#%s#sc%%%lu%%;la%lu;farcall;", buf1, outputcounter & 0xFFff, outputcounter >>16);
 			my_strcpy(line, buf2);
-			/*
-			char buf[2048];
-			char* line_old = line;
-			char* procedure_name = strcatalloc(line + strlen("..decl_farproc:"), "");
-			if(!procedure_name){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			buf[2047] = 0;
-			sprintf(buf, "VAR#%s#sc%%%lu%%;la%lu;farcall;", procedure_name, outputcounter & 0xFFff, outputcounter >>16);
-			line = strcatalloc(buf,"");
-			if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-			free(line_old);
-			free(procedure_name);
-
-			*/
+		} else if(strprefix("..decl_lfarproc:", (char*) line)){
+			my_strcpy(buf1, line + strlen("..decl_lfarproc:"));
+			sprintf((char*)buf2, "VAR#%s#cpcr;ac;sc%%%lu%%;farcall;", buf1, outputcounter & 0xFFff);
+			my_strcpy(line, buf2);
 		} else if(strprefix("..decl_farproc(" /*)*/, (char*)line)){
 			long loc_colon = -1;
 			unsigned long regioncode;

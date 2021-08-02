@@ -7,7 +7,7 @@
 #endif
 
 #define k case
-/*Would require edit if you wanted a 32 bit PC*/
+
 
 #define SET_PCR(val) (program_counter_region = val)
 #define GET_PCR() (program_counter_region)
@@ -368,8 +368,8 @@ G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
 G_STA:write_byte(a,CONSUME_TWO_BYTES)D
 G_STB:write_byte(b,CONSUME_TWO_BYTES)D
-G_JMPIFEQ:if(a==1)SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
-G_JMPIFNEQ:if(a!=1)SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
+G_JMPIFEQ:if(a==1)SET_PC(c);D
+G_JMPIFNEQ:if(a!=1)SET_PC(c);D
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
@@ -407,16 +407,16 @@ G_FARPAGEST:{
 G_LFARPC:
 SET_PCR(a);
 SET_PC(0);
-D/*Would require edit if you wanted a 32 bit PC*/
+D
 G_CALL:
-write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
-SET_PC(c);D/*Would require edit if you wanted a 32 bit PC*/
-G_RET:SET_PC(Z_POP_TWO_BYTES_FROM_STACK);D/*Would require edit if you wanted a 32 bit PC*/
+write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;
+SET_PC(c);D
+G_RET:SET_PC(Z_POP_TWO_BYTES_FROM_STACK);D
 G_FARCALL:
-	write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;/*Would require edit if you wanted a 32 bit PC*/
-	write_byte(GET_PCR(),stack_pointer);stack_pointer+=1;/*Would require edit if you wanted a 32 bit PC*/
-	SET_PCR(a);/*Would require edit if you wanted a 32 bit PC*/
-	SET_PC(c);/*Would require edit if you wanted a 32 bit PC*/
+	write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;
+	write_byte(GET_PCR(),stack_pointer);stack_pointer+=1;
+	SET_PCR(a);
+	SET_PC(c);
 D
 G_FARRET:
 	stack_pointer-=1;
@@ -494,7 +494,7 @@ G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
 G_APOP:stack_pointer-=1;a=M[stack_pointer]D
 G_BPOP:stack_pointer-=1;b=M[stack_pointer]D
-/*Would require edit if you wanted a 32 bit PC*/
+
 G_INTERRUPT:
 {
 	STASH_REGS;
