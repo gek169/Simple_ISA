@@ -479,6 +479,7 @@ U9:
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	REG_SAVER[current_task].program_counter_region = 0;
 	REG_SAVER[current_task].program_counter = 0;
+	REG_SAVER[current_task].stack_pointer = 0;
 #ifndef NO_PREEMPT
 	REG_SAVER[current_task].instruction_counter = 0; /*So that if we drop back in, the IC doesnt immediately kick in.*/
 #endif
