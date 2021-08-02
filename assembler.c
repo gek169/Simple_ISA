@@ -4,7 +4,7 @@
 #include "d.h"
 #include "isa.h"
 
-static char* outfilename = "outs16.bin";
+static char* outfilename = "sisa16.dsk"; /*Default to creating a disk image.*/
 static const char* fail_msg = "\r\n<ASM> Assembler Aborted.\r\n";
 static const char* compil_fail_pref = "<ASM COMPILATION ERROR>";
 static const char* syntax_fail_pref = "<ASM SYNTAX ERROR>";
