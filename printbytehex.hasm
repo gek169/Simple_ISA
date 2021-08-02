@@ -4,7 +4,8 @@
 ..decl_farproc(LIBC_REGION):proc_printbytehex
 ..export"proc_printbytehex"
 	//retrieve our argument.
-		astp;lb4;sub;ca;ilda;
+//		astp;lb4;sub;ca;ilda;
+		pop %3%; apop; push %4%;
 	//push it
 		apush
 		lb 4;rsh;
@@ -56,7 +57,7 @@ farret
 ..decl_farproc(LIBC_REGION):proc_printbytelchex
 ..export"proc_printbytelchex"
 	//retrieve our argument.
-		astp;lb4;sub;ca;ilda;
+		pop %3%; apop; push %4%;
 	//push it
 		apush
 		lb 4;rsh;
