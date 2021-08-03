@@ -307,6 +307,7 @@ const void* const goto_table[256] = {
 &&G_HALT,
 &&G_HALT,
 &&G_HALT,
+
 &&G_HALT
 };
 #endif
