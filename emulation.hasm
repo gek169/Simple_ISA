@@ -10,17 +10,13 @@
 
 //These four nops are very important.
 nop;nop;nop;nop;
-farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%; //HUGE NOTE: upon a boot of the libc, this will load zeroes.
+ldrx0 %libc_krenel_stack_data_store%; //HUGE NOTE: upon a boot of the libc, this will load zeroes.
 farstrx0 %&0%
 .libc_krenel_jumploc:@+1+
 lrx0 %/libc_booter%;
 farjmprx0;
 :libc_krenel_stack_data_store:
 nop;nop;nop;nop;
-
-//		TODO- make this work somehow.
-//		:libc_krenel_jumploc:
-//		bytes %/libc_booter%;
 
 //krenel constants:
 //MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
@@ -127,8 +123,8 @@ bytes 0,0;
 bytes 0,1;
 
 ..decl_lproc:libc_lproc_krenel_configure_segment
-		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%
-		farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%
+		llda %libc_krenel_active_task_index%
+		lldb %libc_krenel_owns_segment_index%
 		cmp;
 		sc %libc_krenel_configure_segment_make_own_segment%; jmpifeq;
 			//we don't own it! The mask and offset should be configured to prevent any form of segment access, it should always generate an error.
@@ -157,10 +153,10 @@ bytes 0,1;
 		lla %0xE000%; interrupt;
 		
 	//Set the active task's info.
-		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	
-		la 0; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
-		la 0; farstla %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
-		la 1; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+		la 0; stla  %libc_krenel_task_nreturns%;	
+		la 0; stla  %libc_krenel_active_task_index%;
+		la 0; stla  %libc_krenel_owns_segment_index%;
+		la 1; stla  %libc_krenel_segment_lock%;
 
 	//Set all tasks to be zero
 		lb0;rx0b; 
@@ -178,7 +174,7 @@ bytes 0,1;
 	//PID 0 is the initial program... make it 1.
 		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
 		la 1;
-		farstla %~LIBC_REGION%,  %libc_krenel_task_isactive_array%;
+		stla   %libc_krenel_task_isactive_array%;
 		la 0; task_set;
 	//get that important argument back!
 		rx0pop;
@@ -196,7 +192,7 @@ bytes 0,1;
 		
 		emulate;
 	//restore stack integrity.
-		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
+		ldrx0 %libc_krenel_stack_data_store%
 		farstrx0 %&0%
 	//a holds the return value. CHECK IT.
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -272,7 +268,7 @@ bytes 0,1;
 			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_getpid:
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			llda %libc_krenel_active_task_index%;
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
@@ -284,7 +280,7 @@ bytes 0,1;
 			apop;
 			user_farista;	//write it!
 			//Re-set our active task.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			llda %libc_krenel_active_task_index%;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_kill_pid:
@@ -293,7 +289,7 @@ bytes 0,1;
 			lb libc_krenel_max_active_tasks_mask; 
 			and;
 			apush;
-			farlldb %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			lldb %libc_krenel_active_task_index%;
 			cmp; bpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
 
 			ab;apush;
@@ -305,7 +301,7 @@ bytes 0,1;
 			apop;task_set; task_kill;
 
 			//Re-set our active task.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			llda %libc_krenel_active_task_index%;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_flush_stdout:
@@ -328,39 +324,39 @@ bytes 0,1;
 			la 4; interrupt; 
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_become_av_provider:
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			llda %libc_krenel_active_task_index%;
 			aincr; ba;
 			la 7; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_releasesegment:
 			//Do we already own the segment? If not, then, don't unlock it.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			llda %libc_krenel_active_task_index%;
+			lldb %libc_krenel_owns_segment_index%;
 			cmp;
 			sc %libc_krenel_syscall_ret0_failure%; 
 			jmpifneq;
 			//We own the segment. Unlock it.
-			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			la 0; stla  %libc_krenel_segment_lock%;
 			la 1; user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ownsegment:
 			//Do we already own the segment? If so, lock it.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			llda %libc_krenel_active_task_index%;
+			lldb %libc_krenel_owns_segment_index%;
 			cmp;
 			sc %libc_krenel_syscall_ownsegment_already_own_pleaselock%; jmpifeq;
 			
 			//is the segment locked?
-			farllda %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			llda %libc_krenel_segment_lock%;
 			lb 1; cmp;
 			sc %libc_krenel_syscall_ret0_failure%; jmpifeq;
 
 			//We can own the segment!
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			farstla %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			llda %libc_krenel_active_task_index%;
+			stla  %libc_krenel_owns_segment_index%;
 			libc_lproc_krenel_configure_segment;
 		:libc_krenel_syscall_ownsegment_already_own_pleaselock:
-			la 1; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			la 1; stla  %libc_krenel_segment_lock%;
 			la 1; user_seta; //success!
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ret0_failure:
@@ -467,10 +463,10 @@ bytes 0,1;
 			libc_krenel_syscall_exec_found_that_pid:
 				//First, tell our previous user that we succeeded.
 				la 1;user_seta;
-				la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
+				la 0; stla  %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 				//It is in RX0.
 				arx0;task_set;
-				farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+				stla  %libc_krenel_active_task_index%;
 
 				//Mark it as running.
 				lb 2; mul; ba;
@@ -495,7 +491,7 @@ bytes 0,1;
 				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				emulate;
 			//restore stack integrity.
-				farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
+				ldrx0 %libc_krenel_stack_data_store%
 				farstrx0 %&0%
 				//We have switched task, as commanded. A holds our return value. CHECK IT...
 				sc %libc_krenel_cswitch_looptop%; jmp;
@@ -522,7 +518,7 @@ bytes 0,1;
 			libc_krenel_syscall_fork_found_that_pid:
 				//First, tell our previous user that we succeeded.
 				la 1; user_seta;
-				la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns.
+				la 0; stla  %libc_krenel_task_nreturns%;	//Reset the number of returns.
 				//The new PID is in RX0.
 				arx0;apush;
 				
@@ -535,12 +531,12 @@ bytes 0,1;
 					apop;apush;task_set; //Into new user memory.
 					lla %libc_krenel_diskio_page%;
 					user_farpagest;
-					farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+					llda %libc_krenel_active_task_index%;
 					task_set;
 					rxincr;rxcmp;nota; 
 					sc %libc_krenel_syscall_fork_copymem_looptop%; jmpifeq; //if(++rx0 < rx1) jmp
 
-				apop; task_set; farstla %~LIBC_REGION%, %libc_krenel_active_task_index%;
+				apop; task_set; stla  %libc_krenel_active_task_index%;
 				
 
 				//Mark it as running.
@@ -560,9 +556,9 @@ bytes 0,1;
 				sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_end:
 			//Syscalls are expensive.
-			farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
+			llda %libc_krenel_task_nreturns%;
 			lb 3; add;
-			farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
+			stla  %libc_krenel_task_nreturns%;
 			sc %libc_krenel_preempt%; jmp;
 	libc_krenel_getchar:
 		getchar;user_seta;sc %libc_krenel_preempt%; jmp;
@@ -597,9 +593,9 @@ bytes 0,1;
 		sc %libc_krenel_cswitch_killtask%; jmp;
 	libc_krenel_preempt:
 		//Check for need of a task switch.
-		farllda %~LIBC_REGION%, %libc_krenel_task_nreturns%;
+		llda %libc_krenel_task_nreturns%;
 		aincr;
-		farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;
+		stla  %libc_krenel_task_nreturns%;
 		llb %libc_krenel_max_returns%; cmp; lb 2; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
 		//We already configured the segment.
 		priv_drop;
@@ -608,7 +604,7 @@ bytes 0,1;
 		//Kill the current task.
 			task_kill;
 		//Set active task to be in the "dead" state- 0.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+			llda %libc_krenel_active_task_index%;
 			lb libc_krenel_max_active_tasks_mask; and;
 			lb 2;mul;ba;
 			sc %LIBC_REGION%;
@@ -616,21 +612,21 @@ bytes 0,1;
 			add;ba;
 			la 0; faristla;
 		//Does this dead task own the segment? If not, then, don't unlock it.
-			farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
-			farlldb %~LIBC_REGION%, %libc_krenel_owns_segment_index%;
+			llda %libc_krenel_active_task_index%;
+			lldb %libc_krenel_owns_segment_index%;
 			cmp; 
 			sc %libc_krenel_try_select_task%; 
 			jmpifneq;
 		//It owns the segment. Unlock it.
-			la 0; farstla %~LIBC_REGION%, %libc_krenel_segment_lock%;
+			la 0; stla  %libc_krenel_segment_lock%;
 	libc_krenel_try_select_task:
 		task_ric; //Reset the current task's instruction counter.
 		la 1; interrupt; //Check for quit signal. Also pumps the keyboard...
 		llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq; //quit if we should!
 		lb 0; rx2b;	//RX2: the number of things we have tried.
-		la 0; farstla %~LIBC_REGION%, %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
+		la 0; stla  %libc_krenel_task_nreturns%;	//Reset the number of returns for our old task.
 		lb libc_krenel_max_active_tasks_mask; rx1b;
-		farllda %~LIBC_REGION%, %libc_krenel_active_task_index%;
+		llda %libc_krenel_active_task_index%;
 		rx3a;//RX3: our counter.
 	libc_krenel_try_select_task_loop:
 		//Loop from where we are, and around again. If we find a task to execute... execute it!
@@ -657,7 +653,7 @@ bytes 0,1;
 		arx3;
 		task_set; 
 		task_ric;
-		farstla %~LIBC_REGION%, %libc_krenel_active_task_index%
+		stla  %libc_krenel_active_task_index%
 		libc_lproc_krenel_configure_segment;
 		priv_drop;
 		//We have a return argument to respond to!

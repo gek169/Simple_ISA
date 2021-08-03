@@ -1,4 +1,4 @@
-static char* insns[227] = {
+static char* insns[231] = {
 	"halt", /*0*/
 	"lda",
 	"la",
@@ -249,9 +249,13 @@ static char* insns[227] = {
 	"ldrx1",
 	"ldrx2",
 	"ldrx3",
-	"ldc"
+	"ldc",
+	"strx0",
+	"strx1",
+	"strx2",
+	"strx3"
 };
-static unsigned char insns_numargs[227] = {
+static unsigned char insns_numargs[231] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -379,9 +383,10 @@ static unsigned char insns_numargs[227] = {
 		/*local addressing extension- all of these take two bytes as argument.*/
 		2,2,
 		2,2,2,2,
-		2
+		2,
+		2,2,2,2
 };
-static char* insn_repl[227] = {
+static char* insn_repl[231] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -644,5 +649,10 @@ static char* insn_repl[227] = {
 		"bytes225,",
 		/*ldc*/
 		"bytes226,",
+		/*strx*/
+		"bytes227,",
+		"bytes228,",
+		"bytes229,",
+		"bytes230,",
 };
-static const unsigned int n_insns = 227;
+static const unsigned int n_insns = 231;
