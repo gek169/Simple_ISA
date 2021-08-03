@@ -6,7 +6,7 @@
 section 1000;
 .proc_printbytehex:sc %1000%;call;
 	//retrieve our argument.
-	astp;lb3;sub;ca;ilda;
+	pop %3%; apop; push %4%;
 	//push it
 	apush;
 	lb 4;rsh;
