@@ -183,7 +183,7 @@
 			rx0_2; rxincr; rx2_0;sc %bf_LEXER_looptop%; jmp;
 	bf_LEXER_final:
 		ldrx0 %bf_LEXER_lbracket_count%
-		ldrx0 %bf_LEXER_rbracket_count%
+		ldrx1 %bf_LEXER_rbracket_count%
 		rxcmp
 		sc %bf_LEXER_failure%; jmpifneq
 	lb 0; rx0b; //success.	
