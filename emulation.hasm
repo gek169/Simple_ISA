@@ -452,10 +452,10 @@ bytes 0,1;
 			libc_krenel_syscall_exec_findfreepid_looptop:
 				arx0;
 				lb 2;mul;ba
-				sc %LIBC_REGION%;
+				//sc %LIBC_REGION%;
 				lla %libc_krenel_task_isactive_array%;
 				add;ba;
-				farillda;
+				illdab; //MARKED
 				nota;
 				sc %libc_krenel_syscall_exec_found_that_pid%; jmpifeq;
 				rxincr;rxcmp;
@@ -507,10 +507,10 @@ bytes 0,1;
 			libc_krenel_syscall_fork_findfreepid_looptop:
 				arx0;
 				lb 2;mul;ba
-				sc %LIBC_REGION%;
+				//sc %LIBC_REGION%;
 				lla %libc_krenel_task_isactive_array%;
 				add;ba;
-				farillda;
+				illdab; //MARKED
 				nota;
 				sc %libc_krenel_syscall_fork_found_that_pid%; jmpifeq;
 				rxincr;rxcmp;
@@ -637,10 +637,10 @@ bytes 0,1;
 			rxand; //we're using the mask.
 			rx3_0;
 			arx3;lb 1;lsh;ba;
-			sc %LIBC_REGION%;
+			//sc %LIBC_REGION%;
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
-			farillda;
+			illdab;
 		//Did we find it? 1 is already the value for "equals" so we dont need to compare it.
 			sc %libc_krenel_found_pid_to_run%; jmpifeq;
 		//We didn't! Should we quit?
