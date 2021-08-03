@@ -8,7 +8,8 @@
 ..decl_farproc(LIBC_REGION):proc_wait
 ..export"proc_wait"
 	//	retrieve our argument and store it in RX0.
-	astp;lb5;sub;illdaa;rx0a;
+	//astp;lb5;sub;illdaa;rx0a;
+	pop %3%; alpop; push %5%; rx0a;
 	//	store the start time in RX1
 	clock;				rx1a;
 	//loop.

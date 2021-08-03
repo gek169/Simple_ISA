@@ -114,7 +114,7 @@ bytes '\r' ,'\n', 0;
 		//bootloader written here
 		//This is written at 0: la 55, lfarpc
 		sc %0%; 
-		lb 0;la 2; farista;
+		lb 0; la 2; farista;
 		lb 1; la 55; farista;
 		lb 2; la 0x44; farista;
 		lla %0xDE06%; 

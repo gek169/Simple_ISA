@@ -9,11 +9,6 @@
 
 ..decl_farproc(LIBC_REGION):proc_gets
 ..export"proc_gets"
-	//Grab the far pointer.
-//	astp; lb 6; sub; ca; ildb;
-//	rx0b; lb16; rx1b; rxlsh;
-//	aincr; ca; illdb; 
-//	rx1b; rxadd;
 	//It's in RX0.
 	rx3_0;
 	lb0;rx2b;
@@ -96,11 +91,6 @@ farret;
 //GETS_NOECHO
 //Clobbers: A, B, C, RX0, RX1, RX2, RX3
 ..decl_farproc(LIBC_REGION):proc_gets_noecho
-	//Grab the far pointer.
-//	astp; lb 6; sub; ca; ildb;
-//	rx0b; lb16; rx1b; rxlsh;
-//	aincr; ca; illdb; 
-//	rx1b; rxadd;
 	//It's in RX0.
 	rx3_0;
 	lb0;rx2b;

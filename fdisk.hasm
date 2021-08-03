@@ -24,22 +24,3 @@
 	farret
 
 //Functions for Krenel.
-
-//Create a file with a name, starting page, and size.
-..decl_lproc:libc_lproc_krenel_create_file
-	//TODO
-	ret
-
-//delete a file from disk.
-..decl_lproc:libc_lproc_krenel_delete_file
-	//TODO
-	ret
-
-//Attempt to find free pages.
-..decl_lproc:libc_lproc_krenel_find_free_pages
-	//TODO
-	ret
-
-..decl_lproc:libc_lproc_krenel_load_filetable
-	//TODO
-	ret
