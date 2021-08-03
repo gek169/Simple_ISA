@@ -938,8 +938,8 @@ G_AA12:{SUU SRX0, SRX1;
 		write_4bytes(RX0, flight);
 	}D
 	G_AA21:{UU flight;
-			flight = CONSUME_THREE_BYTES;
-			write_4bytes(RX1, flight);
+		flight = CONSUME_THREE_BYTES;
+		write_4bytes(RX1, flight);
 	}D
 	G_AA22:{UU flight;
 		flight = CONSUME_THREE_BYTES;
