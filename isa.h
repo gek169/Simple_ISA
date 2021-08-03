@@ -41,6 +41,8 @@
 #define Z_READ_TWO_BYTES_THROUGH_C ((((U)M[GET_EFF_C()])<<8) | (U)M[GET_EFF_C_PLUS(1)])
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[GET_EFF_A()])<<8) | (U)M[GET_EFF_A_PLUS(1)])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[GET_EFF_B()])<<8) | (U)M[GET_EFF_B_PLUS(1)])
+
+
 #define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8) | (U)M[stack_pointer+1])
 #define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
 										(((UU)M[stack_pointer])<<24)|\
@@ -59,9 +61,9 @@
 											(  (UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
 											)
 #define write_byte(v,d)		M[d]=v;
-#define write_2bytes(v,d)	{UU tmp = d; U vuv = v; M[tmp]=					(vuv)>>8;\
+#define write_2bytes(v,d)	{UU tmp = (d) & 0xffFFff;  U vuv = v; M[tmp]=					(vuv)>>8;\
 													M[(tmp+1)&0xFFffFF]=	vuv;}
-#define write_4bytes(v,d)	{UU tmp = d;UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
+#define write_4bytes(v,d)	{UU tmp = (d) & 0xffFFff; UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
 													M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
 													M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
 													M[(tmp+3)&0xFFffFF]=	(vuv);}
@@ -378,7 +380,7 @@ G_COMPL:a=~a;D
 G_CPC:c=GET_PC();D
 G_LDA:a=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES) ]D
 G_LA:a=CONSUME_BYTE;D
-G_LDB:b=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES)]D
+G_LDB:b=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES) ]D
 G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
 G_STA:write_byte(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D

@@ -376,9 +376,10 @@ static unsigned char insns_numargs[227] = {
 		/*user_farpagel and st*/
 		0,
 		0,
-		/*local addressing extension*/
-		2,2,2,
-		2,2,2,2
+		/*local addressing extension- all of these take two bytes as argument.*/
+		2,2,
+		2,2,2,2,
+		2
 };
 static char* insn_repl[227] = {
 	"bytes0;", 
@@ -634,7 +635,7 @@ static char* insn_repl[227] = {
 		"bytes218;",
 		"bytes219;",
 		/*local addressing extension*/
-		"bytes220,",
+		"bytes220,", /*llda*/
 		"bytes221,",
 		/*ldrx0*/
 		"bytes222,",

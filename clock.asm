@@ -42,7 +42,6 @@ bytes 0xd, 0xa;
 ..main(5):
 	//containerize execution of the clock.
 	lrx0 %/Lbl_clock_start%;
-	llb %0xEEEE%;
 	proc_krenel;
 	la '\n';putchar;
 	la '\r';putchar;
@@ -52,7 +51,9 @@ bytes 0xd, 0xa;
 
 	
 	:Lbl_clock_start:
-	la '\n'; interrupt;
+	la 'f'; putchar;
+	la 'f'; putchar;
+	la '\n';putchar; interrupt;
 	push %5%;
 	clock;
 	st_secs_b;
