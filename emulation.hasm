@@ -186,10 +186,14 @@ bytes 0,1;
 	//We must copy three bytes, so we do 4 for speed's sake.
 		farldrx0 %&0%
 		farstrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
-		sc %0%; la 2; ista; //la
-		adecr;ca;			//put 1 into c.
-		lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
+
+		//Has to be FIXED for the new sta
+		lb 0; cb; la 2; farista; //code for "la"
+		lb 1; la %~LIBC_REGION%; farista; //load libc's region into a.
+		lb 2; la 0x44; farista; //0x44 is lfarpc.
+
 		push %10%; libc_lproc_krenel_configure_segment; pop %10%;
+		
 		emulate;
 	//restore stack integrity.
 		farldrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
@@ -482,9 +486,12 @@ bytes 0,1;
 			//We must copy three bytes, so we do 4 for speed's sake.
 				farldrx0 %&0%
 				farstrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
-				sc %0%; la 2; ista; //la
-				adecr;ca;			//put 1 into c.
-				lla %~LIBC_REGION%, 0x44; istla;	//0x44 is the code for lfarpc.
+
+				//Has to be FIXED for the new sta
+				lb 0; cb; la 2; farista; //code for "la"
+				lb 1; la %~LIBC_REGION%; farista; //load libc's region into a.
+				lb 2; la 0x44; farista; //0x44 is lfarpc.
+
 				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				emulate;
 			//restore stack integrity.
