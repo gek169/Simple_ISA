@@ -75,7 +75,7 @@
 			sc %bf_interpreter_looptop%; jmp;
 			bf_leftbracket_do_jump_past:
 				lrx0 %/1%; 
-				farstrx0 %&brainfrick_bracket_parsing_depth%;
+				strx0 %brainfrick_bracket_parsing_depth%;
 				rx0_2; rxincr; rx2_0;
 				bf_leftbracket_looptop:
 					rx0_2; cbrx0; farilda;
@@ -88,15 +88,15 @@
 					sc %bf_leftbracket_looptop%; jmp;
 					
 					bf_leftbracket_found_leftbracket:
-						farldrx0 %&brainfrick_bracket_parsing_depth%; 
+						ldrx0 %brainfrick_bracket_parsing_depth%; 
 						rxincr;
-						farstrx0 %&brainfrick_bracket_parsing_depth%;
+						strx0 %brainfrick_bracket_parsing_depth%;
 						rx0_2; rxincr; rx2_0;
 						sc %bf_leftbracket_looptop%; jmp;	
 					bf_leftbracket_found_rightbracket:
-						farldrx0 %&brainfrick_bracket_parsing_depth%; 
+						ldrx0 %brainfrick_bracket_parsing_depth%; 
 						rxdecr;
-						farstrx0 %&brainfrick_bracket_parsing_depth%;
+						strx0 %brainfrick_bracket_parsing_depth%;
 						lb 0; rx1b; rxcmp;
 						sc %bf_leftbracket_loopend%; jmpifeq; //the break condition.
 						rx0_2; rxincr; rx2_0;
@@ -114,7 +114,7 @@
 
 			bf_rightbracket_do_jump_past:
 				lrx0 %/1%; 
-				farstrx0 %&brainfrick_bracket_parsing_depth%;
+				strx0 %brainfrick_bracket_parsing_depth%;
 				rx0_2; rxdecr; rx2_0;
 				bf_rightbracket_looptop:
 					rx0_2; cbrx0; farilda;
@@ -126,17 +126,17 @@
 					rxdecr; rx2_0;
 					sc %bf_rightbracket_looptop%; jmp;
 					bf_rightbracket_found_leftbracket:
-						farldrx0 %&brainfrick_bracket_parsing_depth%; 
+						ldrx0 %brainfrick_bracket_parsing_depth%; 
 						rxdecr;
-						farstrx0 %&brainfrick_bracket_parsing_depth%;
+						strx0 %brainfrick_bracket_parsing_depth%;
 						lb 0; rx1b; rxcmp;
 						sc %bf_rightbracket_loopend%; jmpifeq; //the break condition.
 						rx0_2; rxdecr; rx2_0;
 						sc %bf_rightbracket_looptop%; jmp;	
 					bf_rightbracket_found_rightbracket:
-						farldrx0 %&brainfrick_bracket_parsing_depth%; 
+						ldrx0 %brainfrick_bracket_parsing_depth%; 
 						rxincr;
-						farstrx0 %&brainfrick_bracket_parsing_depth%;
+						strx0 %brainfrick_bracket_parsing_depth%;
 						rx0_2; rxdecr; rx2_0;
 						sc %bf_rightbracket_looptop%; jmp;
 			bf_rightbracket_loopend:
@@ -145,8 +145,8 @@
 
 ..decl_lproc:proc_bf_lex
 	lrx0 %/0%;
-	farstrx0 %&bf_LEXER_rbracket_count%;
-	farstrx0 %&bf_LEXER_lbracket_count%;
+	strx0 %bf_LEXER_rbracket_count%;
+	strx0 %bf_LEXER_lbracket_count%;
 	lrx0 %/brainfrick_program_memory%;
 	rx2_0;
 	bf_LEXER_looptop:
@@ -169,21 +169,21 @@
 		rx0b;
 		ret;
 		:bf_LEXER_found_lbracket:
-			farldrx0 %&bf_LEXER_lbracket_count%
+			ldrx0 %bf_LEXER_lbracket_count%
 			rxincr
-			farstrx0 %&bf_LEXER_lbracket_count%
+			strx0 %bf_LEXER_lbracket_count%
 			rx0_2; rxincr; rx2_0;
 			sc %bf_LEXER_looptop%; jmp;
 		bf_LEXER_found_rbracket:
-			farldrx0 %&bf_LEXER_rbracket_count%
+			ldrx0 %bf_LEXER_rbracket_count%
 			rxincr
-			farstrx0 %&bf_LEXER_rbracket_count%
+			strx0 %bf_LEXER_rbracket_count%
 			rx0_2; rxincr; rx2_0;sc %bf_LEXER_looptop%; jmp;
 		bf_LEXER_approved_character:
 			rx0_2; rxincr; rx2_0;sc %bf_LEXER_looptop%; jmp;
 	bf_LEXER_final:
-		farldrx0 %&bf_LEXER_lbracket_count%
-		farldrx1 %&bf_LEXER_rbracket_count%
+		ldrx0 %bf_LEXER_lbracket_count%
+		ldrx0 %bf_LEXER_rbracket_count%
 		rxcmp
 		sc %bf_LEXER_failure%; jmpifneq
 	lb 0; rx0b; //success.	

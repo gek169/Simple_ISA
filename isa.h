@@ -47,7 +47,7 @@
 */
 #define Z_READBYTE(memloc) ((UU)M[(memloc) & 0xffFFff])
 #define Z_READ2BYTES(memloc) (Z_READBYTE(memloc)<<8) | (Z_READBYTE(memloc+1))
-#define Z_READ4BYTES(memloc) (Z_READ2BYTES(memloc)<<16) | (Z_READ2BYTES(memloc+2))
+#define Z_READ4BYTES(memloc) (Z_READBYTE(memloc)<<24) | (Z_READBYTE(memloc+1)<<16) | (Z_READBYTE(memloc+2)<<8) | (Z_READBYTE(memloc+3))
 #define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 Z_READ2BYTES((((UU)c)<<16)|((UU)b))
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 Z_READ2BYTES((((UU)c)<<16)|((UU)a))
 #define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 Z_READ4BYTES((((UU)c)<<16)|((UU)a))
