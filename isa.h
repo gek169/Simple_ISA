@@ -50,16 +50,12 @@
 										(((UU)M[stack_pointer+2])<<8)|\
 										(UU)M[stack_pointer+3]\
 									)
-#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 ((((U)M[0xffFFff & ((((UU)c)<<16)|((UU)b)) ])<<8) \
-										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)b))+1) ])
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 ((((U)M[0xffFFff & ((((UU)c)<<16)|((UU)a))])<<8) \
-										| (U)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1)  ]   )
-#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 (\
-											(  ((UU)M[0xffFFff & ((((UU)c)<<16)|((UU)a))  ])          <<24)|\
-											(  ((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+1) ])   <<16)|\
-											(  ((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+2) ])   <<8)|\
-											(  (UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
-											)
+#define Z_READBYTE(memloc) ((UU)M[(memloc) & 0xffFFff])
+#define Z_READ2BYTES(memloc) (Z_READBYTE(memloc)<<8) | (Z_READBYTE(memloc+1))
+#define Z_READ4BYTES(memloc) (Z_READ2BYTES(memloc)<<16) | (Z_READ2BYTES(memloc+2))
+#define Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16 Z_READ2BYTES((((UU)c)<<16)|((UU)b))
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16 Z_READ2BYTES((((UU)c)<<16)|((UU)a))
+#define Z_FAR_MEMORY_READ_C_HIGH8_A_LOW16_4 Z_READ4BYTES((((UU)c)<<16)|((UU)a))
 #define write_byte(v,d)		M[(d) & 0xffFFff]=v;
 #define write_2bytes(v,d)	{UU TEMPORARY_VARIABLE = (d) & 0xffFFff;  U vuv = v; M[TEMPORARY_VARIABLE]=					(vuv)>>8;\
 													M[(TEMPORARY_VARIABLE+1)&0xFFffFF]=	vuv;}
@@ -789,14 +785,8 @@ G_FLTCMP: {
 }D
 #endif
 G_AA3:RX0=SEGMENT_PAGES;D
-G_AA4:RX0=(((UU)M[(RX1)&0xffFFff])<<24) | 
-			(((UU)M[(RX1+1)&0xffFFff])<<16) |
-			(((UU)M[(RX1+2)&0xffFFff])<<8) |
-			(((UU)M[(RX1+3)&0xffFFff]))D
-G_AA5:RX0=(((UU)M[(RX0)&0xffFFff])<<24) | 
-			(((UU)M[(RX0+1)&0xffFFff])<<16) |
-			(((UU)M[(RX0+2)&0xffFFff])<<8) |
-			(((UU)M[(RX0+3)&0xffFFff]))D
+G_AA4:RX0=Z_READ4BYTES(RX1)D
+G_AA5:RX0=Z_READ4BYTES(RX0)D
 G_AA6:SET_PCR(RX0>>16);SET_PC(RX0 & 0xffFF);D
 G_AA7:write_4bytes(RX0,RX1)D
 G_AA8:write_4bytes(RX1,RX0)D
@@ -969,7 +959,11 @@ G_AA12:{SUU SRX0, SRX1;
 	G_LOGAND: a = a && b;D
 	G_BOOLIFY: a = (a!=0)D
 	G_NOTA: a=(a==0)D
-	G_USER_FARISTA:if(EMULATE_DEPTH){R=15; goto G_HALT;} M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]=a D
+	G_USER_FARISTA:{
+		if(EMULATE_DEPTH){R=15; goto G_HALT;}
+	 	M_SAVER[current_task][ (((UU)c&255)<<16) | (UU)b]=a;
+	}
+	D
 	/*add more insns here. remember the free slots above!*/
 	G_TASK_RIC:
 #ifndef NO_PREEMPT
@@ -1010,65 +1004,49 @@ G_AA12:{SUU SRX0, SRX1;
 		b <<= 8;b |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
 	}D
 	G_LDRX0:{
-		U f = CONSUME_TWO_BYTES;
-		RX0 = M[GET_LOCAL_ADDR(f)];
-		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		RX0 = Z_READ4BYTES(f);
 	}D
 	G_LDRX1:{
-		U f = CONSUME_TWO_BYTES;
-		RX1 = M[GET_LOCAL_ADDR(f)];
-		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		RX1 = Z_READ4BYTES(f);
 	}D	
 	G_LDRX2:{
-		U f = CONSUME_TWO_BYTES;
-		RX2 = M[GET_LOCAL_ADDR(f)];
-		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		RX2 = Z_READ4BYTES(f);
 	}D
 	G_LDRX3:{
-		U f = CONSUME_TWO_BYTES;
-		RX3 = M[GET_LOCAL_ADDR(f)];
-		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		RX3 = Z_READ4BYTES(f);
 	}D
 	G_LDC:{
-		U f = CONSUME_TWO_BYTES;
-		c = M[GET_LOCAL_ADDR(f)];
-		c <<= 8;c |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		c = Z_READ2BYTES(f);
 	}D
 	G_STRX0:{
-		U f = CONSUME_TWO_BYTES;
-		M[GET_LOCAL_ADDR(f)] 				= RX0 >> 24;
-		M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff] = RX0 >> 16;
-		M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff] = RX0 >> 8;
-		M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff] = RX0;
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		write_4bytes(RX0, f);
 	}D
 	G_STRX1:{
-		U f = CONSUME_TWO_BYTES;
-		M[GET_LOCAL_ADDR(f)] 				= RX1 >> 24;
-		M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff] = RX1 >> 16;
-		M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff] = RX1 >> 8;
-		M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff] = RX1;
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		write_4bytes(RX1, f);
 	}D
 	G_STRX2:{
-		U f = CONSUME_TWO_BYTES;
-		M[GET_LOCAL_ADDR(f)] 				= RX2 >> 24;
-		M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff] = RX2 >> 16;
-		M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff] = RX2 >> 8;
-		M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff] = RX2;
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		write_4bytes(RX2, f);
 	}D
 	G_STRX3:{
-		U f = CONSUME_TWO_BYTES;
-		M[GET_LOCAL_ADDR(f)] 				= RX3 >> 24;
-		M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff] = RX3 >> 16;
-		M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff] = RX3 >> 8;
-		M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff] = RX3;
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		write_4bytes(RX3, f);
 	}D
 	G_HALT:
 	if(EMULATE_DEPTH == 0){
