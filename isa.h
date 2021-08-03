@@ -473,7 +473,6 @@ G_FARILDA:a=M[ (((UU)c&255)<<16) |  ((UU)b)]D
 G_FARISTA:write_byte(a,((((UU)c)<<16)|((UU)b)))D
 G_FARILDB:b=M[(((UU)c&255)<<16)|((UU)a)]D
 G_FARISTB:write_byte(b,((((UU)c)<<16)|((UU)a)))D
-
 TB: /**/
 {
 		if(EMULATE_DEPTH > 0) {R=15; goto G_HALT;}
