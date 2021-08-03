@@ -73,9 +73,6 @@
 		rxsub;	
 		la 0xd; putchar;
 			proc_prints;
-		la 32; putchar;
-		la 32; putchar;
-		la 32; putchar;
 		la '\r'; putchar;
 		la '\n'; interrupt;
 		sc %libc_gets_looptop%;jmp;
