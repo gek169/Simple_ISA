@@ -61,12 +61,12 @@
 											(  (UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
 											)
 #define write_byte(v,d)		M[d]=v;
-#define write_2bytes(v,d)	{UU tmp = (d) & 0xffFFff;  U vuv = v; M[tmp]=					(vuv)>>8;\
-													M[(tmp+1)&0xFFffFF]=	vuv;}
-#define write_4bytes(v,d)	{UU tmp = (d) & 0xffFFff; UU vuv = v; M[(tmp)&0xFFffFF]=		(vuv)>>24;\
-													M[(tmp+1)&0xFFffFF]=	(vuv)>>16;\
-													M[(tmp+2)&0xFFffFF]=	(vuv)>>8;\
-													M[(tmp+3)&0xFFffFF]=	(vuv);}
+#define write_2bytes(v,d)	{UU TEMPORARY_VARIABLE = (d) & 0xffFFff;  U vuv = v; M[TEMPORARY_VARIABLE]=					(vuv)>>8;\
+													M[(TEMPORARY_VARIABLE+1)&0xFFffFF]=	vuv;}
+#define write_4bytes(v,d)	{UU TEMPORARY_VARIABLE = (d) & 0xffFFff; UU vuv = v; M[(TEMPORARY_VARIABLE)&0xFFffFF]=		(vuv)>>24;\
+													M[(TEMPORARY_VARIABLE+1)&0xFFffFF]=	(vuv)>>16;\
+													M[(TEMPORARY_VARIABLE+2)&0xFFffFF]=	(vuv)>>8;\
+													M[(TEMPORARY_VARIABLE+3)&0xFFffFF]=	(vuv);}
 
 #define STASH_REG(XX)   UU XX##_stash = XX;
 #define UNSTASH_REG(XX) XX = XX##_stash;
@@ -369,9 +369,21 @@ G_ISTB:write_byte(b,GET_EFF_C())D
 G_ISTLA:write_2bytes(a,GET_EFF_C())D
 G_ISTLB:write_2bytes(b,GET_EFF_C())D
 G_JMP:program_counter=c;D
-G_STLA:write_2bytes(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_STLB:write_2bytes(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_STC:write_2bytes(c,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
+G_STLA:{
+	UU temp = (CONSUME_TWO_BYTES);
+	temp = GET_LOCAL_ADDR(temp);
+	write_2bytes(a,temp);
+}D
+G_STLB:{
+	UU temp = (CONSUME_TWO_BYTES);
+	temp = GET_LOCAL_ADDR(temp);
+	write_2bytes(b,temp);
+}D
+G_STC:{
+	UU temp = (CONSUME_TWO_BYTES);
+	temp = GET_LOCAL_ADDR(temp);
+	write_2bytes(c,temp);
+}D
 G_PUSH:stack_pointer+=CONSUME_TWO_BYTES;D
 G_POP:stack_pointer-=CONSUME_TWO_BYTES;D
 G_PUSHA:stack_pointer+=a;D
