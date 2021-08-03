@@ -144,6 +144,8 @@ bytes 0,1;
 
 ..decl_farproc(LIBC_REGION):proc_krenel
 ..export"proc_krenel"
+:LIBC_KRENEL_BEGIN:
+..export"LIBC_KRENEL_BEGIN"
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL STARTUP ROUTINE ~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -533,7 +535,7 @@ bytes 0,1;
 					user_farpagest;
 					llda %libc_krenel_active_task_index%;
 					task_set;
-					rxincr;rxcmp;nota; 
+					rxincr;rxcmp;nota;
 					sc %libc_krenel_syscall_fork_copymem_looptop%; jmpifeq; //if(++rx0 < rx1) jmp
 
 				apop; task_set; stla  %libc_krenel_active_task_index%;
@@ -710,5 +712,7 @@ bytes 0,1;
 	lrx0 %/libc_COMMAND_COM%;
 	proc_krenel;
 	halt;
+:LIBC_KRENEL_END:
+..export"LIBC_KRENEL_END"
 ..include"command_com.hasm"
 

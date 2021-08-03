@@ -24,6 +24,19 @@ bytes '\r' ,'\n', 0;
 
 //ENTER: exec 2048 on the command line!!!
 ..(55):
+
+	
+	// Overwrite the krenel. There is no way it would work if this was being done to krenel memory!
+			lrx0 %LIBC_REGION, %LIBC_KRENEL_BEGIN%;
+			lrx1 %LIBC_REGION, %LIBC_KRENEL_END%;
+			overwrite_krenel_looptop:
+				cbrx0;
+				la 0;
+				farista;
+				rxincr;
+				rxcmp;
+				sc %overwrite_krenel_looptop%; jmpifneq;
+
 	side_process_looptop:
 	la 'V';
 	putchar;
@@ -90,22 +103,12 @@ bytes '\r' ,'\n', 0;
 		push %10%; //make some room for that bootloader!
 		//Attempt to get a lock on the segment.
 		cpc;
-		la 'f'; putchar;
+		la 'q'; putchar;
 		la '\n'; putchar; interrupt;
 		lla %0xDE08%; syscall;
 		jmpifneq;
 
 
-//		//<TODO: needs update> Overwrite the krenel. There is no way it would work if this was being done to krenel memory.
-//		lrx0 %/0x20000%;
-//		lrx1 %/0x20480%;
-//		overwrite_krenel_looptop:
-//			cbrx0;
-//			la 0;
-//			farista;
-//			rxincr;
-//			rxcmp;
-//			sc %overwrite_krenel_looptop%; jmpifneq;
 
 		//exec region syscall.
 		lla %0xDE04%; lb 55; syscall;
@@ -113,12 +116,12 @@ bytes '\r' ,'\n', 0;
 		//Instead, fork it!
 		//bootloader written here
 		//This is written at 0: la 55, lfarpc
-		//sc %0%; 
-		//lb 0; la 2; farista;
-		//lb 1; la 55; farista;
-		//lb 2; la 0x44; farista;
-		//lla %0xDE06%; 
-		//syscall;
+//		sc %0%; 
+//		lb 0; la 2; farista;
+//		lb 1; la 55; farista;
+//		lb 2; la 0x44; farista;
+//		lla %0xDE06%; 
+//		syscall;
 		nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
 		proc_prints;
@@ -192,7 +195,7 @@ bytes '\r' ,'\n', 0;
 		lla %0xDE00%;lb 5;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 6;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 7;syscall; //Kill the other guy.
-		lla %0xDE00%;lb 8;syscall; //Kill ourselves. 8 wraps around to 0.
+		lla %0xDE00%;lb 1;syscall; //Kill ourselves. We are actually 1.
 		lb 0; rx1b; fltdiv
 		main_program_failure:
 		la 'f'; putchar;
