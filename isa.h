@@ -42,13 +42,17 @@
 #define Z_READ_TWO_BYTES_THROUGH_A ((((U)M[GET_EFF_A()])<<8) | (U)M[GET_EFF_A_PLUS(1)])
 #define Z_READ_TWO_BYTES_THROUGH_B ((((U)M[GET_EFF_B()])<<8) | (U)M[GET_EFF_B_PLUS(1)])
 
-
-#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,(((U)M[stack_pointer])<<8) | (U)M[stack_pointer+1])
+/*
+	Note the use of the comma operator.
+*/
+#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,\
+							(((U)M[stack_pointer])<<8)\
+							| (U)M[(stack_pointer+1) & 0xffFF])
 #define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
 										(((UU)M[stack_pointer])<<24)|\
-										(((UU)M[stack_pointer+1])<<16)|\
-										(((UU)M[stack_pointer+2])<<8)|\
-										(UU)M[stack_pointer+3]\
+										(((UU)M[(stack_pointer+1) & 0xffFF])<<16)|\
+										(((UU)M[(stack_pointer+2) & 0xffFF])<<8)|\
+										(UU)M[(stack_pointer+3) & 0xffFF]\
 									)
 #define Z_READBYTE(memloc) ((UU)M[(memloc) & 0xffFFff])
 #define Z_READ2BYTES(memloc) (Z_READBYTE(memloc)<<8) | (Z_READBYTE(memloc+1))
@@ -525,16 +529,33 @@ U9:
 #endif
 D
 UA:R=19;goto G_HALT;
-G_ALPUSH:	write_2bytes(a,stack_pointer);	stack_pointer+=2;D
-G_BLPUSH:	write_2bytes(b,stack_pointer);	stack_pointer+=2;D
-G_CPUSH:	write_2bytes(c,stack_pointer);	stack_pointer+=2;D
-G_APUSH:	write_byte(a,stack_pointer);	stack_pointer+=1;D
-G_BPUSH:	write_byte(b,stack_pointer);	stack_pointer+=1;D
+G_ALPUSH:	
+M[stack_pointer++] = a>>8;
+M[stack_pointer++] = a;
+D
+G_BLPUSH:	
+M[stack_pointer++] = b>>8;
+M[stack_pointer++] = b;
+D
+G_CPUSH:	
+M[stack_pointer++] = c>>8;
+M[stack_pointer++] = c;
+D
+G_APUSH:	
+M[stack_pointer++] = a;
+D
+G_BPUSH:
+M[stack_pointer++] = b;
+D
 G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
 G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
 G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
-G_APOP:stack_pointer-=1;a=M[stack_pointer]D
-G_BPOP:stack_pointer-=1;b=M[stack_pointer]D
+G_APOP:
+	stack_pointer-=1;a=M[stack_pointer];
+D
+G_BPOP:
+	stack_pointer-=1;b=M[stack_pointer];
+D
 
 G_INTERRUPT:
 {
@@ -645,10 +666,30 @@ YB:if(RX1!=0)RX0=(RX0%RX1)&0xffFFffFF;else{R=4;goto G_HALT;}D
 YC:RX0=(RX0>>(RX1))&0xffFFffFF;D
 YD:RX0=(RX0<<(RX1))&0xffFFffFF;D
 /*pushes*/
-YE:write_4bytes(RX0, stack_pointer);stack_pointer+=4;D
-YF:write_4bytes(RX1, stack_pointer);stack_pointer+=4;D
-Z0:write_4bytes(RX2, stack_pointer);stack_pointer+=4;D
-Z1:write_4bytes(RX3, stack_pointer);stack_pointer+=4;D
+YE:
+M[stack_pointer++] = RX0>>24;
+M[stack_pointer++] = RX0>>16;
+M[stack_pointer++] = RX0>>8;
+M[stack_pointer++] = RX0;
+D
+YF:
+M[stack_pointer++] = RX1>>24;
+M[stack_pointer++] = RX1>>16;
+M[stack_pointer++] = RX1>>8;
+M[stack_pointer++] = RX1;
+D
+Z0:
+M[stack_pointer++] = RX2>>24;
+M[stack_pointer++] = RX2>>16;
+M[stack_pointer++] = RX2>>8;
+M[stack_pointer++] = RX2;
+D
+Z1:
+M[stack_pointer++] = RX3>>24;
+M[stack_pointer++] = RX3>>16;
+M[stack_pointer++] = RX3>>8;
+M[stack_pointer++] = RX3;
+D
 /*pops*/
 Z2:RX0=Z_POP_FOUR_BYTES_FROM_STACK;D
 Z3:RX1=Z_POP_FOUR_BYTES_FROM_STACK;D
