@@ -690,7 +690,7 @@ bytes 0,1;
 
 //If you directly boot the libc, this is what you boot into.
 :libc_booter:
-	//restore the nops at zero.
+	//restore the nops at zero. We are in the zero region, so we don't actually have to do any far memory indexing.
 	la 0x1E;
 	sta %0%;
 	sta %1%;
