@@ -371,7 +371,11 @@ G_ISTLB:write_2bytes(b,GET_EFF_C())D
 G_JMP:program_counter=c;D
 G_STLA:write_2bytes(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
 G_STLB:write_2bytes(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_STC:write_2bytes(c,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
+G_STC:{
+	UU tmp = CONSUME_TWO_BYTES;
+	tmp = GET_LOCAL_ADDR(tmp);
+	write_2bytes(c,tmp);
+}D
 G_PUSH:stack_pointer+=CONSUME_TWO_BYTES;D
 G_POP:stack_pointer-=CONSUME_TWO_BYTES;D
 G_PUSHA:stack_pointer+=a;D
@@ -380,26 +384,41 @@ G_ASTP:a=stack_pointer;D
 G_BSTP:b=stack_pointer;D
 G_COMPL:a=~a;D
 G_CPC:c=GET_PC();D
-G_LDA:a=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES) ]D
+G_LDA:{
+	UU tmp = CONSUME_TWO_BYTES;
+	tmp = GET_LOCAL_ADDR(tmp);
+	a=M[ tmp ];
+}D
 G_LA:a=CONSUME_BYTE;D
-G_LDB:b=M[ GET_LOCAL_ADDR(CONSUME_TWO_BYTES) ]D
+G_LDB:{
+	UU tmp = CONSUME_TWO_BYTES;
+	tmp = GET_LOCAL_ADDR(tmp);
+	b=M[ tmp ];
+}
+	D
 G_LB:b=CONSUME_BYTE;D
 G_SC:c=CONSUME_TWO_BYTES;D
-G_STA:write_byte(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_STB:write_byte(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_JMPIFEQ:if(a==1)SET_PC(c);D
-G_JMPIFNEQ:if(a!=1)SET_PC(c);D
+G_STA:{
+	UU tmp = CONSUME_TWO_BYTES;
+	tmp = GET_LOCAL_ADDR(tmp);
+	write_byte(a,tmp);
+}D
+G_STB:{
+	UU tmp = CONSUME_TWO_BYTES;
+	tmp = GET_LOCAL_ADDR(tmp);
+	write_byte(b,tmp);
+}D
+G_JMPIFEQ:if(a==1){SET_PC(c);}D
+G_JMPIFNEQ:if(a!=1){SET_PC(c);}D
 G_ADD:a+=b;D
 G_SUB:a-=b;D
 G_MUL:a*=b;D
 G_DIV:{if(b!=0)a/=b;else{R=1;goto G_HALT;}}D
 G_MOD:{if(b!=0)a%=b;else{R=2;goto G_HALT;}}D
 G_CMP:
-
 if(a<b)a=0;
 else if(a>b) a=2;
 else a=1;
-
 D
 G_FARILLDA:a=Z_FAR_MEMORY_READ_C_HIGH8_B_LOW16;D
 G_FARISTLA:write_2bytes(a,  ((((UU)c)<<16)|((UU)b))  )D
