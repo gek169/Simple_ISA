@@ -7,7 +7,7 @@
 section 1000;
 .proc_printbytehex:sc %1000%;call;
 	//retrieve our argument.
-	pop %3%; apop; push %4%;
+	pop %2%; apop; push %3%;
 	//push it
 	apush;
 	lb 4;rsh;
@@ -57,17 +57,14 @@ ret;
 
 section 500;
 	:L_main:
-		getchar;putchar; 
+		getchar;putchar;
 		lb 0x30;sub;
 		apush;
-		proc_printbytehex;
-		proc_printbytehex;
-		proc_printbytehex;
 		la 0xa; putchar; la 0xd; putchar;interrupt;
 		getchar;putchar;
 		lb 0x30;sub;
-		//bpop;
-		//mul;
+		bpop;
+		mul;
 		apush;
 		la 0xa; putchar; la 0xd; putchar;interrupt
 		proc_printbytehex;
