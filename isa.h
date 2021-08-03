@@ -452,8 +452,8 @@ SET_PC(c);D
 G_RET:
 {
 	U tmp;
-	stack_pointer--;tmp=M[stack_pointer];
-	stack_pointer--;tmp <<= 8;tmp=M[stack_pointer];
+	stack_pointer--;tmp =M[stack_pointer];
+	stack_pointer--;tmp|=(((UU)M[stack_pointer])<<8);
 	SET_PC(tmp);
 }
 D
@@ -467,10 +467,9 @@ D
 G_FARRET:
 {
 	U tmp;
-	stack_pointer--;
-	SET_PCR(M[stack_pointer]);
-	stack_pointer--;tmp = M[stack_pointer];
-	stack_pointer--;tmp <<= 8;tmp = M[stack_pointer];
+	stack_pointer--;SET_PCR(M[stack_pointer]);
+	stack_pointer--;tmp =M[stack_pointer];
+	stack_pointer--;tmp|=(((UU)M[stack_pointer])<<8);
 	SET_PC(tmp);
 }
 D
@@ -553,25 +552,22 @@ G_BPUSH:
 	M[stack_pointer] = b;		stack_pointer++;
 D
 G_ALPOP:
-stack_pointer--;
-a=M[stack_pointer];
-stack_pointer--;
-a <<= 8;
-a=M[stack_pointer];
+	stack_pointer--;
+	a=M[stack_pointer];
+	stack_pointer--;
+	a|= (((UU)M[stack_pointer])<<8);
 D
 G_BLPOP:
-stack_pointer--;
-b=M[stack_pointer];
-stack_pointer--;
-b <<= 8;
-b=M[stack_pointer];
+	stack_pointer--;
+	b=M[stack_pointer];
+	stack_pointer--;
+	b|= (((UU)M[stack_pointer])<<8);
 D
 G_CPOP:
-stack_pointer--;
-c=M[stack_pointer];
-stack_pointer--;
-c <<= 8;
-c=M[stack_pointer];
+	stack_pointer--;
+	c=   M[stack_pointer];
+	stack_pointer--;
+	c|= (((UU)M[stack_pointer])<<8);
 D
 G_APOP:
 	stack_pointer-=1;a=M[stack_pointer];
@@ -715,28 +711,28 @@ M[stack_pointer++] = RX3;
 D
 /*pops*/
 Z2:
-stack_pointer--;RX0=M[stack_pointer];
-stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
-stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
-stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
+	stack_pointer--; RX0=M[stack_pointer];
+	stack_pointer--; RX0 |= (((UU)M[stack_pointer])<<8);
+	stack_pointer--; RX0 |= (((UU)M[stack_pointer])<<16);
+	stack_pointer--; RX0 |= (((UU)M[stack_pointer])<<24);
 D
 Z3:
-stack_pointer--;RX1=M[stack_pointer];
-stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
-stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
-stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
+	stack_pointer--; RX1=M[stack_pointer];
+	stack_pointer--; RX1 |= (((UU)M[stack_pointer])<<8);
+	stack_pointer--; RX1 |= (((UU)M[stack_pointer])<<16);
+	stack_pointer--; RX1 |= (((UU)M[stack_pointer])<<24);
 D
 Z4:
-stack_pointer--;RX2=M[stack_pointer];
-stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
-stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
-stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
+	stack_pointer--; RX2=M[stack_pointer];
+	stack_pointer--; RX2 |= (((UU)M[stack_pointer])<<8);
+	stack_pointer--; RX2 |= (((UU)M[stack_pointer])<<16);
+	stack_pointer--; RX2 |= (((UU)M[stack_pointer])<<24);
 D
 Z5:
-stack_pointer--;RX3=M[stack_pointer];
-stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
-stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
-stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
+	stack_pointer--; RX3=M[stack_pointer];
+	stack_pointer--; RX3 |= (((UU)M[stack_pointer])<<8);
+	stack_pointer--; RX3 |= (((UU)M[stack_pointer])<<16);
+	stack_pointer--; RX3 |= (((UU)M[stack_pointer])<<24);
 D
 /*bitwise*/
 Z6:RX0=RX0&RX1;D
