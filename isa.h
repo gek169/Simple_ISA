@@ -60,7 +60,7 @@
 											(  ((UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+2) ])   <<8)|\
 											(  (UU)M[0xffFFff & (((((UU)c)<<16)|((UU)a))+3) ])\
 											)
-#define write_byte(v,d)		M[d]=v;
+#define write_byte(v,d)		M[(d) & 0xffFFff]=v;
 #define write_2bytes(v,d)	{UU TEMPORARY_VARIABLE = (d) & 0xffFFff;  U vuv = v; M[TEMPORARY_VARIABLE]=					(vuv)>>8;\
 													M[(TEMPORARY_VARIABLE+1)&0xFFffFF]=	vuv;}
 #define write_4bytes(v,d)	{UU TEMPORARY_VARIABLE = (d) & 0xffFFff; UU vuv = v; M[(TEMPORARY_VARIABLE)&0xFFffFF]=		(vuv)>>24;\
