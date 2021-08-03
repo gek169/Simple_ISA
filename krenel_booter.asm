@@ -108,17 +108,17 @@ bytes '\r' ,'\n', 0;
 //			sc %overwrite_krenel_looptop%; jmpifneq;
 
 		//exec region syscall.
-		lla %0xDE04%; lb 55; syscall;
+//		lla %0xDE04%; lb 55; syscall;
 
 		//Instead, fork it!
 		//bootloader written here
 		//This is written at 0: la 55, lfarpc
-		//sc %0%; 
-		//lb 0;la 2; farista;
-		//lb 1; la 55; farista;
-		//lb 2; la 0x44; farista;
-		//lla %0xDE06%; 
-		//syscall;
+		sc %0%; 
+		lb 0;la 2; farista;
+		lb 1; la 55; farista;
+		lb 2; la 0x44; farista;
+		lla %0xDE06%; 
+		syscall;
 		nota; sc %main_program_failure%; jmpifeq;
 		lrx0 0, %&STR_my_string%;
 		proc_prints;

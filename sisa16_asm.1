@@ -647,6 +647,30 @@ user_farpagel: load user page c into privileged page a (PRIVILEGED) (DA)
 
 user_farpagest: store privileged page a into user page c (PRIVILEGED) (DB)
 
+.B Local Region Loads and Stores Extension (All two bytes)
+
+llda: load 16 bit value into a from fixed memory location. (DC)
+
+lldb: load 16 bit value into b from fixed memory location. (DD)
+
+ldrx0: load 32 bit value from fixed memory location. (DE)
+
+ldrx1: load 32 bit value from fixed memory location. (DF)
+
+ldrx2: load 32 bit value from fixed memory location. (E0)
+
+ldrx3: load 32 bit value from fixed memory location. (E1)
+
+ldc: load 16 bit value into c from fixed memory location. (E2)
+
+strx0: store RX0 to fixed memory location. (E3)
+
+strx1: store RX1 to fixed memory location. (E4)
+
+strx2: store RX2 to fixed memory location. (E5)
+
+strx3: store RX3 to fixed memory location. (E6)
+
 The rest: halt duplicates, free for expansion (1 byte)
 
 .TP
