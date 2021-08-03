@@ -142,7 +142,7 @@ q:
 	admin $(MAKE) clean
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
-	git push || echo "nothing to push"
+	git push --force || echo "nothing to push"
 #	./asmbuild.sh
 
 d:
