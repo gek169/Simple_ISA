@@ -530,22 +530,22 @@ U9:
 D
 UA:R=19;goto G_HALT;
 G_ALPUSH:	
-M[stack_pointer++] = a>>8;
-M[stack_pointer++] = a;
+	M[stack_pointer] = a>>8;	stack_pointer++;
+	M[stack_pointer] = a;		stack_pointer++;
 D
 G_BLPUSH:	
-M[stack_pointer++] = b>>8;
-M[stack_pointer++] = b;
+	M[stack_pointer] = b>>8;	stack_pointer++;
+	M[stack_pointer] = b;		stack_pointer++;
 D
 G_CPUSH:	
-M[stack_pointer++] = c>>8;
-M[stack_pointer++] = c;
+	M[stack_pointer] = c>>8;	stack_pointer++;
+	M[stack_pointer] = c;		stack_pointer++;
 D
 G_APUSH:	
-M[stack_pointer++] = a;
+	M[stack_pointer] = a;		stack_pointer++;
 D
 G_BPUSH:
-M[stack_pointer++] = b;
+	M[stack_pointer] = b;		stack_pointer++;
 D
 G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
 G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
