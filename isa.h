@@ -371,11 +371,7 @@ G_ISTLB:write_2bytes(b,GET_EFF_C())D
 G_JMP:program_counter=c;D
 G_STLA:write_2bytes(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
 G_STLB:write_2bytes(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
-G_STC:{
-	UU tmp = CONSUME_TWO_BYTES;
-	tmp = GET_LOCAL_ADDR(tmp);
-	write_2bytes(c,tmp);
-}D
+G_STC:write_2bytes(c,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
 G_PUSH:stack_pointer+=CONSUME_TWO_BYTES;D
 G_POP:stack_pointer-=CONSUME_TWO_BYTES;D
 G_PUSHA:stack_pointer+=a;D
