@@ -142,7 +142,8 @@ k 206:goto G_RX0DECR;k 207:goto G_EMULATE;\
 k 208:goto G_ITOF;k 209:goto G_FTOI;\
 k 210:goto G_SEG_GETCONFIG;k 211:goto G_RXICMP;k 212:goto G_LOGOR;k 213:goto G_LOGAND;\
 k 214:goto G_BOOLIFY;k 215:goto G_NOTA;k 216:goto G_USER_FARISTA;k 217:goto G_TASK_RIC;\
-k 218:goto G_USER_FARPAGEL;k 219:goto G_USER_FARPAGEST;k 220:k 221:k 222:k 223:k 224:k 225:k 226:k 227:\
+k 218:goto G_USER_FARPAGEL;k 219:goto G_USER_FARPAGEST;\
+k 220:goto G_LLDA;k 221:goto G_LLDB;k 222:k 223:k 224:k 225:k 226:k 227:\
 k 228:k 229:k 230:k 231:k 232:k 233:k 234:k 235:k 236:k 237:\
 k 238:k 239:k 240:k 241:k 242:k 243:k 244:k 245:k 246:k 247:\
 k 248:k 249:k 250:k 251:k 252:k 253:k 254:k 255:default:goto G_HALT;}
@@ -287,7 +288,7 @@ const void* const goto_table[256] = {
 &&G_LOGOR,&&G_LOGAND,
 &&G_BOOLIFY,&&G_NOTA,&&G_USER_FARISTA,&&G_TASK_RIC,
 &&G_USER_FARPAGEL,&&G_USER_FARPAGEST,
-&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
+&&G_LLDA,&&G_LLDB,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,&&G_HALT,
 &&G_HALT,
@@ -352,14 +353,14 @@ G_CA:c=a;D
 G_CB:c=b;D
 G_AC:a=c;D
 G_BC:b=c;D
-G_ISTA:write_byte(a,c)D
-G_ISTB:write_byte(b,c)D
-G_ISTLA:write_2bytes(a,c)D
-G_ISTLB:write_2bytes(b,c)D
+G_ISTA:write_byte(a,GET_EFF_C())D
+G_ISTB:write_byte(b,GET_EFF_C())D
+G_ISTLA:write_2bytes(a,GET_EFF_C())D
+G_ISTLB:write_2bytes(b,GET_EFF_C())D
 G_JMP:program_counter=c;D
-G_STLA:write_2bytes(a,CONSUME_TWO_BYTES)D
-G_STLB:write_2bytes(b,CONSUME_TWO_BYTES)D
-G_STC:write_2bytes(c,CONSUME_TWO_BYTES)D
+G_STLA:write_2bytes(a,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
+G_STLB:write_2bytes(b,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
+G_STC:write_2bytes(c,GET_LOCAL_ADDR(CONSUME_TWO_BYTES))D
 G_PUSH:stack_pointer+=CONSUME_TWO_BYTES;D
 G_POP:stack_pointer-=CONSUME_TWO_BYTES;D
 G_PUSHA:stack_pointer+=a;D
@@ -960,6 +961,52 @@ G_AA12:{SUU SRX0, SRX1;
 			256
 		);
 		UNSTASH_REGS;
+	}D
+	G_LLDA:{
+		U f = CONSUME_TWO_BYTES;
+		a = M[GET_LOCAL_ADDR(f)];
+		a <<= 8;
+		a |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+	}D
+	G_LLDB:{
+		U f = CONSUME_TWO_BYTES;
+		b = M[GET_LOCAL_ADDR(f)];
+		b <<= 8;
+		b |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+	}D
+	G_LDRX0:{
+		U f = CONSUME_TWO_BYTES;
+		RX0 = M[GET_LOCAL_ADDR(f)];
+		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff]<<8;
+		RX0 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff]<<8;
+	}D
+	G_LDRX1:{
+		U f = CONSUME_TWO_BYTES;
+		RX1 = M[GET_LOCAL_ADDR(f)];
+		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff]<<8;
+		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff]<<8;
+	}D	
+	G_LDRX2:{
+		U f = CONSUME_TWO_BYTES;
+		RX2 = M[GET_LOCAL_ADDR(f)];
+		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff]<<8;
+		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff]<<8;
+	}D
+	G_LDRX3:{
+		U f = CONSUME_TWO_BYTES;
+		RX3 = M[GET_LOCAL_ADDR(f)];
+		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
+		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff]<<8;
+		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff]<<8;
+	}D
+	G_LDC:{
+		U f = CONSUME_TWO_BYTES;
+		c = M[GET_LOCAL_ADDR(f)];
+		c <<= 8;
+		c |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff]<<8;
 	}D
 	G_HALT:
 	if(EMULATE_DEPTH == 0){

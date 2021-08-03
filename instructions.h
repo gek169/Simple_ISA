@@ -1,4 +1,4 @@
-static char* insns[220] = {
+static char* insns[227] = {
 	"halt", /*0*/
 	"lda",
 	"la",
@@ -240,9 +240,18 @@ static char* insns[220] = {
 	"user_farista",
 	"task_ric",
 	"user_farpagel",
-	"user_farpagest"
+	"user_farpagest",
+	/*The local addressing extension*/
+	"llda",
+	"lldb",
+	
+	"ldrx0",
+	"ldrx1",
+	"ldrx2",
+	"ldrx3",
+	"ldc"
 };
-static unsigned char insns_numargs[220] = {
+static unsigned char insns_numargs[227] = {
 	0,/*halt*/
 	2,1,2,1, /*load and load constant comboes, lda, la, ldb, lb*/
 	2, /*load constant into C*/
@@ -366,9 +375,12 @@ static unsigned char insns_numargs[220] = {
 		0,
 		/*user_farpagel and st*/
 		0,
-		0
+		0,
+		/*local addressing extension*/
+		2,2,2,
+		2,2,2,2
 };
-static char* insn_repl[220] = {
+static char* insn_repl[227] = {
 	"bytes0;", 
 	/*The direct load-and-store operations have args.*/
 	"bytes1,",
@@ -618,7 +630,18 @@ static char* insn_repl[220] = {
 		"bytes216;",
 		/*task_ric*/
 		"bytes217;",
+		/*user_farpagel and farpagest*/
 		"bytes218;",
-		"bytes219;"
+		"bytes219;",
+		/*local addressing extension*/
+		"bytes220,",
+		"bytes221,",
+		/*ldrx0*/
+		"bytes222,",
+		"bytes223,",
+		"bytes224,",
+		"bytes225,",
+		/*ldc*/
+		"bytes226,",
 };
-static const unsigned int n_insns = 220;
+static const unsigned int n_insns = 227;
