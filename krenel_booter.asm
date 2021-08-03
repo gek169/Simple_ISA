@@ -27,8 +27,8 @@ bytes '\r' ,'\n', 0;
 
 	
 	// Overwrite the krenel. There is no way it would work if this was being done to krenel memory!
-			lrx0 %LIBC_REGION, %LIBC_KRENEL_BEGIN%;
-			lrx1 %LIBC_REGION, %LIBC_KRENEL_END%;
+			lrx0 %LIBC_REGION%, %LIBC_KRENEL_BEGIN%;
+			lrx1 %LIBC_REGION%, %LIBC_KRENEL_END%;
 			overwrite_krenel_looptop:
 				cbrx0;
 				la 0;
