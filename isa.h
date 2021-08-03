@@ -994,14 +994,14 @@ G_AA12:{SUU SRX0, SRX1;
 		UNSTASH_REGS;
 	}D
 	G_LLDA:{
-		U f = CONSUME_TWO_BYTES;
-		a = M[GET_LOCAL_ADDR(f)];
-		a <<= 8;a |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		a = Z_READ2BYTES(f);
 	}D
 	G_LLDB:{
-		U f = CONSUME_TWO_BYTES;
-		b = M[GET_LOCAL_ADDR(f)];
-		b <<= 8;b |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		UU f = CONSUME_TWO_BYTES;
+		f = GET_LOCAL_ADDR(f);
+		b = Z_READ2BYTES(f);
 	}D
 	G_LDRX0:{
 		UU f = CONSUME_TWO_BYTES;
