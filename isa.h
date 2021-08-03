@@ -45,15 +45,6 @@
 /*
 	Note the use of the comma operator.
 */
-#define Z_POP_TWO_BYTES_FROM_STACK (stack_pointer-=2,\
-							(((U)M[stack_pointer])<<8)\
-							| (U)M[(stack_pointer+1) & 0xffFF])
-#define Z_POP_FOUR_BYTES_FROM_STACK (stack_pointer-=4,\
-										(((UU)M[stack_pointer])<<24)|\
-										(((UU)M[(stack_pointer+1) & 0xffFF])<<16)|\
-										(((UU)M[(stack_pointer+2) & 0xffFF])<<8)|\
-										(UU)M[(stack_pointer+3) & 0xffFF]\
-									)
 #define Z_READBYTE(memloc) ((UU)M[(memloc) & 0xffFFff])
 #define Z_READ2BYTES(memloc) (Z_READBYTE(memloc)<<8) | (Z_READBYTE(memloc+1))
 #define Z_READ4BYTES(memloc) (Z_READ2BYTES(memloc)<<16) | (Z_READ2BYTES(memloc+2))
@@ -418,9 +409,9 @@ G_STB:{
 }D
 G_JMPIFEQ:if(a==1){SET_PC(c);}D
 G_JMPIFNEQ:if(a!=1){SET_PC(c);}D
-G_ADD:a+=b;D
-G_SUB:a-=b;D
-G_MUL:a*=b;D
+G_ADD:a+=b; D
+G_SUB:a-=b; D
+G_MUL:a*=b; D
 G_DIV:{if(b!=0)a/=b;else{R=1;goto G_HALT;}}D
 G_MOD:{if(b!=0)a%=b;else{R=2;goto G_HALT;}}D
 G_CMP:
@@ -455,19 +446,33 @@ SET_PCR(a);
 SET_PC(0);
 D
 G_CALL:
-write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;
+M[stack_pointer] = GET_PC()>>8; stack_pointer++;
+M[stack_pointer] = GET_PC(); stack_pointer++;
 SET_PC(c);D
-G_RET:SET_PC(Z_POP_TWO_BYTES_FROM_STACK);D
+G_RET:
+{
+	U tmp;
+	stack_pointer--;tmp=M[stack_pointer];
+	stack_pointer--;tmp <<= 8;tmp=M[stack_pointer];
+	SET_PC(tmp);
+}
+D
 G_FARCALL:
-	write_2bytes(GET_PC(),stack_pointer);stack_pointer+=2;
-	write_byte(GET_PCR(),stack_pointer);stack_pointer+=1;
+	M[stack_pointer] = GET_PC()>>8; stack_pointer++;
+	M[stack_pointer] = GET_PC(); stack_pointer++;
+	M[stack_pointer] = GET_PCR(); stack_pointer++;
 	SET_PCR(a);
 	SET_PC(c);
 D
 G_FARRET:
-	stack_pointer-=1;
+{
+	U tmp;
+	stack_pointer--;
 	SET_PCR(M[stack_pointer]);
-	SET_PC(Z_POP_TWO_BYTES_FROM_STACK);
+	stack_pointer--;tmp = M[stack_pointer];
+	stack_pointer--;tmp <<= 8;tmp = M[stack_pointer];
+	SET_PC(tmp);
+}
 D
 G_FARILDA:a=M[ (((UU)c&255)<<16) |  ((UU)b)]D
 G_FARISTA:write_byte(a,((((UU)c)<<16)|((UU)b)))D
@@ -547,9 +552,27 @@ D
 G_BPUSH:
 	M[stack_pointer] = b;		stack_pointer++;
 D
-G_ALPOP:a=Z_POP_TWO_BYTES_FROM_STACK;D
-G_BLPOP:b=Z_POP_TWO_BYTES_FROM_STACK;D
-G_CPOP:c=Z_POP_TWO_BYTES_FROM_STACK;D
+G_ALPOP:
+stack_pointer--;
+a=M[stack_pointer];
+stack_pointer--;
+a <<= 8;
+a=M[stack_pointer];
+D
+G_BLPOP:
+stack_pointer--;
+b=M[stack_pointer];
+stack_pointer--;
+b <<= 8;
+b=M[stack_pointer];
+D
+G_CPOP:
+stack_pointer--;
+c=M[stack_pointer];
+stack_pointer--;
+c <<= 8;
+c=M[stack_pointer];
+D
 G_APOP:
 	stack_pointer-=1;a=M[stack_pointer];
 D
@@ -691,10 +714,30 @@ M[stack_pointer++] = RX3>>8;
 M[stack_pointer++] = RX3;
 D
 /*pops*/
-Z2:RX0=Z_POP_FOUR_BYTES_FROM_STACK;D
-Z3:RX1=Z_POP_FOUR_BYTES_FROM_STACK;D
-Z4:RX2=Z_POP_FOUR_BYTES_FROM_STACK;D
-Z5:RX3=Z_POP_FOUR_BYTES_FROM_STACK;D
+Z2:
+stack_pointer--;RX0=M[stack_pointer];
+stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
+stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
+stack_pointer--;RX0 <<= 8;RX0=M[stack_pointer];
+D
+Z3:
+stack_pointer--;RX1=M[stack_pointer];
+stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
+stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
+stack_pointer--;RX1 <<= 8;RX1=M[stack_pointer];
+D
+Z4:
+stack_pointer--;RX2=M[stack_pointer];
+stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
+stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
+stack_pointer--;RX2 <<= 8;RX2=M[stack_pointer];
+D
+Z5:
+stack_pointer--;RX3=M[stack_pointer];
+stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
+stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
+stack_pointer--;RX3 <<= 8;RX3=M[stack_pointer];
+D
 /*bitwise*/
 Z6:RX0=RX0&RX1;D
 Z7:RX0=RX0|RX1;D

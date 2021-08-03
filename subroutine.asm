@@ -1,6 +1,7 @@
 #!/usr/bin/sisa16_asm -run
 
 ..zero:
+	pop %1%;
 	sc %L_main%; jmp;
 
 section 1000;
@@ -59,12 +60,14 @@ section 500;
 		getchar;putchar; 
 		lb 0x30;sub;
 		apush;
-		
+		proc_printbytehex;
+		proc_printbytehex;
+		proc_printbytehex;
 		la 0xa; putchar; la 0xd; putchar;interrupt;
 		getchar;putchar;
 		lb 0x30;sub;
-		bpop;
-		mul;
+		//bpop;
+		//mul;
 		apush;
 		la 0xa; putchar; la 0xd; putchar;interrupt
 		proc_printbytehex;
