@@ -992,23 +992,23 @@ G_AA12:{SUU SRX0, SRX1;
 	G_LDRX1:{
 		U f = CONSUME_TWO_BYTES;
 		RX1 = M[GET_LOCAL_ADDR(f)];
-		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX1 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
+		RX1 <<= 8;RX1 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
 	}D	
 	G_LDRX2:{
 		U f = CONSUME_TWO_BYTES;
 		RX2 = M[GET_LOCAL_ADDR(f)];
-		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX2 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
+		RX2 <<= 8;RX2 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
 	}D
 	G_LDRX3:{
 		U f = CONSUME_TWO_BYTES;
 		RX3 = M[GET_LOCAL_ADDR(f)];
-		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
-		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
-		RX3 <<= 8;RX0 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
+		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+1) & 0xffFFff];
+		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+2) & 0xffFFff];
+		RX3 <<= 8;RX3 |= M[(GET_LOCAL_ADDR(f)+3) & 0xffFFff];
 	}D
 	G_LDC:{
 		U f = CONSUME_TWO_BYTES;
