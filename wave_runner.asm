@@ -14,10 +14,9 @@
 .ld_page_count:	farllda %&0x30004%;
 .st_page_count:	farstla %&0x30004%;
 
-//This program is designed to be executed via command.com.
-//Run exec 1024 at the command prompt!
+
 ..include"libc_pre.hasm"
-..zero:
+..(2):
 ..dinclude"libc_pre.bin"
 
 
@@ -27,6 +26,10 @@
 .wait_time:				16
 
 
+..main(3):
+	lrx0 0,4,0,0;
+	proc_krenel;
+	halt;
 
 ..(0x4):
 asm_begin_region_restriction;
@@ -59,7 +62,7 @@ fill_dat_mem_looptop:
 	sc %fill_dat_mem_looptop%; jmpifneq;
 la 3; 
 interrupt; //Play that memory as audio.
-asciifun_looptop: //Comment.
+asciifun_looptop: //Observe how I elegantly write a comment on the same line as code!
 	//increment the counter.
 		alpop;
 			aincr;
@@ -106,7 +109,7 @@ asciifun_looptop: //Comment.
 		lb %~ascii_greyscale_len%;
 		mod;
 		//we now have the offset calculated in register a.
-		sc %0x1%; 
+		cpcr
 		lb %~ascii_greyscale%;
 		add;
 		ba;
