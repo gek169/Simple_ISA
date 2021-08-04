@@ -154,8 +154,7 @@ Some instructions cannot be executed in User mode. getchar, putchar, interrupt, 
 153600 bytes starting at 0xB00000 which are used for the screen in the AV driver.
 
 .B Audio Region:
-65536 bytes starting from 0xB50000 which are used for the active audio buffer.
-
+Memory starting at 0xB50000 which goes until 0xC00000 for audio.
 If you call an interrupt with a==3, you will start playing back audio in the AV driver.
 
 
