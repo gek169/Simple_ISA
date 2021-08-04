@@ -789,10 +789,8 @@ ZD:
 	if(EMULATE_DEPTH) {R = 15; goto G_HALT;}
 	seg_access_offset = RX0;
 	seg_access_mask = RX1;
-D
-#else
-	R=14; goto G_HALT;
 #endif
+D
 
 #ifdef NO_FP
 /*no floating point unit.*/
@@ -864,7 +862,13 @@ G_FLTCMP: {
 	)a=2;else a=1;
 }D
 #endif
-G_AA3:RX0=SEGMENT_PAGES;D
+G_AA3:
+#ifndef NO_SEGMENT
+	RX0=SEGMENT_PAGES;
+#else
+	RX0=0;
+#endif
+D
 G_AA4:RX0=Z_READ4BYTES(RX1)D
 G_AA5:RX0=Z_READ4BYTES(RX0)D
 G_AA6:SET_PCR(RX0>>16);SET_PC(RX0 & 0xffFF);D
@@ -992,7 +996,9 @@ G_AA12:{SUU SRX0, SRX1;
 		RX0 = seg_access_offset;
 	}D
 #else
-	R=14; goto G_HALT;
+	RX1 = 0;
+	RX0 = 0;
+	D
 #endif
 #if !defined(NO_EMULATE)
 	G_EMULATE:{
