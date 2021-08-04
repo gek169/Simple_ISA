@@ -106,7 +106,7 @@ asciifun_looptop: //Comment.
 		lb %~ascii_greyscale_len%;
 		mod;
 		//we now have the offset calculated in register a.
-		sc %0x1%; 
+		cpcr
 		lb %~ascii_greyscale%;
 		add;
 		ba;
