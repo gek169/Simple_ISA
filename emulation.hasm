@@ -20,9 +20,9 @@ nop;nop;nop;nop;
 
 //krenel constants:
 //MUST BE A POWER OF TWO, must be identical to the constant in isa_pre.h SISA_MAX_TASKS
-.libc_krenel_max_active_tasks:8
+.libc_krenel_max_active_tasks:32
 //Must be one less than that power of two, for an "and" mask:
-.libc_krenel_max_active_tasks_mask:7
+.libc_krenel_max_active_tasks_mask:31
 //Maximum number of times a syscall or interrupt can be made before a context switch occurs.
 .libc_krenel_max_returns:100
 //the region where code to execute is stored.
@@ -98,13 +98,8 @@ nop;nop;nop;nop;
 //all tasks start out as 0- inactive.
 //these are shorts.
 :libc_krenel_task_isactive_array:
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
-bytes 0,0,  0,0;
+fill libc_krenel_max_active_tasks, 0;
+fill libc_krenel_max_active_tasks, 0;
 
 
 :libc_krenel_task_nreturns:
