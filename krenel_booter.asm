@@ -186,7 +186,7 @@ bytes '\r' ,'\n', 0;
 		la '\n'; syscall;
 		lrx0 0, %&STR_yet_other_string%;
 		proc_prints;
-		//lla %0xDEAD%; syscall;
+		lla %0xDEAD%; syscall;
 		
 		lla %0xDE00%;lb 0;syscall; //Kill the other guy.
 		lla %0xDE00%;lb 2;syscall; //Kill the other guy.
