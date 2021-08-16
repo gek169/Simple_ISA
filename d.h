@@ -70,7 +70,7 @@ static SDL_Window *sdl_win = NULL;
 static SDL_Renderer *sdl_rend = NULL;
 static SDL_Texture *sdl_tex = NULL;
 static SDL_AudioSpec sdl_spec = {0};
-static const unsigned int display_scale = 2;
+static unsigned int display_scale = 2;
 static UU audio_left = 0;
 #ifndef SDL2_NO_EMULATE_BLOCKING_INPUT
 static char blocking_input = 1;
@@ -92,12 +92,16 @@ static void DONT_WANT_TO_INLINE_THIS sdl_audio_callback(void *udata, Uint8 *stre
 }
 
 static void DONT_WANT_TO_INLINE_THIS di(){
+		SDL_DisplayMode DM;
 	    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
 	    {
 	        printf("SDL2 could not be initialized!\n"
 	               "SDL_Error: %s\n", SDL_GetError());
 	        exit(1);
 	    }
+	    SDL_GetCurrentDisplayMode(0, &DM);
+	    if(DM.w > 1000) display_scale = 2;
+	    if(DM.w > 3000) display_scale = 4;
 		sdl_spec.freq = 16000;
 		sdl_spec.format = AUDIO_S16MSB;
 		sdl_spec.channels = 1;
