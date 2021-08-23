@@ -67,8 +67,6 @@ Platforms planned to be tested:
 
 * Public domain. 
 
-	* (NOTE: The provided example textmode driver includes four lines under the Ncurses license. See d.h.)
-
 Build Statuses:
 
 gek169/Simple_ISA:
