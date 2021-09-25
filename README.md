@@ -1,4 +1,4 @@
-# Simple, Embeddable, Performant Virtual Machine Language
+# A miniscule virtual machine language
 
 SISA16 is an extremely lightweight high-performance minimal virtual machine designed not only
 to replace languages like Lua and WebAssembly for program extension, but also to provide a common
