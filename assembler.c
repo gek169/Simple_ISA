@@ -1606,7 +1606,7 @@ int main(int argc, char** argv){
 				strfind("section", macro_name) != -1 ||
 				strfind("region", macro_name) != -1 ||
 				strfind("fill", macro_name) != -1 ||
-				strfind("..decl_farproc(", macro_name) != -1 ||
+				strfind("..", macro_name) != -1 ||
 				strfind("asm_help", macro_name) != -1 ||
 				strfind("asm_export_header", macro_name) != -1 ||
 				strfind("asm_fix_outputcounter", macro_name) != -1 ||
