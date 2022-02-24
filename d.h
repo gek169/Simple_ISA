@@ -403,6 +403,17 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 8){
 		vga_palette[b&0xff] = RX0 & 0xFFffFF;
 	}
+	/*Rectangle drawing routine- fill rectangle with color.*/
+	if(a == 0x101){
+		unsigned short xl = b;
+		unsigned short yl = c;
+		unsigned short rw = RX0;
+		unsigned short rh = RX1;
+		unsigned char col = RX2 & 0xff;
+		for(UU i = yl; i < (yl + rh) && i < (SCREEN_HEIGHT_CHARS * 8); i++)
+		for(UU j = xl; j < (xl + rw) && j < (SCREEN_WIDTH_CHARS * 8); j++)
+			SDL_targ[j + i*(SCREEN_WIDTH_CHARS * 8)] = vga_palette[col];
+	}
 #else
 	if(a == 1){
 		return shouldquit;
@@ -468,7 +479,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 					printf("%02x%c",M[j],((j+1)%8)?' ':'|');
 		return a;
 	}
-	if(a == 0xFF10){ /*Read 256 bytes from saved disk.*/
+	if(a == 0xFF10){ /*Read 256 bytes from saved disk to page b*/
 		size_t location_on_disk = ((size_t)RX0) << 8;
 		FILE* f = fopen("sisa16.dsk", "rb+");
 		location_on_disk &= DISK_ACCESS_MASK;
@@ -496,7 +507,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		return 1;
 	}
 
-	if(a == 0xFF11){ /*write 256 bytes from 'b' to saved disk.*/
+	if(a == 0xFF11){ /*write 256 bytes from page 'b' to saved disk.*/
 		size_t location_on_disk = ((size_t)RX0) << 8;
 		FILE* f = fopen("sisa16.dsk", "rb+");
 		location_on_disk &= DISK_ACCESS_MASK;

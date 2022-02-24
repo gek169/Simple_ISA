@@ -237,6 +237,7 @@ bytes 0,1;
 			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
 			user_geta;	lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
 			user_geta;	lb 8; cmp; sc %libc_krenel_syscall_set_palette_color%; jmpifeq;
+			user_geta;	llb %0x101%; cmp; sc %libc_krenel_syscall_rectdraw%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -267,6 +268,15 @@ bytes 0,1;
 		:libc_krenel_syscall_getpid:
 			llda %libc_krenel_active_task_index%;
 			user_seta;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_rectdraw:
+			user_get2; rx2_0;
+			user_get1; rx1_0;
+			user_get0;
+			user_getb; ba;
+			user_getc;
+			lla %0x101%;
+			interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
 			user_get0; //The location in memory to write it.
