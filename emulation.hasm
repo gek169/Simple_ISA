@@ -207,6 +207,8 @@ bytes 0,1;
 		ab; alpush;
 		lb 16; cmp; blpop; sc %libc_krenel_getchar%; jmpifeq;
 		ab; alpush;
+		llb %0x101%; cmp; blpop; sc %libc_krenel_syscall_rectdraw%; jmpifeq;
+		ab; alpush;
 		lb 0; cmp; blpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
