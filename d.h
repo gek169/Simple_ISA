@@ -412,7 +412,7 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		unsigned char col = RX2 & 0xff;
 		for(UU i = yl; i < (yl + rh) && i < (SCREEN_HEIGHT_CHARS * 8); i++)
 		for(UU j = xl; j < (xl + rw) && j < (SCREEN_WIDTH_CHARS * 8); j++)
-			SDL_targ[j + i*(SCREEN_WIDTH_CHARS * 8)] = vga_palette[col];
+			M_SAVER[active_audio_user][0xB00000 + j + i*(SCREEN_WIDTH_CHARS * 8)] = col;
 	}
 #else
 	if(a == 1){
