@@ -49,11 +49,10 @@ bytes 0xd, 0xa;
 		proc_prints;
 	halt;
 
-	
+region 22;	
 	:Lbl_clock_start:
-	la 'f'; putchar;
-	la 'f'; putchar;
 	la '\n';putchar; interrupt;
+	la 0xc; interrupt;
 	push %5%;
 	clock;
 	st_secs_b;
@@ -122,6 +121,7 @@ bytes 0xd, 0xa;
 	sc %main_loopout%;
 	ld_secs;rx3a;llb %BENCH_SECONDS%;cmp;lb0;cmp;jmpifneq;
 	la '\n'; interrupt;
+	la 0xc; interrupt;
 	sc %main_looptop%;jmp;
 :main_loopout:
 lb0;mod;
