@@ -4,6 +4,7 @@
 //finds the sqrt of the number passed in RX0.
 //rx2: the number we're trying to find the square root of.
 //rx3: the current number we're trying.
+//Only unsigned numbers!
 
 ..decl_farproc(LIBC_REGION):proc_rxsqrt
 ..export"proc_rxsqrt"
