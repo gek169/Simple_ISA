@@ -124,6 +124,7 @@ bytes 0,1;
 		sc %libc_krenel_configure_segment_make_own_segment%; jmpifeq;
 			//we don't own it! The mask and offset should be configured to prevent any form of segment access, it should always generate an error.
 			//Offset=pages is a magic value for preventing segment access.
+			//TODO: Provide users with access to the segment. Divy up the segment.
 			lb 0; 
 			rx1b
 			seg_pages
@@ -279,6 +280,14 @@ bytes 0,1;
 			user_getc;
 			lla %0x101%;
 			interrupt;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_getscreenwidth:
+			lla %0x102%; interrupt;
+			user_seta;
+			sc %libc_krenel_syscall_end%; jmp;
+		:libc_krenel_syscall_getscreenheight:
+			lla %0x103%; interrupt;
+			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
 			user_get0; //The location in memory to write it.
@@ -696,6 +705,7 @@ bytes 0,1;
 
 
 //If you directly boot the libc, this is what you boot into.
+
 :libc_booter:
 	//restore the nops at zero. We are in the zero region, so we don't actually have to do any far memory indexing.
 	la 0x1E;
@@ -716,8 +726,10 @@ bytes 0,1;
 		sc %libc_booter_copy_loop%; jmpifeq;
 	//Indicate that booting succeded.
 	astp;popa; //Clear the stack pointer.
-	lrx0 %/libc_COMMAND_COM%;
-	proc_krenel;
+
+	//NOTE TO USER: REPLACE THE FOLLOWING WITH YOUR ENTRY POINT!!!!
+	lrx0 %/libc_COMMAND_COM%;		//Launch our shell, command.com
+	proc_krenel;					//Krenel is told what to boot into.
 	halt;
 :LIBC_KRENEL_END:
 ..export"LIBC_KRENEL_END"

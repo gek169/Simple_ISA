@@ -1,5 +1,5 @@
 :libc_command_com_prompt:
-..asciz:$
+..asciz:COM$
 
 :libc_command_com_help_printout:
 ..ascii:SISA16 COMMAND.COM- the world's smallest operating system

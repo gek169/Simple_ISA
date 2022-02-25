@@ -414,10 +414,15 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		for(UU j = xl; j < (xl + rw) && j < (SCREEN_WIDTH_CHARS * 8); j++)
 			M_SAVER[active_audio_user][0xB00000 + j + i*(SCREEN_WIDTH_CHARS * 8)] = col;
 	}
+	/*width and height*/
+	if(a == 0x102) { return SCREEN_WIDTH_CHARS * 8;}
+	if(a == 0x103) { return SCREEN_HEIGHT_CHARS * 8;}
 #else
 	if(a == 1){
 		return shouldquit;
 	}
+	if(a == 0x102) { return 0;}
+	if(a == 0x103) { return 0;}
 #endif
 
 	if(a==0xa||a == 0xd) {
