@@ -523,7 +523,7 @@ G_TASK_SET: /*task_set*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	current_task = a%SISA_MAX_TASKS + 1;
 D
-U9:
+U9:	/*G_TASK_KILL*/
 	if(EMULATE_DEPTH){R=15; goto G_HALT;}
 	REG_SAVER[current_task].program_counter_region = 0;
 	REG_SAVER[current_task].program_counter = 0;

@@ -354,7 +354,7 @@ user_seta: set user mode's A register. (57)
 
 task_set: save a task to the task buffer, using register A to select which task buffer. (58)
 
-task_kill: delete the segment of the current task and set its number of pages to 0. (59)
+task_kill: Resets essential variables for a task so it can be setup for another task's execution. (59)
 
 syscall: make syscall. Generate error code 19. (5A)
 
