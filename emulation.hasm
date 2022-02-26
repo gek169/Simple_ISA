@@ -497,7 +497,6 @@ bytes 0,1;
 				lb 0; cb; la 2; farista; //code for "la"
 				lb 1; la %~libc_krenel_exec_region%; farista; //the new process boots directly into the exec region.
 				lb 2; la 0x44; farista; //0x44 is lfarpc
-				.
 				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				emulate; //This copies the entire address space of the kernel into the new process.
 			//restore stack integrity.
