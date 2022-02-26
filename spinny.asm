@@ -4,7 +4,7 @@
 //Notably...
 //1) usage of putchar and libc proc_wait
 //2) the exec syscall
-//3) 
+//3) Multitasking.
 
 .ZERO_STACK_POINTER:		astp;popa;
 //..(2):
@@ -27,7 +27,17 @@ krenel_boot:
 	lb 5;		//What region to exec?
 	syscall;	//Make the call
 	sc %bruh%;
+	//halt; //Try removing this.
 	bruh:
+	la 100;
+	proc_wait;
+	la '9'; putchar;
+	la '9'; putchar;
+	la '9'; putchar;
+	la '9'; putchar;
+	la '9'; putchar;
+	la '9'; putchar;
+	la '9'; putchar;
 	jmp;
 
 
