@@ -132,8 +132,8 @@ bytes 0,1;
 			ret;
 		libc_krenel_configure_segment_make_own_segment:
 			//we do own it!
-			seg_pages; rxdecr; rx1_0;
-			lb 0; rx0b;
+			seg_pages; rxdecr; rx1_0;	//mask of 1 less than seg_pages- meaning the entire segment is accessible
+			lb 0; rx0b;					//offset of 0
 			seg_config;
 			ret;
 
@@ -613,7 +613,9 @@ bytes 0,1;
 		aincr;
 		stla  %libc_krenel_task_nreturns%;
 		llb %libc_krenel_max_returns%; cmp; lb 2; cmp; sc %libc_krenel_try_select_task%; jmpifeq;
-		//We already configured the segment.
+		//We already configured the segment. We just preempted a running task, which we should return to.
+		//push %10%; libc_lproc_krenel_configure_segment; pop %10%;
+		
 		priv_drop;
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_cswitch_killtask:

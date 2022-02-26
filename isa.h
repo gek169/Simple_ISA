@@ -534,6 +534,7 @@ U9:	/*G_TASK_KILL*/
 	REG_SAVER[current_task].instruction_counter = 0; /*So that if we drop back in, the IC doesnt immediately kick in.*/
 #endif
 D
+/*G_SYSCALL*/
 UA:R=19;goto G_HALT;
 G_ALPUSH:	
 	M[stack_pointer] = a>>8;	stack_pointer++;
