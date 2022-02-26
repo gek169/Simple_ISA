@@ -138,8 +138,7 @@ clean:
 
 
 q:
-	admin $(MAKE) -B install
-#	admin $(MAKE) -B install_sdl2
+	admin $(MAKE) -B install_sdl2
 	admin $(MAKE) libc
 	admin $(MAKE) clean
 	git add .
