@@ -1,12 +1,19 @@
 #!/usr/bin/sisa16_asm -run
 
+//This small program demonstrates a few essential features of Sisa16 and KRENEL
+//Notably...
+//1) usage of putchar and libc proc_wait
+//2) the exec syscall
+//3) 
+
 .ZERO_STACK_POINTER:		astp;popa;
-..(2):
+//..(2):
 ..include"libc.hasm"
 
 //..include"libc_pre.hasm"
 //..(2):
 //..dinclude"libc_pre.bin"
+
 .wait_time:				33
 
 ..main(3):
@@ -16,9 +23,9 @@ halt;
 
 ..(4):
 krenel_boot:
-	lla %0xDE04%;
-	lb 5;
-	syscall;
+	lla %0xDE04%;//code for the exec region syscall.
+	lb 5;		//What region to exec?
+	syscall;	//Make the call
 	sc %bruh%;
 	bruh:
 	jmp;
