@@ -23,18 +23,17 @@ static char is_parsing_bas = 0;
 static char read_until_terminator_alloced_modified_mode = 0;
 
 static char my_isdigit(char c){
-	return (
-		c == '0'
-		|| c == '1'
-		|| c == '2'
-		|| c == '3'
-		|| c == '4'
-		|| c == '5'
-		|| c == '6'
-		|| c == '7'
-		|| c == '8'
-		|| c == '9'
-	);
+	if(c == '0') return 1;
+	if(c == '1') return 1;
+	if(c == '2') return 1;
+	if(c == '3') return 1;
+	if(c == '4') return 1;
+	if(c == '5') return 1;
+	if(c == '6') return 1;
+	if(c == '7') return 1;
+	if(c == '8') return 1;
+	if(c == '9') return 1;
+	return 0;
 }
 
 void my_strcpy(unsigned char* dest, unsigned char* src){
@@ -78,10 +77,12 @@ static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned l
 		rut_append_to_me = NULL;
 	}
 
-	while(1){
-		if(feof(f)){break;}
+	local_top_1:;
+	{
+		
+		if(feof(f)){goto local_end_1;}
 		c = fgetc(f);
-		if(c == terminator) {break;}
+		if(c == terminator) {goto local_end_1;}
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				printf(general_fail_pref);
@@ -89,7 +90,12 @@ static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned l
 				exit(1);
 			}
 		buf[blen++] = c;
+		goto local_top_1;
+
+		local_end_1:;
 	}
+	
+	
 	buf[blen] = '\0';
 	*lenout = blen;
 	return buf;
