@@ -326,12 +326,14 @@ G_GETCHAR:{
 	UNSTASH_REGS;
 }D
 G_PUTCHAR:{
-	STASH_REGS;
 #ifndef NO_DEVICE_PRIVILEGE
 	if(EMULATE_DEPTH){R = 17; goto G_HALT;}
 #endif
-	pch(a_stash);
-	UNSTASH_REGS;
+	{
+		STASH_REGS;
+		pch(a_stash);
+		UNSTASH_REGS;
+	}
 }D
 G_LSHIFT:a<<=b;D
 G_RSHIFT:a>>=b;D
