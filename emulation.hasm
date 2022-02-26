@@ -494,18 +494,11 @@ bytes 0,1;
 				la 1; faristla;
 
 				//Create a bootloader
-				//We're execing the at *our* assigned location, because that's where we copied it!
-				lrx0 0,libc_krenel_exec_region,0,0
-				farstrx0 %~LIBC_REGION%, %libc_krenel_jumploc%;
-				//We must copy three bytes, so we do 4 for speed's sake.
-				farldrx0 %&0%
-				farstrx0 %~LIBC_REGION%, %libc_krenel_stack_data_store%
-				//Has to be FIXED for the new sta
 				lb 0; cb; la 2; farista; //code for "la"
-				lb 1; la %~LIBC_REGION%; farista; //load libc's region into a.
-				//lb 1; la %~libc_krenel_exec_region%; farista; //the new process boots directly into the exec region.
+				//lb 1; la %~LIBC_REGION%; farista; //load libc's region into a.
+				
+				lb 1; la %~libc_krenel_exec_region%; farista; //the new process boots directly into the exec region.
 				lb 2; la 0x44; farista; //0x44 is lfarpc.
-
 				push %10%; libc_lproc_krenel_configure_segment; pop %10%;
 				emulate; //This copies the entire address space of the kernel into the new process.
 			//restore stack integrity.
@@ -513,12 +506,16 @@ bytes 0,1;
 				ldrx0 %libc_krenel_stack_data_store%
 				farstrx0 %&0%
 				//We have switched task, as commanded. A holds our return value. CHECK IT...
-				la 'g'; putchar;
-				la 'h'; putchar;
+				alpush;
+				alpop;
 				sc %libc_krenel_cswitch_looptop%; jmp;
 			libc_krenel_syscall_exec_failure:
 				la 0;user_seta;
 				sc %libc_krenel_syscall_end%; jmp;
+
+
+
+				
 		:libc_krenel_syscall_fork:
 			//Find a free pid.
 			lrx1 %/libc_krenel_max_active_tasks%; 

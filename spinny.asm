@@ -7,7 +7,7 @@
 //..include"libc_pre.hasm"
 //..(2):
 //..dinclude"libc_pre.bin"
-.wait_time:				50
+.wait_time:				33
 
 ..main(3):
 lrx0 %/krenel_boot%;
@@ -20,42 +20,35 @@ krenel_boot:
 	lb 5;
 	syscall;
 	sc %bruh%;
-	halt;
 	bruh:
 	jmp;
 
 
-..(10):
+..(5):
 asm_begin_region_restriction;
-nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;
-nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;nop;
-
+sc %asciifun_start%; jmp;
 la '\r'; putchar; 
-la 'q'; putchar; 
 la '\n'; interrupt;
-alpush;
+asciifun_start:
+la 0;alpush;
 	//our loop!
-	
 	asciifun_looptop: 
-		la ' '; putchar;
+		la ' '; putchar;putchar;putchar;
 		alpop; 
 			aincr; 
+			lb %~ascii_spinny_len%;mod;
 		alpush;
-		
-		lb %~ascii_spinny_len%;mod; 
+		lb %~ascii_spinny%;
+		add; ba;
 		cpcr;
-		 lb %~ascii_spinny%; 
-		add; ca;
-		ilda;
+		farilda;
 		putchar;
 		la '\r'; putchar;
 		la '\n'; interrupt;
 		la %~wait_time%;
 		alpush; proc_wait; alpop;
 		sc %asciifun_looptop%;jmp;
-	:ascii_spinny:
-	..asciz:-\|/
-	.ascii_spinny_len:4
+		:ascii_spinny:
+		..asciz:-\|/
+		.ascii_spinny_len:4
 asm_end_restriction;
