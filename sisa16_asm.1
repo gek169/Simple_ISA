@@ -322,11 +322,11 @@ farildb: load byte using far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4
 
 faristb: store byte into far memory indexing at [(u8)c<<16 + (u16)a] (1 byte) (4A)
 
-.B PRIVILEGED INSTRUCTIONS (All one byte): 
-
 priv_drop: Drop privilege after returning from emulate, return to user mode. (4B)
 
 	this effectively just invokes EMULATE, but without using the current memory map- the lower one is used.
+
+	The registers are not reset.
 
 user_geta: a = usermode register A. (4C)
 
