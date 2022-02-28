@@ -25,3 +25,19 @@
 	libc_sqrt_other_end:
 		rx0_3; rxdecr;
 		farret;
+
+//Find absolute value of value in RX0;
+//Quashes RX1 and RX0
+//Return value in RX0
+..decl_farproc(LIBC_REGION):proc_rxabs
+..export"proc_rxabs"
+	la 0; rx1a;
+	rxicmp;lb 0; cmp;
+	sc %libc_rxabs_end%; jmpifneq;
+	rxcompl; rxincr; //invert the number.
+	//Check if it's still negative.
+	rxicmp;lb 0; cmp;
+	sc %libc_rxabs_end%; jmpifneq;
+	rxdecr; //It was the special value! make it positive
+	libc_rxabs_end:
+		farret;
