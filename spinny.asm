@@ -27,7 +27,7 @@ krenel_boot:
 	lb 5;		//What region to exec?
 	syscall;	//Make the call
 	sc %bruh%;
-	//halt; //Try removing this.
+	halt; //Try removing this.
 	bruh:
 	la 100;
 	proc_wait;
