@@ -41,6 +41,9 @@ void my_strcpy(unsigned char* dest, unsigned char* src){
 	*dest = 0;
 }
 
+
+char was_macro = 0;	
+char using_asciz = 0;
 static unsigned char line_copy[0x10000] = {0}; /*line_copy*/
 static unsigned char line[0x10000] = {0}; /*line_copy*/
 static unsigned char buf1[0x10000] = {0}; /*buffer for working with strings.*/
@@ -603,8 +606,8 @@ int main(int argc, char** argv){
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET),
 	 (outputcounter=0), (is_parsing_bas=0))
 	while(1){
-		char was_macro = 0;	
-		char using_asciz = 0;
+		was_macro = 0;	
+		using_asciz = 0;
 		if(feof(infile)){
 			/*try popping from the fstack*/
 			if(include_level > 0){
@@ -835,18 +838,6 @@ int main(int argc, char** argv){
 			line[strlen("..include\"") + loc_eparen] = '\0';
 			strcat(buf2, line + strlen("..include\""));
 			my_strcpy(line, buf2);
-			/*
-				This trash replaced...
-			*/
-			/*
-				line = strcatallocf2(
-					"ASM_header ",
-					str_null_terminated_alloc(line + strlen("..include\""), loc_eparen)
-				);
-				if(!line){printf(general_fail_pref); printf("Failed Malloc."); exit(1);}
-				free(line_old);
-			*/
-			
 		} else if(strprefix("..dinclude\"", line)){
 			long loc_eparen = strfind(line + strlen("..dinclude\""), "\"");
 			if(loc_eparen == -1){
@@ -1149,7 +1140,10 @@ int main(int argc, char** argv){
 			was_macro=1; 
 		else 
 			was_macro = 0;
-		{unsigned char have_expanded = 0; unsigned long iteration = 0; long i; unsigned char have_reached_builtins = 0;
+		{unsigned char have_expanded = 0; 
+		unsigned long iteration = 0; 
+		long i; 
+		unsigned char have_reached_builtins = 0;
 			do{
 				have_expanded = 0;
 				if(debugging){
@@ -1164,7 +1158,6 @@ int main(int argc, char** argv){
 					long loc; long linesize; char found_longer_match;
 					long len_to_replace; 
 					char* before;
-					char* after;
 					long j, loc_vbar = 0;;
 					buf1[0] = '\0';
 					buf2[0] = '\0';
