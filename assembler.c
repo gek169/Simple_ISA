@@ -109,8 +109,9 @@ static unsigned char* variable_expansions[SISA16_MAX_MACROS] = {0};
 static unsigned char variable_is_redefining_flag[SISA16_MAX_MACROS] = {0};
 static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
+char int_mode = 0; /*starting with 0x means hexidecimal*/
 static char DONT_WANT_TO_INLINE_THIS int_checker(unsigned char* proc){
-	char int_mode = 0; /*starting with 0x means hexidecimal*/
+	
 	unsigned long chars_read = 0;
 	if(!my_isdigit(proc[0])) return 1;
 	if(proc[0] == '0') {
@@ -290,12 +291,16 @@ static void parse_bas(){
 	return;
 }
 */
+
+
+FILE *infile = NULL,*ofile = NULL; 
+char* metaproc = NULL;
+unsigned long include_level = 0;
+const unsigned long nbuiltin_macros = 5; 
+const unsigned long nmacrodef_macros = 2;
+int i_cli_args;
 int main(int argc, char** argv){
-	FILE *infile,*ofile; 
-	char* metaproc;
-	unsigned long include_level = 0;
-	const unsigned long nbuiltin_macros = 5; 
-	const unsigned long nmacrodef_macros = 2;
+
 	variable_names[0] = "@";
 	variable_expansions[0] = "";
 	variable_names[1] = "$";
@@ -309,43 +314,48 @@ int main(int argc, char** argv){
 	variable_expansions[4] = variable_expansions[0];
 	nmacros = 5;
 	if(argc < 2) goto ASSEMBLER_SHOW_HELP;
-	{int i;for(i = 2; i < argc; i++)
+	for(i_cli_args = 2; i_cli_args < argc; i_cli_args++)
 	{
-		if(strprefix("-o",argv[i-1]))outfilename = argv[i];
-		if(strprefix("-i",argv[i-1]))infilename = argv[i];
-		if(strprefix("-run",argv[i-1])){
+		if(strprefix("-o",argv[i_cli_args-1]))outfilename = argv[i_cli_args];
+		if(strprefix("-i",argv[i_cli_args-1]))infilename = argv[i_cli_args];
+		if(strprefix("-run",argv[i_cli_args-1])){
 			/*FILE* f; unsigned long which = 0;*/
-			infilename = argv[i];
+			infilename = argv[i_cli_args];
 			run_sisa16 = 1;
 			clear_output = 1;
 			outfilename = NULL;
 		}
-		if(	strprefix("-nc",argv[i-2])
-			||strprefix("--no-comments",argv[i-2])) {
+		if(	strprefix("-nc",argv[i_cli_args-2])
+			||strprefix("--no-comments",argv[i_cli_args-2])) {
 			enable_dis_comments = 0;
 		}
-		if(strprefix("--disassemble",argv[i-2]) || strprefix("-dis",argv[i-2]) || strprefix("--disassembly",argv[i-2])){
+		if(strprefix("--disassemble",argv[i_cli_args-2]) || 
+			strprefix("-dis",argv[i_cli_args-2]) || 
+			strprefix("--disassembly",argv[i_cli_args-2])
+		){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
-			loc = strtoul(argv[i],0,0) & 0xffFFff;
-			disassembler(argv[i-1], loc, 3, 256 * 256 * 256 + 1, M_SAVER[0]);
+			loc = strtoul(argv[i_cli_args],0,0) & 0xffFFff;
+			disassembler(argv[i_cli_args-1], loc, 3, 256 * 256 * 256 + 1, M_SAVER[0]);
 			exit(0);
 		}
-		if(strprefix("--full-disassemble",argv[i-2]) || strprefix("-fdis",argv[i-2]) || strprefix("--full-disassembly",argv[i-2]) ){
+		if(strprefix("--full-disassemble",argv[i_cli_args-2]) || 
+		strprefix("-fdis",argv[i_cli_args-2]) || 
+		strprefix("--full-disassembly",argv[i_cli_args-2]) ){
 			unsigned long loc;
 			puts("//Beginning Disassembly");
-			loc = strtoul(argv[i],0,0) & 0xffFFff;
-			disassembler(argv[i-1], loc, 0x1000001, 256 * 256 * 256 + 1, M_SAVER[0]);
+			loc = strtoul(argv[i_cli_args],0,0) & 0xffFFff;
+			disassembler(argv[i_cli_args-1], loc, 0x1000001, 256 * 256 * 256 + 1, M_SAVER[0]);
 			exit(0);
 		}
-	}}
-	{int i;for(i = 1; i < argc; i++)
+	}
+	{for(i_cli_args = 1; i_cli_args < argc; i_cli_args++)
 	{
-		if(strprefix("-E",argv[i])) {
+		if(strprefix("-E",argv[i_cli_args])) {
 			quit_after_macros = 1;
 			ASM_PUTS("#Contents of file post macro expansion are as follows:");
 		}
-		if(strprefix("-C",argv[i])){
+		if(strprefix("-C",argv[i_cli_args])){
 			puts("SISA-16 Assembler and Emulator written by D[MHS]W for the Public Domain");
 			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
 			puts("Developer's original repository: https://github.com/gek169/Simple_ISA.git");
@@ -531,19 +541,19 @@ int main(int argc, char** argv){
 			return 0;
 		}
 
-		if(strprefix("-DBG",argv[i])) {
+		if(strprefix("-DBG",argv[i_cli_args])) {
 			debugging = 1;
 			ASM_PUTS("<ASM> Debugging.\n");
 		}
-		if(strprefix("-pl",argv[i])){
+		if(strprefix("-pl",argv[i_cli_args])){
 			printlines = 1;
 			ASM_PUTS("<ASM> Printing lines.");
 		}
 		if(
-			strprefix("-h",argv[i]) ||
-			strprefix("-v",argv[i]) ||
-			strprefix("--help",argv[i]) ||
-			strprefix("--version",argv[i])
+			strprefix("-h",argv[i_cli_args]) ||
+			strprefix("-v",argv[i_cli_args]) ||
+			strprefix("--help",argv[i_cli_args]) ||
+			strprefix("--version",argv[i_cli_args])
 		){
 			ASSEMBLER_SHOW_HELP:;
 			if(!clear_output)printf("Usage: %s [ARGS...]\n", argv[0]);
