@@ -7,7 +7,6 @@
 //3) Multitasking.
 
 .ZERO_STACK_POINTER:		astp;popa;
-//..(2):
 ..include"libc.hasm"
 
 //..include"libc_pre.hasm"
