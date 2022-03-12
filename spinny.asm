@@ -14,7 +14,7 @@
 //..(2):
 //..dinclude"libc_pre.bin"
 
-.wait_time:				33
+.wait_time:				60
 
 ..main(3):
 lrx0 %/krenel_boot%;
