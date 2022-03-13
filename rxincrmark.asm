@@ -4,7 +4,6 @@
 ..main:
 lrx0 %/0x70000%;
 proc_krenel;
-la 'd'; putchar;
 halt;
 
 ..(7):
