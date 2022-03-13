@@ -1642,6 +1642,8 @@ int main(int argc, char** argv){
 						printf(syntax_fail_pref);printf("This macro would prevent critical macro %s from being used.Line:\n%s\n", variable_names[i], line_copy);
 						goto error;	
 					}
+
+				/*
 				if(
 					(!streq(macro_name, variable_names[i]))
 					&& (npasses==1) && 
@@ -1655,7 +1657,7 @@ int main(int argc, char** argv){
 					printf("This Macro may produce a conflict with other Macro: \"%s\"Line:\n%s\n",variable_names[i], line_copy);
 					}
 				}
-				
+				*/
 				if(streq(macro_name, variable_names[i])){
 					if(is_overwriting){
 						printf(internal_fail_pref);printf("Multiple macros exist with the same name. Line:\n%s\n", line_copy);
