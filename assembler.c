@@ -89,7 +89,7 @@ static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned l
 		if(blen == (bcap-1))	/*Grow the buffer.*/
 			{
 				printf(general_fail_pref);
-				printf("Oversized line exceeds 64k limit for a line.");
+				printf("Oversized line!");
 				exit(1);
 			}
 		buf[blen++] = c;
@@ -97,8 +97,6 @@ static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned l
 
 		local_end_1:;
 	}
-	
-	
 	buf[blen] = '\0';
 	*lenout = blen;
 	return buf;
@@ -114,7 +112,6 @@ static const unsigned long max_lines_disassembler = 0x1ffFFff;
 #include "instructions.h"
 char int_mode = 0; /*starting with 0x means hexidecimal*/
 static char DONT_WANT_TO_INLINE_THIS int_checker(unsigned char* proc){
-	
 	unsigned long chars_read = 0;
 	if(!my_isdigit(proc[0])) return 1;
 	if(proc[0] == '0') {
