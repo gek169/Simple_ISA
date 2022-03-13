@@ -35,7 +35,7 @@ User mode is pre-empted.
 	the libc is designed specifically to work with this!
 */
 #ifndef SISA_MAX_TASKS
-#define SISA_MAX_TASKS 32
+#define SISA_MAX_TASKS 16
 #endif
 
 

@@ -121,8 +121,6 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 1){
 		return shouldquit;
 	}
-
-
 	if(a==0xa||a == 0xd) {
 		fflush(stdout);
 		return a;
@@ -131,7 +129,6 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 		printf("\e[H\e[2J\e[3J");
 		return a;
 	}
-
 	if(a==0xE000){
 #ifdef USE_TERMIOS
 		fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);return 1;
