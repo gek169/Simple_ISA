@@ -60,8 +60,8 @@ fill_dat_mem_looptop:
 	rxincr;
 	rxcmp;
 	sc %fill_dat_mem_looptop%; jmpifneq;
-la 3; 
-interrupt; //Play that memory as audio.
+//WARNING!!!! The following line can cause speakers to be damaged!!!!!
+//la 3; interrupt; //Play that memory as audio.
 asciifun_looptop: //Observe how I elegantly write a comment on the same line as code!
 	//increment the counter.
 		alpop;
