@@ -12,10 +12,10 @@ OPTLEVEL    = -O3 -s -march=native $(CFLAGS_PRIV) -DSISA_GIT_HASH=\"$(GIT_HASH)\
 #" dont remove this it fixes syntax highlighting in my editor
 
 MORECFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE
-SDL2CFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
+#SDL2CFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_SDL2 -DUSE_UNSIGNED_INT
 CFLAGS_NOERR = -Wno-pointer-sign -Wno-format-security
 CFLAGS      = $(MORECFLAGS) $(OPTLEVEL) $(CFLAGS_NOERR)
-CFLAGS_SDL2 = $(SDL2CFLAGS) $(OPTLEVEL) $(CFLAGS_NOERR)
+#CFLAGS_SDL2 = $(SDL2CFLAGS) $(OPTLEVEL) $(CFLAGS_NOERR)
 STATIC = # -static
 
 # ------=========------ COLORS ------=========------ #
@@ -40,8 +40,8 @@ endif
 all: main #asm_programs
 	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Done building." $(COLOR_RESET)
 
-all_sdl2: main_sdl2 #asm_programs
-	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Done building with SDL2." $(COLOR_RESET)
+#all_sdl2: main_sdl2 #asm_programs
+#	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Done building with SDL2." $(COLOR_RESET)
 
 assembler2: 
 	$(CC) $(CFLAGS) $(STATIC) assembler2.c -o s16asm2
@@ -61,21 +61,9 @@ sisa16_dbg:
 
 # SDL2 versions, if you want to mess with graphics and audio
 
-sisa16_sdl2_emu:
-	$(CC) $(CFLAGS_SDL2) isa.c -o sisa16_sdl2_emu -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of the emulator."
-	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Built SDL2 emulator." $(COLOR_RESET)
-
-sisa16_sdl2_asm:
-	$(CC) $(CFLAGS_SDL2) assembler.c -o sisa16_sdl2_asm -lSDL2  -DUSE_SDL2 || echo "Cannot build the sdl2 version of assembler."
-	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Built SDL2 assembler (Which has an emulator built into it.)" $(COLOR_RESET)
-
-sisa16_sdl2_dbg:
-	$(CC) $(CFLAGS_SDL2) debugger.c -o sisa16_sdl2_dbg  -DUSE_SDL2 -lSDL2 || echo "Cannot build the sdl2 version of the debugger."
-	@printf "%b%s%b\n" $(COLOR_BCYAN) "~~Built SDL2 debugger." $(COLOR_RESET)
-
 
 main: sisa16_asm sisa16_emu sisa16_dbg
-main_sdl2: sisa16_sdl2_asm sisa16_sdl2_emu sisa16_sdl2_dbg
+#main_sdl2: sisa16_sdl2_asm sisa16_sdl2_emu sisa16_sdl2_dbg
 
 asm: sisa16_asm
 	./asm_compile.sh
@@ -104,19 +92,7 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp *.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
-install_sdl2:
-	$(MAKE) -B install
-	$(MAKE) -B sisa16_sdl2_asm 
-	$(MAKE) -B sisa16_sdl2_emu 
-	$(MAKE) -B sisa16_sdl2_dbg
-	@cp ./sisa16_sdl2_emu $(INSTALL_DIR)/ || cp ./sisa16_sdl2_emu.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_emu"
-	@cp ./sisa16_sdl2_asm $(INSTALL_DIR)/ || cp ./sisa16_sdl2_asm.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_asm"
-	@cp ./sisa16_sdl2_dbg $(INSTALL_DIR)/ || cp ./sisa16_sdl2_dbg.exe $(INSTALL_DIR)/ || echo "ERROR!!! Cannot install sisa16_sdl2_dbg"
-	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
-	@cp ./libc.hasm /usr/include/sisa16/ || echo "ERROR!!! Cannot install libc.hasm. It is the main utility library for sisa16"
-	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
-
-libc:
+libc: install
 	sisa16_asm -i libc.asm -o libc.bin
 	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
 	@cp *.hasm /usr/include/sisa16/ && echo "Installed libraries." || echo "ERROR!!! Cannot install headers"
@@ -138,8 +114,7 @@ clean:
 
 
 q:
-	admin $(MAKE) -B install_sdl2
-	admin $(MAKE) libc
+	admin $(MAKE) -B libc
 	admin $(MAKE) clean
 	git add .
 	git commit -m "Developer time" || echo "nothing to commit"
@@ -147,9 +122,7 @@ q:
 #	./asmbuild.sh
 
 d:
-#	admin $(MAKE) -B install
-	admin $(MAKE) install_sdl2 -B
-	admin $(MAKE) libc
+	admin $(MAKE) -B libc
 	admin $(MAKE) clean
 	./asmbuild.sh
 
