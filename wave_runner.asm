@@ -40,11 +40,11 @@ st_iteration_count;
 st_page_count;
 st_line_count;
 nop;nop;
-la 7;
-syscall;
-la 5; 
-lb 51; 
-syscall;
+//la 7;
+//syscall;
+//la 5; 
+//lb 51; 
+//syscall;
 //Fill that memory with rolling stuff.
 lrx0 %/0xB00000%;
 lrx1 %/0xC00000%;

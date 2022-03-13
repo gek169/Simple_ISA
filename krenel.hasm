@@ -149,13 +149,11 @@ bytes 0,1;
 		rx0push;
 	//Set input mode to be non-blocking.
 		lla %0xE000%; interrupt;
-		
 	//Set the active task's info.
 		la 0; stla  %libc_krenel_task_nreturns%;	
 		la 0; stla  %libc_krenel_active_task_index%;
 		la 0; stla  %libc_krenel_owns_segment_index%;
 		la 1; stla  %libc_krenel_segment_lock%;
-
 	//Set all tasks to be zero
 		lb0;rx0b; 
 		lb libc_krenel_max_active_tasks; rx1b;
@@ -168,7 +166,6 @@ bytes 0,1;
 			la 0; faristla;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_looptop%; jmpifeq;
-	//
 	//PID 0 is the initial program... make it 1.
 		sc %LIBC_REGION%;llb %libc_krenel_task_isactive_array%
 		la 1;
@@ -208,8 +205,6 @@ bytes 0,1;
 		ab; alpush;
 		lb 16; cmp; blpop; sc %libc_krenel_getchar%; jmpifeq;
 		ab; alpush;
-		llb %0x101%; cmp; blpop; sc %libc_krenel_syscall_rectdraw%; jmpifeq;
-		ab; alpush;
 		lb 0; cmp; blpop; sc %libc_krenel_cswitch_killtask%; jmpifeq;
 		la '\r'; putchar; la '\n'; putchar;
 		libc_lproc_krenel_print_krenel;
@@ -234,13 +229,6 @@ bytes 0,1;
 			user_geta;	lb 0xd; cmp; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	nota; sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 			user_geta;	sc %libc_krenel_syscall_pumpevents%; jmpifeq; 						//Already 1!
-			user_geta;	lb 2; cmp; sc %libc_krenel_syscall_read_gamer_buttons%; jmpifeq;
-			user_geta;	lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
-			user_geta;	lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
-			user_geta;	lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
-			user_geta;	lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
-			user_geta;	lb 8; cmp; sc %libc_krenel_syscall_set_palette_color%; jmpifeq;
-			user_geta;	llb %0x101%; cmp; sc %libc_krenel_syscall_rectdraw%; jmpifeq;
 			user_geta;	llb %0xDEAD%; cmp; sc %libc_krenel_shutdown%; jmpifeq;
 			user_geta;	llb %0xDE00%; cmp; sc %libc_krenel_syscall_kill_pid%; jmpifeq;
 			user_geta;	llb %0xDE01%; cmp; sc %libc_krenel_syscall_disk_write%; jmpifeq;
@@ -270,23 +258,6 @@ bytes 0,1;
 			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_getpid:
 			llda %libc_krenel_active_task_index%;
-			user_seta;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_rectdraw:
-			user_get2; rx2_0;
-			user_get1; rx1_0;
-			user_get0;
-			user_getb; ba;
-			user_getc;
-			lla %0x101%;
-			interrupt;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_getscreenwidth:
-			lla %0x102%; interrupt;
-			user_seta;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_getscreenheight:
-			lla %0x103%; interrupt;
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_ipc_write:
@@ -333,19 +304,6 @@ bytes 0,1;
 			llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq; //handle quit.
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_read_gamer_buttons:
-			la 2; interrupt;
-			user_seta;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_kill_audio:
-			//Anyone on the system can request to kill the audio.
-			la 4; interrupt; 
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_become_av_provider:
-			llda %libc_krenel_active_task_index%;
-			aincr; ba;
-			la 7; interrupt;
-			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_releasesegment:
 			//Do we already own the segment? If not, then, don't unlock it.
 			llda %libc_krenel_active_task_index%;
@@ -380,18 +338,6 @@ bytes 0,1;
 		:libc_krenel_syscall_ret0_failure:
 			la 0; 
 			user_seta;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_set_palette_color:
-			user_get0;
-			user_getb; ba;
-			la 8; interrupt;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_play_audio:
-			la 3; interrupt; 
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_set_colors:
-			user_getb;ba;
-			la 5; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
@@ -588,11 +534,6 @@ bytes 0,1;
 		user_geta; lb '\r'; cmp;  sc %libc_krenel_syscall_flush_stdout%; jmpifeq;
 		user_geta; lb 0xc; cmp; sc %libc_krenel_syscall_clear_term%; jmpifeq;
 		user_geta; lb 1; cmp; sc %libc_krenel_syscall_pumpevents%; jmpifeq;
-		user_geta; lb 3; cmp; sc %libc_krenel_syscall_play_audio%; jmpifeq;
-		user_geta; lb 4; cmp; sc %libc_krenel_syscall_kill_audio%; jmpifeq;
-		user_geta; lb 5; cmp; sc %libc_krenel_syscall_set_colors%; jmpifeq;
-		user_geta; lb 7; cmp; sc %libc_krenel_syscall_become_av_provider%; jmpifeq;
-		user_geta; lb 8; cmp; sc %libc_krenel_syscall_set_palette_color%; jmpifeq;
 		user_geta; lb 0x80; cmp;  sc %libc_krenel_try_select_task%; jmpifeq; //Interrupt 0x80 just selects the next task.
 		//BAD INTERRUPT
 		la '\r'; putchar; la '\n'; putchar;

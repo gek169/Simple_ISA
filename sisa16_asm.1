@@ -148,15 +148,6 @@ emulate_seg, or priv_drop.
 
 Some instructions cannot be executed in User mode. getchar, putchar, interrupt, emulate, emulate_seg and the user_ instructions
 
-.B (SDL2 Driver Features Only)
-
-.B Screen Memory:
-153600 bytes starting at 0xB00000 which are used for the screen in the AV driver.
-
-.B Audio Region:
-Memory starting at 0xB50000 which goes until 0xC00000 for audio.
-If you call an interrupt with a==3, you will start playing back audio in the AV driver.
-
 
 .SH INSTRUCTIONS
 
@@ -381,7 +372,7 @@ apop: pop byte register a from the stack. (1 byte) (63)
 
 bpop: pop byte register b from the stack. (1 byte) (64)
 
-interrupt: pass the registers to the user defined "interrupt" function (1 byte) (PRIVILIGED) (65)
+interrupt: pass the registers to the BIOS "interrupt" function (1 byte) (PRIVILIGED) (65)
 
 clock: set register a to the execution time in thousandths of a second. (1 byte) (66)
 Register B will be the time in seconds. 

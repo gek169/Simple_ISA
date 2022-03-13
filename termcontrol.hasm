@@ -5,11 +5,12 @@
 
 
 .clear_terminal:la0xc;interrupt;
-
 ..export"clear_terminal"
 
 .flush_stdout:la10;interrupt;
 ..export"flush_stdout"
+
 .flush_stdout_user:la10;syscall;
-..export"flush_stdout_user"	
-farret;
+..export"flush_stdout_user"
+
+

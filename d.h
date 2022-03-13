@@ -121,8 +121,6 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 	if(a == 1){
 		return shouldquit;
 	}
-	if(a == 0x102) { return 0;}
-	if(a == 0x103) { return 0;}
 
 
 	if(a==0xa||a == 0xd) {
