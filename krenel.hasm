@@ -140,6 +140,8 @@ bytes 0,1;
 
 ..decl_farproc(LIBC_REGION):proc_krenel
 ..export"proc_krenel"
+
+
 :LIBC_KRENEL_BEGIN:
 ..export"LIBC_KRENEL_BEGIN"
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
