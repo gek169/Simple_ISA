@@ -294,7 +294,6 @@ farpagel: copy 256 bytes from any page indexed by c to page indexed by a (1 byte
 
 farpagest: copy 256 bytes to any page indexed by c from page indexed by a (1 byte) (43)
 
-
 lfarpc: pp = a; pc=0; move the program counter offset to a different 64k region of memory. Set PC to 0. (1 byte) (44)
 
 farcall: write the program counter to the stack pointer. 
@@ -349,9 +348,6 @@ task_kill: Resets essential variables for a task so it can be setup for another 
 
 syscall: make syscall. Generate error code 19. (5A)
 
-
-
-
 alpush: push short register a onto the stack. (1 byte) (5B)
 
 blpush: push short register b onto the stack. (1 byte) (5C)
@@ -377,8 +373,6 @@ interrupt: pass the registers to the BIOS "interrupt" function (1 byte) (PRIVILI
 clock: set register a to the execution time in thousandths of a second. (1 byte) (66)
 Register B will be the time in seconds. 
 C will be the raw number of clock cycles.
-
-.B SISA16 32 BIT EXTENSION
 
 arx0: load RX0 into A. (1 byte) (67)
 
@@ -636,8 +630,6 @@ task_ric: If pre-emption is enabled, reset the current task's instruction counte
 user_farpagel: load user page c into privileged page a (PRIVILEGED) (DA)
 
 user_farpagest: store privileged page a into user page c (PRIVILEGED) (DB)
-
-.B Local Region Loads and Stores Extension (All two bytes)
 
 llda: load 16 bit value into a from fixed memory location. (DC)
 
