@@ -1,0 +1,35 @@
+
+
+//STACK READ AND WRITE OPS
+//the number of bytes deep into the stack to go is in the a register, I.E....
+//How many bytes of "stuff" above the variable is there?
+//This does not include the variable itself
+					     STP
+//                       V
+//|myVarb1|myVarb2|255|7|20|0
+//In the above example, myVar is 2 bytes deep, even though
+//its first byte is at the fourth byte, there are two bytes AFTER the variable.
+//The value of the A register is NOT preserved in dig ops, but it is preserved
+//across a bury
+//the stack pointer is preserved- it is the same after the macro as before
+//the value retrieved is either in B (8/16 bit) or RX0 (32 bit)
+
+//Retrieve a single byte on the stack, 'a' bytes deep.
+.stack_dig8: popa;bpop;    aincr;                   pusha
+.stack_dig16:popa;blpop;   aincr;aincr;             pusha
+.stack_dig32:popa;rx0pop;  aincr;aincr;aincr;aincr; pusha
+
+..export"stack_dig8"
+..export"stack_dig16"
+..export"stack_dig32"
+
+//Bury the value in b 'a' bytes deep
+.stack_bury8: aincr;                  popa;bpush;  adecr;                  pusha
+.stack_bury16:aincr;aincr;            popa;blpush; adecr;adecr;            pusha
+.stack_bury32:aincr;aincr;aincr;aincr;popa;rx0push;adecr;adecr;adecr;adecr;pusha
+
+..export"stack_bury8"
+..export"stack_bury16"
+..export"stack_bury32"
+
+
