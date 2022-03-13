@@ -22,6 +22,8 @@ section 0;
 push %5000%;
 lrx0 %/true_start%;
 proc_krenel;
+la '\r'; putchar;
+la '\n'; putchar;
 la 'f'; putchar;
 la 'i'; putchar;
 la 'n'; putchar;
