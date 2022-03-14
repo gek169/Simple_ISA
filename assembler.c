@@ -653,8 +653,8 @@ int main(int argc, char** argv){
 		} else if(strprefix("..include\"", line)){
 			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
-				puts("<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
-				puts("Line:");
+				printf(syntax_fail_pref);
+				puts("Syntactic sugar for file include is missing ending \"\r\nLine:\r\n");
 				puts((char*)line_copy);
 				goto error;
 			}
@@ -666,8 +666,8 @@ int main(int argc, char** argv){
 		} else if(strprefix("..dinclude\"", line)){
 			long loc_eparen = strfind(line + strlen("..dinclude\""), "\"");
 			if(loc_eparen == -1){
-				puts("<ASM SYNTAX ERROR> Syntactic sugar for data include is missing ending \"");
-				puts("Line:");
+				printf(syntax_fail_pref);
+				puts("Syntactic sugar for data include is missing ending \"\r\nLine:\r\n");
 				puts((char*)line_copy);
 				goto error;
 			}
