@@ -56,7 +56,10 @@ bytes %/0%;
 	proc_prints
 	la '\n'; putchar;
 	la '\r'; putchar;
+
+
 	lrx0 %/0x1000%;
+	proc_alloc;
 	proc_alloc;
 	rx2_0
 	la '\n'; putchar; la '\r'; putchar;
@@ -65,42 +68,47 @@ bytes %/0%;
 	rx0_2;
 	//lrx1 %/256%;rxadd;
 	proc_free;
+		sc %the_end%; 
+		nota; 
+		jmpifeq;
 	la '\n'; putchar; 
 	la '\r'; putchar;
+
+
+
 	lrx0 %/0xF00%;
 		proc_alloc;
-		rx2_0
-		//
-			//print the number!
-		rx0_2;arx0;apush;
-		lb8; rx1b;rxrsh;arx0;apush;
-		rx0_2;lb16;rx1b;rxrsh;arx0;apush;
-		rx0_2;lb24;rx1b;rxrsh;arx0;apush;
-		proc_printbytelchex;
-			apop;
-		proc_printbytelchex;
-			apop;
-		proc_printbytelchex;
-			apop;
-		proc_printbytelchex;
-			apop;
+	rx2_0
+	proc_print32lchex
+	rx0_2
 	la '\n'; putchar; 
 	la '\r'; putchar;
+
+
 	lrx0 %/0xBAFF00%;
-			proc_alloc;
-			rx2_0
-				//print the number!
-			rx0_2;arx0;apush;
-			lb8; rx1b;rxrsh;arx0;apush;
-			rx0_2;lb16;rx1b;rxrsh;arx0;apush;
-			rx0_2;lb24;rx1b;rxrsh;arx0;apush;
-			proc_printbytelchex;
-				apop;
-			proc_printbytelchex;
-				apop;
-			proc_printbytelchex;
-				apop;
-			proc_printbytelchex;
-				apop;
-	la '\n'; interrupt;
+		proc_alloc;
+	rx2_0
+	proc_print32lchex
+	rx0_2
+	la '\n'; putchar; 
+	la '\r'; putchar;
+
+
+	lrx0 %/0xFFE5%;
+	proc_alloc;
+	rx2_0
+	proc_print32lchex
+	rx0_2
+	la '\n'; putchar; 
+	la '\r'; putchar;
+
+	lrx0 %/0xFFE5%;
+	proc_alloc;
+	rx2_0
+	proc_print32lchex
+	rx0_2
+	la '\n'; putchar; 
+	la '\r'; putchar;
+
+	the_end:
 	halt;
