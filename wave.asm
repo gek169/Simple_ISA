@@ -57,8 +57,6 @@ fill_dat_mem_looptop:
 	rxincr;
 	rxcmp;
 	sc %fill_dat_mem_looptop%; jmpifneq;
-la 3; 
-interrupt; //Play that memory as audio.
 asciifun_looptop: //Comment.
 	//increment the counter.
 		alpop;
