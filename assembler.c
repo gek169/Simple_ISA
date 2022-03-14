@@ -266,7 +266,7 @@ int main(int argc, char** argv){
 
 	/*for(i_cli_args = 1; i_cli_args < argc; i_cli_args++)*/
 
-	i_cli_args = 2;
+	i_cli_args = 1;
 	cli_arg_parse_loop2:if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop2;
 	{
 		if(strprefix("-E",argv[i_cli_args])) {
