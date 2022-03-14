@@ -195,103 +195,12 @@ static void DONT_WANT_TO_INLINE_THIS fputbyte(unsigned char b, FILE* f){
 				M_SAVER[0][outputcounter]=b;
 		}
 	}
-	outputcounter++; outputcounter&=0xffffff;
+	outputcounter++; outputcounter&=0xffFFff;
 }
 static void putshort(unsigned short sh, FILE* f){fputbyte(sh/256, f);fputbyte(sh, f);}
 #define ASM_MAX_INCLUDE_LEVEL 20
 static FILE* fstack[ASM_MAX_INCLUDE_LEVEL];
-/*#include "asm_expr_parser.h"*/
 #include "disassembler.h"
-
-
-/*
-static unsigned char is_declaring_delayed_variable = 0;
-static unsigned char delayed_variable_type = 0;
-static unsigned char bas_require_delay = 0;
-static void bas_delayed_action(){
-	line[0] = '\0';
-	bas_require_delay = 0;
-	if(is_declaring_delayed_variable){
-		is_declaring_delayed_variable = 0;
-		if(delayed_variable_type == 0) {
-			my_strcpy(line, "..ASM:bytes 0");
-		} else if(delayed_variable_type == 1) {
-			my_strcpy(line, "..ASM:bytes 0,0");
-		}else if(delayed_variable_type == 4) {
-			my_strcpy(line, "..ASM:bytes %?0%");
-		}else if(delayed_variable_type >= 2) {
-			my_strcpy(line, "..ASM:bytes %/0%");
-		}else {
-			printf(internal_fail_pref);
-			printf("Bad variable declaration.");
-		}
-		delayed_variable_type = 0;
-		return;
-	}
-}
-
-static void parse_bas(){
-	buf2[0] = '\0'; 
-	buf1[0] = '\0';
-	if(strprefix("..ENDBAS", line)){
-		is_parsing_bas = 0;
-		my_strcpy(line, "");
-		return;
-	}
-	if(strprefix("..ASM:", line)){
-		strcat(buf2, line + 6);
-		my_strcpy(line, buf2);
-		return;
-	}
-	while(perform_inplace_repl(line, "\t", " "));
-	while(perform_inplace_repl(line, "\v", " "));
-	while(perform_inplace_repl(line, "\f", " "));
-	while(perform_inplace_repl(line, "\r", " "));
-	while(perform_inplace_repl(line, "  ", " "));
-	if(strprefix("var ", line)){
-		unsigned char variable_type = 0; 
-		unsigned long stepper = 4; 
-		if(strprefix("u32 ", line+stepper)){
-			stepper += 4;
-			variable_type = 2;
-		} else if(strprefix("i32 ", line+stepper)){
-			stepper += 4;
-			variable_type = 3;
-		} else if(strprefix("f32 ", line+stepper)){
-			stepper += 4;
-			variable_type = 4;
-		}else if(strprefix("byte ", line+stepper)){
-			stepper += 5;
-			variable_type = 0;
-		}else if(strprefix("short ", line+stepper)){
-			stepper += 6;
-			variable_type = 1;			
-		} else {
-			printf(syntax_fail_pref);
-			printf("Variable declaration missing type.");
-			exit(1);
-		}
-		while(perform_inplace_repl(line+stepper, " ", ""));
-		if(strfind(line, "//") != -1){
-			line[strfind(line, "//")] = '\0';
-		}
-		if(strfind(line, "#") != -1){
-			line[strfind(line, "#")] = '\0';
-		}
-		my_strcpy(buf2, "VAR#");
-		strcat(buf2, line+stepper);
-		strcat(buf2, "#@");
-		my_strcpy(line, buf2);
-		bas_require_delay = 1;
-		is_declaring_delayed_variable = 1;
-		delayed_variable_type = variable_type;
-		return;	
-	}
-	my_strcpy(line, buf2);
-	return;
-}
-*/
-
 
 FILE *infile = NULL,*ofile = NULL; 
 char* metaproc = NULL;
@@ -314,7 +223,9 @@ int main(int argc, char** argv){
 	variable_expansions[4] = variable_expansions[0];
 	nmacros = 5;
 	if(argc < 2) goto ASSEMBLER_SHOW_HELP;
-	for(i_cli_args = 2; i_cli_args < argc; i_cli_args++)
+	/*for(i_cli_args = 2; i_cli_args < argc; i_cli_args++)*/
+	i_cli_args = 2;
+	cli_arg_parse_loop:if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop;
 	{
 		if(strprefix("-o",argv[i_cli_args-1]))outfilename = argv[i_cli_args];
 		if(strprefix("-i",argv[i_cli_args-1]))infilename = argv[i_cli_args];
@@ -348,8 +259,15 @@ int main(int argc, char** argv){
 			disassembler(argv[i_cli_args-1], loc, 0x1000001, 256 * 256 * 256 + 1, M_SAVER[0]);
 			exit(0);
 		}
+		i_cli_args++; goto cli_arg_parse_loop;
 	}
-	{for(i_cli_args = 1; i_cli_args < argc; i_cli_args++)
+	beyond_cli_arg_parse_loop:;
+
+
+	/*for(i_cli_args = 1; i_cli_args < argc; i_cli_args++)*/
+
+	i_cli_args = 2;
+	cli_arg_parse_loop2:if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop2;
 	{
 		if(strprefix("-E",argv[i_cli_args])) {
 			quit_after_macros = 1;
@@ -359,30 +277,15 @@ int main(int argc, char** argv){
 			puts("SISA-16 Assembler and Emulator written by D[MHS]W for the Public Domain");
 			puts("This program is Free Software that respects your freedom, you may trade it as you wish.");
 			puts("Developer's original repository: https://github.com/gek169/Simple_ISA.git");
-			puts("Please submit bug reports and... leave a star if you like the project! Every issue will be read.");
-			puts("Programmer Documentation for this virtual machine is provided in the provided manpage sisa16_asm.1");
+			puts("Programmer Documentation for this software is provided in the provided manpage sisa16_asm.1");
 			puts("~~COMPILETIME ENVIRONMENT INFORMATION~~");
-#if defined(FUZZTEST)
-			puts("This build of Sisa16 is safe for fuzz testing. You can run random binaries with impunity.");
-#else
-			puts("Fuzztesting safety is disabled. The driver may allow you to damage the host- be careful what you run!");
-#endif
 #if defined(NO_SEGMENT)
-			puts("The segment was disabled during compilation. emulate is also disabled.");
+			puts("The segment was disabled during compilation.");
 #else
-			puts("The segment is enabled, so is Emulate.");
+			puts("The segment is enabled.");
 #endif
-
 #if defined(NO_EMULATE)
-			puts("emulate and emulate_seg are disabled.");
-#else
-
-#if defined(NO_SEGMENT)
-			puts("... but you CAN use emulate_seg! Just not emulate.");
-#else
-			puts("You may use emulate and emulate_seg");
-#endif
-
+			puts("emulate is disabled.");
 #endif
 #if defined(NO_FP)
 			puts("Floating point unit was disabled during compilation. Float ops generate error code 8.");
@@ -396,7 +299,6 @@ int main(int argc, char** argv){
 #else
 			puts("32 bit signed integer division instructions were enabled during compilation. Don't divide by zero!");
 #endif
-
 			printf("Size of u is %u, it should be 1\n", (unsigned int)sizeof(u));
 			printf("Size of U is %u, it should be 2\n", (unsigned int)sizeof(U));
 			printf("Size of UU is %u, it should be 4\n", (unsigned int)sizeof(UU));
@@ -404,19 +306,16 @@ int main(int argc, char** argv){
 #if !defined(NO_FP)
 			printf("Size of float is %u, it should be 4\n", (unsigned int)sizeof(float));
 #endif
-
-
 #ifdef __STDC_IEC_559__
 #if __STDC_IEC_559__ == 0
 		puts("Floating point compatibility of the environment is specifically not guaranteed.");
 #else
 		puts("Floating point compatibility of the environment is specifically guaranteed.");
 #endif
-
 #else
 		puts("the STDC_IEC_559 define is not defined. Standard behavior is not guaranteed.");
 #endif
-		if(sizeof(void*) == 2) puts("Compiled for a... 16 bit architecture? This is going to be interesting...");
+		if(sizeof(void*) < 4) puts("Something funky happened to the size of a void pointer...");
 		if(sizeof(void*) == 4) puts("Compiled for a 32 bit architecture.");
 		if(sizeof(void*) == 8) puts("Compiled for a 64 bit architecture.");
 #if defined(__i386__) || defined(_M_X86) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(__IA32__) || defined(__INTEL__) || defined(__386)
@@ -452,12 +351,6 @@ int main(int argc, char** argv){
 #if defined(__TMS470__)
 		puts("Compiled for TMS470");
 #endif
-#if defined(__SISA16__)
-		puts("Compiled for... This architecture!\nIf you're reading this from the source code, let this be a challenge to you:"
-		"\nWrite a C compiler for SISA16 and tell me about it on Github. Then, show me some screenshots.\nI'll give you a special prize.");
-		puts("The first person to get sisa16_asm to be self-hosting will win something. If that's you, Submit an issue! https://github.com/gek169/Simple_ISA");
-#endif
-
 #if defined(__x86_64__) || defined(__amd64__) || defined(_M_X64) || defined(_M_AMD64)
 		puts("Compiled for x86_64");
 #endif
@@ -483,10 +376,10 @@ int main(int argc, char** argv){
 		puts("Compiled for hppa.");
 #endif
 #if defined(WIN32) || defined(_WIN32)
-			puts("Compiled for Macrohard Doors.");
+		puts("Compiled for Macrohard Doors.");
 #endif
 #if defined(__unix__)
-			puts("Targetting *nix");
+		puts("Targetting *nix");
 #endif
 #if defined(linux) || defined(__linux__) || defined(__linux) || defined (_linux) || defined(_LINUX) || defined(__LINUX__)
 			puts("Targetting Linux. Free Software Is Freedom.");
@@ -498,23 +391,18 @@ int main(int argc, char** argv){
 			puts("Compiled with TenDRA. Gotta say, that's a cool name for a compiler.");
 			return 0;
 #endif
-
 #ifdef __INTEL_LLVM_COMPILER
 			puts("Compiled with Intel LLVM. Duopoly Inside.");
 			return 0;
 #endif
-
 #ifdef __cilk
 			puts("Compiled with Cilk. Duopoly inside.");
 			return 0;
 #endif
-
-
 #ifdef __TINYC__
 			puts("Compiled with TinyCC. All Respects to F. Bellard and Crew~~ Try TinyGL! https://github.com/C-Chads/tinygl/");
 			return 0;
 #endif
-
 #ifdef _MSVC_VER
 			puts("Gah! You didn't really compile my beautiful software with that disgusting compiler?");
 			puts("MSVC is the worst C compiler on earth. No, not just because Microsoft wrote it. They make *some* good products.");
@@ -522,17 +410,14 @@ int main(int argc, char** argv){
 			puts("Herb Sutter can go suck an egg! He's trying to kill C++.");
 			return 0;
 #endif
-
 #ifdef __SDCC
 			puts("Compiled with SDCC. Please leave feedback on github about your experiences compiling this with SDCC, I'd like to know.");
 			return 0;
 #endif
-
 #ifdef __clang__
 			puts("Compiled with Clang. In my testing, GCC compiles this project faster *and* produces faster x86_64 code.");
 			return 0;
 #endif
-
 #ifdef __GNUC__
 			puts("Compiled with GCC. Free Software Is Freedom.");
 			return 0;
@@ -575,8 +460,10 @@ int main(int argc, char** argv){
 			printf("The last instruction added to the instruction set is %s\n", insns[n_insns-1]);
 			return 0;
 		}
-	}}
-
+		i_cli_args++;goto cli_arg_parse_loop2;
+	}
+	beyond_cli_arg_parse_loop2:;
+	
 	if(infilename){
 		infile = fopen(infilename, "rb");
 		if(!infile) {
