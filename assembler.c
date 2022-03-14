@@ -511,7 +511,6 @@ int main(int argc, char** argv){
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET),
 	 (outputcounter=0), (is_parsing_bas=0))
 	while(1){
-		puts("parsing a line...\r\n");
 		was_macro = 0;	
 		using_asciz = 0;
 		if(feof(infile)){
@@ -702,7 +701,6 @@ int main(int argc, char** argv){
 			i = nbuiltin_macros;
 			export_sugar_macro_loop:
 			if(!(i < nmacros)) goto end_export_sugar_macro_loop;
-			puts("stuck in export...\r\n");
 			{
 				if(streq(variable_names[i], variable_name))
 				{
@@ -714,8 +712,6 @@ int main(int argc, char** argv){
 				i++;goto export_sugar_macro_loop;
 			}
 			end_export_sugar_macro_loop:;
-
-			puts("finished export...\r\n");fflush(stdout);
 
 			if(found == 0){
 				printf(compil_fail_pref);
