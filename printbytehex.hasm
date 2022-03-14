@@ -112,3 +112,12 @@ farret
 	rx0push;la 1;popa;proc_printbytelchex;apop;alpop;
 	rx0push;proc_printbytelchex;alpop;alpop;
 farret
+
+
+..decl_farproc(LIBC_REGION):proc_print32hex
+..export"proc_print32hex"
+	rx0push;la 3;popa;proc_printbytehex;apop;
+	rx0push;la 2;popa;proc_printbytehex;alpop;
+	rx0push;la 1;popa;proc_printbytehex;apop;alpop;
+	rx0push;proc_printbytehex;alpop;alpop;
+farret
