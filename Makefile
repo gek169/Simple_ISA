@@ -4,10 +4,10 @@ INSTALL_DIR     = /usr/bin
 MAN_INSTALL_DIR = /usr/share/man/man1
 
 GIT_HASH = $(shell git rev-parse > /dev/null 2>&1 && git rev-parse --short HEAD || echo no)
-OPTLEVEL    = -O3 -s -march=native $(CFLAGS_PRIV) -DSISA_GIT_HASH=\"$(GIT_HASH)\"
+OPTLEVEL    = -O3 -s -march=native -DSISA_GIT_HASH=\"$(GIT_HASH)\" #$(CFLAGS_PRIV) 
 #" dont remove this it fixes syntax highlighting in my editor
 
-MORECFLAGS  = -DUSE_COMPUTED_GOTO -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE
+MORECFLAGS  =  -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE -DUSE_COMPUTED_GOTO
 
 CFLAGS_NOERR = -Wno-pointer-sign -Wno-format-security
 CFLAGS      = $(MORECFLAGS) $(OPTLEVEL) $(CFLAGS_NOERR)
