@@ -57,7 +57,6 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 ){
 	long loc = strfind((char*)workbuf, (char*)replaceme);
 	if(loc == -1) return 0;
-	/*printf("\r\nASKED TO REPLACE %s WITH %s IN %s", replaceme, replacewith, workbuf);*/
 	memcpy(buf_repl, workbuf, loc);
 	my_strcpy(buf_repl + loc, replacewith);
 	my_strcpy(
@@ -65,7 +64,6 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 		workbuf + loc + strlen((char*)replaceme)
 	);
 	my_strcpy(workbuf, buf_repl);
-	/*printf("\r\nIS NOW:%s\r\n", workbuf);*/
 	return 1;
 }
 
@@ -265,7 +263,6 @@ int main(int argc, char** argv){
 
 
 	/*for(i_cli_args = 1; i_cli_args < argc; i_cli_args++)*/
-
 	i_cli_args = 1;
 	cli_arg_parse_loop2:if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop2;
 	{
@@ -504,21 +501,12 @@ int main(int argc, char** argv){
 			break;
 		}
 		if(debugging) if(!clear_output)printf("\nEnter a line...\n");
-		/*if(bas_require_delay == 0)*/
-			read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
-		/*else
-		{
-			bas_delayed_action();
-			linesize = strlen(line);
-		}
-		*/
+		read_until_terminator_alloced_modified(infile, &linesize, '\n'); /*Always suceeds.*/
 		while(
 				strprefix(" ",line)
 				|| strprefix("\t",line)
 				|| (isspace(line[0]) && line[0] != '\0')
-		){ /*Remove preceding whitespace... we do this twice, actually...*/
-			my_strcpy(line, line+1);
-		}
+		){my_strcpy(line, line+1);}
 
 		/*if this line ends in a backslash...*/
 		while(
@@ -533,29 +521,9 @@ int main(int argc, char** argv){
 			rut_append_to_me = line;
 			read_until_terminator_alloced_modified(infile, &linesize, '\n');
 		}
-		/*line_copy = strcatalloc(line,"");*/
 		my_strcpy(line_copy, (unsigned char*)line);
 		if(strprefix("#",line)) goto end;
 		if(strprefix("//",line)) goto end;
-
-/*
-		if(is_parsing_bas){
-			parse_bas();
-		}
-*/
-		/*
-			syntactic sugars. Only one may be used on a single line!
-		*/
-
-/*
-		if(strprefix("..BAS", line)){
-			is_parsing_bas = 1;
-			goto end;
-		}else if(strprefix("..ENDBAS", line)){
-			is_parsing_bas = 0;
-			goto end;
-		}else 
-*/
 		if(strprefix("..zero:", line)){
 			perform_inplace_repl(
 				line,
@@ -578,11 +546,10 @@ int main(int argc, char** argv){
 			char have_expanded = 0;
 			unsigned long secnum = 0;
 			long loc_eparen = -1;
-			const long len_command = strlen("..main(");
-			/*
-				attempt to find a macro to expand here.
-			*/
-			do{
+			const long len_command = strlen("..main("/*)*/ );
+			/*attempt to find a macro to expand here.*/
+			main_expander_looptop:;
+			{
 				unsigned long i = 0;
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
@@ -597,7 +564,9 @@ int main(int argc, char** argv){
 						break;
 					}
 				}
-			}while(have_expanded == 1);
+			} if(have_expanded == 1) goto main_expander_looptop;
+
+			
 			if(int_checker(line+len_command)){
 				printf(syntax_fail_pref);
 				printf("Bad integer constant inside of main region selection syntactic sugar.\n");
@@ -621,31 +590,21 @@ int main(int argc, char** argv){
 			strcat(buf2, ";");
 			strcat(buf2, line + loc_eparen);
 			my_strcpy(line, buf2);
-			/*
-			line = strcatallocfb(
-				strcatalloc(
-					"section0;la",
-					buf1
-				),
-				strcatallocf1(
-					strcatallocf1(
-						strcatalloc(
-						";lfarpc;region", 
-						buf1
-						),
-						";"
-					),
-					line + loc_eparen
-				)
-			);
-			*/
 		}else if(strprefix("..ascii:", line)){
-			my_strcpy(line+1, line+strlen("..ascii:"));
-			line[0] = '!';
+			/*my_strcpy(line+1, line+strlen("..ascii:"));
+			line[0] = '!';*/
+			perform_inplace_repl(
+				line,
+				"..ascii:",
+				"!"
+			);
 			using_asciz = 0;
 		} else if(strprefix("..asciz:", line)){
-			my_strcpy(line+1, line+strlen("..asciz:"));
-			line[0] = '!';
+			perform_inplace_repl(
+				line,
+				"..asciz:",
+				"!"
+			);
 			using_asciz = 1;
 		} else if(strprefix("..(", line)){
 			char have_expanded = 0;
@@ -655,7 +614,8 @@ int main(int argc, char** argv){
 			/*
 				attempt to find a macro to expand here.
 			*/
-			do{
+			secsugar_expander_looptop:;
+			{
 				unsigned long i = 0;
 				have_expanded = 0;
 				for(i=nbuiltin_macros; i < nmacros; i++){
@@ -670,7 +630,7 @@ int main(int argc, char** argv){
 						break;
 					}
 				}
-			}while(have_expanded == 1);
+			}if(have_expanded == 1) goto secsugar_expander_looptop;
 			if(int_checker(line+3)){
 				printf(syntax_fail_pref);
 				printf("Bad integer constant inside of region select syntactic sugar.\n");
@@ -696,18 +656,7 @@ int main(int argc, char** argv){
 			strcat((char*)buf2, ";");
 			strcat((char*)buf2, (char*)line + loc_eparen);
 			my_strcpy(line, buf2);
-			/*
-			line = strcatallocfb(
-				strcatalloc(
-					"section",
-					buf
-				),
-				strcatalloc(
-					";",
-					line + loc_eparen
-				)
-			);
-			*/
+
 		} else if(strprefix("..include\"", line)){
 			long loc_eparen = strfind(line + strlen("..include\""), "\"");
 			if(loc_eparen == -1){
