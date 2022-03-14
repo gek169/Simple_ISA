@@ -28,14 +28,10 @@ krenel_boot:
 	syscall;	//Make the call
 	sc %bruh%;
 	bruh:
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	jmp;
+	la '\ '; putchar;
+	//la 1;
+	//alpush; proc_wait; alpop;
+	sc %bruh%;jmp;
 
 
 ..(5):
