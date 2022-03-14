@@ -602,9 +602,9 @@ G_INTERRUPT:
 }
 D
 G_CLOCK:{
-	clock_ins()
+	clock_ins();
 #ifndef NO_PREEMPT
-	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
+	if(EMULATE_DEPTH) instruction_counter += HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
 #endif
 }D
 /*load from RX0*/

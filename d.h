@@ -23,23 +23,7 @@ void emu_respond(int bruh){
 #define TRAP_CTRLC /*a comment.*/
 #endif
 
-/*
-	IMPLEMENT YOUR CLOCK HERE!!!!
-	a must be milliseconds
-	b must be seconds
-	c is presumed to be some raw measurement of the clock- it can be whatever
-*/
-#define clock_ins(){\
-	size_t q;\
-	{\
-		STASH_REGS;\
-		q=clock();\
-		UNSTASH_REGS;\
-	}\
-	a=((q)/(CLOCKS_PER_SEC/1000));\
-	b=q/(CLOCKS_PER_SEC);\
-	c=q;\
-}
+
 
 #include "isa_pre.h"
 /*
@@ -76,7 +60,7 @@ static void DONT_WANT_TO_INLINE_THIS di(){
 	initTermios(0);
 	atexit(dieTermios);
 #ifndef SISA_DEBUGGER
-		TRAP_CTRLC
+	TRAP_CTRLC
 #endif
 	setvbuf ( stdout, stdout_buf, _IOFBF, sizeof(stdout_buf));
 }
@@ -93,11 +77,25 @@ static void dcl(){return;}
 #endif
 
 
-
 /*
-	non-sdl2 variants of 
+	IMPLEMENT YOUR CLOCK HERE!!!!
+	a must be milliseconds
+	b must be seconds
+	c is presumed to be some raw measurement of the clock- it can be whatever
 */
-#ifndef USE_SDL2
+#define clock_ins(){\
+	size_t q;\
+	{\
+		STASH_REGS;\
+		q=clock();\
+		UNSTASH_REGS;\
+	}\
+	a=((q)/(CLOCKS_PER_SEC/1000));\
+	b=q/(CLOCKS_PER_SEC);\
+	c=q;\
+}
+
+
 static unsigned short gch(){
 #if defined(USE_TERMIOS)
 	return 0xff & getchar_unlocked();
@@ -105,6 +103,8 @@ static unsigned short gch(){
 	return 0xff & getchar();
 #endif
 }
+
+
 static void pch(unsigned short a){
 #if defined(USE_TERMIOS)
 	putchar_unlocked(a);
@@ -112,11 +112,6 @@ static void pch(unsigned short a){
 	putchar(a);
 #endif
 }
-#endif
-
-
-
-
 
 static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 									unsigned short b,
@@ -133,8 +128,6 @@ static unsigned short DONT_WANT_TO_INLINE_THIS interrupt(unsigned short a,
 {
 	if(a == 0x80) return 0x80; /*Ignore 80- it is reserved for system calls!*/
 	if(a == 0) return 0;
-
-
 	if(a == 1){
 		return shouldquit;
 	}
