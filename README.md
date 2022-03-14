@@ -122,7 +122,7 @@ Read the documentation for more information.
 
 sisa16_asm.1
 
-Manual.pdf
+Manual.odt
 
 ```
 Written by
