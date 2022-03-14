@@ -27,15 +27,7 @@ krenel_boot:
 	lb 5;		//What region to exec?
 	syscall;	//Make the call
 	sc %bruh%;
-	bruh:
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	la '9'; putchar;
-	jmp;
+	halt;
 
 
 ..(5):
