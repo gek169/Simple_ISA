@@ -23,6 +23,23 @@ void emu_respond(int bruh){
 #define TRAP_CTRLC /*a comment.*/
 #endif
 
+/*
+	IMPLEMENT YOUR CLOCK HERE!!!!
+	a must be milliseconds
+	b must be seconds
+	c is presumed to be some raw measurement of the clock- it can be whatever
+*/
+#define clock_ins(){\
+	size_t q;\
+	{\
+		STASH_REGS;\
+		q=clock();\
+		UNSTASH_REGS;\
+	}\
+	a=((q)/(CLOCKS_PER_SEC/1000));\
+	b=q/(CLOCKS_PER_SEC);\
+	c=q;\
+}
 
 #include "isa_pre.h"
 /*

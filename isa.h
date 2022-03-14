@@ -602,15 +602,7 @@ G_INTERRUPT:
 }
 D
 G_CLOCK:{
-	size_t q;
-	{
-		STASH_REGS;
-		q=clock();
-		UNSTASH_REGS;
-	}
-	a=((q)/(CLOCKS_PER_SEC/1000));
-	b=q/(CLOCKS_PER_SEC);
-	c=q;
+	clock_ins()
 #ifndef NO_PREEMPT
 	if(EMULATE_DEPTH) instruction_counter += EXTREME_HIGH_INSN_COST; /*This is a very VERY expensive instruction.*/
 #endif
