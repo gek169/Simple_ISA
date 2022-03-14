@@ -14,7 +14,7 @@
 //the stack pointer is preserved- it is the same after the macro as before
 //the value retrieved is either in B (8/16 bit) or RX0 (32 bit)
 
-//Retrieve a single byte on the stack, 'a' bytes deep.
+//Retrieve a single byte on the stack, 'A' bytes deep.
 .stp_dig8: popa;bpop;    aincr;                   pusha
 .stp_dig16:popa;blpop;   aincr;aincr;             pusha
 .stp_dig32:popa;rx0pop;  aincr;aincr;aincr;aincr; pusha
@@ -23,7 +23,7 @@
 ..export"stp_dig16"
 ..export"stp_dig32"
 
-//Bury the value in b 'a' bytes deep
+//Bury the value in B/RX0 'A' bytes deep
 .stp_bury8: aincr;                  popa;bpush;  adecr;                  pusha
 .stp_bury16:aincr;aincr;            popa;blpush; adecr;adecr;            pusha
 .stp_bury32:aincr;aincr;aincr;aincr;popa;rx0push;adecr;adecr;adecr;adecr;pusha
