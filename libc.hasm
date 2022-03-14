@@ -16,6 +16,9 @@ asm_begin_region_restriction;
 	..include"stack_rw.hasm"
 	..include"krenel.hasm"
 	//this should be made the last one. it consumes 16k for a page table.
+
+
 	:libc_alloc_page_map:
+	..export"libc_alloc_page_map"
 	fill 15500,0
 asm_end_region_restriction;
