@@ -61,18 +61,7 @@ bytes %/0%;
 	rx2_0
 	la '\n'; putchar; la '\r'; putchar;
 		//print the number!
-	rx0_2;arx0;apush;
-	lb8; rx1b;rxrsh;arx0;apush;
-	rx0_2;lb16;rx1b;rxrsh;arx0;apush;
-	rx0_2;lb24;rx1b;rxrsh;arx0;apush;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
-	proc_printbytelchex;
-		apop;
+	proc_print32lchex
 	rx0_2;
 	//lrx1 %/256%;rxadd;
 	proc_free;
@@ -81,7 +70,7 @@ bytes %/0%;
 	lrx0 %/0xF00%;
 		proc_alloc;
 		rx2_0
-		proc_print32lchex
+		//
 			//print the number!
 		rx0_2;arx0;apush;
 		lb8; rx1b;rxrsh;arx0;apush;

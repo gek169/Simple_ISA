@@ -110,5 +110,5 @@ farret
 	rx0push;la 3;popa;proc_printbytelchex;apop;
 	rx0push;la 2;popa;proc_printbytelchex;alpop;
 	rx0push;la 1;popa;proc_printbytelchex;apop;alpop;
-	rx0push;la 1;popa;proc_printbytelchex;rx0pop;
+	rx0push;la 1;popa;proc_printbytelchex;alpop;alpop;
 farret
