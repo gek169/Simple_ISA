@@ -81,6 +81,7 @@ bytes %/0%;
 	lrx0 %/0xF00%;
 		proc_alloc;
 		rx2_0
+		proc_print32lchex
 			//print the number!
 		rx0_2;arx0;apush;
 		lb8; rx1b;rxrsh;arx0;apush;

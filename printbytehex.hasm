@@ -103,3 +103,12 @@ farret
 		la0x66;sc%libc_printbytehex_jmptable_2_end%;jmp
 	//We can re-use the same ending from printbytehex.
 
+
+
+..decl_farproc(LIBC_REGION):proc_print32lchex
+..export"proc_print32lchex"
+	rx0push;la 3;popa;proc_printbytelchex;apop;
+	rx0push;la 2;popa;proc_printbytelchex;alpop;
+	rx0push;la 1;popa;proc_printbytelchex;apop;alpop;
+	rx0push;la 1;popa;proc_printbytelchex;rx0pop;
+farret
