@@ -1,7 +1,7 @@
 /*Default textmode driver for SISA16.*/
 #include <stdio.h>
 #include <stdlib.h>
-
+#include <time.h>
 static const size_t DISK_ACCESS_MASK = 0x3FffFFff;
 
 static unsigned short shouldquit = 0;

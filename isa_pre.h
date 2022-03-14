@@ -1,5 +1,5 @@
 #include <string.h>
-#include <time.h>
+
 typedef unsigned char u;
 typedef unsigned short U;
 #if defined(USE_UNSIGNED_INT)
