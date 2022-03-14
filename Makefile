@@ -11,7 +11,7 @@ MORECFLAGS  =  -DUSE_TERMIOS -DUSE_UNSIGNED_INT -DATTRIB_NOINLINE -DUSE_COMPUTED
 CFLAGS_NOERR = -Wno-pointer-sign -Wno-format-security
 CFLAGS      = $(MORECFLAGS) $(OPTLEVEL) $(CFLAGS_NOERR)
 
-STATIC = # -static
+STATIC = -static
 
 # ------=========------ COLORS ------=========------ #
 ifndef NO_COLORS
