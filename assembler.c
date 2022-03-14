@@ -68,7 +68,7 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 }
 
 #define main_expander(name) {\
-name##_expander_looptop:puts("STUCK HERE");fflush(stdout);\
+name##_expander_looptop:;\
 	{\
 		unsigned long i = 0;\
 		have_expanded = 0;\
@@ -572,7 +572,6 @@ int main(int argc, char** argv){
 			long loc_eparen = -1;
 			const long len_command = strlen("..main("/*)*/ );
 			/*attempt to find a macro to expand here.*/
-			puts("expanding ..main()\r\n");
 			main_expander(main_syntax_sugar)
 			
 			if(int_checker(line+len_command)){
@@ -622,7 +621,6 @@ int main(int argc, char** argv){
 			/*
 				attempt to find a macro to expand here.
 			*/
-			puts("expanding ..()\r\n");
 			{
 				main_expander(region_syntax_sugar)
 			}
