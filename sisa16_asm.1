@@ -984,6 +984,16 @@ expands to
 
 Splits are NOT evaluated at macro definition time.
 
+if you have defined a variable 
+
+.myVariable:37
+
+and you use it in a split
+
+lla %myVariable%;
+
+then the value will be placed there at macro replacement time.
+
 .TP
 .B SPLIT8 (%~%)
 
