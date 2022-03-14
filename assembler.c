@@ -67,6 +67,29 @@ int perform_inplace_repl( /*returns whether or not it actually did a replacement
 	return 1;
 }
 
+#define main_expander(name) {\
+name##_expander_looptop:puts("STUCK HERE");fflush(stdout);\
+	{\
+		unsigned long i = 0;\
+		have_expanded = 0;\
+		/*for(i=nbuiltin_macros; i < nmacros; i++)*/\
+		i = nbuiltin_macros; name##inner_for_top:if(!(i<nmacros)) goto name##beyond_inner_for; {\
+			if(\
+				strfind((char*)line,(char*)variable_names[i]) == (long)len_command\
+				&&\
+				line[len_command+strlen((char*)variable_names[i])] == /*(*/')'\
+				)\
+			{\
+				perform_inplace_repl(line, variable_names[i], variable_expansions[i]);\
+				have_expanded = 1;\
+				goto name##beyond_inner_for;\
+			}\
+			i++; goto name##inner_for_top;\
+		}\
+		name##beyond_inner_for:;\
+	} if(have_expanded == 1) goto name##_expander_looptop;\
+}
+
 static unsigned char* rut_append_to_me = NULL;
 static unsigned char* read_until_terminator_alloced_modified(FILE* f, unsigned long* lenout, char terminator){
 	char c;
@@ -223,7 +246,8 @@ int main(int argc, char** argv){
 	if(argc < 2) goto ASSEMBLER_SHOW_HELP;
 	/*for(i_cli_args = 2; i_cli_args < argc; i_cli_args++)*/
 	i_cli_args = 2;
-	cli_arg_parse_loop:if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop;
+	cli_arg_parse_loop:;
+	if(!(i_cli_args < argc)) goto beyond_cli_arg_parse_loop;
 	{
 		if(strprefix("-o",argv[i_cli_args-1]))outfilename = argv[i_cli_args];
 		if(strprefix("-i",argv[i_cli_args-1]))infilename = argv[i_cli_args];
@@ -487,6 +511,7 @@ int main(int argc, char** argv){
 	for(npasses = 0; npasses < 2; npasses++, fseek(infile, 0, SEEK_SET),
 	 (outputcounter=0), (is_parsing_bas=0))
 	while(1){
+		puts("parsing a line...\r\n");
 		was_macro = 0;	
 		using_asciz = 0;
 		if(feof(infile)){
@@ -548,24 +573,8 @@ int main(int argc, char** argv){
 			long loc_eparen = -1;
 			const long len_command = strlen("..main("/*)*/ );
 			/*attempt to find a macro to expand here.*/
-			main_expander_looptop:;
-			{
-				unsigned long i = 0;
-				have_expanded = 0;
-				for(i=nbuiltin_macros; i < nmacros; i++){
-					if(
-						strfind(line,variable_names[i]) == len_command
-						&&
-						line[len_command+strlen(variable_names[i])] == /*(*/')'
-						)
-					{
-						perform_inplace_repl(line, variable_names[i], variable_expansions[i]);
-						have_expanded = 1;
-						break;
-					}
-				}
-			} if(have_expanded == 1) goto main_expander_looptop;
-
+			puts("expanding ..main()\r\n");
+			main_expander(main_syntax_sugar)
 			
 			if(int_checker(line+len_command)){
 				printf(syntax_fail_pref);
@@ -614,23 +623,10 @@ int main(int argc, char** argv){
 			/*
 				attempt to find a macro to expand here.
 			*/
-			secsugar_expander_looptop:;
+			puts("expanding ..()\r\n");
 			{
-				unsigned long i = 0;
-				have_expanded = 0;
-				for(i=nbuiltin_macros; i < nmacros; i++){
-					if(
-						strfind(line,variable_names[i]) == len_command
-						&&
-						line[len_command+strlen(variable_names[i])] == /*(*/')'
-						)
-					{
-						perform_inplace_repl(line, variable_names[i], variable_expansions[i]);
-						have_expanded = 1;
-						break;
-					}
-				}
-			}if(have_expanded == 1) goto secsugar_expander_looptop;
+				main_expander(region_syntax_sugar)
+			}
 			if(int_checker(line+3)){
 				printf(syntax_fail_pref);
 				printf("Bad integer constant inside of region select syntactic sugar.\n");
@@ -665,7 +661,7 @@ int main(int argc, char** argv){
 				puts((char*)line_copy);
 				goto error;
 			}
-
+			puts("parsing an include...\r\n");
 			buf2[0] = '\0';
 			strcat(buf2, "ASM_header ");
 			line[strlen("..include\"") + loc_eparen] = '\0';
@@ -701,13 +697,26 @@ int main(int argc, char** argv){
 			}
 			loc_eparen += strlen("..export\"");
 			line[loc_eparen] = '\0';
-			for(i=nbuiltin_macros; i<nmacros; i++){
-				if(streq(variable_names[i], variable_name)){
+			
+		/*for(i=nbuiltin_macros; i<nmacros; i++)*/
+			i = nbuiltin_macros;
+			export_sugar_macro_loop:
+			if(!(i < nmacros)) goto end_export_sugar_macro_loop;
+			puts("stuck in export...\r\n");
+			{
+				if(streq(variable_names[i], variable_name))
+				{
 					found = 1;
 					variable_is_redefining_flag[i] |= 2;
-					break;
+					goto end_export_sugar_macro_loop;
 				}
+
+				i++;goto export_sugar_macro_loop;
 			}
+			end_export_sugar_macro_loop:;
+
+			puts("finished export...\r\n");fflush(stdout);
+
 			if(found == 0){
 				printf(compil_fail_pref);
 				printf("Unknown symbol %s to export!\n", variable_name);

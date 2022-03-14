@@ -88,7 +88,7 @@ install: sisa16_asm sisa16_emu sisa16_dbg
 	@cp ./*.1 $(MAN_INSTALL_DIR)/ || echo "Could not install manpages."
 
 libc: install
-	sisa16_asm -i libc.asm -o libc.bin
+	sisa16_asm -i libc.asm -o libc.bin -pl
 	@mkdir /usr/include/sisa16/ || echo "sisa16 include directory either already exists or cannot be created."
 	@cp *.hasm /usr/include/sisa16/ && echo "Installed libraries." || echo "ERROR!!! Cannot install headers"
 	@cp libc.bin.hasm.tmp /usr/include/sisa16/libc_pre.hasm && echo "Installed libraries." || echo "ERROR!!! Cannot install libc_pre.hasm. It is the main utility library for sisa16"
