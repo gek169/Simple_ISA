@@ -658,7 +658,6 @@ int main(int argc, char** argv){
 				puts((char*)line_copy);
 				goto error;
 			}
-			puts("parsing an include...\r\n");
 			buf2[0] = '\0';
 			strcat(buf2, "ASM_header ");
 			line[strlen("..include\"") + loc_eparen] = '\0';
