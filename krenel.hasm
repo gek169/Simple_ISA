@@ -595,8 +595,7 @@ bytes 0,1;
 			rxincr;
 			rxand; //we're using the mask.
 			rx3_0;
-			arx3;lb 1;lsh;ba;
-			//sc %LIBC_REGION%;
+			arx3;lb 1;lsh;ba;		//Times two, we store shorts
 			lla %libc_krenel_task_isactive_array%;
 			add;ba;
 			illdab;
@@ -606,7 +605,7 @@ bytes 0,1;
 			rx0_2;rxincr;rx2_0;
 		//It will always be at LEAST 1 after this... We have to compare with the *mask* which is one less.
 			rxdecr;
-			rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq;
+			rxcmp;lb 2;cmp;sc %libc_krenel_shutdown%; jmpifeq; //shutdown if we are greater than the mask.
 		//No. Continue to search for new tasks.
 			sc %libc_krenel_try_select_task_loop%; jmp;
 	libc_krenel_found_pid_to_run:

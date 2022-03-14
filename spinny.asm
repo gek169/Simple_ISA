@@ -29,8 +29,6 @@ krenel_boot:
 	sc %bruh%;
 	halt; //Try removing this.
 	bruh:
-	la 100;
-	proc_wait;
 	la '9'; putchar;
 	la '9'; putchar;
 	la '9'; putchar;
