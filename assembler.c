@@ -686,7 +686,7 @@ int main(int argc, char** argv){
 			variable_name = line + strlen("..export\"");
 			loc_eparen = strfind(line + strlen("..export\""), "\"");
 			if(loc_eparen == -1){
-				puts( /*(*/"<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
+				puts("<ASM SYNTAX ERROR> Syntactic sugar for file include is missing ending \"");
 				puts("Line:");
 				puts((char*)line_copy);
 				goto error;
