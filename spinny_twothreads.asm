@@ -29,8 +29,13 @@ krenel_boot:
 	sc %bruh%;
 	bruh:
 	la '\ '; putchar;
-	//la 1;
-	//alpush; proc_wait; alpop;
+	la '\ '; putchar;
+	la '\ '; putchar;
+	la '\ '; putchar;
+	la '\ '; putchar;
+	la '\ '; putchar;
+	la 1;
+	alpush; proc_wait; alpop;
 	sc %bruh%;jmp;
 
 
