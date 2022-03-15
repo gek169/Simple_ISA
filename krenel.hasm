@@ -225,7 +225,7 @@ bytes 0,1;
 		bpush;proc_printbytehex;bpop;
 		la '\r'; putchar; la '\n'; putchar;interrupt;
 		sc %libc_krenel_cswitch_killtask%; jmp;
-	libc_krenel_syscall:
+	:libc_krenel_syscall:
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~ KRENEL SYSCALL IMPLEMENTATIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -262,15 +262,12 @@ bytes 0,1;
 			la '\r'; putchar;
 			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
-		:libc_krenel_syscall_setshutdownprint:
-			user_getb;
-			stb %libc_krenel_do_shutdown_print%;
-			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_getpid:
+
+	:libc_krenel_syscall_getpid:
 			llda %libc_krenel_active_task_index%;
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_ipc_write:
+	:libc_krenel_syscall_ipc_write:
 			user_get0; //The location in memory to write it.
 			cbrx0;
 			user_getb;apush; //the byte you want to write.
@@ -282,7 +279,7 @@ bytes 0,1;
 			llda %libc_krenel_active_task_index%;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_kill_pid:
+	:libc_krenel_syscall_kill_pid:
 			//did the user ask us to kill them?
 			user_getb;
 			lb libc_krenel_max_active_tasks_mask; 
@@ -303,18 +300,18 @@ bytes 0,1;
 			llda %libc_krenel_active_task_index%;
 			task_set;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_flush_stdout:
+	:libc_krenel_syscall_flush_stdout:
 			la '\n'; interrupt; //This also displays the screen.
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_clear_term:
+	:libc_krenel_syscall_clear_term:
 			la 0xc; interrupt;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_pumpevents:
+	:libc_krenel_syscall_pumpevents:
 			la 1; interrupt;
 			llb %0xffFF%; cmp; sc %libc_krenel_shutdown%; jmpifeq; //handle quit.
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_releasesegment:
+	:libc_krenel_syscall_releasesegment:
 			//Do we already own the segment? If not, then, don't unlock it.
 			llda %libc_krenel_active_task_index%;
 			lldb %libc_krenel_owns_segment_index%;
@@ -325,7 +322,7 @@ bytes 0,1;
 			la 0; stla  %libc_krenel_segment_lock%;
 			la 1; user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_ownsegment:
+	:libc_krenel_syscall_ownsegment:
 			//Do we already own the segment? If so, lock it.
 			llda %libc_krenel_active_task_index%;
 			lldb %libc_krenel_owns_segment_index%;
@@ -341,15 +338,15 @@ bytes 0,1;
 			llda %libc_krenel_active_task_index%;
 			stla  %libc_krenel_owns_segment_index%;
 			libc_lproc_krenel_configure_segment;
-		:libc_krenel_syscall_ownsegment_already_own_pleaselock:
+	:libc_krenel_syscall_ownsegment_already_own_pleaselock:
 			la 1; stla  %libc_krenel_segment_lock%;
 			la 1; user_seta; //success!
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_ret0_failure:
+	:libc_krenel_syscall_ret0_failure:
 			la 0; 
 			user_seta;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_disk_write:
+	:libc_krenel_syscall_disk_write:
 			//Write a single sector to disk.
 			//RX0: Destination on disk. Not aligned!
 			//B: source page.
@@ -366,7 +363,7 @@ bytes 0,1;
 			interrupt;
 			user_seta; //Inform the user if the disk write succeeded.
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_bad_disk_write:
+	:libc_krenel_bad_disk_write:
 			//print an error message.
 			libc_lproc_krenel_print_krenel;
 			la 'b'; putchar;
@@ -386,7 +383,7 @@ bytes 0,1;
 			la '\r'; putchar;
 			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
-		:libc_krenel_syscall_disk_read:
+	:libc_krenel_syscall_disk_read:
 			//read a single sector from disk.
 			//RX0: source sector in disk. Not aligned!
 			//B: destination memory page in user memory.
@@ -400,7 +397,7 @@ bytes 0,1;
 			lla %libc_krenel_diskio_page%;
 			user_farpagest;
 			sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_exec:
+	:libc_krenel_syscall_exec:
 			user_getb;			//The region;
 			lb 8; lsh;			//times 256.
 			rx0a;				//put it in RX0.
@@ -470,7 +467,7 @@ bytes 0,1;
 
 
 				
-		:libc_krenel_syscall_fork:
+	:libc_krenel_syscall_fork:
 			//Find a free pid.
 			lrx1 %/libc_krenel_max_active_tasks%; 
 			lb 0; rx0b;
@@ -526,7 +523,11 @@ bytes 0,1;
 			libc_krenel_syscall_fork_failure:
 				la 0;user_seta;
 				sc %libc_krenel_syscall_end%; jmp;
-		:libc_krenel_syscall_end:
+	:libc_krenel_syscall_setshutdownprint:
+			user_getb;
+			stb %libc_krenel_do_shutdown_print%;
+			sc %libc_krenel_syscall_end%; jmp;
+	:libc_krenel_syscall_end:
 			//Syscalls are expensive.
 			llda %libc_krenel_task_nreturns%;
 			lb 3; add;
