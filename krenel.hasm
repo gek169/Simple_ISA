@@ -525,7 +525,7 @@ bytes 0,1;
 				sc %libc_krenel_syscall_end%; jmp;
 	:libc_krenel_syscall_setshutdownprint:
 			user_getb;
-			stb %libc_krenel_do_shutdown_print%;
+			sta %libc_krenel_do_shutdown_print%;
 			sc %libc_krenel_syscall_end%; jmp;
 	:libc_krenel_syscall_end:
 			//Syscalls are expensive.
