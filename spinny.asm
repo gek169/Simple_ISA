@@ -8,11 +8,11 @@
 
 .ZERO_STACK_POINTER:		astp;popa;
 //..(2):
-..include"libc.hasm"
+//..include"libc.hasm"
 
-//..include"libc_pre.hasm"
-//..(2):
-//..dinclude"libc_pre.bin"
+..include"libc_pre.hasm"
+..(2):
+..dinclude"libc_pre.bin"
 
 .wait_time:				60
 
@@ -36,10 +36,11 @@ sc %asciifun_start%; jmp;
 la '\r'; putchar; 
 la '\n'; interrupt;
 asciifun_start:
+//lla %0xDE0A%; lb 1; syscall;
 la 0;alpush;
 	//our loop!
 	asciifun_looptop: 
-		la ' '; putchar;putchar;putchar;
+		//la ' '; putchar;putchar;putchar;
 		alpop; 
 			aincr; 
 			lb %~ascii_spinny_len%;mod;
