@@ -66,7 +66,10 @@ section 500;
 		bpop;
 		mul;
 		apush;
-		la 0xa; putchar; la 0xd; putchar;interrupt
+		la 0xa; putchar; la 0xd; putchar;
+		la '0'; putchar;
+		la 'x'; putchar;
+		la 0xd; interrupt
 		proc_printbytehex;
 		la 0xa; putchar; la 0xd; putchar;
 	halt;
