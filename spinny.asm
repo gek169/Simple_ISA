@@ -36,7 +36,7 @@ sc %asciifun_start%; jmp;
 la '\r'; putchar; 
 la '\n'; interrupt;
 asciifun_start:
-//lla %0xDE0A%; lb 1; syscall;
+lla %0xDE0A%; lb 1; syscall;
 la 0;alpush;
 	//our loop!
 	asciifun_looptop: 
