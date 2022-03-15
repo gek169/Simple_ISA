@@ -108,6 +108,9 @@ bytes 0,0;
 :libc_krenel_active_task_index:
 bytes 0,0;
 
+:libc_krenel_do_shutdown_print:
+bytes 0;
+
 
 //TODO: implement some sort of BRK implementation
 //PID 0 owns the entire segment to begin with.
@@ -242,6 +245,7 @@ bytes 0,1;
 			user_geta;	llb %0xDE07%; cmp; sc %libc_krenel_syscall_getpid%; jmpifeq;
 			user_geta;	llb %0xDE08%; cmp; sc %libc_krenel_syscall_ownsegment%; jmpifeq;
 			user_geta;	llb %0xDE09%; cmp; sc %libc_krenel_syscall_releasesegment%; jmpifeq;
+			user_geta;	llb %0xDE0A%; cmp; sc %libc_krenel_syscall_setshutdownprint%; jmpifeq;
 			//I don't recognize this syscall. 
 			libc_lproc_krenel_print_krenel;
 			la 'b'; putchar;
@@ -258,6 +262,10 @@ bytes 0,1;
 			la '\r'; putchar;
 			la '\n'; putchar;interrupt;
 			sc %libc_krenel_cswitch_killtask%; jmp;
+		:libc_krenel_syscall_setshutdownprint:
+			user_getb;
+			stb %libc_krene_do_shutdown_print%;
+			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_getpid:
 			llda %libc_krenel_active_task_index%;
 			user_seta;
@@ -619,6 +627,23 @@ bytes 0,1;
 		//We have a return argument to respond to!
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_shutdown:
+		lda %libc_krenel_do_shutdown_print%;
+
+		sc %libc_krenel_noprint_shutdown%; 
+		jmpifneq;
+		
+		libc_lproc_krenel_print_krenel;
+		la 's'; putchar;
+		la 'h'; putchar;
+		la 'u'; putchar;
+		la 't'; putchar;
+		la 'd'; putchar;
+		la 'o'; putchar;
+		la 'w'; putchar;
+		la 'n'; putchar;
+		la '\n'; interrupt;
+
+	libc_krenel_noprint_shutdown:
 		//Shut down the system.
 		//Loop through all the stuff. Close everything!
 		//Set all tasks to be zero. task_kill everything.
@@ -633,16 +658,6 @@ bytes 0,1;
 			rxincr;rxcmp;nota; //nota is just "Is a equal to zero?"
 			sc %libc_krenel_zero_tasks_shutdown_looptop%; jmpifeq;
 		lla %0xE001%; interrupt; //make IO blocking again.
-		libc_lproc_krenel_print_krenel;
-		la 's'; putchar;
-		la 'h'; putchar;
-		la 'u'; putchar;
-		la 't'; putchar;
-		la 'd'; putchar;
-		la 'o'; putchar;
-		la 'w'; putchar;
-		la 'n'; putchar;
-		la '\n'; interrupt;
 		farret;//asm_print; //I want information!
 
 
