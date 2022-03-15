@@ -172,7 +172,7 @@ int DONT_WANT_TO_INLINE_THIS e()
 	UU seg_access_mask = (SEGMENT_PAGES-1);
 	UU seg_access_offset = 0;
 #ifndef PREEMPT_TIMER
-#define PREEMPT_TIMER 0x100000
+#define PREEMPT_TIMER 0x40000
 #endif
 #define EXTREME_HIGH_INSN_COST 10000
 #define VERY_HIGH_INSN_COST 700
