@@ -264,7 +264,7 @@ bytes 0,1;
 			sc %libc_krenel_cswitch_killtask%; jmp;
 		:libc_krenel_syscall_setshutdownprint:
 			user_getb;
-			stb %libc_krene_do_shutdown_print%;
+			stb %libc_krenel_do_shutdown_print%;
 			sc %libc_krenel_syscall_end%; jmp;
 		:libc_krenel_syscall_getpid:
 			llda %libc_krenel_active_task_index%;
