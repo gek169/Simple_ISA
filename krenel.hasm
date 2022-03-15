@@ -629,9 +629,8 @@ bytes 0,1;
 		sc %libc_krenel_cswitch_looptop%; jmp;
 	libc_krenel_shutdown:
 		lda %libc_krenel_do_shutdown_print%;
-
-		sc %libc_krenel_noprint_shutdown%; 
-		jmpifneq;
+		sc %libc_krenel_noprint_shutdown%;
+		jmpifeq;
 		
 		libc_lproc_krenel_print_krenel;
 		la 's'; putchar;
