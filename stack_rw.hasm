@@ -15,9 +15,9 @@
 //the value retrieved is either in B (8/16 bit) or RX0 (32 bit)
 
 //Retrieve a single byte on the stack, 'A' bytes deep.
-.stp_dig8: popa;bpop;    aincr;                   pusha
-.stp_dig16:popa;blpop;   aincr;aincr;             pusha
-.stp_dig32:popa;rx0pop;  aincr;aincr;aincr;aincr; pusha
+.stp_dig8: popa;bpop;  aincr;                  pusha
+.stp_dig16:popa;blpop; aincr;aincr;            pusha
+.stp_dig32:popa;rx0pop;aincr;aincr;aincr;aincr;pusha
 
 ..export"stp_dig8"
 ..export"stp_dig16"
